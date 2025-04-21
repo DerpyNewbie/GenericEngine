@@ -1,0 +1,1043 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="EngineEditor\editor_scene.cpp" />
+    <ClCompile Include="EngineEditor\engine_editor.cpp" />
+    <ClCompile Include="EngineEditor\hierarchy.cpp" />
+    <ClCompile Include="EngineEditor\inspector.cpp" />
+    <ClCompile Include="Engine\component.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\engine.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\engine_util.cpp" />
+    <ClCompile Include="Engine\event_receivers.cpp" />
+    <ClCompile Include="Engine\game_object.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\logger.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\object.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\scene.cpp" />
+    <ClCompile Include="Engine\scene_manager.cpp" />
+    <ClCompile Include="Engine\time.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\transform.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="Engine\update_manager.cpp" />
+    <ClCompile Include="main.cpp">
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <Optimization>Disabled</Optimization>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>Animator.9f3a4869\x64\Debug\</AssemblerListingLocation>
+      <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+      <BrowseInformation>false</BrowseInformation>
+      <BrowseInformationFile>Animator.9f3a4869\x64\Debug\</BrowseInformationFile>
+      <CompileAs>Default</CompileAs>
+      <ConformanceMode>true</ConformanceMode>
+      <DiagnosticsFormat>Column</DiagnosticsFormat>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <ErrorReporting>Prompt</ErrorReporting>
+      <ExpandAttributedSource>false</ExpandAttributedSource>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <EnableASAN>false</EnableASAN>
+      <EnableFuzzer>false</EnableFuzzer>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableVectorLength>NotSet</EnableVectorLength>
+      <FloatingPointModel>Precise</FloatingPointModel>
+      <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+      <GenerateModuleDependencies>false</GenerateModuleDependencies>
+      <GenerateSourceDependencies>false</GenerateSourceDependencies>
+      <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <MinimalRebuild>false</MinimalRebuild>
+      <ModuleDependenciesFile>Animator.9f3a4869\x64\Debug\</ModuleDependenciesFile>
+      <ModuleOutputFile>Animator.9f3a4869\x64\Debug\</ModuleOutputFile>
+      <OmitDefaultLibName>false</OmitDefaultLibName>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <ObjectFileName>Animator.9f3a4869\x64\Debug\</ObjectFileName>
+      <CallingConvention>Cdecl</CallingConvention>
+      <ProgramDataBaseFileName>Animator.9f3a4869\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>Animator.9f3a4869\x64\Debug\AnimatorExperiment.pch</PrecompiledHeaderOutputFile>
+      <PreprocessToFile>false</PreprocessToFile>
+      <PreprocessKeepComments>false</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+      <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+      <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+      <ShowIncludes>false</ShowIncludes>
+      <SourceDependenciesFile>Animator.9f3a4869\x64\Debug\</SourceDependenciesFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <SpectreMitigation>false</SpectreMitigation>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <TrackerLogDirectory>Animator.9f3a4869\x64\Debug\Animator.9f3a4869.tlog\</TrackerLogDirectory>
+      <TranslateIncludes>false</TranslateIncludes>
+      <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+      <TreatWarningAsError>false</TreatWarningAsError>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <UseFullPaths>true</UseFullPaths>
+      <WarningLevel>Level3</WarningLevel>
+      <XMLDocumentationFileName>Animator.9f3a4869\x64\Debug\</XMLDocumentationFileName>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <IntelJCCErratum>false</IntelJCCErratum>
+      <BuildStlModules>false</BuildStlModules>
+      <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+      <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+      <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+      <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <LinkCompiled>true</LinkCompiled>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_allegro5.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_android.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx10.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx12.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx9.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_glut.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_opengl2.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_sdl3.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_sdlgpu3.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_sdlrenderer2.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_sdlrenderer3.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_wgpu.cpp" />
+    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_allegro5\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_android_opengl3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_glfw_opengl2\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_glfw_opengl3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_glfw_vulkan\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_glfw_wgpu\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_glut_opengl2\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_null\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl2_directx11\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl2_opengl2\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl2_opengl3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl2_vulkan\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl3_opengl3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl3_sdlgpu3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl3_sdlrenderer3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_sdl3_vulkan\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_directx10\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_directx11\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_directx12\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_directx9\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_opengl3\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\example_win32_vulkan\main.cpp" />
+    <ClCompile Include="ThirdParty\imgui\examples\libs\usynergy\uSynergy.c" />
+    <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="ThirdParty\imgui\misc\cpp\imgui_stdlib.cpp" />
+    <ClCompile Include="ThirdParty\imgui\misc\fonts\binary_to_compressed_c.cpp" />
+    <ClCompile Include="ThirdParty\imgui\misc\freetype\imgui_freetype.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="EngineEditor\editor_scene.h" />
+    <ClInclude Include="EngineEditor\engine_editor.h" />
+    <ClInclude Include="EngineEditor\hierarchy.h" />
+    <ClInclude Include="EngineEditor\inspector.h" />
+    <ClInclude Include="Engine\component.h" />
+    <ClInclude Include="Engine\enable_shared_from_base.h" />
+    <ClInclude Include="Engine\engine.h" />
+    <ClInclude Include="Engine\engine_util.h" />
+    <ClInclude Include="Engine\event_receivers.h" />
+    <ClInclude Include="Engine\game_object.h" />
+    <ClInclude Include="Engine\logger.h" />
+    <ClInclude Include="Engine\object.h" />
+    <ClInclude Include="Engine\scene.h" />
+    <ClInclude Include="Engine\scene_manager.h" />
+    <ClInclude Include="Engine\time.h" />
+    <ClInclude Include="Engine\transform.h" />
+    <ClInclude Include="Engine\update_manager.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_allegro5.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_android.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx10.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx12.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx9.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_glfw.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_glut.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_metal.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_opengl2.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_opengl3.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_opengl3_loader.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_osx.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdl2.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdl3.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdlgpu3.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdlgpu3_shaders.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdlrenderer2.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_sdlrenderer3.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_wgpu.h" />
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h" />
+    <ClInclude Include="ThirdParty\imgui\examples\example_allegro5\imconfig_allegro5.h" />
+    <ClInclude Include="ThirdParty\imgui\examples\libs\emscripten\emscripten_mainloop_stub.h" />
+    <ClInclude Include="ThirdParty\imgui\examples\libs\glfw\include\GLFW\glfw3.h" />
+    <ClInclude Include="ThirdParty\imgui\examples\libs\glfw\include\GLFW\glfw3native.h" />
+    <ClInclude Include="ThirdParty\imgui\examples\libs\usynergy\uSynergy.h" />
+    <ClInclude Include="ThirdParty\imgui\imconfig.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui.h" />
+    <ClInclude Include="ThirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" />
+    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
+    <ClInclude Include="ThirdParty\imgui\misc\cpp\imgui_stdlib.h" />
+    <ClInclude Include="ThirdParty\imgui\misc\freetype\imgui_freetype.h" />
+    <ClInclude Include="ThirdParty\imgui\misc\single_file\imgui_single_file.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include=".clang-format" />
+    <Content Include=".gitignore" />
+    <Content Include="ThirdParty\imgui\.editorconfig" />
+    <Content Include="ThirdParty\imgui\.git" />
+    <Content Include="ThirdParty\imgui\.gitattributes" />
+    <Content Include="ThirdParty\imgui\.github\FUNDING.yml" />
+    <Content Include="ThirdParty\imgui\.github\ISSUE_TEMPLATE\config.yml" />
+    <Content Include="ThirdParty\imgui\.github\ISSUE_TEMPLATE\issue_template.yml" />
+    <Content Include="ThirdParty\imgui\.github\pull_request_template.md" />
+    <Content Include="ThirdParty\imgui\.github\workflows\build.yml" />
+    <Content Include="ThirdParty\imgui\.github\workflows\manual.yml" />
+    <Content Include="ThirdParty\imgui\.github\workflows\scheduled.yml" />
+    <Content Include="ThirdParty\imgui\.github\workflows\static-analysis.yml" />
+    <Content Include="ThirdParty\imgui\.gitignore" />
+    <Content Include="ThirdParty\imgui\backends\imgui_impl_metal.mm" />
+    <Content Include="ThirdParty\imgui\backends\imgui_impl_osx.mm" />
+    <Content Include="ThirdParty\imgui\backends\sdlgpu3\build_instructions.txt" />
+    <Content Include="ThirdParty\imgui\backends\sdlgpu3\shader.frag" />
+    <Content Include="ThirdParty\imgui\backends\sdlgpu3\shader.vert" />
+    <Content Include="ThirdParty\imgui\backends\vulkan\build_instructions.txt" />
+    <Content Include="ThirdParty\imgui\backends\vulkan\generate_spv.sh" />
+    <Content Include="ThirdParty\imgui\backends\vulkan\glsl_shader.frag" />
+    <Content Include="ThirdParty\imgui\backends\vulkan\glsl_shader.vert" />
+    <Content Include="ThirdParty\imgui\docs\BACKENDS.md" />
+    <Content Include="ThirdParty\imgui\docs\CHANGELOG.txt" />
+    <Content Include="ThirdParty\imgui\docs\CONTRIBUTING.md" />
+    <Content Include="ThirdParty\imgui\docs\EXAMPLES.md" />
+    <Content Include="ThirdParty\imgui\docs\FAQ.md" />
+    <Content Include="ThirdParty\imgui\docs\FONTS.md" />
+    <Content Include="ThirdParty\imgui\docs\README.md" />
+    <Content Include="ThirdParty\imgui\docs\TODO.txt" />
+    <Content Include="ThirdParty\imgui\examples\example_allegro5\example_allegro5.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_allegro5\example_allegro5.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_allegro5\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\.gitignore" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\app\build.gradle" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\app\src\main\AndroidManifest.xml" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\app\src\main\java\MainActivity.kt" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\build.gradle" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\android\settings.gradle" />
+    <Content Include="ThirdParty\imgui\examples\example_android_opengl3\CMakeLists.txt" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\example_apple_metal.xcodeproj\project.pbxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\iOS\Info-iOS.plist" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\iOS\LaunchScreen.storyboard" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\macOS\Info-macOS.plist" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\macOS\MainMenu.storyboard" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\main.mm" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_metal\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_opengl2\example_apple_opengl2.xcodeproj\project.pbxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_apple_opengl2\main.mm" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_metal\main.mm" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_metal\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl2\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl2\example_glfw_opengl2.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl2\example_glfw_opengl2.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl2\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl3\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl3\example_glfw_opengl3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl3\example_glfw_opengl3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl3\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_opengl3\Makefile.emscripten" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\CMakeLists.txt" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\example_glfw_vulkan.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\example_glfw_vulkan.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_vulkan\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_wgpu\CMakeLists.txt" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_wgpu\Makefile.emscripten" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_wgpu\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_glfw_wgpu\web\index.html" />
+    <Content Include="ThirdParty\imgui\examples\example_glut_opengl2\example_glut_opengl2.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_glut_opengl2\example_glut_opengl2.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_glut_opengl2\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_null\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_null\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_directx11\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_directx11\example_sdl2_directx11.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_directx11\example_sdl2_directx11.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_metal\main.mm" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_metal\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl2\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl2\example_sdl2_opengl2.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl2\example_sdl2_opengl2.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl2\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl2\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\example_sdl2_opengl3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\example_sdl2_opengl3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\Makefile.emscripten" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_opengl3\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\example_sdl2_sdlrenderer2.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\example_sdl2_sdlrenderer2.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_sdlrenderer2\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_vulkan\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_vulkan\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_vulkan\example_sdl2_vulkan.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_vulkan\example_sdl2_vulkan.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl2_vulkan\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\example_sdl3_opengl3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\example_sdl3_opengl3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\Makefile.emscripten" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_opengl3\README.md" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlgpu3\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlgpu3\example_sdl3_sdlgpu3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlgpu3\example_sdl3_sdlgpu3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlgpu3\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlrenderer3\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlrenderer3\example_sdl3_sdlrenderer3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlrenderer3\example_sdl3_sdlrenderer3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_sdlrenderer3\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_vulkan\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_vulkan\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_vulkan\example_sdl3_vulkan.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_vulkan\example_sdl3_vulkan.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_sdl3_vulkan\Makefile" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx10\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx10\example_win32_directx10.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx10\example_win32_directx10.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx11\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx11\example_win32_directx11.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx11\example_win32_directx11.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx12\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx12\example_win32_directx12.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx12\example_win32_directx12.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx9\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx9\example_win32_directx9.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_directx9\example_win32_directx9.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_opengl3\build_mingw.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_opengl3\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_opengl3\example_win32_opengl3.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_opengl3\example_win32_opengl3.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_vulkan\build_win32.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_vulkan\build_win64.bat" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_vulkan\example_win32_vulkan.vcxproj" />
+    <Content Include="ThirdParty\imgui\examples\example_win32_vulkan\example_win32_vulkan.vcxproj.filters" />
+    <Content Include="ThirdParty\imgui\examples\imgui_examples.sln" />
+    <Content Include="ThirdParty\imgui\examples\libs\emscripten\shell_minimal.html" />
+    <Content Include="ThirdParty\imgui\examples\libs\glfw\COPYING.txt" />
+    <Content Include="ThirdParty\imgui\examples\libs\glfw\lib-vc2010-32\glfw3.lib" />
+    <Content Include="ThirdParty\imgui\examples\libs\glfw\lib-vc2010-64\glfw3.lib" />
+    <Content Include="ThirdParty\imgui\examples\libs\usynergy\README.txt" />
+    <Content Include="ThirdParty\imgui\examples\README.txt" />
+    <Content Include="ThirdParty\imgui\LICENSE.txt" />
+    <Content Include="ThirdParty\imgui\misc\cpp\README.txt" />
+    <Content Include="ThirdParty\imgui\misc\debuggers\imgui.gdb" />
+    <Content Include="ThirdParty\imgui\misc\debuggers\imgui.natstepfilter" />
+    <Content Include="ThirdParty\imgui\misc\debuggers\README.txt" />
+    <Content Include="ThirdParty\imgui\misc\fonts\Cousine-Regular.ttf" />
+    <Content Include="ThirdParty\imgui\misc\fonts\DroidSans.ttf" />
+    <Content Include="ThirdParty\imgui\misc\fonts\Karla-Regular.ttf" />
+    <Content Include="ThirdParty\imgui\misc\fonts\ProggyClean.ttf" />
+    <Content Include="ThirdParty\imgui\misc\fonts\ProggyTiny.ttf" />
+    <Content Include="ThirdParty\imgui\misc\fonts\Roboto-Medium.ttf" />
+    <Content Include="ThirdParty\imgui\misc\freetype\README.md" />
+    <Content Include="ThirdParty\imgui\misc\README.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="ThirdParty\imgui\misc\debuggers\imgui.natvis" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{9f3a4869-9b6a-453c-be73-1cdd88803d68}</ProjectGuid>
+    <RootNamespace>Project</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <PerUserRedirection>true</PerUserRedirection>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <PerUserRedirection>true</PerUserRedirection>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\..\..\Dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
+      <PerUserRedirection>true</PerUserRedirection>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <PerUserRedirection>true</PerUserRedirection>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

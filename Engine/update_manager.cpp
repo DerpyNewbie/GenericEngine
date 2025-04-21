@@ -1,0 +1,1 @@
+﻿#include "update_manager.h"
