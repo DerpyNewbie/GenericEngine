@@ -19,10 +19,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EngineEditor\editor_scene.cpp" />
-    <ClCompile Include="EngineEditor\engine_editor.cpp" />
-    <ClCompile Include="EngineEditor\hierarchy.cpp" />
-    <ClCompile Include="EngineEditor\inspector.cpp" />
+    <ClCompile Include="Editor\editor_scene.cpp" />
+    <ClCompile Include="Editor\engine_editor.cpp" />
+    <ClCompile Include="Editor\hierarchy.cpp" />
+    <ClCompile Include="Editor\inspector.cpp" />
     <ClCompile Include="Engine\component.cpp">
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -688,10 +688,10 @@
     <ClCompile Include="ThirdParty\imgui\misc\freetype\imgui_freetype.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="EngineEditor\editor_scene.h" />
-    <ClInclude Include="EngineEditor\engine_editor.h" />
-    <ClInclude Include="EngineEditor\hierarchy.h" />
-    <ClInclude Include="EngineEditor\inspector.h" />
+    <ClInclude Include="Editor\editor_scene.h" />
+    <ClInclude Include="Editor\engine_editor.h" />
+    <ClInclude Include="Editor\hierarchy.h" />
+    <ClInclude Include="Editor\inspector.h" />
     <ClInclude Include="Engine\component.h" />
     <ClInclude Include="Engine\enable_shared_from_base.h" />
     <ClInclude Include="Engine\engine.h" />

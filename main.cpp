@@ -1,5 +1,5 @@
 ﻿#include "Engine/engine.h"
-#include "EngineEditor/engine_editor.h"
+#include "Editor/engine_editor.h"
 
 #include <DxLib.h>
 
