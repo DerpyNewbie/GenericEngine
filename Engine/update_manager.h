@@ -10,17 +10,20 @@ class UpdateManager
 {
     friend class Engine;
 
-    static std::vector<std::weak_ptr<IUpdateReceiver>> m_update_receivers_;
-    static std::vector<std::weak_ptr<IFixedUpdateReceiver>> m_fixed_update_receivers_;
-
+    static std::vector<std::shared_ptr<IUpdateReceiver>> m_update_receivers_;
+    static std::vector<std::shared_ptr<IFixedUpdateReceiver>> m_fixed_update_receivers_;
+    static std::vector<std::shared_ptr<IDrawCallReceiver>> m_draw_call_receivers_;
+    
     static void InvokeUpdate();
     static void InvokeFixedUpdate();
+    static void InvokeDrawCall();
 
 public:
-    // TODO: implement update manager that can be subscribed from anywhere
-    static void SubscribeUpdate(std::weak_ptr<IUpdateReceiver> receiver);
-    static void UnsubscribeUpdate(std::weak_ptr<IUpdateReceiver> receiver);
-    static void SubscribeFixedUpdate(std::weak_ptr<IFixedUpdateReceiver> receiver);
-    static void UnsubscribeFixedUpdate(std::weak_ptr<IFixedUpdateReceiver> receiver);
+    static void SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
+    static void UnsubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
+    static void SubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver);
+    static void UnsubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver);
+    static void SubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &receiver);
+    static void UnsubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &receiver);
 };
 }

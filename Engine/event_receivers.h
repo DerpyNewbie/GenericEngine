@@ -1,22 +1,29 @@
 ﻿#pragma once
 
-class IUpdateReceiver
+class IOrderable
 {
 public:
-    virtual ~IUpdateReceiver() = default;
+    virtual ~IOrderable() = default;
+    virtual int Order()
+    {
+        return 0;
+    }
+};
+
+class IUpdateReceiver : public IOrderable
+{
+public:
     virtual void OnUpdate() = 0;
 };
 
-class IFixedUpdateReceiver
+class IFixedUpdateReceiver : public IOrderable
 {
-    public:
-    virtual ~IFixedUpdateReceiver() = default;
+public:
     virtual void OnFixedUpdate() = 0;
 };
 
-class IDrawCallReceiver
+class IDrawCallReceiver : public IOrderable
 {
-    public:
-    virtual ~IDrawCallReceiver() = default;
+public:
     virtual void OnDraw() = 0;
 };

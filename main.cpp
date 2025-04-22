@@ -5,10 +5,10 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    engine::Engine engine;
-    editor::Editor editor;
-    engine.Init();
-    editor.Init();
-    editor.Attach(engine);
-    engine.MainLoop();
+    auto engine = std::make_shared<engine::Engine>();
+    auto editor = std::make_shared<editor::Editor>();
+    engine->Init();
+    editor->Init();
+    editor->Attach();
+    engine->MainLoop();
 }

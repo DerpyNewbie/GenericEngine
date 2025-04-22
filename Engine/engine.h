@@ -1,6 +1,6 @@
 ﻿#pragma once
+#include "update_manager.h"
 #include <DxLib.h>
-#include <string>
 
 namespace engine
 {
@@ -22,11 +22,14 @@ public:
         return true;
     }
 
-    void MainLoop()
+    void MainLoop() const
     {
         while (ProcessMessage() == 0 && !should_exit)
         {
-            // TODO: implement engine loop
+            UpdateManager::InvokeUpdate();
+            // TODO: make fixed update actually fixed
+            UpdateManager::InvokeFixedUpdate();
+            UpdateManager::InvokeDrawCall();
         }
     }
 };

@@ -430,3 +430,5 @@ Desktop.ini
 # DxLib
 Log.txt
 
+# Dear IMGUI
+imgui.ini

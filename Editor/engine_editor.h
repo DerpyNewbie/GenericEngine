@@ -1,14 +1,15 @@
 ﻿#pragma once
+#include "../Engine/enable_shared_from_base.h"
 #include "../Engine/engine.h"
 
 namespace editor
 {
-class Editor
+class Editor final : public enable_shared_from_base<Editor>, public IDrawCallReceiver
 {
 public:
     void Init();
     void Update();
-    void Draw();
-    void Attach(engine::Engine engine);
+    void Attach();
+    void OnDraw() override;
 };
 }

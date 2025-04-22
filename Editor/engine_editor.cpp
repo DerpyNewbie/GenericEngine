@@ -11,9 +11,9 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-
-    return 0;
+    auto result = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+    SetUseHookWinProcReturnValue(ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
+    return result;
 }
 
 namespace editor
@@ -23,26 +23,34 @@ void Editor::Init()
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
-    (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     ImGui::StyleColorsDark();
 
-    ImGui_ImplWin32_Init(GetMainWindowHandle());
     ImGui_ImplDX11_Init((ID3D11Device *)GetUseDirect3D11Device(),
                         (ID3D11DeviceContext *)GetUseDirect3D11DeviceContext());
+    ImGui_ImplWin32_Init(GetMainWindowHandle());
+
+    SetHookWinProc(WndProc);
 }
 void Editor::Update()
 {}
-void Editor::Draw()
+
+void Editor::Attach()
 {
-    ImGui::ShowDemoWindow();
+    engine::UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
 }
-void Editor::Attach(engine::Engine engine)
+void Editor::OnDraw()
 {
-    // TODO: implement
-    assert(false && "todo: implement");
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+    ImGui::ShowDemoWindow();
+    ImGui::Render();
+    ImGui::UpdatePlatformWindows();
+    ImGui::RenderPlatformWindowsDefault();
+    RefreshDxLibDirect3DSetting();
 }
 }
