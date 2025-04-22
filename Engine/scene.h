@@ -7,16 +7,16 @@
 
 namespace engine
 {
-class GameObject;
-class final Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
+class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
 {
     friend class GameObject;
     std::vector<std::shared_ptr<GameObject>> m_root_game_objects_;
 
     void OnUpdate() override;
     void OnFixedUpdate() override;
+
 public:
-    const std::vector<std::shared_ptr<GameObject>>& RootGameObjects();
+    const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
 
 };
 }

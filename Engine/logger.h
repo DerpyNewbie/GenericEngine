@@ -35,6 +35,7 @@ public:
         return buffer;
     }
 
+    /* Info Alias */
     template <typename... Args>
     static void Log(const char *level, const char *msg, Args... args)
     {
@@ -59,6 +60,7 @@ public:
         Log<T>(FormatString(msg, args...).get());
     }
 
+    /* Error Alias */
     template <typename... Args>
     static void Error(const char *level, const char *msg, Args... args)
     {
@@ -81,6 +83,31 @@ public:
     static void Error(const char *msg, Args... args)
     {
         Error<T>(FormatString(msg, args...).get());
+    }
+
+    /* Warn Alias */
+    template <typename... Args>
+    static void Warn(const char *level, const char *msg, Args... args)
+    {
+        std::cerr << level << ": " << FormatString(msg, args...) << std::endl;
+    }
+
+    template <typename... Args>
+    static void Warn(const char *msg, Args... args)
+    {
+        Error("WARN", msg, args...);
+    }
+
+    template <typename T>
+    static void Warn(const char *msg)
+    {
+        Error("WARN", "[%s] %s", GetTypeName(typeid(T).name()).c_str(), msg);
+    }
+
+    template <typename T, typename... Args>
+    static void Warn(const char *msg, Args... args)
+    {
+        Warn<T>(FormatString(msg, args...).get());
     }
 };
 }

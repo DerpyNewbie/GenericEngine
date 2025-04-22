@@ -1,6 +1,5 @@
 ﻿#include "engine_editor.h"
 
-#include "editor_scene.h"
 #include "../Engine/scene_manager.h"
 
 #include <DxLib.h>
@@ -43,8 +42,7 @@ void Editor::Draw()
 }
 void Editor::Attach(engine::Engine engine)
 {
-    auto editor_scene = std::make_shared<EditorScene>();
-    editor_scene->editor = this;
-    engine::SceneManager::AddCustomScene(std::dynamic_pointer_cast<engine::Scene>(editor_scene));
+    // TODO: implement
+    assert(false && "todo: implement");
 }
 }
