@@ -660,6 +660,11 @@
     <ClInclude Include="Engine\time.h" />
     <ClInclude Include="Engine\transform.h" />
     <ClInclude Include="Engine\update_manager.h" />
+    <ClInclude Include="ThirdParty\dxlib_h\DxCompileConfig.h" />
+    <ClInclude Include="ThirdParty\dxlib_h\DxDataType.h" />
+    <ClInclude Include="ThirdParty\dxlib_h\DxDataTypeWin.h" />
+    <ClInclude Include="ThirdParty\dxlib_h\DxFunctionWin.h" />
+    <ClInclude Include="ThirdParty\dxlib_h\DxLib.h" />
     <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h" />
     <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h" />
     <ClInclude Include="ThirdParty\imgui\imconfig.h" />
@@ -672,6 +677,205 @@
   <ItemGroup>
     <Content Include=".clang-format" />
     <Content Include=".gitignore" />
+    <Content Include="ThirdParty\dxlib_h\celt.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\celt_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib.txt" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLibW_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxLib_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\DxUseCLib_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc6.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc6_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc8_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc8_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc6.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc6_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc8_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc8_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc6.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc6_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc8_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc8_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86_ItrDbgLv0_d.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_ItrDbgLv0_MTd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MD.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MDd.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MT.lib" />
+    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MTd.lib" />
     <Content Include="ThirdParty\imgui\.editorconfig" />
     <Content Include="ThirdParty\imgui\.git" />
     <Content Include="ThirdParty\imgui\.gitattributes" />
@@ -756,14 +960,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -775,7 +979,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -784,7 +988,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -794,14 +998,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\..\..\Dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\..\..\Dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
@@ -813,7 +1017,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\..\..\Dxlib_h</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -822,7 +1026,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>.\..\..\Dxlib_h</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\ThirdParty\dxlib_h;.\ThirdParty\imgui</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>
