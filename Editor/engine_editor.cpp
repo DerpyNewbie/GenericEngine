@@ -11,9 +11,14 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    auto result = ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
-    SetUseHookWinProcReturnValue(ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse);
-    return result;
+    SetUseHookWinProcReturnValue(true);
+
+    if (ImGui::GetIO().WantCaptureMouse || ImGui::GetIO().WantCaptureKeyboard)
+    {
+        ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam);
+    }
+
+    return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
 namespace editor
@@ -24,7 +29,7 @@ void Editor::Init()
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-    // io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
     ImGui::StyleColorsDark();
