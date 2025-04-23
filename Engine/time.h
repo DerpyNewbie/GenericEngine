@@ -4,10 +4,12 @@
 #pragma once
 
 #include "DxLib.h"
+
 namespace engine
 {
 class Time
 {
+    friend class Engine;
     void Init();
 
     void IncrementFrame();

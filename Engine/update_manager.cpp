@@ -9,8 +9,10 @@ std::vector<std::shared_ptr<IUpdateReceiver>> UpdateManager::m_update_receivers_
 std::vector<std::shared_ptr<IFixedUpdateReceiver>> UpdateManager::m_fixed_update_receivers_;
 std::vector<std::shared_ptr<IDrawCallReceiver>> UpdateManager::m_draw_call_receivers_;
 
+namespace
+{
 template <typename It, typename Func>
-void CustomUpdate(It begin_it, It end_it, Func func)
+void CustomUpdate(It begin_it, const It &end_it, Func func)
 {
     for (; begin_it != end_it; ++begin_it)
     {
@@ -23,6 +25,7 @@ void CustomUpdate(It begin_it, It end_it, Func func)
     
         func(*begin_it);
     }
+}
 }
 
 void UpdateManager::InvokeUpdate()

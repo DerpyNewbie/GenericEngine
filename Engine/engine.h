@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "time.h"
 #include "update_manager.h"
 #include <DxLib.h>
 
@@ -19,6 +20,8 @@ public:
             return false;
         }
 
+        Time::Get()->Init();
+
         return true;
     }
 
@@ -26,9 +29,15 @@ public:
     {
         while (ProcessMessage() == 0 && !should_exit)
         {
+            Time::Get()->IncrementFrame();
             UpdateManager::InvokeUpdate();
-            // TODO: make fixed update actually fixed
-            UpdateManager::InvokeFixedUpdate();
+
+            const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
+            for (int i = 0; i < fixed_update_count; i++)
+            {
+                UpdateManager::InvokeFixedUpdate();
+            }
+
             UpdateManager::InvokeDrawCall();
         }
     }
