@@ -126,5 +126,12 @@ private:
   void InvokeFixedUpdate() const;
 
   void SetAsRootObject(bool is_root_object);
+
+public:
+  template <class Archive>
+  void serialize(Archive ar)
+  {
+    ar(m_name_, m_is_active_, m_scene_, m_components_);
+  }
 };
 }

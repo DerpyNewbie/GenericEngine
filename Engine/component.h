@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <cereal/types/polymorphic.hpp>
 #include "object.h"
 
 namespace engine
@@ -47,6 +48,13 @@ public:
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const
     {
         return m_game_object_.lock();
+    }
+
+    template <class Archive>
+    void serialize(Archive ar)
+    {
+        ar(m_has_called_start_);
+        ar(m_game_object_);
     }
 };
 }

@@ -50,5 +50,6 @@ protected:
     std::string m_name_ = "Unknown Object";
 
     Object() = default;
+    
 };
 }

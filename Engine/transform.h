@@ -71,5 +71,11 @@ public:
     {
         return VTransform(VGet(0, -1, 0), LocalToWorld());
     }
+
+    template <class Archive>
+    void serialize(Archive ar)
+    {
+        ar(m_matrix_, m_parent_, m_children_);
+    }
 };
 }
