@@ -16,7 +16,7 @@ public:
 
   void SetName(const std::string& name) override;
 
-  std::shared_ptr<Transform> GetTransform() const;
+  std::shared_ptr<Transform> Transform() const;
 
   bool IsActive() const { return m_is_active_; }
 
@@ -68,15 +68,15 @@ public:
   std::shared_ptr<T> GetComponentInParent() {
     auto result = GetComponent<T>();
     if (result != nullptr) return result;
-    const auto parent = GetTransform()->GetParent();
+    const auto parent = Transform()->Parent();
     if (parent == nullptr) return nullptr;
-    return parent->GetGameObject()->GetComponentInParent<T>();
+    return parent->GameObject()->GetComponentInParent<T>();
   }
 
   template <typename T>
   std::vector<std::shared_ptr<T>> GetComponentsInParent() {
     auto result = GetComponents<T>();
-    const auto parent = GetTransform()->Parent();
+    const auto parent = Transform()->Parent();
     if (parent == nullptr) return result;
     auto parent_result = parent->GameObject()->GetComponentsInParent<T>();
     result.insert(result.end(), parent_result.begin(), parent_result.end());
@@ -87,9 +87,9 @@ public:
   std::vector<std::shared_ptr<T>> GetComponentInChildren() {
     auto result = GetComponent<T>();
     if (result != nullptr) return result;
-    const auto transform = GetTransform();
+    const auto transform = Transform();
     for (int i = 0; i < transform->ChildCount(); i++) {
-      const auto child = transform->GetChild(i)->GetGameObject();
+      const auto child = transform->GetChild(i)->GameObject();
       result = child->GetComponentInChildren<T>();
       if (result != nullptr) return result;
     }
@@ -100,9 +100,9 @@ public:
   template <typename T>
   std::vector<std::shared_ptr<T>> GetComponentsInChildren() {
     std::vector<std::shared_ptr<T>> result = GetComponents<T>();
-    const auto transform = GetTransform();
+    const auto transform = Transform();
     for (int i = 0; i < transform->ChildCount(); i++) {
-      const auto child = transform->GetChild(i)->GetGameObject();
+      const auto child = transform->GetChild(i)->GameObject();
       auto child_result = child->GetComponentsInChildren<T>();
       result.insert(result.end(), child_result.begin(), child_result.end());
     }

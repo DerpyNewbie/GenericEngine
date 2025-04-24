@@ -15,9 +15,9 @@ void GameObject::SetName(const std::string &name)
     RefreshPath();
 }
 
-std::shared_ptr<Transform> GameObject::GetTransform() const
+std::shared_ptr<Transform> GameObject::Transform() const
 {
-    return m_transform_.lock();
+    return GetComponent<engine::Transform>();
 }
 
 void GameObject::SetActive(const bool is_active)
@@ -100,7 +100,7 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 
 void GameObject::RefreshPath()
 {
-    const auto transform = GetTransform();
+    const auto transform = Transform();
     const auto parent_transform = transform->Parent();
 
     m_path_.clear();
