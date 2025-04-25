@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "scene_manager.h"
 #include "time.h"
 #include "update_manager.h"
 #include <DxLib.h>
@@ -12,7 +13,7 @@ public:
 
     bool Init()
     {
-        SetGraphMode(800, 400, 32);
+        SetGraphMode(1280, 720, 32);
         ChangeWindowMode(TRUE);
         if (DxLib_Init() == -1)
         {
@@ -21,6 +22,7 @@ public:
         }
 
         Time::Get()->Init();
+        SceneManager::CreateScene("Default Scene");
 
         return true;
     }
