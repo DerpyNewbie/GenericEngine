@@ -40,7 +40,18 @@ public:
                 UpdateManager::InvokeFixedUpdate();
             }
 
+            ClearDrawScreen();
             UpdateManager::InvokeDrawCall();
+            
+            { // temporary engine info drawer
+                const auto time = Time::Get();
+                DrawFormatString(20, 20, 0xffffffff, "fps: %3d, f: %03d, dt: %f",
+                                 time->Fps(), time->Frames() % 1000, time->DeltaTime());
+                DrawFormatString(20, 60, 0xffffffff, "update: %d, fixed_update: %d, draw_call: %d",
+                                 UpdateManager::UpdateCount(), UpdateManager::FixedUpdateCount(),
+                                 UpdateManager::DrawCallCount());
+            }
+            ScreenFlip();
         }
     }
 };
