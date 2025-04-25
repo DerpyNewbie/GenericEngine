@@ -8,6 +8,7 @@
 
 #ifndef DX_LIB_H
 #define DX_LIB_H
+#pragma warning(disable: 4819)
 
 #include "DxCompileConfig.h"
 
