@@ -1,6 +1,7 @@
 ﻿#include "scene.h"
 
 #include "game_object.h"
+#include "update_manager.h"
 
 namespace engine
 {
@@ -10,6 +11,12 @@ void Scene::OnFixedUpdate()
     {
         game_object->InvokeFixedUpdate();
     }
+}
+
+void Scene::OnConstructed()
+{
+    UpdateManager::SubscribeUpdate(shared_from_base<Scene>());
+    UpdateManager::SubscribeFixedUpdate(shared_from_base<Scene>());
 }
 
 void Scene::OnUpdate()
