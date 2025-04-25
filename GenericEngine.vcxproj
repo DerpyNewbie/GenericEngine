@@ -23,7 +23,10 @@
     <ClCompile Include="Editor\editor.cpp" />
     <ClCompile Include="Editor\hierarchy.cpp" />
     <ClCompile Include="Editor\inspector.cpp" />
+    <ClCompile Include="Engine\camera.cpp" />
+    <ClCompile Include="Engine\color.cpp" />
     <ClCompile Include="Engine\component.cpp" />
+    <ClCompile Include="Engine\cube_renderer.cpp" />
     <ClCompile Include="Engine\engine.cpp" />
     <ClCompile Include="Engine\engine_util.cpp" />
     <ClCompile Include="Engine\event_receivers.cpp" />
@@ -31,6 +34,7 @@
     <ClCompile Include="Engine\game_object.cpp" />
     <ClCompile Include="Engine\logger.cpp" />
     <ClCompile Include="Engine\object.cpp" />
+    <ClCompile Include="Engine\renderer.cpp" />
     <ClCompile Include="Engine\scene.cpp" />
     <ClCompile Include="Engine\scene_manager.cpp" />
     <ClCompile Include="Engine\time.cpp" />
@@ -50,7 +54,10 @@
     <ClInclude Include="Editor\editor.h" />
     <ClInclude Include="Editor\hierarchy.h" />
     <ClInclude Include="Editor\inspector.h" />
+    <ClInclude Include="Engine\camera.h" />
+    <ClInclude Include="Engine\color.h" />
     <ClInclude Include="Engine\component.h" />
+    <ClInclude Include="Engine\cube_renderer.h" />
     <ClInclude Include="Engine\enable_shared_from_base.h" />
     <ClInclude Include="Engine\engine.h" />
     <ClInclude Include="Engine\engine_util.h" />
@@ -59,6 +66,7 @@
     <ClInclude Include="Engine\game_object.h" />
     <ClInclude Include="Engine\logger.h" />
     <ClInclude Include="Engine\object.h" />
+    <ClInclude Include="Engine\renderer.h" />
     <ClInclude Include="Engine\scene.h" />
     <ClInclude Include="Engine\scene_manager.h" />
     <ClInclude Include="Engine\time.h" />
