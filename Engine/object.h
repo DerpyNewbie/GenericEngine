@@ -12,6 +12,7 @@ public:
     virtual ~Object() = default;
 
     std::string GetName()
+
     {
         return m_name_;
     }
@@ -26,15 +27,21 @@ public:
     {
         static_assert(std::is_base_of<Object, T>(),
                       "Base type is not Object.");
-        return std::make_shared<T>();
+        auto obj = std::make_shared<T>();
+        std::dynamic_pointer_cast<Object>(obj)->OnConstructed();
+        return obj;
     }
 
     template <class T>
     static std::shared_ptr<T> Instantiate(const std::string &name)
     {
-        auto o = Instantiate<T>();
-        o->SetName(name);
-        return o;
+        static_assert(std::is_base_of<Object, T>(),
+                      "Base type is not Object.");
+        auto obj = std::make_shared<T>();
+        auto ptr = std::dynamic_pointer_cast<Object>(obj);
+        ptr->SetName(name);
+        ptr->OnConstructed();
+        return obj;
     }
 
 protected:
