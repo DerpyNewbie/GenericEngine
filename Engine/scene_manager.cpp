@@ -30,4 +30,18 @@ void SceneManager::DestroyScene(const std::string &name)
     assert(FALSE && "not implemented");
     // TODO: implement scene destroy
 }
+
+void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const std::shared_ptr<Scene> &scene)
+{
+    if (!go->m_scene_.expired() && go->Transform()->Parent() == nullptr)
+    {
+        go->SetAsRootObject(false);
+    }
+
+    go->m_scene_ = scene;
+    if (go->Transform()->Parent() == nullptr)
+    {
+        go->SetAsRootObject(true);
+    }
+}
 }
