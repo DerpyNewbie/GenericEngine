@@ -3,16 +3,17 @@
 #include "component.h"
 #include "transform.h"
 #include "scene.h"
+#include "scene_manager.h"
 
 namespace engine
 {
 GameObject::GameObject(): Object()
 {}
-
-void GameObject::SetName(const std::string &name)
+void GameObject::OnConstructed()
 {
-    Object::SetName(name);
-    RefreshPath();
+    Object::OnConstructed();
+    AddComponent<engine::Transform>();
+    SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
 }
 
 std::shared_ptr<Transform> GameObject::Transform() const
@@ -41,10 +42,16 @@ void GameObject::SetActive(const bool is_active)
         }
     }
 }
-
-std::string GameObject::GetPath()
+std::shared_ptr<Scene> GameObject::Scene() const
 {
-    return m_path_;
+    return m_scene_.lock();
+}
+
+std::string GameObject::Path() const
+{
+    if (Transform() == nullptr || Transform()->Parent() == nullptr)
+        return m_name_;
+    return Transform()->Parent()->GameObject()->Path() + "/" + m_name_;
 }
 
 void GameObject::InvokeUpdate() const
@@ -54,8 +61,8 @@ void GameObject::InvokeUpdate() const
         if (!component->m_has_called_start_)
         {
             Logger::Log<GameObject>("[%s] Calling first start for %s",
-                                    m_path_.c_str(),
-                                    component->GetName().c_str());
+                                    Path().c_str(),
+                                    component->Name().c_str());
             component->OnStart();
             component->m_has_called_start_ = true;
         }
@@ -93,24 +100,6 @@ void GameObject::SetAsRootObject(const bool is_root_object)
     {
         // If we're NOT root but has registered as root
         scene->m_root_game_objects_.erase(pos);
-    }
-
-    RefreshPath();
-}
-
-void GameObject::RefreshPath()
-{
-    const auto transform = Transform();
-    const auto parent_transform = transform->Parent();
-
-    m_path_.clear();
-    m_path_ = parent_transform != nullptr
-                  ? parent_transform->GameObject()->GetPath() + "/" + GetName()
-                  : GetName();
-
-    for (int i = 0; i < transform->ChildCount(); i++)
-    {
-        transform->GetChild(i)->GameObject()->RefreshPath();
     }
 }
 }

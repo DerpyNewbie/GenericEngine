@@ -11,8 +11,10 @@ class Object : public enable_shared_from_base<Object>
 public:
     virtual ~Object() = default;
 
-    std::string GetName()
+    virtual void OnConstructed()
+    {}
 
+    std::string Name()
     {
         return m_name_;
     }

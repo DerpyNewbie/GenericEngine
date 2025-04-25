@@ -14,15 +14,17 @@ class GameObject final : public Object {
 public:
   explicit GameObject();
 
-  void SetName(const std::string& name) override;
+  void OnConstructed() override;
 
   std::shared_ptr<Transform> Transform() const;
 
   bool IsActive() const { return m_is_active_; }
 
   void SetActive(bool is_active);
-
-  std::string GetPath();
+   
+  std::shared_ptr<Scene> Scene() const;
+    
+  std::string Path() const;
 
   template <typename T>
   std::shared_ptr<T> AddComponent() {
@@ -30,12 +32,13 @@ public:
                   "Base type is not Component.");
 
     auto instance = std::make_shared<T>();
-    instance->m_game_object_ = shared_from_base<GameObject>();
-    instance->m_name_ = EngineUtil::GetTypeName(typeid(T).name());
-    m_components_.push_back(instance);
+    auto converted_instance = std::dynamic_pointer_cast<Component>(instance);
+    converted_instance->m_game_object_ = shared_from_base<GameObject>();
+    converted_instance->m_name_ = EngineUtil::GetTypeName(typeid(T).name());
+    m_components_.push_back(converted_instance);
 
-    instance->OnAwake();
-    Logger::Log<GameObject>("Added component %s", instance->m_name_.c_str());
+    converted_instance->OnAwake();
+    Logger::Log<GameObject>("(%s): Added component %s", Path().c_str(),  converted_instance->m_name_.c_str());
     return instance;
   }
 
@@ -43,7 +46,7 @@ public:
   std::shared_ptr<T> GetComponent() const {
     static_assert(std::is_base_of<Component, T>(),
                   "Base type is not Component.");
-    for (auto comp : m_components_) {
+    for (const auto &comp : m_components_) {
       auto instance = std::dynamic_pointer_cast<T>(comp);
       if (instance != nullptr) return instance;
     }
@@ -56,7 +59,7 @@ public:
     static_assert(std::is_base_of<Component, T>(),
                   "Base type is not Component.");
     std::vector<std::shared_ptr<T>> results = {};
-    for (auto comp : m_components_) {
+    for (const auto &comp : m_components_) {
       auto instance = std::dynamic_pointer_cast<T>(comp);
       if (instance != nullptr) results.push_back(instance);
     }
@@ -112,19 +115,16 @@ public:
 
 private:
   friend class Scene;
+  friend class SceneManager;
   friend class Transform;
 
   bool m_is_active_ = true;
-  std::weak_ptr<Scene> m_scene_ = {};
-  std::string m_path_ = "Unknown Path";
-  std::weak_ptr<Transform> m_transform_ = {};
+  std::weak_ptr<engine::Scene> m_scene_ = {};
   std::vector<std::shared_ptr<Component>> m_components_ = {};
 
   void InvokeUpdate() const;
   void InvokeFixedUpdate() const;
 
   void SetAsRootObject(bool is_root_object);
-
-  void RefreshPath();
 };
 }
