@@ -1,7 +1,21 @@
 ﻿#pragma once
+#include <memory>
+#include "../Engine/game_object.h"
+#include "editor_window.h"
 
-class Hierarchy
+namespace editor
+{
+class Hierarchy : public IEditorWindow
 {
 public:
-    void Draw();
+    std::shared_ptr<engine::GameObject> selected_game_object;
+
+    void OnConstructed() override;
+    void OnEditorGui() override;
+
+private:
+    void DrawScene(const std::shared_ptr<engine::Scene> &scene);
+    void DrawObjectRecursive(std::shared_ptr<engine::GameObject> game_object);
+    bool DrawObject(std::shared_ptr<engine::GameObject> game_object);
 };
+}

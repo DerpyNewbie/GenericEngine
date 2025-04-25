@@ -1,7 +1,18 @@
 ﻿#pragma once
+#include "editor_window.h"
 
-class Inspector
+namespace engine
+{
+class GameObject;
+}
+
+namespace editor
+{
+class Inspector : public IEditorWindow
 {
 public:
-    void Draw();
+    std::shared_ptr<engine::GameObject>* selected_game_object_ptr;
+    void OnConstructed() override;
+    void OnEditorGui() override;
 };
+}

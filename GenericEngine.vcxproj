@@ -19,7 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Editor\engine_editor.cpp" />
+    <ClCompile Include="Editor\editor_window.cpp" />
+    <ClCompile Include="Editor\editor.cpp" />
     <ClCompile Include="Editor\hierarchy.cpp" />
     <ClCompile Include="Editor\inspector.cpp" />
     <ClCompile Include="Engine\component.cpp" />
@@ -45,7 +46,8 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Editor\engine_editor.h" />
+    <ClInclude Include="Editor\editor_window.h" />
+    <ClInclude Include="Editor\editor.h" />
     <ClInclude Include="Editor\hierarchy.h" />
     <ClInclude Include="Editor\inspector.h" />
     <ClInclude Include="Engine\component.h" />
