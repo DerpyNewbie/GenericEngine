@@ -4,7 +4,7 @@
 
 void editor::IEditorWindow::DrawGui()
 {
-    if (ImGui::Begin(Name().c_str()))
+    if (ImGui::Begin(Name().c_str(), nullptr, window_flags))
     {
         OnEditorGui();
     }
