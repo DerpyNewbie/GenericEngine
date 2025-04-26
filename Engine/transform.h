@@ -73,9 +73,9 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive ar)
+  void serialize(Archive& ar)
     {
-        ar(CEREAL_NVP(m_matrix_), CEREAL_NVP(m_parent_), CEREAL_NVP(m_children_));
+        Object::serialize(ar);
     }
 };
 }

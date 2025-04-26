@@ -49,11 +49,5 @@ public:
     {
         return m_game_object_;
     }
-
-    template <class Archive>
-    void serialize(Archive& ar)
-    {
-        ar(m_name_);
-    }
 };
 }

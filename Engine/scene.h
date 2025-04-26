@@ -25,7 +25,8 @@ public:
     template <class Archive>
     void serialize(Archive& ar)
     {
-        ar(CEREAL_NVP(m_name_), CEREAL_NVP(m_root_game_objects_));
+        Object::serialize(ar);
+        ar( CEREAL_NVP(m_root_game_objects_));
     }
 };
 }
