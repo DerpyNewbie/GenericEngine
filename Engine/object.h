@@ -4,6 +4,8 @@
 
 #include "enable_shared_from_base.h"
 
+#include <cereal/cereal.hpp>
+
 namespace engine
 {
 class Object : public enable_shared_from_base<Object>
@@ -46,10 +48,16 @@ public:
         return obj;
     }
 
+    template <class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(CEREAL_NVP(m_name_));
+    }
+
 protected:
     std::string m_name_ = "Unknown Object";
 
     Object() = default;
-    
+
 };
 }

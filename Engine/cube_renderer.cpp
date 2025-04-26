@@ -15,3 +15,7 @@ void CubeRenderer::OnDraw()
                diffuse_color.Argb(), specular_color.Argb(), fill);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::CubeRenderer)
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::CubeRenderer)

@@ -21,5 +21,11 @@ class Camera : public Component
 
 public:
     void OnUpdate() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(m_name_);
+    }
 };
 }

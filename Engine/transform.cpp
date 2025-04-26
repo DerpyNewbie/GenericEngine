@@ -147,5 +147,7 @@ void Transform::SetLocalScale(const VECTOR local_scale)
     m_matrix_ = Compose(local_scale, LocalRotation(), LocalPosition());
 }
 }
+
 CEREAL_REGISTER_TYPE(engine::Transform)
-CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component,engine::Transform)
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::Transform)

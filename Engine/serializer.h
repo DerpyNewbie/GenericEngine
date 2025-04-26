@@ -4,16 +4,17 @@
 #include "cereal/archives/json.hpp"
 #include <cereal/types/polymorphic.hpp>
 
+namespace engine
+{
 class Serializer
 {
 public:
     template <typename T>
-    void Save(T* save_resource)
+    void Save(std::shared_ptr<T> save_resource)
     {
-        auto resource = dynamic_cast<engine::Object*>(save_resource);
-        if (resource == nullptr) return;
-
-        std::string name = resource->GetName() + ".json";
+        static_assert(std::is_base_of<Object, T>(),
+              "Base type is not Object.");
+        std::string name = save_resource->Name() + ".json";
         std::ofstream os(name);
         cereal::JSONOutputArchive oArchive(os);
         
@@ -26,10 +27,11 @@ public:
         auto resource = dynamic_cast<engine::Object*>(load_resource);
         if (resource == nullptr) return;
 
-        std::string name = resource->GetName() + ".json";
+        std::string name = resource->Name() + ".json";
         std::ifstream is(name);
         cereal::JSONInputArchive iArchive(is);
         
         iArchive(load_resource);
     }
 };
+}

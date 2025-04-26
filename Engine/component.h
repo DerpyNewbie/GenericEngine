@@ -51,10 +51,9 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive ar)
+    void serialize(Archive& ar)
     {
-        ar(m_has_called_start_);
-        ar(m_game_object_);
+        ar(m_name_);
     }
 };
 }

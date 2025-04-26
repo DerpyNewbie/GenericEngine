@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 
+#include <cereal/types/vector.hpp>
+
 #include "logger.h"
 #include "object.h"
 #include "component.h"
@@ -31,10 +33,9 @@ public:
     static_assert(std::is_base_of<Component, T>(),
                   "Base type is not Component.");
 
-    auto instance = std::make_shared<T>();
+    auto instance = Object::Instantiate<T>(EngineUtil::GetTypeName(typeid(T).name()));
     auto converted_instance = std::dynamic_pointer_cast<Component>(instance);
     converted_instance->m_game_object_ = shared_from_base<GameObject>();
-    converted_instance->m_name_ = EngineUtil::GetTypeName(typeid(T).name());
     m_components_.push_back(converted_instance);
 
     converted_instance->OnAwake();
@@ -129,9 +130,9 @@ private:
 
 public:
   template <class Archive>
-  void serialize(Archive ar)
+  void serialize(Archive& ar)
   {
-    ar(m_name_, m_is_active_, m_scene_, m_components_);
+    ar(CEREAL_NVP(m_name_), CEREAL_NVP(m_is_active_), CEREAL_NVP(m_components_));
   }
 };
 }

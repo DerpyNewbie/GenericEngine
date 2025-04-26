@@ -24,3 +24,7 @@ void Camera::OnUpdate()
     ApplyCameraSettingToDxLib();
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Camera)
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::Camera)
