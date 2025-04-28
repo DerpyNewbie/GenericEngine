@@ -5,6 +5,12 @@
 #include <memory>
 #include <vector>
 
+template<class Archive>
+void serialize(Archive& ar,MATRIX& matrix)
+{
+    ar(matrix.m);
+}
+
 namespace engine
 {
 class Transform : public Component
@@ -75,7 +81,7 @@ public:
     template <class Archive>
   void serialize(Archive& ar)
     {
-        Object::serialize(ar);
+        ar(m_parent_,m_children_);
     }
 };
 }
