@@ -29,7 +29,15 @@ void Hierarchy::DrawMenu()
 
     if (ImGui::BeginMenu("Files"))
     {
-        ImGui::MenuItem("Load Scene");
+        if (ImGui::MenuItem("Unload Scene"))
+        {
+            engine::SceneManager::DestroyScene("Default Scene");
+        }
+        if (ImGui::MenuItem("Load Scene"))
+        {
+            engine::Serializer serializer;
+            serializer.Load(engine::SceneManager::CreateScene("Default Scene"));
+        }
         if (ImGui::MenuItem("Save Scene"))
         {
             engine::Serializer serializer;
