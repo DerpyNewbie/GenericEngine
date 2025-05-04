@@ -22,12 +22,12 @@ public:
     }
     
     template <typename T>
-    void Load(T* load_resource)
+    void Load(std::shared_ptr<T> load_resource)
     {
-        auto resource = dynamic_cast<engine::Object*>(load_resource);
-        if (resource == nullptr) return;
+        static_assert(std::is_base_of<Object, T>(),
+              "Base type is not Object.");
 
-        std::string name = resource->Name() + ".json";
+        std::string name = load_resource->Name() + ".json";
         std::ifstream is(name);
         cereal::JSONInputArchive iArchive(is);
         
