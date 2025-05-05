@@ -37,6 +37,7 @@
     <ClCompile Include="Engine\renderer.cpp" />
     <ClCompile Include="Engine\scene.cpp" />
     <ClCompile Include="Engine\scene_manager.cpp" />
+    <ClCompile Include="Engine\skinned_mesh_renderer.cpp" />
     <ClCompile Include="Engine\serializer.cpp" />
     <ClCompile Include="Engine\time.cpp" />
     <ClCompile Include="Engine\transform.cpp" />
@@ -70,6 +71,7 @@
     <ClInclude Include="Engine\renderer.h" />
     <ClInclude Include="Engine\scene.h" />
     <ClInclude Include="Engine\scene_manager.h" />
+    <ClInclude Include="Engine\skinned_mesh_renderer.h" />
     <ClInclude Include="Engine\serializer.h" />
     <ClInclude Include="Engine\time.h" />
     <ClInclude Include="Engine\transform.h" />
@@ -570,14 +572,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalLibraryDirectories>
       <PerUserRedirection>true</PerUserRedirection>
     </Link>
   </ItemDefinitionGroup>

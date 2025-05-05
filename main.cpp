@@ -3,6 +3,7 @@
 #include "Engine/camera.h"
 #include "Engine/cube_renderer.h"
 #include "Engine/scene.h"
+#include "Engine/skinned_mesh_renderer.h"
 
 #include <DxLib.h>
 
@@ -28,6 +29,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         const auto parent_obj2 = engine::Object::Instantiate<engine::GameObject>("Parent2");
         const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
         child_obj2->Transform()->SetParent(parent_obj2->Transform());
+
+        const auto skinned_mesh = engine::Object::Instantiate<engine::GameObject>("Hackadoll");
+        const auto skinned_mesh_renderer = skinned_mesh->AddComponent<engine::SkinnedMeshRenderer>();
+        skinned_mesh_renderer->LoadModel("Resources/hackadoll/hackadoll.pmx");
     }
 
     engine->MainLoop();
