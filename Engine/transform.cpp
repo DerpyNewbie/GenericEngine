@@ -5,12 +5,12 @@ namespace engine
 {
 MATRIX Transform::ParentMatrix() const
 {
-    if (m_parent_ == nullptr || m_parent_->m_parent_ == nullptr)
+    if (m_parent_.expired() || m_parent_.lock()->m_parent_.expired())
     {
         return MGetIdent();
     }
-
-    return MMult(m_parent_->m_parent_->ParentMatrix(), m_parent_->m_matrix_);
+    const auto parent = m_parent_.lock();
+    return MMult(parent->m_parent_.lock()->ParentMatrix(), parent->m_matrix_);
 }
 
 MATRIX Transform::Compose(const VECTOR &scale, const MATRIX &rotation, const VECTOR &translation)
@@ -62,7 +62,7 @@ VECTOR Transform::LocalScale() const
 
 std::shared_ptr<Transform> Transform::Parent() const
 {
-    return m_parent_;
+    return m_parent_.lock();
 }
 std::shared_ptr<Transform> Transform::GetChild(const int i) const
 {
@@ -71,20 +71,20 @@ std::shared_ptr<Transform> Transform::GetChild(const int i) const
 
 bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const bool deep) const
 {
+    auto parent = m_parent_.lock();
     if (deep)
     {
-        auto parent = m_parent_;
         while (parent != nullptr)
         {
             if (parent == transform)
                 return true;
-            parent = parent->m_parent_;
+            parent = parent->m_parent_.lock();
         }
 
         return false;
     }
 
-    return m_parent_ == transform;
+    return parent == transform;
 }
 
 int Transform::ChildCount() const
@@ -95,30 +95,31 @@ int Transform::ChildCount() const
 void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 {
     // If parent doesn't change, ignore the call.
-    if (m_parent_ == next_parent)
+    auto parent = m_parent_.lock();
+    if (parent == next_parent)
         return;
 
     // If we've had parent, Remove from parent's child
-    if (m_parent_ != nullptr)
+    if (parent != nullptr)
     {
         auto this_ptr = shared_from_base<Transform>();
         const auto pos =
-            std::ranges::find_if(m_parent_->m_children_,
+            std::ranges::find_if(parent->m_children_,
                                  [&this_ptr](const std::weak_ptr<Transform> &other_ptr) {
                                      return other_ptr.lock() == this_ptr;
                                  });
-        m_parent_->m_children_.erase(pos);
+        parent->m_children_.erase(pos);
     }
 
     m_parent_ = next_parent;
 
     // If parent is not null, Add to parent's child
-    if (m_parent_ != nullptr)
+    if ((parent = m_parent_.lock()))
     {
-        m_parent_->m_children_.push_back(shared_from_base<Transform>());
+        parent->m_children_.push_back(shared_from_base<Transform>());
     }
 
-    GameObject()->SetAsRootObject(m_parent_ == nullptr);
+    GameObject()->SetAsRootObject(m_parent_.expired());
 }
 
 

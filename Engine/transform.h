@@ -10,7 +10,7 @@ namespace engine
 class Transform : public Component
 {
     MATRIX m_matrix_ = MGetIdent();
-    std::shared_ptr<Transform> m_parent_ = nullptr;
+    std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::weak_ptr<Transform>> m_children_;
 
     [[nodiscard]] MATRIX ParentMatrix() const;
