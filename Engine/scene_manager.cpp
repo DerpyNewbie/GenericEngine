@@ -38,7 +38,13 @@ void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const s
         go->SetAsRootObject(false);
     }
 
+    if (const auto prev_scene = go->m_scene_.lock())
+    {
+        prev_scene->m_all_game_objects_.erase(std::ranges::find(prev_scene->m_all_game_objects_, go));
+    }
+
     go->m_scene_ = scene;
+    scene->m_all_game_objects_.emplace_back(go);
     if (go->Transform()->Parent() == nullptr)
     {
         go->SetAsRootObject(true);
