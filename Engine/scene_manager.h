@@ -15,6 +15,7 @@ public:
     static std::shared_ptr<Scene> GetActiveScene();
     static const std::vector<std::shared_ptr<Scene>> &GetCurrentScenes();
     static std::shared_ptr<Scene> CreateScene(const std::string &name);
+    static void AddScene(const std::shared_ptr<Scene> &scene);
     static void DestroyScene(const std::string &name);
     static void MoveGameObject(const std::shared_ptr<GameObject> &go, const std::shared_ptr<Scene> &scene);
 };

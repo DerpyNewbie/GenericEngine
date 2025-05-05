@@ -25,6 +25,11 @@ std::shared_ptr<Scene> SceneManager::CreateScene(const std::string &name)
     return scene;
 }
 
+void SceneManager::AddScene(const std::shared_ptr<Scene> &scene)
+{
+    m_scenes_.emplace_back(scene);
+}
+
 void SceneManager::DestroyScene(const std::string &name)
 {
     auto pos = std::ranges::find_if(m_scenes_, [&](std::shared_ptr<Scene> scene) {

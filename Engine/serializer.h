@@ -22,7 +22,7 @@ public:
     }
     
     template <typename T>
-    void Load(std::shared_ptr<T> load_resource)
+    std::shared_ptr<T> Load(std::shared_ptr<T> load_resource)
     {
         static_assert(std::is_base_of<Object, T>(),
               "Base type is not Object.");
@@ -32,6 +32,7 @@ public:
         cereal::JSONInputArchive iArchive(is);
         
         iArchive(load_resource);
+        return load_resource;
     }
 };
 }

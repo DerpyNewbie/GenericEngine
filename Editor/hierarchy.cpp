@@ -36,7 +36,9 @@ void Hierarchy::DrawMenu()
         if (ImGui::MenuItem("Load Scene"))
         {
             engine::Serializer serializer;
-            serializer.Load(engine::SceneManager::CreateScene("Default Scene"));
+            auto scene = serializer.Load(Object::Instantiate<engine::Scene>("Default Scene"));
+
+            engine::SceneManager::AddScene(scene);
         }
         if (ImGui::MenuItem("Save Scene"))
         {
