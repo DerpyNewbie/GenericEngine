@@ -147,6 +147,10 @@ void Transform::SetLocalScale(const VECTOR local_scale)
 {
     m_matrix_ = Compose(local_scale, LocalRotation(), LocalPosition());
 }
+void Transform::SetLocalMatrix(const MATRIX &matrix)
+{
+    m_matrix_ = matrix;
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::Transform)

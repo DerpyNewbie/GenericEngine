@@ -46,7 +46,7 @@ public:
     void SetLocalPosition(VECTOR local_position);
     void SetLocalRotation(const MATRIX &rotation);
     void SetLocalScale(VECTOR local_scale);
-
+    void SetLocalMatrix(const MATRIX &matrix);
 
     [[nodiscard]] VECTOR Forward() const
     {
