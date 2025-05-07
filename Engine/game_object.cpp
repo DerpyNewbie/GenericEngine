@@ -54,6 +54,16 @@ std::string GameObject::Path() const
     return Transform()->Parent()->GameObject()->Path() + "/" + m_name_;
 }
 
+std::string GameObject::PathFrom(std::shared_ptr<GameObject> parent)
+{
+    if (Transform() == nullptr || parent->Transform() == nullptr || !Transform()->IsChildOf(parent->Transform()))
+        return m_name_;
+    const auto path = Path();
+    const auto parent_path = parent->Path();
+
+    return path.substr(parent_path.size());
+}
+
 void GameObject::InvokeUpdate() const
 {
     for (auto &component : m_components_)

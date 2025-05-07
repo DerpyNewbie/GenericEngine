@@ -27,6 +27,7 @@ public:
   std::shared_ptr<Scene> Scene() const;
     
   std::string Path() const;
+  std::string PathFrom(std::shared_ptr<GameObject> parent);
 
   template <typename T>
   std::shared_ptr<T> AddComponent() {
