@@ -33,6 +33,13 @@ void Editor::Init()
 
         ImGui::StyleColorsDark();
 
+        ImFontConfig font_config;
+        font_config.MergeMode = true;
+        font_config.GlyphRanges = io.Fonts->GetGlyphRangesJapanese();
+        io.Fonts->AddFontDefault();
+        ImFont* font = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\meiryo.ttc)", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+        IM_ASSERT(font != nullptr);
+
         ImGui_ImplWin32_Init(GetMainWindowHandle());
         ImGui_ImplDX11_Init((ID3D11Device *)GetUseDirect3D11Device(),
                             (ID3D11DeviceContext *)GetUseDirect3D11DeviceContext());
