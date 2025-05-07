@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <cereal/types/polymorphic.hpp>
 #include "object.h"
 
 namespace engine
@@ -12,7 +13,7 @@ private:
     friend class GameObject;
 
     bool m_has_called_start_ = false;
-    std::weak_ptr<GameObject> m_game_object_ = {};
+    std::shared_ptr<GameObject> m_game_object_ = nullptr;
 
 public:
     Component();
@@ -46,7 +47,13 @@ public:
 
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const
     {
-        return m_game_object_.lock();
+        return m_game_object_;
+    }
+
+    template<class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(m_game_object_);
     }
 };
 }

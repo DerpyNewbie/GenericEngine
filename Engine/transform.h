@@ -5,6 +5,12 @@
 #include <memory>
 #include <vector>
 
+template<class Archive>
+void serialize(Archive& ar,MATRIX& matrix)
+{
+    ar(matrix.m);
+}
+
 namespace engine
 {
 class Transform : public Component
@@ -70,6 +76,12 @@ public:
     [[nodiscard]] VECTOR Down() const
     {
         return VTransform(VGet(0, -1, 0), LocalToWorld());
+    }
+
+    template <class Archive>
+  void serialize(Archive& ar)
+    {
+        ar(m_parent_,m_children_);
     }
 };
 }

@@ -25,10 +25,20 @@ std::shared_ptr<Scene> SceneManager::CreateScene(const std::string &name)
     return scene;
 }
 
+void SceneManager::AddScene(const std::shared_ptr<Scene> &scene)
+{
+    m_scenes_.emplace_back(scene);
+}
+
 void SceneManager::DestroyScene(const std::string &name)
 {
-    assert(FALSE && "not implemented");
-    // TODO: implement scene destroy
+    auto pos = std::ranges::find_if(m_scenes_, [&](std::shared_ptr<Scene> scene) {
+        return scene->Name() == name;
+    });
+    if (pos == m_scenes_.end())
+        return;
+
+    m_scenes_.erase(pos);
 }
 
 void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const std::shared_ptr<Scene> &scene)

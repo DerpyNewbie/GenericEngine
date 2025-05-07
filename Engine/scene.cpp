@@ -21,7 +21,8 @@ void Scene::OnConstructed()
 
 void Scene::OnUpdate()
 {
-    for (const auto &game_object : m_root_game_objects_)
+    auto buff = m_root_game_objects_;
+    for (const auto &game_object : buff)
     {
         game_object->InvokeUpdate();
     }

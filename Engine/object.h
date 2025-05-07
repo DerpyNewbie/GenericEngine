@@ -1,8 +1,12 @@
 #pragma once
 #include <memory>
 #include <string>
-
 #include "enable_shared_from_base.h"
+#include<cereal/archives/binary.hpp>
+#include<cereal/archives/portable_binary.hpp>
+#include<cereal/archives/xml.hpp>
+#include<cereal/archives/json.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 namespace engine
 {
@@ -46,9 +50,16 @@ public:
         return obj;
     }
 
+    template <class Archive>
+    void serialize(Archive& ar)
+    {
+        ar(CEREAL_NVP(m_name_));
+    }
+
 protected:
     std::string m_name_ = "Unknown Object";
 
     Object() = default;
+
 };
 }

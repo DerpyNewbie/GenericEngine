@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include <cereal/types/vector.hpp>
+
 namespace engine
 {
 class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
@@ -20,5 +22,12 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
 
 public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
+
+    template <class Archive>
+    void serialize(Archive& ar)
+    {
+        Object::serialize(ar);
+        ar( CEREAL_NVP(m_root_game_objects_));
+    }
 };
 }
