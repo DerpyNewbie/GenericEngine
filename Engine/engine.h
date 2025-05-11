@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "scene_manager.h"
-#include "time.h"
+#include "engine_time.h"
 #include "update_manager.h"
 #include <DxLib.h>
 
