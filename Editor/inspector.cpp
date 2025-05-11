@@ -1,7 +1,7 @@
 ﻿#include "inspector.h"
 
 #include "imgui.h"
-#include "../Engine/game_object.h"
+#include "game_object.h"
 
 namespace editor
 {
@@ -12,7 +12,6 @@ void Inspector::OnConstructed()
 }
 void Inspector::OnEditorGui()
 {
-
     if (selected_game_object_ptr == nullptr)
     {
         ImGui::Text("Inspector is uninitialized!");
@@ -27,7 +26,7 @@ void Inspector::OnEditorGui()
     }
 
     for (const auto all_components = selected_go->GetComponents<engine::Component>();
-         const auto& component : all_components)
+         const auto &component : all_components)
     {
         if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
         {

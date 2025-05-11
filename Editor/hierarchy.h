@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <memory>
-#include "../Engine/game_object.h"
+#include "game_object.h"
 #include "editor_window.h"
 
 namespace editor

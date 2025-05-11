@@ -1,610 +1,192 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Editor\editor_window.cpp" />
-    <ClCompile Include="Editor\editor.cpp" />
-    <ClCompile Include="Editor\hierarchy.cpp" />
-    <ClCompile Include="Editor\inspector.cpp" />
-    <ClCompile Include="Engine\camera.cpp" />
-    <ClCompile Include="Engine\color.cpp" />
-    <ClCompile Include="Engine\component.cpp" />
-    <ClCompile Include="Engine\cube_renderer.cpp" />
-    <ClCompile Include="Engine\engine.cpp" />
-    <ClCompile Include="Engine\engine_util.cpp" />
-    <ClCompile Include="Engine\event_receivers.cpp" />
-    <ClCompile Include="Engine\factory.cpp" />
-    <ClCompile Include="Engine\game_object.cpp" />
-    <ClCompile Include="Engine\logger.cpp" />
-    <ClCompile Include="Engine\object.cpp" />
-    <ClCompile Include="Engine\renderer.cpp" />
-    <ClCompile Include="Engine\scene.cpp" />
-    <ClCompile Include="Engine\scene_manager.cpp" />
-    <ClCompile Include="Engine\skinned_mesh_renderer.cpp" />
-    <ClCompile Include="Engine\serializer.cpp" />
-    <ClCompile Include="Engine\time.cpp" />
-    <ClCompile Include="Engine\transform.cpp" />
-    <ClCompile Include="Engine\update_manager.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp" />
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp" />
-    <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
-    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
-    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Editor\editor_window.h" />
-    <ClInclude Include="Editor\editor.h" />
-    <ClInclude Include="Editor\hierarchy.h" />
-    <ClInclude Include="Editor\inspector.h" />
-    <ClInclude Include="Engine\camera.h" />
-    <ClInclude Include="Engine\color.h" />
-    <ClInclude Include="Engine\component.h" />
-    <ClInclude Include="Engine\cube_renderer.h" />
-    <ClInclude Include="Engine\enable_shared_from_base.h" />
-    <ClInclude Include="Engine\engine.h" />
-    <ClInclude Include="Engine\engine_util.h" />
-    <ClInclude Include="Engine\event_receivers.h" />
-    <ClInclude Include="Engine\factory.h" />
-    <ClInclude Include="Engine\game_object.h" />
-    <ClInclude Include="Engine\logger.h" />
-    <ClInclude Include="Engine\object.h" />
-    <ClInclude Include="Engine\renderer.h" />
-    <ClInclude Include="Engine\scene.h" />
-    <ClInclude Include="Engine\scene_manager.h" />
-    <ClInclude Include="Engine\skinned_mesh_renderer.h" />
-    <ClInclude Include="Engine\serializer.h" />
-    <ClInclude Include="Engine\time.h" />
-    <ClInclude Include="Engine\transform.h" />
-    <ClInclude Include="Engine\update_manager.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxCompileConfig.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxDataType.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxDataTypeWin.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxFunctionWin.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxLib.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include=".clang-format" />
-    <Content Include=".gitignore" />
-    <Content Include="ThirdParty\dxlib_h\celt.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\celt_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxDrawFunc_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib.txt" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLibW_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxLib_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2012_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2013_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLibW_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2012_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2013_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\DxUseCLib_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc6.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc6_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc8_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vc8_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2012_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2013_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletcollision_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc6.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc6_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc8_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vc8_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2012_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2013_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletdynamics_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc6.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc6_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc8_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vc8_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2012_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x64_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2013_x86_ItrDbgLv0_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_ItrDbgLv0_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libbulletmath_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libjpeg_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libpng_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtheora_static_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\libtiff_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\ogg_static_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opusfile_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\opus_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\silk_common_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbisfile_static_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\vorbis_static_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2012_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2012_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2012_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2012_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2013_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2013_x64_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2013_x86.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2013_x86_d.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x64_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x64_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x64_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x64_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x86_MD.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x86_MDd.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x86_MT.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_vs2015_x86_MTd.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_x64.lib" />
-    <Content Include="ThirdParty\dxlib_h\zlib_x64_d.lib" />
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
-    <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{9f3a4869-9b6a-453c-be73-1cdd88803d68}</ProjectGuid>
-    <RootNamespace>Project</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalLibraryDirectories>
-      <PerUserRedirection>true</PerUserRedirection>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalLibraryDirectories>
-      <PerUserRedirection>true</PerUserRedirection>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalLibraryDirectories>
-      <PerUserRedirection>true</PerUserRedirection>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalIncludeDirectories>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui</AdditionalLibraryDirectories>
-      <PerUserRedirection>true</PerUserRedirection>
-    </Link>
-  </ItemDefinitionGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+    <ItemGroup Label="ProjectConfigurations">
+        <ProjectConfiguration Include="Debug|Win32">
+            <Configuration>Debug</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|Win32">
+            <Configuration>Release</Configuration>
+            <Platform>Win32</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Debug|x64">
+            <Configuration>Debug</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+        <ProjectConfiguration Include="Release|x64">
+            <Configuration>Release</Configuration>
+            <Platform>x64</Platform>
+        </ProjectConfiguration>
+    </ItemGroup>
+    <ItemGroup>
+        <ClCompile Include="Editor\editor_window.cpp"/>
+        <ClCompile Include="Editor\editor.cpp"/>
+        <ClCompile Include="Editor\hierarchy.cpp"/>
+        <ClCompile Include="Editor\inspector.cpp"/>
+        <ClCompile Include="Engine\camera.cpp"/>
+        <ClCompile Include="Engine\color.cpp"/>
+        <ClCompile Include="Engine\component.cpp"/>
+        <ClCompile Include="Engine\cube_renderer.cpp"/>
+        <ClCompile Include="Engine\engine.cpp"/>
+        <ClCompile Include="Engine\engine_util.cpp"/>
+        <ClCompile Include="Engine\event_receivers.cpp"/>
+        <ClCompile Include="Engine\game_object.cpp"/>
+        <ClCompile Include="Engine\logger.cpp"/>
+        <ClCompile Include="Engine\object.cpp"/>
+        <ClCompile Include="Engine\renderer.cpp"/>
+        <ClCompile Include="Engine\scene.cpp"/>
+        <ClCompile Include="Engine\scene_manager.cpp"/>
+        <ClCompile Include="Engine\skinned_mesh_renderer.cpp" />
+        <ClCompile Include="Engine\serializer.cpp"/>
+        <ClCompile Include="Engine\time.cpp"/>
+        <ClCompile Include="Engine\transform.cpp"/>
+        <ClCompile Include="Engine\update_manager.cpp"/>
+        <ClCompile Include="main.cpp"/>
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp" />
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp" />
+        <ClCompile Include="ThirdParty\imgui\imgui.cpp" />
+        <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp" />
+        <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp" />
+        <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp" />
+        <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp" />
+    </ItemGroup>
+    <ItemGroup>
+        <ClInclude Include="Editor\editor_window.h"/>
+        <ClInclude Include="Editor\editor.h"/>
+        <ClInclude Include="Editor\hierarchy.h"/>
+        <ClInclude Include="Editor\inspector.h"/>
+        <ClInclude Include="Engine\camera.h"/>
+        <ClInclude Include="Engine\color.h"/>
+        <ClInclude Include="Engine\component.h"/>
+        <ClInclude Include="Engine\cube_renderer.h"/>
+        <ClInclude Include="Engine\enable_shared_from_base.h"/>
+        <ClInclude Include="Engine\engine.h"/>
+        <ClInclude Include="Engine\engine_util.h"/>
+        <ClInclude Include="Engine\event_receivers.h"/>
+        <ClInclude Include="Engine\game_object.h"/>
+        <ClInclude Include="Engine\logger.h"/>
+        <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\renderer.h"/>
+        <ClInclude Include="Engine\scene.h"/>
+        <ClInclude Include="Engine\scene_manager.h"/>
+        <ClInclude Include="Engine\skinned_mesh_renderer.h" />
+        <ClInclude Include="Engine\serializer.h"/>
+        <ClInclude Include="Engine\time.h"/>
+        <ClInclude Include="Engine\transform.h"/>
+        <ClInclude Include="Engine\update_manager.h"/>
+        <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h" />
+        <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h" />
+        <ClInclude Include="ThirdParty\imgui\imconfig.h" />
+        <ClInclude Include="ThirdParty\imgui\imgui.h" />
+        <ClInclude Include="ThirdParty\imgui\imgui_internal.h" />
+        <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h" />
+        <ClInclude Include="ThirdParty\imgui\imstb_textedit.h" />
+        <ClInclude Include="ThirdParty\imgui\imstb_truetype.h" />
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include=".clang-format"/>
+        <Content Include=".gitignore"/>
+    </ItemGroup>
+    <PropertyGroup Label="Globals">
+        <VCProjectVersion>17.0</VCProjectVersion>
+        <Keyword>Win32Proj</Keyword>
+        <ProjectGuid>{9f3a4869-9b6a-453c-be73-1cdd88803d68}</ProjectGuid>
+        <RootNamespace>Project</RootNamespace>
+        <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    </PropertyGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props"/>
+    <PropertyGroup Label="Configuration">
+        <ConfigurationType>Application</ConfigurationType>
+        <UseDebugLibraries>true</UseDebugLibraries>
+        <PlatformToolset>v143</PlatformToolset>
+        <CharacterSet>MultiByte</CharacterSet>
+    </PropertyGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props"/>
+    <ImportGroup Label="ExtensionSettings">
+    </ImportGroup>
+    <ImportGroup Label="Shared">
+    </ImportGroup>
+    <ImportGroup Label="PropertySheets">
+        <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform"/>
+    </ImportGroup>
+    <PropertyGroup Label="UserMacros"/>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
+            <PerUserRedirection>true</PerUserRedirection>
+        </Link>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
+            <PerUserRedirection>true</PerUserRedirection>
+        </Link>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
+            <PerUserRedirection>true</PerUserRedirection>
+        </Link>
+    </ItemDefinitionGroup>
+    <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+        <ClCompile>
+            <WarningLevel>Level3</WarningLevel>
+            <FunctionLevelLinking>true</FunctionLevelLinking>
+            <IntrinsicFunctions>true</IntrinsicFunctions>
+            <SDLCheck>true</SDLCheck>
+            <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+            <ConformanceMode>true</ConformanceMode>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+        </ClCompile>
+        <Link>
+            <SubSystem>Windows</SubSystem>
+            <EnableCOMDATFolding>true</EnableCOMDATFolding>
+            <OptimizeReferences>true</OptimizeReferences>
+            <GenerateDebugInformation>true</GenerateDebugInformation>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
+            <PerUserRedirection>true</PerUserRedirection>
+        </Link>
+    </ItemDefinitionGroup>
+    <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>
+    <ImportGroup Label="ExtensionTargets">
+    </ImportGroup>
 </Project>

@@ -1,5 +1,7 @@
 #include "component.h"
 
-namespace engine {
-Component::Component() : Object() {}
+namespace engine
+{
+Component::Component() : Object()
+{}
 }

@@ -22,7 +22,7 @@ void CustomUpdate(It begin_it, const It &end_it, Func func)
                                         Logger::GetTypeName(typeid(It).name()));
             continue;
         }
-    
+
         func(*begin_it);
     }
 }

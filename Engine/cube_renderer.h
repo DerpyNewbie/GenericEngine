@@ -16,7 +16,7 @@ public:
     void OnDraw() override;
 
     template <class Archive>
-  void serialize(Archive& ar)
+    void serialize(Archive &ar)
     {
         Object::serialize(ar);
     }
