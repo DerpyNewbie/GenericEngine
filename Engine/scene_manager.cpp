@@ -27,7 +27,7 @@ std::shared_ptr<Scene> SceneManager::CreateScene(const std::string &name)
 
 void SceneManager::AddScene(const std::shared_ptr<Scene> &scene)
 {
-    m_scenes_.emplace_back(scene);
+    m_scenes_.push_back(scene);
 }
 
 void SceneManager::DestroyScene(const std::string &name)
