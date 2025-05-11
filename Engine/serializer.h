@@ -13,25 +13,25 @@ public:
     void Save(std::shared_ptr<T> save_resource)
     {
         static_assert(std::is_base_of<Object, T>(),
-              "Base type is not Object.");
+                      "Base type is not Object.");
         std::string name = save_resource->Name() + ".json";
         std::ofstream os(name);
-        cereal::JSONOutputArchive oArchive(os);
-        
-        oArchive(save_resource);
+        cereal::JSONOutputArchive o_archive(os);
+
+        o_archive(save_resource);
     }
-    
+
     template <typename T>
-    std::shared_ptr<T> Load(std::shared_ptr<T> load_resource)
+    std::shared_ptr<T> Load(const std::string &file_name)
     {
         static_assert(std::is_base_of<Object, T>(),
-              "Base type is not Object.");
+                      "Base type is not Object.");
 
-        std::string name = load_resource->Name() + ".json";
-        std::ifstream is(name);
-        cereal::JSONInputArchive iArchive(is);
-        
-        iArchive(load_resource);
+        auto load_resource = std::make_shared<T>();
+        std::ifstream is(file_name);
+        cereal::JSONInputArchive i_archive(is);
+
+        i_archive(load_resource);
         return load_resource;
     }
 };
