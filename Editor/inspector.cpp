@@ -1,7 +1,7 @@
 ﻿#include "inspector.h"
 
 #include "imgui.h"
-#include "../Engine/game_object.h"
+#include "game_object.h"
 
 namespace editor
 {
@@ -12,7 +12,6 @@ void Inspector::OnConstructed()
 }
 void Inspector::OnEditorGui()
 {
-
     if (selected_game_object_ptr == nullptr)
     {
         ImGui::Text("Inspector is uninitialized!");

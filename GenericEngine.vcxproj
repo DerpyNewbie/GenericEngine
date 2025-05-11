@@ -114,14 +114,14 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
         </Link>
     </ItemDefinitionGroup>
@@ -133,7 +133,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
@@ -142,7 +142,7 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
         </Link>
     </ItemDefinitionGroup>
@@ -152,14 +152,14 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
         </Link>
     </ItemDefinitionGroup>
@@ -171,7 +171,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
@@ -180,7 +180,7 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include</AdditionalLibraryDirectories>
+            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine</AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
         </Link>
     </ItemDefinitionGroup>

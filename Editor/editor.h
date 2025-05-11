@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "hierarchy.h"
 #include "inspector.h"
-#include "../Engine/enable_shared_from_base.h"
-#include "../Engine/engine.h"
+#include "enable_shared_from_base.h"
+#include "engine.h"
 
 namespace editor
 {
