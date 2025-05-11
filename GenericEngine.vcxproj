@@ -38,7 +38,7 @@
         <ClCompile Include="Engine\scene_manager.cpp"/>
         <ClCompile Include="Engine\skinned_mesh_renderer.cpp" />
         <ClCompile Include="Engine\serializer.cpp"/>
-        <ClCompile Include="Engine\time.cpp"/>
+        <ClCompile Include="Engine\engine_time.cpp" />
         <ClCompile Include="Engine\transform.cpp"/>
         <ClCompile Include="Engine\update_manager.cpp"/>
         <ClCompile Include="main.cpp"/>
@@ -71,7 +71,7 @@
         <ClInclude Include="Engine\scene_manager.h"/>
         <ClInclude Include="Engine\skinned_mesh_renderer.h" />
         <ClInclude Include="Engine\serializer.h"/>
-        <ClInclude Include="Engine\time.h"/>
+        <ClInclude Include="Engine\engine_time.h" />
         <ClInclude Include="Engine\transform.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
         <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h" />
