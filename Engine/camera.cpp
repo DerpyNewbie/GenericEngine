@@ -1,10 +1,11 @@
 #include "camera.h"
 
 #include "DxLib.h"
+#include "game_object.h"
 
 namespace engine
 {
-void Camera::ApplyCameraSettingToDxLib()
+void Camera::ApplyCameraSettingToDxLib() const
 {
     switch (m_view_mode_)
     {
@@ -17,6 +18,8 @@ void Camera::ApplyCameraSettingToDxLib()
     }
 
     SetBackgroundColor(m_background_color_.r, m_background_color_.g, m_background_color_.b);
+    const auto transform = GameObject()->Transform();
+    SetCameraPositionAndTargetAndUpVec(transform->Position(), transform->Forward(), transform->Up());
 }
 
 void Camera::OnUpdate()

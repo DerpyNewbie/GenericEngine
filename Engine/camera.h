@@ -17,7 +17,7 @@ class Camera : public Component
     float m_ortho_size_ = 50;
     Color m_background_color_ = Color(0xFF000000);
 
-    void ApplyCameraSettingToDxLib();
+    void ApplyCameraSettingToDxLib() const;
 
 public:
     void OnUpdate() override;
