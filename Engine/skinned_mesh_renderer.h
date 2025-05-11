@@ -14,6 +14,12 @@ struct BoneInfo
     std::string name;
     std::string path;
     MATRIX rest_pose;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(frame_index, name, path);
+    }
 };
 
 class SkinnedMeshRenderer : public Renderer
@@ -71,9 +77,12 @@ public:
         }
     }
 
-    void OnDraw() override
+    void OnDraw() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
     {
-        MV1DrawModel(m_model_handle_);
+        ar(m_bones_);
     }
 };
 }
