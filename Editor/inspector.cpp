@@ -27,7 +27,7 @@ void Inspector::OnEditorGui()
     }
 
     for (const auto all_components = selected_go->GetComponents<engine::Component>();
-         const auto& component : all_components)
+         const auto &component : all_components)
     {
         if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
         {

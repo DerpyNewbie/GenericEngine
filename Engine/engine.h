@@ -42,8 +42,9 @@ public:
 
             ClearDrawScreen();
             UpdateManager::InvokeDrawCall();
-            
-            { // temporary engine info drawer
+
+            {
+                // temporary engine info drawer
                 const auto time = Time::Get();
                 DrawFormatString(20, 20, 0xffffffff, "fps: %3d, f: %03d, dt: %f",
                                  time->Fps(), time->Frames() % 1000, time->DeltaTime());

@@ -22,10 +22,9 @@ class Camera : public Component
 public:
     void OnUpdate() override;
     template <class Archive>
-  void serialize(Archive& ar)
+    void serialize(Archive &ar)
     {
         Object::serialize(ar);
     }
-    
 };
 }
