@@ -58,9 +58,6 @@
     <ClCompile Include="Engine\update_manager.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Editor\engine_editor.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
     <ClCompile Include="Editor\hierarchy.cpp">
       <Filter>editor</Filter>
     </ClCompile>
@@ -68,6 +65,31 @@
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Engine\factory.cpp" />
+    <ClCompile Include="Engine\camera.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\color.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\cube_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\editor.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\editor_window.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\serializer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\skinned_mesh_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\enable_shared_from_base.h" />
@@ -85,27 +107,6 @@
     </ClInclude>
     <ClInclude Include="ThirdParty\dxlib_h\DxLib.h">
       <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="Engine\component.h">
       <Filter>engine</Filter>
@@ -143,14 +144,35 @@
     <ClInclude Include="Engine\update_manager.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\engine_editor.h">
-      <Filter>editor</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\hierarchy.h">
       <Filter>editor</Filter>
     </ClInclude>
     <ClInclude Include="Editor\inspector.h">
       <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\camera.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\color.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\cube_renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\editor.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\editor_window.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\serializer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\skinned_mesh_renderer.h">
+      <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
