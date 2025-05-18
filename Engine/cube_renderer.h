@@ -18,7 +18,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        Object::serialize(ar);
+        ar(cereal::base_class<Component>(this));        
     }
 };
 }

@@ -59,6 +59,7 @@
         <ClInclude Include="Engine\color.h"/>
         <ClInclude Include="Engine\component.h"/>
         <ClInclude Include="Engine\cube_renderer.h"/>
+        <ClInclude Include="Engine\dxlib_serializer.h" />
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
         <ClInclude Include="Engine\engine_util.h"/>

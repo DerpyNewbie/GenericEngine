@@ -5,12 +5,6 @@
 #include <memory>
 #include <vector>
 
-template<class Archive>
-void serialize(Archive& ar,MATRIX& matrix)
-{
-    ar(matrix.m);
-}
-
 namespace engine
 {
 class Transform : public Component
@@ -79,9 +73,10 @@ public:
     }
 
     template <class Archive>
-  void serialize(Archive& ar)
+    void serialize(Archive& ar)
     {
-        ar(m_parent_,m_children_);
+        // TODO: serialize matrix
+        ar(cereal::base_class<Component>(this), m_parent_, m_children_);
     }
 };
 }

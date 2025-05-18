@@ -154,5 +154,3 @@ void Transform::SetLocalMatrix(const MATRIX &matrix)
 }
 
 CEREAL_REGISTER_TYPE(engine::Transform)
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::Transform)

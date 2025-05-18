@@ -7,6 +7,7 @@
 #include <cereal/archives/json.hpp>
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/array.hpp>
+#include "dxlib_serializer.h"
 
 namespace engine
 {

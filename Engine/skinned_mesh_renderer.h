@@ -82,7 +82,8 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(m_bones_);
+        // TODO: reload model
+        ar(cereal::base_class<Component>(this), m_bones_);
     }
 };
 }

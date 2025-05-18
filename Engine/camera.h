@@ -21,10 +21,11 @@ class Camera : public Component
 
 public:
     void OnUpdate() override;
+
     template <class Archive>
     void serialize(Archive &ar)
     {
-        Object::serialize(ar);
+        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_field_of_view_), CEREAL_NVP(m_ortho_size_));
     }
 };
 }

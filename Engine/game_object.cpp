@@ -5,6 +5,8 @@
 #include "scene.h"
 #include "scene_manager.h"
 
+#include "cereal/archives/json.hpp"
+
 namespace engine
 {
 GameObject::GameObject(): Object()
@@ -112,4 +114,15 @@ void GameObject::SetAsRootObject(const bool is_root_object)
         scene->m_root_game_objects_.erase(pos);
     }
 }
+
+template <class Archive>
+void GameObject::serialize(Archive &ar)
+{
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_name_), CEREAL_NVP(m_is_active_), CEREAL_NVP(m_components_));
 }
+}
+
+template void engine::GameObject::serialize<cereal::JSONOutputArchive>( cereal::JSONOutputArchive & );
+template void engine::GameObject::serialize<cereal::JSONInputArchive>( cereal::JSONInputArchive & );
+
+CEREAL_REGISTER_TYPE(engine::GameObject)

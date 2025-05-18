@@ -6,5 +6,3 @@ void engine::SkinnedMeshRenderer::OnDraw()
 }
 
 CEREAL_REGISTER_TYPE(engine::SkinnedMeshRenderer)
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::SkinnedMeshRenderer)

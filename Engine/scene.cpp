@@ -3,6 +3,8 @@
 #include "game_object.h"
 #include "update_manager.h"
 
+#include "cereal/archives/json.hpp"
+
 namespace engine
 {
 void Scene::OnFixedUpdate()
@@ -32,4 +34,16 @@ const std::vector<std::shared_ptr<GameObject>> &Scene::RootGameObjects()
 {
     return m_root_game_objects_;
 }
+
+template <class Archive>
+void Scene::serialize(Archive &ar)
+{
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_root_game_objects_), CEREAL_NVP(m_all_game_objects_));
 }
+}
+
+template void engine::Scene::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &);
+template void engine::Scene::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &);
+
+
+CEREAL_REGISTER_TYPE(engine::Scene)

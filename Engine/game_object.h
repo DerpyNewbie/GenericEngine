@@ -154,9 +154,6 @@ private:
 
 public:
     template <class Archive>
-    void serialize(Archive &ar)
-    {
-        ar(CEREAL_NVP(m_scene_),CEREAL_NVP(m_name_), CEREAL_NVP(m_is_active_),CEREAL_NVP(m_components_));
-    }
+    void serialize(Archive &ar);
 };
 }

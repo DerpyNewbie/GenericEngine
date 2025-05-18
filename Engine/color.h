@@ -48,5 +48,11 @@ struct Color
     static Color FromHsv(short h, Byte s, Byte v);
 
     static Color FromDxLibColor(unsigned int hex_argb);
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(r, g, b, a);
+    }
 };
 }
