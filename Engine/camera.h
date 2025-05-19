@@ -25,7 +25,11 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_field_of_view_), CEREAL_NVP(m_ortho_size_));
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_view_mode_),
+           CEREAL_NVP(m_field_of_view_),
+           CEREAL_NVP(m_ortho_size_),
+           CEREAL_NVP(m_background_color_));
     }
 };
 }

@@ -83,7 +83,9 @@ public:
     void serialize(Archive &ar)
     {
         // TODO: reload model
-        ar(cereal::base_class<Component>(this), m_bones_);
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_bones_),
+           CEREAL_NVP(m_transforms_));
     }
 };
 }

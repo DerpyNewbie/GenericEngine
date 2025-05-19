@@ -18,7 +18,11 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this));        
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(extent),
+           CEREAL_NVP(diffuse_color),
+           CEREAL_NVP(specular_color),
+           CEREAL_NVP(fill));
     }
 };
 }

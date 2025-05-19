@@ -29,5 +29,3 @@ void Camera::OnUpdate()
 }
 
 CEREAL_REGISTER_TYPE(engine::Camera)
-
-CEREAL_REGISTER_POLYMORPHIC_RELATION(engine::Component, engine::Camera)

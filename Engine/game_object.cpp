@@ -118,7 +118,7 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 template <class Archive>
 void GameObject::serialize(Archive &ar)
 {
-    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_name_), CEREAL_NVP(m_is_active_), CEREAL_NVP(m_components_));
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_is_active_), CEREAL_NVP(m_components_));
 }
 }
 
