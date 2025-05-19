@@ -75,8 +75,7 @@ public:
     template <class Archive>
     void serialize(Archive& ar)
     {
-        // TODO: serialize matrix
-        ar(cereal::base_class<Component>(this), m_parent_, m_children_);
+        ar(cereal::base_class<Component>(this), m_matrix_, m_parent_, m_children_);
     }
 };
 }
