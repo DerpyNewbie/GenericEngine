@@ -1,9 +1,9 @@
 #include "game_object.h"
-
-#include "component.h"
-#include "transform.h"
 #include "scene.h"
 #include "scene_manager.h"
+
+#include "Components/component.h"
+#include "Components/transform.h"
 
 #include "cereal/archives/json.hpp"
 
@@ -56,7 +56,7 @@ std::string GameObject::Path() const
     return Transform()->Parent()->GameObject()->Path() + "/" + m_name_;
 }
 
-std::string GameObject::PathFrom(std::shared_ptr<GameObject> parent)
+std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent)
 {
     if (Transform() == nullptr || parent->Transform() == nullptr || !Transform()->IsChildOf(parent->Transform()))
         return m_name_;

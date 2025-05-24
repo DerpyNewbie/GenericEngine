@@ -1,7 +1,7 @@
 #include "engine_util.h"
 
 #include "logger.h"
-#include "component.h"
+#include "Components/component.h"
 
 #include <cassert>
 #include <codecvt>

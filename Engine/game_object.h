@@ -5,9 +5,9 @@
 
 #include "logger.h"
 #include "object.h"
-#include "component.h"
 #include "engine_util.h"
-#include "transform.h"
+#include "Components/component.h"
+#include "Components/transform.h"
 
 namespace engine
 {
@@ -32,7 +32,7 @@ public:
     std::shared_ptr<Scene> Scene() const;
 
     std::string Path() const;
-    std::string PathFrom(std::shared_ptr<GameObject> parent);
+    std::string PathFrom(const std::shared_ptr<GameObject> &parent);
 
     template <typename T>
     std::shared_ptr<T> AddComponent()

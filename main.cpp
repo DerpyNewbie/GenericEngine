@@ -1,9 +1,9 @@
 ﻿#include "Engine/engine.h"
 #include "Editor/editor.h"
-#include "Engine/camera.h"
-#include "Engine/cube_renderer.h"
 #include "Engine/scene.h"
-#include "Engine/skinned_mesh_renderer.h"
+#include "Engine/Components/camera.h"
+#include "Engine/Components/cube_renderer.h"
+#include "Engine/Components/skinned_mesh_renderer.h"
 
 #include <DxLib.h>
 
