@@ -2,6 +2,7 @@
 #include "Editor/editor.h"
 #include "Engine/scene.h"
 #include "Engine/Components/camera.h"
+#include "Engine/Components/controller.h"
 #include "Engine/Components/cube_renderer.h"
 #include "Engine/Components/skinned_mesh_renderer.h"
 
@@ -18,6 +19,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     { // Sample scene creation
         const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
         camera->AddComponent<engine::Camera>();
+        camera->AddComponent<engine::Controller>();
 
         const auto cube_renderer = engine::Object::Instantiate<engine::GameObject>("Cube");
         cube_renderer->AddComponent<engine::CubeRenderer>();

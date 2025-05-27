@@ -21,6 +21,8 @@ public:
             return false;
         }
 
+        SetUseZBuffer3D(true);
+
         Time::Get()->Init();
         SceneManager::CreateScene("Default Scene");
 

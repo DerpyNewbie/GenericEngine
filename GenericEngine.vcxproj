@@ -176,6 +176,7 @@
           <AdditionalIncludeDirectories>G:\Users\derpy\Documents\GitHub\GenericEngine\ThirdParty\dxlib_h;G:\Users\derpy\Documents\GitHub\GenericEngine\ThirdParty\imgui;G:\Users\derpy\Documents\GitHub\GenericEngine\ThirdParty\cereal\include;G:\Users\derpy\Documents\GitHub\GenericEngine\Engine</AdditionalIncludeDirectories>
           <LinkCompiled>true</LinkCompiled>
         </ClCompile>
+        <ClCompile Include="Engine\Components\controller.cpp" />
         <ClCompile Include="Engine\Components\cube_renderer.cpp">
           <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
           <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -508,6 +509,7 @@
         <ClInclude Include="Engine\color.h" />
         <ClInclude Include="Engine\Components\camera.h" />
         <ClInclude Include="Engine\Components\component.h" />
+        <ClInclude Include="Engine\Components\controller.h" />
         <ClInclude Include="Engine\Components\cube_renderer.h" />
         <ClInclude Include="Engine\Components\renderer.h" />
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
