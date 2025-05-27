@@ -512,6 +512,8 @@
         <ClInclude Include="Engine\Components\renderer.h" />
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
         <ClInclude Include="Engine\Components\transform.h" />
+        <ClInclude Include="Engine\dxlib_helper.h" />
+        <ClInclude Include="Engine\dxlib_math.h" />
         <ClInclude Include="Engine\dxlib_serializer.h" />
         <ClInclude Include="Engine\enable_shared_from_base.h" />
         <ClInclude Include="Engine\engine.h" />

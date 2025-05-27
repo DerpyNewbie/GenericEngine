@@ -1,5 +1,6 @@
 ﻿#include "editor.h"
 
+#include "dxlib_helper.h"
 #include "../Engine/scene_manager.h"
 
 #include <DxLib.h>
@@ -37,7 +38,8 @@ void Editor::Init()
         font_config.MergeMode = true;
         font_config.GlyphRanges = io.Fonts->GetGlyphRangesJapanese();
         io.Fonts->AddFontDefault();
-        ImFont* font = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\meiryo.ttc)", 18.0f, &font_config, io.Fonts->GetGlyphRangesJapanese());
+        ImFont *font = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\meiryo.ttc)", 18.0f, &font_config,
+                                                    io.Fonts->GetGlyphRangesJapanese());
         IM_ASSERT(font != nullptr);
 
         ImGui_ImplWin32_Init(GetMainWindowHandle());
@@ -68,7 +70,9 @@ void Editor::OnDraw()
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
     }
-    
+
+    DxLibHelper::DrawYPlaneGrid();
+
     m_hierarchy_->DrawGui();
     m_inspector_->DrawGui();
 
@@ -81,7 +85,7 @@ void Editor::OnDraw()
             ImGui::RenderPlatformWindowsDefault();
         }
     }
-    
+
     RefreshDxLibDirect3DSetting();
 }
 void Editor::Finalize()
