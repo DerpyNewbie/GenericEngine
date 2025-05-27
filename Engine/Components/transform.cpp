@@ -10,40 +10,35 @@ MATRIX Transform::ParentMatrix() const
         return MGetIdent();
     }
     const auto parent = m_parent_.lock();
-    return MMult(parent->m_parent_.lock()->ParentMatrix(), parent->m_matrix_);
-}
-
-MATRIX Transform::Compose(const VECTOR &scale, const MATRIX &rotation, const VECTOR &translation)
-{
-    return MMult(MGetScale(scale), MMult(MGetRotElem(rotation), MGetTranslate(translation)));
+    return parent->m_parent_.lock()->ParentMatrix() * parent->m_matrix_;
 }
 
 MATRIX Transform::LocalToWorld() const
 {
-    return MInverse(MMult(ParentMatrix(), m_matrix_));
+    return MInverse(ParentMatrix() * m_matrix_);
 }
 
 MATRIX Transform::WorldToLocal() const
 {
-    return MMult(ParentMatrix(), m_matrix_);
+    return ParentMatrix() * m_matrix_;
 }
 
 VECTOR Transform::Position() const
 {
-    MATRIX ltw = LocalToWorld();
-    return MGetTranslateElem(ltw);
+    MATRIX wtl = WorldToLocal();
+    return MGetTranslateElem(wtl);
 }
 
 MATRIX Transform::Rotation() const
 {
-    const MATRIX ltw = LocalToWorld();
-    return MGetRotElem(ltw);
+    const MATRIX wtl = WorldToLocal();
+    return MGetRotElem(wtl);
 }
 
 VECTOR Transform::Scale() const
 {
-    const MATRIX ltw = LocalToWorld();
-    return MGetSize(MMult(ltw, MGetRotElem(MInverse(ltw))));
+    const MATRIX wtl = WorldToLocal();
+    return MGetSize(wtl * MGetRotElem(MInverse(wtl)));
 }
 VECTOR Transform::LocalPosition() const
 {
@@ -57,7 +52,7 @@ MATRIX Transform::LocalRotation() const
 
 VECTOR Transform::LocalScale() const
 {
-    return MGetSize(MMult(m_matrix_, MGetRotElem(MInverse(m_matrix_))));
+    return MGetSize(m_matrix_ * MGetRotElem(MInverse(m_matrix_)));
 }
 
 std::shared_ptr<Transform> Transform::Parent() const
@@ -125,27 +120,27 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 
 void Transform::SetPosition(const VECTOR position)
 {
-    m_matrix_ = Compose(LocalScale(), LocalRotation(), VTransform(position, WorldToLocal()));
+    m_matrix_ = m_matrix_ * MGetTranslate(position - Position());
 }
 
 void Transform::SetRotation(const MATRIX &rotation)
 {
-    m_matrix_ = Compose(LocalScale(), MMult(rotation, MGetRotElem(WorldToLocal())), LocalPosition());
+    m_matrix_ = rotation * MInverse(Rotation()) * m_matrix_;
 }
 
 void Transform::SetLocalPosition(const VECTOR local_position)
 {
-    m_matrix_ = Compose(LocalScale(), LocalRotation(), local_position);
+    m_matrix_ = m_matrix_ * MGetTranslate(local_position - LocalPosition());
 }
 
-void Transform::SetLocalRotation(const MATRIX &rotation)
+void Transform::SetLocalRotation(const MATRIX &local_rotation)
 {
-    m_matrix_ = Compose(LocalScale(), MGetRotElem(rotation), LocalPosition());
+    m_matrix_ = local_rotation * MInverse(LocalRotation()) * m_matrix_;
 }
 
 void Transform::SetLocalScale(const VECTOR local_scale)
 {
-    m_matrix_ = Compose(local_scale, LocalRotation(), LocalPosition());
+    m_matrix_ = MGetScale(LocalScale() - local_scale);
 }
 void Transform::SetLocalMatrix(const MATRIX &matrix)
 {

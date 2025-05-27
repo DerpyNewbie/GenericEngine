@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 
+#include "dxlib_math.h"
+
 namespace engine
 {
 class Transform : public Component
@@ -14,7 +16,6 @@ class Transform : public Component
     std::vector<std::weak_ptr<Transform>> m_children_;
 
     [[nodiscard]] MATRIX ParentMatrix() const;
-    static MATRIX Compose(const VECTOR &scale, const MATRIX &rotation, const VECTOR &translation);
 
 public:
     [[nodiscard]] MATRIX LocalToWorld() const;
@@ -38,38 +39,39 @@ public:
     void SetRotation(const MATRIX &rotation);
 
     void SetLocalPosition(VECTOR local_position);
-    void SetLocalRotation(const MATRIX &rotation);
+    void SetLocalRotation(const MATRIX &local_rotation);
     void SetLocalScale(VECTOR local_scale);
+
     void SetLocalMatrix(const MATRIX &matrix);
 
     [[nodiscard]] VECTOR Forward() const
     {
-        return VTransform(VGet(0, 0, 1), LocalToWorld());
+        return VECTOR{0, 0, 1} * Rotation();
     }
 
     [[nodiscard]] VECTOR Back() const
     {
-        return VTransform(VGet(0, 0, -1), LocalToWorld());
+        return VECTOR{0, 0, -1} * Rotation();
     }
 
     [[nodiscard]] VECTOR Right() const
     {
-        return VTransform(VGet(1, 0, 0), LocalToWorld());
+        return VECTOR{1, 0, 0} * Rotation();
     }
 
     [[nodiscard]] VECTOR Left() const
     {
-        return VTransform(VGet(-1, 0, 0), LocalToWorld());
+        return VECTOR{-1, 0, 0} * Rotation();
     }
 
     [[nodiscard]] VECTOR Up() const
     {
-        return VTransform(VGet(0, 1, 0), LocalToWorld());
+        return VECTOR{0, 1, 0} * Rotation();
     }
 
     [[nodiscard]] VECTOR Down() const
     {
-        return VTransform(VGet(0, -1, 0), LocalToWorld());
+        return VECTOR{0, -1, 0} * Rotation();
     }
 
     template <class Archive>
