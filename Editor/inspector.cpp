@@ -25,12 +25,12 @@ void Inspector::OnEditorGui()
         return;
     }
 
-    for (const auto all_components = selected_go->GetComponents<engine::Component>();
+    for (const auto all_components = selected_go->GetComponents();
          const auto &component : all_components)
     {
         if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
         {
-            ImGui::Text("TODO: Draw some fields!");
+            component->OnInspectorGui();
         }
     }
 }

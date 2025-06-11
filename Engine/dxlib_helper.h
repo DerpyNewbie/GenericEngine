@@ -17,7 +17,7 @@ namespace DxLibHelper
  * @param size 描画するビルボードのサイズ。デフォルトは24
  */
 static void DrawString3D(const VECTOR &pos, const char *str,
-                         const unsigned int color, const unsigned int edge_color = 0, const float size = 24)
+                         const unsigned int color, const unsigned int edge_color = 0, const float size = 8)
 {
     int size_x, size_y, line_count;
     GetDrawStringSize(&size_x, &size_y, &line_count, str, static_cast<int>(strlen(str)));
@@ -174,7 +174,7 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
 static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix)
 {
     const auto pos = VTransform({0, 0, 0}, object_matrix);
-    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255));
+    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0, 4);
     DrawAxis3D(object_matrix);
 }
 

@@ -40,13 +40,13 @@ public:
         static_assert(std::is_base_of<Component, T>(),
                       "Base type is not Component.");
 
-        auto instance = Object::Instantiate<T>(EngineUtil::GetTypeName(typeid(T).name()));
-        auto converted_instance = std::dynamic_pointer_cast<Component>(instance);
-        converted_instance->m_game_object_ = shared_from_base<GameObject>();
-        m_components_.push_back(converted_instance);
+        std::shared_ptr<T> instance = Object::Instantiate<T>(EngineUtil::GetTypeName(typeid(T).name()));
+        // const std::shared_ptr<Component> converted_instance = std::dynamic_pointer_cast<Component>(instance);
+        instance->m_game_object_ = shared_from_base<GameObject>();
+        m_components_.push_back(instance);
 
-        converted_instance->OnAwake();
-        Logger::Log<GameObject>("(%s): Added component %s", Path().c_str(), converted_instance->m_name_.c_str());
+        instance->OnAwake();
+        Logger::Log<GameObject>("(%s): Added component '%s'", Path().c_str(), instance->m_name_.c_str());
         return instance;
     }
 
@@ -79,6 +79,11 @@ public:
         }
 
         return results;
+    }
+
+    std::vector<std::shared_ptr<Component>> GetComponents() const
+    {
+        return m_components_;    
     }
 
     template <typename T>

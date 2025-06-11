@@ -20,7 +20,9 @@ void Camera::ApplyCameraSettingToDxLib() const
     SetBackgroundColor(m_background_color_.r, m_background_color_.g, m_background_color_.b);
     SetCameraNearFar(m_near_plane_, m_far_plane_);
     const auto transform = GameObject()->Transform();
-    SetCameraViewMatrix(transform->LocalToWorld());
+    // SetCameraPositionAndTargetAndUpVec(transform->Position(), transform->Position() + transform->Forward(),
+    //                                    transform->Up());
+    SetCameraViewMatrix(transform->WorldToLocal());
 }
 
 void Camera::OnUpdate()

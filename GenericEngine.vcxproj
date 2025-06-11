@@ -486,6 +486,7 @@
         <ClCompile Include="Engine\event_receivers.cpp" />
         <ClCompile Include="Engine\game_object.cpp" />
         <ClCompile Include="Engine\logger.cpp" />
+        <ClCompile Include="Engine\Math\quaternion.cpp" />
         <ClCompile Include="Engine\object.cpp" />
         <ClCompile Include="Engine\scene.cpp" />
         <ClCompile Include="Engine\scene_manager.cpp" />
@@ -523,6 +524,7 @@
         <ClInclude Include="Engine\event_receivers.h" />
         <ClInclude Include="Engine\game_object.h" />
         <ClInclude Include="Engine\logger.h" />
+        <ClInclude Include="Engine\Math\quaternion.h" />
         <ClInclude Include="Engine\object.h" />
         <ClInclude Include="Engine\scene.h" />
         <ClInclude Include="Engine\scene_manager.h" />

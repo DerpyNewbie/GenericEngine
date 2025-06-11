@@ -125,4 +125,5 @@ void GameObject::serialize(Archive &ar)
 template void engine::GameObject::serialize<cereal::JSONOutputArchive>( cereal::JSONOutputArchive & );
 template void engine::GameObject::serialize<cereal::JSONInputArchive>( cereal::JSONInputArchive & );
 
+
 CEREAL_REGISTER_TYPE(engine::GameObject)

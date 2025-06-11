@@ -14,8 +14,12 @@ public:
         auto n = str.find_last_of(':');
         if (n == std::string::npos)
         {
-            Error("Could not find type name for %s", typeid_name);
-            n = 5;
+            n = str.find_last_of(' ');
+            if (n == std::string::npos)
+            {
+                Error("Could not find type name for %s", typeid_name);
+                n = 5;
+            }
         }
 
         return str.substr(n + 1);

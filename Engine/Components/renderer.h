@@ -6,6 +6,7 @@ namespace engine
 {
 class Renderer : public Component, public IDrawCallReceiver
 {
+public:
     void OnAwake() override;
 };
 }

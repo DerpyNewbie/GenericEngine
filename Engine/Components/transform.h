@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "dxlib_math.h"
+#include "Math/quaternion.h"
 
 namespace engine
 {
@@ -13,20 +14,22 @@ class Transform : public Component
 {
     MATRIX m_matrix_ = MGetIdent();
     std::weak_ptr<Transform> m_parent_ = {};
-    std::vector<std::weak_ptr<Transform>> m_children_;
+    std::vector<std::shared_ptr<Transform>> m_children_;
 
     [[nodiscard]] MATRIX ParentMatrix() const;
 
 public:
+    void OnInspectorGui() override;
+    
     [[nodiscard]] MATRIX LocalToWorld() const;
     [[nodiscard]] MATRIX WorldToLocal() const;
 
     [[nodiscard]] VECTOR Position() const;
-    [[nodiscard]] MATRIX Rotation() const;
+    [[nodiscard]] Quaternion Rotation() const;
     [[nodiscard]] VECTOR Scale() const;
 
     [[nodiscard]] VECTOR LocalPosition() const;
-    [[nodiscard]] MATRIX LocalRotation() const;
+    [[nodiscard]] Quaternion LocalRotation() const;
     [[nodiscard]] VECTOR LocalScale() const;
 
     [[nodiscard]] std::shared_ptr<Transform> Parent() const;
@@ -36,13 +39,19 @@ public:
     void SetParent(const std::shared_ptr<Transform> &next_parent);
 
     void SetPosition(VECTOR position);
-    void SetRotation(const MATRIX &rotation);
+    void SetRotation(const Quaternion &rotation);
 
     void SetLocalPosition(VECTOR local_position);
-    void SetLocalRotation(const MATRIX &local_rotation);
+    void SetLocalRotation(const Quaternion &local_rotation);
     void SetLocalScale(VECTOR local_scale);
 
     void SetLocalMatrix(const MATRIX &matrix);
+
+    // Rotates around a pivot point in world space
+    void RotateAround(const VECTOR &pivot_point, const VECTOR &axis, float angle_degrees);
+
+    // Rotates around a pivot point using a quaternion
+    void RotateAround(const VECTOR &pivot_point, const Quaternion &rotation);
 
     [[nodiscard]] VECTOR Forward() const
     {

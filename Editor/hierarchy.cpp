@@ -1,5 +1,6 @@
 ﻿#include "hierarchy.h"
 
+#include "dxlib_helper.h"
 #include "imgui.h"
 #include "../Engine/scene.h"
 #include "../Engine/scene_manager.h"
@@ -20,6 +21,12 @@ void Hierarchy::OnEditorGui()
          const auto &scene : current_scenes)
     {
         DrawScene(scene);
+    }
+
+    if (selected_game_object != nullptr)
+    {
+        DxLibHelper::DrawObjectInfo(selected_game_object->Name().c_str(),
+                                    selected_game_object->Transform()->WorldToLocal());
     }
 }
 void Hierarchy::DrawMenu()

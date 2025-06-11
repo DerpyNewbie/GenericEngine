@@ -22,6 +22,12 @@ class Camera : public Component
     void ApplyCameraSettingToDxLib() const;
 
 public:
+    void OnAwake() override
+    {}
+
+    void OnStart() override
+    {}
+    
     void OnUpdate() override;
 
     template <class Archive>

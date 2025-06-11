@@ -23,10 +23,11 @@ std::string EngineUtil::GetTypeName(const std::shared_ptr<Component> &component)
 {
     return GetTypeName(typeid(component.get()).name());
 }
-float *EngineUtil::ToFloat3(const VECTOR vec)
+void EngineUtil::ToFloat3(float buff[3], const VECTOR vec)
 {
-    float f3[] = {vec.x, vec.y, vec.z};
-    return f3;
+    buff[0] = vec.x;
+    buff[1] = vec.y;
+    buff[2] = vec.z;
 }
 std::wstring EngineUtil::ShiftJisToUtf16(const std::string &shift_jis_string)
 {

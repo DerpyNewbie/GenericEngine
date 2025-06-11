@@ -1,7 +1,6 @@
 #pragma once
 
 #include <DxLib.h>
-#include <array>
 #include <type_traits>
 
 template <class T>
