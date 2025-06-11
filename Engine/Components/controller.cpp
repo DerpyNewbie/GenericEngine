@@ -65,3 +65,5 @@ void Controller::OnUpdate()
     }
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Controller)

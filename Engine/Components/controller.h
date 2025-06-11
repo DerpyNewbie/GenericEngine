@@ -6,12 +6,14 @@ namespace engine
 class Controller : public Component
 {
     VECTOR m_rotation_ = {};
-public:
-    void OnAwake() override
-    {}
 
-    void OnStart() override
-    {}
+public:
     void OnUpdate() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_rotation_));
+    }
 };
 }
