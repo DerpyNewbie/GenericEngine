@@ -1,6 +1,6 @@
 #pragma once
-#include "color.h"
 #include "component.h"
+#include "Math/color.h"
 
 namespace engine
 {

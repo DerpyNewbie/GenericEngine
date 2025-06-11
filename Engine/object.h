@@ -8,6 +8,7 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/array.hpp>
 #include "dxlib_serializer.h"
+#include "Math/math_serializer.h"
 
 namespace engine
 {

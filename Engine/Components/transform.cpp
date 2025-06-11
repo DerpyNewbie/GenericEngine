@@ -4,7 +4,7 @@
 
 namespace engine
 {
-MATRIX Transform::ParentMatrix() const
+Matrix4x4 Transform::ParentMatrix() const
 {
     if (m_parent_.expired())
     {
@@ -49,25 +49,25 @@ void Transform::OnInspectorGui()
         SetLocalScale({local_scale[0], local_scale[1], local_scale[2]});
     }
 }
-MATRIX Transform::WorldToLocal() const
+Matrix4x4 Transform::WorldToLocal() const
 {
     return MInverse(LocalToWorld());
 }
 
-MATRIX Transform::LocalToWorld() const
+Matrix4x4 Transform::LocalToWorld() const
 {
     return ParentMatrix() * m_matrix_;
 }
-VECTOR Transform::Position() const
+Vector3 Transform::Position() const
 {
-    auto local_to_world = LocalToWorld();
+    MATRIX local_to_world = LocalToWorld();
     return MGetTranslateElem(local_to_world);
 }
 
 Quaternion Transform::Rotation() const
 {
     // Get rotation part of the world transform matrix
-    MATRIX rotation_matrix = MGetRotElem(LocalToWorld());
+    Matrix4x4 rotation_matrix = MGetRotElem(LocalToWorld());
 
     // Extract quaternion using the robust method
     Quaternion rotation = Quaternion::FromMatrix(rotation_matrix);
@@ -77,12 +77,12 @@ Quaternion Transform::Rotation() const
     return rotation;
 }
 
-VECTOR Transform::Scale() const
+Vector3 Transform::Scale() const
 {
-    const MATRIX local_to_world = LocalToWorld();
+    const Matrix4x4 local_to_world = LocalToWorld();
     return MGetSize(local_to_world * MGetRotElem(MInverse(local_to_world)));
 }
-VECTOR Transform::LocalPosition() const
+Vector3 Transform::LocalPosition() const
 {
     MATRIX v = m_matrix_;
     return MGetTranslateElem(v);
@@ -90,7 +90,7 @@ VECTOR Transform::LocalPosition() const
 Quaternion Transform::LocalRotation() const
 {
     // Get rotation part of the local matrix
-    MATRIX rotation_matrix = MGetRotElem(m_matrix_);
+    Matrix4x4 rotation_matrix = MGetRotElem(m_matrix_);
 
     // Extract quaternion using the robust method
     Quaternion rotation = Quaternion::FromMatrix(rotation_matrix);
@@ -100,7 +100,7 @@ Quaternion Transform::LocalRotation() const
     return rotation;
 }
 
-VECTOR Transform::LocalScale() const
+Vector3 Transform::LocalScale() const
 {
     return MGetSize(m_matrix_ * MGetRotElem(MInverse(m_matrix_)));
 }
@@ -163,7 +163,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
-void Transform::SetPosition(const VECTOR position)
+void Transform::SetPosition(const Vector3 position)
 {
     // If we have no parent, just set the local position directly
     if (m_parent_.expired())
@@ -173,8 +173,8 @@ void Transform::SetPosition(const VECTOR position)
     }
 
     // Transform world position to local space using parent's world-to-local matrix
-    const MATRIX parent_world_to_local = MInverse(ParentMatrix());
-    const VECTOR local_position = position * parent_world_to_local;
+    const Matrix4x4 parent_world_to_local = MInverse(ParentMatrix());
+    const Vector3 local_position = position * parent_world_to_local;
 
     // Set the local position
     SetLocalPosition(local_position);
@@ -190,7 +190,7 @@ void Transform::SetRotation(const Quaternion &rotation)
     }
 
     // Get parent's world-to-local matrix to transform our rotation correctly
-    const MATRIX parent_world_to_local = MInverse(ParentMatrix());
+    const Matrix4x4 parent_world_to_local = MInverse(ParentMatrix());
 
     // Get parent's world rotation as a normalized quaternion
     const Quaternion parent_world_rotation = Quaternion::FromMatrix(MGetRotElem(ParentMatrix()));
@@ -205,39 +205,39 @@ void Transform::SetRotation(const Quaternion &rotation)
     // Set the local rotation
     SetLocalRotation(local_rotation);
 }
-void Transform::SetLocalPosition(const VECTOR local_position)
+void Transform::SetLocalPosition(const Vector3 local_position)
 {
-    const MATRIX trans = MGetTranslate(local_position);
-    const MATRIX rot = MGetRotElem(m_matrix_);
-    const MATRIX scale = MGetScale(LocalScale());
+    const Matrix4x4 trans = MGetTranslate(local_position);
+    const Matrix4x4 rot = MGetRotElem(m_matrix_);
+    const Matrix4x4 scale = MGetScale(LocalScale());
     m_matrix_ = scale * rot * trans;
 }
 
 void Transform::SetLocalRotation(const Quaternion &local_rotation)
 {
-    const MATRIX trans = MGetTranslate(LocalPosition());
-    const MATRIX rot = local_rotation.ToMatrix();
-    const MATRIX scale = MGetScale(LocalScale());
+    const Matrix4x4 trans = MGetTranslate(LocalPosition());
+    const Matrix4x4 rot = local_rotation.ToMatrix();
+    const Matrix4x4 scale = MGetScale(LocalScale());
     m_matrix_ = scale * rot * trans;
 }
 
-void Transform::SetLocalScale(const VECTOR local_scale)
+void Transform::SetLocalScale(const Vector3 local_scale)
 {
-    const MATRIX trans = MGetTranslate(LocalPosition());
-    const MATRIX rot = MGetRotElem(m_matrix_);
-    const MATRIX scale = MGetScale(local_scale);
+    const Matrix4x4 trans = Matrix4x4::FromTranslate(LocalPosition());
+    const Matrix4x4 rot = MGetRotElem(m_matrix_);
+    const Matrix4x4 scale = MGetScale(local_scale);
     m_matrix_ = scale * rot * trans;
 }
-void Transform::SetLocalMatrix(const MATRIX &matrix)
+void Transform::SetLocalMatrix(const Matrix4x4 &matrix)
 {
     m_matrix_ = matrix;
 }
 
-void Transform::RotateAround(const VECTOR &pivot_point, const VECTOR &axis, float angle_degrees)
+void Transform::RotateAround(const Vector3 &pivot_point, const Vector3 &axis, float angle_degrees)
 {
     // Convert axis and angle to quaternion
     const float angle_radians = angle_degrees * (DX_PI_F / 180.0f);
-    const VECTOR normalized_axis = VNorm(axis);
+    const Vector3 normalized_axis = VNorm(axis);
     const Quaternion rotation = Quaternion(normalized_axis.x * sinf(angle_radians * 0.5f),
                                            normalized_axis.y * sinf(angle_radians * 0.5f),
                                            normalized_axis.z * sinf(angle_radians * 0.5f),
@@ -247,19 +247,19 @@ void Transform::RotateAround(const VECTOR &pivot_point, const VECTOR &axis, floa
     RotateAround(pivot_point, rotation);
 }
 
-void Transform::RotateAround(const VECTOR &pivot_point, const Quaternion &rotation)
+void Transform::RotateAround(const Vector3 &pivot_point, const Quaternion &rotation)
 {
     // Get current position in world space
-    VECTOR current_position = Position();
+    Vector3 current_position = Position();
 
     // Step 1: Translate to make the pivot point the origin
-    VECTOR position_relative_to_pivot = VSub(current_position, pivot_point);
+    Vector3 position_relative_to_pivot = VSub(current_position, pivot_point);
 
     // Step 2: Rotate the position around the origin (now the pivot)
-    VECTOR rotated_position = position_relative_to_pivot * rotation;
+    Vector3 rotated_position = position_relative_to_pivot * rotation;
 
     // Step 3: Translate back
-    VECTOR new_position = VAdd(rotated_position, pivot_point);
+    Vector3 new_position = VAdd(rotated_position, pivot_point);
 
     // Step 4: Set the new position
     SetPosition(new_position);

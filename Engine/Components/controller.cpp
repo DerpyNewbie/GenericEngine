@@ -1,6 +1,7 @@
 #include "controller.h"
 #include "game_object.h"
 #include "transform.h"
+#include "Math/vector3.h"
 
 namespace engine
 {
@@ -12,7 +13,7 @@ void Controller::OnUpdate()
     const float rotate_speed = 2.0f; // Adjust this value to control rotation speed
 
     // Movement input
-    VECTOR dir = {0, 0, 0};
+    Vector3 dir = {0, 0, 0};
     if (CheckHitKey(KEY_INPUT_W))
         dir.z += 1.0f;
     if (CheckHitKey(KEY_INPUT_S))
@@ -51,16 +52,16 @@ void Controller::OnUpdate()
     if (VSize(delta_rot) > 0.001f)
     {
         m_rotation_ = m_rotation_ + delta_rot;
-        auto pitch = Quaternion::FromEulerDegrees({m_rotation_.x, 0, 0});
-        auto yaw = Quaternion::FromEulerDegrees({0, m_rotation_.y, 0});
+        auto pitch = Quaternion::FromEulerDegrees({m_rotation_.x, 0.0F, 0.0F});
+        auto yaw = Quaternion::FromEulerDegrees({0.0F, m_rotation_.y, 0.0F});
         transform->SetRotation(pitch * yaw);
     }
 
     // Apply movement in local space
     if (length > 0.001f)
     {
-        VECTOR world_dir = dir * transform->Rotation();
-        VECTOR new_pos = VAdd(transform->Position(), world_dir);
+        const Vector3 world_dir = dir * transform->Rotation();
+        const Vector3 new_pos = transform->Position() + world_dir;
         transform->SetPosition(new_pos);
     }
 }

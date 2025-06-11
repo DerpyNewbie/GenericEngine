@@ -1,6 +1,7 @@
 #pragma once
-#include "color.h"
 #include "renderer.h"
+#include "Math/color.h"
+
 #include <DxLib.h>
 
 namespace engine

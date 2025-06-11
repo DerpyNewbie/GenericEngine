@@ -6,31 +6,33 @@
 #include <vector>
 
 #include "dxlib_math.h"
+#include "Math/matrix4x4.h"
+#include "Math/vector3.h"
 #include "Math/quaternion.h"
 
 namespace engine
 {
 class Transform : public Component
 {
-    MATRIX m_matrix_ = MGetIdent();
+    Matrix4x4 m_matrix_ = MGetIdent();
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
-    [[nodiscard]] MATRIX ParentMatrix() const;
+    [[nodiscard]] Matrix4x4 ParentMatrix() const;
 
 public:
     void OnInspectorGui() override;
-    
-    [[nodiscard]] MATRIX LocalToWorld() const;
-    [[nodiscard]] MATRIX WorldToLocal() const;
 
-    [[nodiscard]] VECTOR Position() const;
+    [[nodiscard]] Matrix4x4 LocalToWorld() const;
+    [[nodiscard]] Matrix4x4 WorldToLocal() const;
+
+    [[nodiscard]] Vector3 Position() const;
     [[nodiscard]] Quaternion Rotation() const;
-    [[nodiscard]] VECTOR Scale() const;
+    [[nodiscard]] Vector3 Scale() const;
 
-    [[nodiscard]] VECTOR LocalPosition() const;
+    [[nodiscard]] Vector3 LocalPosition() const;
     [[nodiscard]] Quaternion LocalRotation() const;
-    [[nodiscard]] VECTOR LocalScale() const;
+    [[nodiscard]] Vector3 LocalScale() const;
 
     [[nodiscard]] std::shared_ptr<Transform> Parent() const;
     [[nodiscard]] std::shared_ptr<Transform> GetChild(int i) const;
@@ -38,49 +40,49 @@ public:
     [[nodiscard]] int ChildCount() const;
     void SetParent(const std::shared_ptr<Transform> &next_parent);
 
-    void SetPosition(VECTOR position);
+    void SetPosition(Vector3 position);
     void SetRotation(const Quaternion &rotation);
 
-    void SetLocalPosition(VECTOR local_position);
+    void SetLocalPosition(Vector3 local_position);
     void SetLocalRotation(const Quaternion &local_rotation);
-    void SetLocalScale(VECTOR local_scale);
+    void SetLocalScale(Vector3 local_scale);
 
-    void SetLocalMatrix(const MATRIX &matrix);
+    void SetLocalMatrix(const Matrix4x4 &matrix);
 
     // Rotates around a pivot point in world space
-    void RotateAround(const VECTOR &pivot_point, const VECTOR &axis, float angle_degrees);
+    void RotateAround(const Vector3 &pivot_point, const Vector3 &axis, float angle_degrees);
 
     // Rotates around a pivot point using a quaternion
-    void RotateAround(const VECTOR &pivot_point, const Quaternion &rotation);
+    void RotateAround(const Vector3 &pivot_point, const Quaternion &rotation);
 
-    [[nodiscard]] VECTOR Forward() const
+    [[nodiscard]] Vector3 Forward() const
     {
-        return VECTOR{0, 0, 1} * Rotation();
+        return Vector3{0, 0, 1} * Rotation();
     }
 
-    [[nodiscard]] VECTOR Back() const
+    [[nodiscard]] Vector3 Back() const
     {
-        return VECTOR{0, 0, -1} * Rotation();
+        return Vector3{0, 0, -1} * Rotation();
     }
 
-    [[nodiscard]] VECTOR Right() const
+    [[nodiscard]] Vector3 Right() const
     {
-        return VECTOR{1, 0, 0} * Rotation();
+        return Vector3{1, 0, 0} * Rotation();
     }
 
-    [[nodiscard]] VECTOR Left() const
+    [[nodiscard]] Vector3 Left() const
     {
-        return VECTOR{-1, 0, 0} * Rotation();
+        return Vector3{-1, 0, 0} * Rotation();
     }
 
-    [[nodiscard]] VECTOR Up() const
+    [[nodiscard]] Vector3 Up() const
     {
-        return VECTOR{0, 1, 0} * Rotation();
+        return Vector3{0, 1, 0} * Rotation();
     }
 
-    [[nodiscard]] VECTOR Down() const
+    [[nodiscard]] Vector3 Down() const
     {
-        return VECTOR{0, -1, 0} * Rotation();
+        return Vector3{0, -1, 0} * Rotation();
     }
 
     template <class Archive>
