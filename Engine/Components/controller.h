@@ -5,7 +5,7 @@ namespace engine
 {
 class Controller : public Component
 {
-    VECTOR m_rotation_ = {};
+    Vector3 m_rotation_ = {};
 
 public:
     void OnUpdate() override;

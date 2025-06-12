@@ -8,8 +8,6 @@
 
 namespace cereal
 {
-
-
 template <class Archive>
 void serialize(Archive &ar, engine::Vector2 v)
 {

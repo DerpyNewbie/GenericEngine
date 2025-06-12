@@ -1,5 +1,7 @@
 #include "color.h"
 
+#include <algorithm>
+
 namespace engine
 {
 unsigned int Color::Rgba() const

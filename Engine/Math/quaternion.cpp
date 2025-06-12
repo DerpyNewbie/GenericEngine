@@ -5,65 +5,52 @@
 
 namespace engine
 {
-Quaternion Quaternion::FromMatrix(const MATRIX &matrix)
+Quaternion Quaternion::FromMatrix(const Matrix4x4 &matrix)
 {
-    // Implementation based on Shepperd's method which is considered more robust
-    // Source: https://d3cw3dd2w32x2b.cloudfront.net/wp-content/uploads/2015/01/matrix-to-quat.pdf
-
     float m00 = matrix.m[0][0], m01 = matrix.m[0][1], m02 = matrix.m[0][2];
     float m10 = matrix.m[1][0], m11 = matrix.m[1][1], m12 = matrix.m[1][2];
     float m20 = matrix.m[2][0], m21 = matrix.m[2][1], m22 = matrix.m[2][2];
 
-    float t;
+    // Using a more stable algorithm for matrix to quaternion conversion
+    float trace = m00 + m11 + m22;
     Quaternion q;
 
-    // Check which diagonal element is largest
-    if (m22 < 0)
-    {
-        if (m00 > m11)
-        {
-            // m00 is largest diagonal
-            t = 1.0f + m00 - m11 - m22;
-            q = Quaternion(t, m01 + m10, m20 + m02, m12 - m21);
-        }
-        else
-        {
-            // m11 is largest diagonal
-            t = 1.0f - m00 + m11 - m22;
-            q = Quaternion(m01 + m10, t, m12 + m21, m20 - m02);
-        }
-    }
-    else
-    {
-        if (m00 < -m11)
-        {
-            // m22 is largest diagonal
-            t = 1.0f - m00 - m11 + m22;
-            q = Quaternion(m20 + m02, m12 + m21, t, m01 - m10);
-        }
-        else
-        {
-            // m00 + m11 + m22 is largest
-            t = 1.0f + m00 + m11 + m22;
-            q = Quaternion(m12 - m21, m20 - m02, m01 - m10, t);
-        }
+    if (trace > 0.0f) {
+        float s = sqrtf(trace + 1.0f) * 2.0f;
+        q.w = 0.25f * s;
+        q.x = (m21 - m12) / s;
+        q.y = (m02 - m20) / s;
+        q.z = (m10 - m01) / s;
+    } 
+    else if ((m00 > m11) && (m00 > m22)) {
+        float s = sqrtf(1.0f + m00 - m11 - m22) * 2.0f;
+        q.w = (m21 - m12) / s;
+        q.x = 0.25f * s;
+        q.y = (m01 + m10) / s;
+        q.z = (m02 + m20) / s;
+    } 
+    else if (m11 > m22) {
+        float s = sqrtf(1.0f + m11 - m00 - m22) * 2.0f;
+        q.w = (m02 - m20) / s;
+        q.x = (m01 + m10) / s;
+        q.y = 0.25f * s;
+        q.z = (m12 + m21) / s;
+    } 
+    else {
+        float s = sqrtf(1.0f + m22 - m00 - m11) * 2.0f;
+        q.w = (m10 - m01) / s;
+        q.x = (m02 + m20) / s;
+        q.y = (m12 + m21) / s;
+        q.z = 0.25f * s;
     }
 
-    // Normalize and scale to get a unit quaternion
-    const float scale = 0.5f / sqrtf(t);
-    return Quaternion(
-        q.x * scale,
-        q.y * scale,
-        q.z * scale,
-        q.w * scale
-        );
+    return q.Normalized();
 }
 Quaternion Quaternion::FromEulerRadians(const Vector3 &euler)
 {
-    // Convert angles to radians and get half angles
     const float pitch = euler.x * 0.5f; // X rotation
-    const float yaw = euler.y * 0.5f; // Y rotation
-    const float roll = euler.z * 0.5f; // Z rotation
+    const float yaw = euler.y * 0.5f;   // Y rotation
+    const float roll = euler.z * 0.5f;  // Z rotation
 
     // Pre-calculate sines and cosines
     const float cp = cosf(pitch);
@@ -73,12 +60,12 @@ Quaternion Quaternion::FromEulerRadians(const Vector3 &euler)
     const float cr = cosf(roll);
     const float sr = sinf(roll);
 
-    // Calculate quaternion components using ZYX order
+    // ZYX order for left-handed system
     return Quaternion{
-        cr * sp * cy + sr * cp * sy, // x
-        cr * cp * sy - sr * sp * cy, // y
-        sr * cp * cy - cr * sp * sy, // z
-        cr * cp * cy + sr * sp * sy // w
+        cr * sp * cy - sr * cp * sy,  // x
+        cr * cp * sy + sr * sp * cy,  // y
+        sr * cp * cy + cr * sp * sy,  // z
+        cr * cp * cy - sr * sp * sy   // w
     };
 }
 Quaternion Quaternion::FromEulerDegrees(const Vector3 &euler)
@@ -121,18 +108,19 @@ Matrix4x4 Quaternion::ToMatrix() const
 {
     Matrix4x4 result;
 
+    // For left-handed coordinate system
     result.m[0][0] = 1 - 2 * (y * y + z * z);
-    result.m[0][1] = 2 * (x * y - z * w);
-    result.m[0][2] = 2 * (x * z + y * w);
+    result.m[0][1] = 2 * (x * y - w * z);
+    result.m[0][2] = 2 * (x * z + w * y);
     result.m[0][3] = 0.0f;
 
-    result.m[1][0] = 2 * (x * y + z * w);
+    result.m[1][0] = 2 * (x * y + w * z);
     result.m[1][1] = 1 - 2 * (x * x + z * z);
-    result.m[1][2] = 2 * (y * z - x * w);
+    result.m[1][2] = 2 * (y * z - w * x);
     result.m[1][3] = 0.0f;
 
-    result.m[2][0] = 2 * (x * z - y * w);
-    result.m[2][1] = 2 * (y * z + x * w);
+    result.m[2][0] = 2 * (x * z - w * y);
+    result.m[2][1] = 2 * (y * z + w * x);
     result.m[2][2] = 1 - 2 * (x * x + y * y);
     result.m[2][3] = 0.0f;
 
@@ -197,5 +185,25 @@ void Quaternion::Normalize()
     y *= inv_mag;
     z *= inv_mag;
     w *= inv_mag;
+}
+Quaternion Quaternion::operator*(const Quaternion &other) const
+{
+    return {
+        w * other.x + x * other.w - y * other.z + z * other.y, // x
+        w * other.y + x * other.z + y * other.w - z * other.x, // y
+        w * other.z - x * other.y + y * other.x + z * other.w, // z
+        w * other.w - x * other.x - y * other.y - z * other.z  // w
+    };
+}
+Vector3 Quaternion::operator*(const Vector3& v) const
+{
+    // For left-handed coordinate system, we need to adjust the cross product signs
+    Quaternion p(v.x, v.y, v.z, 0);
+    
+    // For left-handed system: q * p * q^(-1)
+    auto q_conj = Conjugate();
+    auto result = (*this * p) * q_conj;
+    
+    return Vector3(result.x, result.y, result.z);
 }
 }

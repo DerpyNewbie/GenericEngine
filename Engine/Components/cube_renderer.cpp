@@ -8,7 +8,7 @@ namespace engine
 {
 void CubeRenderer::OnDraw()
 {
-    const auto matrix = GameObject()->Transform()->LocalToWorld();
+    const auto matrix = GameObject()->Transform()->WorldToLocal();
     const auto half_extent = VScale(extent, 0.5F);
     // DrawBox(0, 0, 500, 500, diffuse_color.Argb(), true);
     DrawCube3D(VTransform(half_extent, matrix), VTransform(VScale(half_extent, -1), matrix),

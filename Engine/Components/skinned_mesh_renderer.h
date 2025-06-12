@@ -13,7 +13,7 @@ struct BoneInfo
     int frame_index;
     std::string name;
     std::string path;
-    MATRIX rest_pose;
+    Matrix4x4 bind_pose;
 
     template <class Archive>
     void serialize(Archive &ar)
@@ -25,13 +25,17 @@ struct BoneInfo
 class SkinnedMeshRenderer : public Renderer
 {
     int m_model_handle_ = -1;
+    bool m_draw_bones_ = false;
     std::vector<std::shared_ptr<BoneInfo>> m_bones_;
     std::vector<std::shared_ptr<Transform>> m_transforms_;
 
 public:
-    void LoadModel(const std::string &file_path);
 
+    void OnInspectorGui() override;
+    
     void OnDraw() override;
+
+    void LoadModel(const std::string &file_path);
 
     template <class Archive>
     void serialize(Archive &ar)

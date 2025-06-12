@@ -1,5 +1,4 @@
 #pragma once
-#include "imgui.h"
 
 #include <memory>
 #include "object.h"
@@ -40,10 +39,7 @@ public:
     virtual void OnRender()
     {}
 
-    virtual void OnInspectorGui()
-    {
-        ImGui::Text("Default Inspector Gui");
-    }
+    virtual void OnInspectorGui();
 
     virtual void OnDestroy()
     {}

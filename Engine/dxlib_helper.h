@@ -17,7 +17,7 @@ namespace DxLibHelper
  * @param size 描画するビルボードのサイズ。デフォルトは24
  */
 static void DrawString3D(const VECTOR &pos, const char *str,
-                         const unsigned int color, const unsigned int edge_color = 0, const float size = 8)
+                         const unsigned int color, const unsigned int edge_color = 0, const float size = 0.01)
 {
     int size_x, size_y, line_count;
     GetDrawStringSize(&size_x, &size_y, &line_count, str, static_cast<int>(strlen(str)));
@@ -33,7 +33,7 @@ static void DrawString3D(const VECTOR &pos, const char *str,
         SetUseSetDrawScreenSettingReset(prev_draw_screen_setting);
     }
 
-    DrawBillboard3D(pos, 0.5F, 0.5f, size, 0, draw_screen, TRUE);
+    DrawBillboard3D(pos, 0.5F, 0.5f, size_x * size, 0, draw_screen, TRUE);
     DeleteGraph(draw_screen);
 }
 
@@ -69,7 +69,7 @@ static void DrawString3DToHandle(const VECTOR &pos, const char *str,
         SetUseSetDrawScreenSettingReset(prev_draw_screen_setting);
     }
 
-    DrawBillboard3D(pos, 0.5F, 0.5f, size, 0, draw_screen, TRUE);
+    DrawBillboard3D(pos, 0.5F, 0.5f, size_x * size, 0, draw_screen, TRUE);
     DeleteGraph(draw_screen);
 }
 
@@ -102,9 +102,10 @@ static void GetLocalAxis(const MATRIX &matrix, VECTOR &out_left, VECTOR &out_up,
  * @param m 座標軸の変換行列(位置、回転、スケール)
  * @param len 座標軸の長さ
  */
-static void DrawAxis3D(const MATRIX &m, const float len = 5)
+static void DrawAxis3D(const MATRIX &m, const float len = 0.5F)
 {
     const auto origin = VTransform({0, 0, 0}, m);
+    DrawSphere3D(origin, len * 0.1F, 8, 0xFFFFFFFF, 0xFFFFFFFF, false);
     DrawLine3D(origin, VTransform({len, 0, 0}, m), GetColor(255, 0, 0));
     DrawLine3D(origin, VTransform({0, len, 0}, m), GetColor(0, 255, 0));
     DrawLine3D(origin, VTransform({0, 0, len}, m), GetColor(0, 0, 255));
@@ -174,7 +175,7 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
 static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix)
 {
     const auto pos = VTransform({0, 0, 0}, object_matrix);
-    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0, 4);
+    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0);
     DrawAxis3D(object_matrix);
 }
 

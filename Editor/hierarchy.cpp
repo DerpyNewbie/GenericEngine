@@ -25,7 +25,8 @@ void Hierarchy::OnEditorGui()
 
     if (selected_game_object != nullptr)
     {
-        DxLibHelper::DrawObjectInfo(selected_game_object->Name().c_str(),
+        SetFontSize(12);
+        DxLibHelper::DrawObjectInfo(engine::EngineUtil::ShiftJisToUtf8(selected_game_object->Name()).c_str(),
                                     selected_game_object->Transform()->WorldToLocal());
     }
 }

@@ -30,7 +30,9 @@ void Inspector::OnEditorGui()
     {
         if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
         {
+            ImGui::Indent();
             component->OnInspectorGui();
+            ImGui::Unindent();
         }
     }
 }

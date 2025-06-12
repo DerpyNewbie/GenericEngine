@@ -19,7 +19,7 @@ struct Quaternion
 
     static constexpr Quaternion Identity();
 
-    static Quaternion FromMatrix(const MATRIX &matrix);
+    static Quaternion FromMatrix(const Matrix4x4 &matrix);
 
     static Quaternion FromEulerRadians(const Vector3 &euler);
 
@@ -40,16 +40,9 @@ struct Quaternion
     [[nodiscard]] Quaternion Normalized() const;
 
     void Normalize();
+    Vector3 operator*(const Vector3 &v) const;
 
-    Quaternion operator*(const Quaternion &other) const
-    {
-        return {
-            w * other.x + x * other.w + y * other.z - z * other.y, // x
-            w * other.y - x * other.z + y * other.w + z * other.x, // y
-            w * other.z + x * other.y - y * other.x + z * other.w, // z
-            w * other.w - x * other.x - y * other.y - z * other.z // w
-        };
-    }
+    Quaternion operator*(const Quaternion &other) const;
 };
 
 constexpr Quaternion Quaternion::Identity()

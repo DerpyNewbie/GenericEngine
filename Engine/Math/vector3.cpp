@@ -77,15 +77,6 @@ float Vector3::Distance(const Vector3 &from, const Vector3 &to)
     return (to - from).Magnitude();
 }
 
-Vector3 Vector3::operator*(const Quaternion &v) const
-{
-    Quaternion q = {x, y, z, 0};
-    auto q_conjugate = v.Inverse();
-    auto q_result = (v * q) * q_conjugate;
-
-    return {q_result.x, q_result.y, q_result.z};
-}
-
 Vector3::operator Vector2() const
 {
     return {x, y};
@@ -112,5 +103,10 @@ Vector3 &Vector3::operator=(const VECTOR &vec)
     y = vec.y;
     z = vec.z;
     return *this;
+}
+Vector3 Vector3::operator*(const MATRIX &m) const
+{
+    const auto [nx, ny, nz] = VTransform({x, y, z}, m);
+    return {nx, ny, nz};
 }
 }

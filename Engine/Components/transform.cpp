@@ -33,17 +33,17 @@ void Transform::OnInspectorGui()
     EngineUtil::ToFloat3(local_scale, LocalScale());
 
     ImGui::Text("Position: %f, %f, %f", local_pos[0], local_pos[1], local_pos[2]);
-    if (ImGui::InputFloat3("Position", &local_pos[0]) && ImGui::IsItemDeactivatedAfterEdit())
+    if (ImGui::InputFloat3("Position", local_pos) && ImGui::IsItemDeactivatedAfterEdit())
     {
         Logger::Log<Transform>("New Position: %f, %f, %f", local_pos[0], local_pos[1], local_pos[2]);
         SetLocalPosition({local_pos[0], local_pos[1], local_pos[2]});
     }
-    if (ImGui::InputFloat3("Rotation", &local_rot_euler[0]) && ImGui::IsItemDeactivatedAfterEdit())
+    if (ImGui::InputFloat3("Rotation", local_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
     {
         Logger::Log<Transform>("New Rotation: %f, %f, %f", local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]);
         SetLocalRotation(Quaternion::FromEulerDegrees({local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]}));
     }
-    if (ImGui::InputFloat3("Scale", &local_scale[0]) && ImGui::IsItemDeactivatedAfterEdit())
+    if (ImGui::InputFloat3("Scale", local_scale) && ImGui::IsItemDeactivatedAfterEdit())
     {
         Logger::Log<Transform>("New Scale: %f, %f, %f", local_scale[0], local_scale[1], local_scale[2]);
         SetLocalScale({local_scale[0], local_scale[1], local_scale[2]});
@@ -52,6 +52,10 @@ void Transform::OnInspectorGui()
 Matrix4x4 Transform::WorldToLocal() const
 {
     return MInverse(LocalToWorld());
+}
+Matrix4x4 Transform::LocalMatrix() const
+{
+    return m_matrix_;
 }
 
 Matrix4x4 Transform::LocalToWorld() const
@@ -102,7 +106,7 @@ Quaternion Transform::LocalRotation() const
 
 Vector3 Transform::LocalScale() const
 {
-    return MGetSize(m_matrix_ * MGetRotElem(MInverse(m_matrix_)));
+    return MGetSize(m_matrix_ * MInverse(MGetRotElem(m_matrix_)));
 }
 
 std::shared_ptr<Transform> Transform::Parent() const
@@ -163,7 +167,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
-void Transform::SetPosition(const Vector3 position)
+void Transform::SetPosition(const Vector3 &position)
 {
     // If we have no parent, just set the local position directly
     if (m_parent_.expired())
@@ -189,15 +193,11 @@ void Transform::SetRotation(const Quaternion &rotation)
         return;
     }
 
-    // Get parent's world-to-local matrix to transform our rotation correctly
-    const Matrix4x4 parent_world_to_local = MInverse(ParentMatrix());
-
     // Get parent's world rotation as a normalized quaternion
     const Quaternion parent_world_rotation = Quaternion::FromMatrix(MGetRotElem(ParentMatrix()));
 
     // Normalize before using the quaternion to prevent errors
-    Quaternion normalized_rotation = rotation;
-    normalized_rotation.Normalize();
+    const Quaternion normalized_rotation = rotation.Normalized();
 
     // Convert world rotation to local rotation by applying inverse of parent rotation
     const Quaternion local_rotation = parent_world_rotation.Inverse() * normalized_rotation;
@@ -205,32 +205,53 @@ void Transform::SetRotation(const Quaternion &rotation)
     // Set the local rotation
     SetLocalRotation(local_rotation);
 }
-void Transform::SetLocalPosition(const Vector3 local_position)
+void Transform::SetPositionAndRotation(const Vector3 &position, const Quaternion &rotation)
 {
-    const Matrix4x4 trans = MGetTranslate(local_position);
-    const Matrix4x4 rot = MGetRotElem(m_matrix_);
-    const Matrix4x4 scale = MGetScale(LocalScale());
-    m_matrix_ = scale * rot * trans;
+    if (m_parent_.expired())
+    {
+        SetLocalPositionAndRotation(position, rotation);
+        return;
+    }
+
+    // Transform world position to local space using parent's world-to-local matrix
+    const Vector3 local_position = position * MInverse(ParentMatrix());
+
+    // Convert world rotation to local rotation by applying inverse of parent rotation
+    const Quaternion local_rotation = Quaternion::FromMatrix(MGetRotElem(ParentMatrix())).Inverse() * rotation.
+                                      Normalized();
+
+    // Set the local position and rotation
+    SetLocalPositionAndRotation(local_position, local_rotation);
+}
+void Transform::SetLocalPosition(const Vector3 &local_position)
+{
+    SetTRS(LocalScale(), LocalRotation(), local_position);
 }
 
 void Transform::SetLocalRotation(const Quaternion &local_rotation)
 {
-    const Matrix4x4 trans = MGetTranslate(LocalPosition());
-    const Matrix4x4 rot = local_rotation.ToMatrix();
-    const Matrix4x4 scale = MGetScale(LocalScale());
-    m_matrix_ = scale * rot * trans;
+    SetTRS(LocalScale(), local_rotation, LocalPosition());
+}
+void Transform::SetLocalPositionAndRotation(const Vector3 &local_position, const Quaternion &local_rotation)
+{
+    SetTRS(LocalScale(), local_rotation, local_position);
 }
 
-void Transform::SetLocalScale(const Vector3 local_scale)
+void Transform::SetLocalScale(const Vector3 &local_scale)
 {
-    const Matrix4x4 trans = Matrix4x4::FromTranslate(LocalPosition());
-    const Matrix4x4 rot = MGetRotElem(m_matrix_);
-    const Matrix4x4 scale = MGetScale(local_scale);
-    m_matrix_ = scale * rot * trans;
+    SetTRS(local_scale, LocalRotation(), LocalPosition());
 }
 void Transform::SetLocalMatrix(const Matrix4x4 &matrix)
 {
     m_matrix_ = matrix;
+}
+void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
+{
+    const Matrix4x4 trans_m = MGetTranslate(position);
+    const Matrix4x4 rot_m = rotation.ToMatrix();
+    const Matrix4x4 scale_m = MGetScale(scale);
+
+    m_matrix_ = scale_m * rot_m * trans_m; // Apply Translation, then Rotation, then Scale
 }
 
 void Transform::RotateAround(const Vector3 &pivot_point, const Vector3 &axis, float angle_degrees)
@@ -256,7 +277,7 @@ void Transform::RotateAround(const Vector3 &pivot_point, const Quaternion &rotat
     Vector3 position_relative_to_pivot = VSub(current_position, pivot_point);
 
     // Step 2: Rotate the position around the origin (now the pivot)
-    Vector3 rotated_position = position_relative_to_pivot * rotation;
+    Vector3 rotated_position = rotation * position_relative_to_pivot;
 
     // Step 3: Translate back
     Vector3 new_position = VAdd(rotated_position, pivot_point);

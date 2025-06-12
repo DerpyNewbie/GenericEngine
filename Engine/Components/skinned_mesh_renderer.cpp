@@ -1,5 +1,8 @@
 #include "skinned_mesh_renderer.h"
 
+#include "dxlib_helper.h"
+#include "imgui.h"
+
 void engine::SkinnedMeshRenderer::LoadModel(const std::string &file_path)
 {
     m_model_handle_ = MV1LoadModel(file_path.c_str());
@@ -18,7 +21,7 @@ void engine::SkinnedMeshRenderer::LoadModel(const std::string &file_path)
             i,
             name,
             "##UNINITIALIZED",
-            MV1GetFrameLocalMatrix(m_model_handle_, i)
+            MV1GetFrameBaseLocalMatrix(m_model_handle_, i)
             );
 
         m_bones_.emplace_back(info);
@@ -44,13 +47,37 @@ void engine::SkinnedMeshRenderer::LoadModel(const std::string &file_path)
     {
         const auto bone_info = m_bones_[i];
         bone_info->path = GameObject()->PathFrom(GameObject());
-        m_transforms_[i]->SetLocalMatrix(bone_info->rest_pose);
+        m_transforms_[i]->SetLocalMatrix(bone_info->bind_pose);
+    }
+}
+void engine::SkinnedMeshRenderer::OnInspectorGui()
+{
+    ImGui::Checkbox("Draw Bones", &m_draw_bones_);
+    ImGui::Separator();
+    if (ImGui::CollapsingHeader("Bone Info"))
+    {
+        for (int i = 0; i < m_bones_.size(); i++)
+        {
+            const auto &bone_info = m_bones_[i];
+            ImGui::Text("%d: %s", bone_info->frame_index, bone_info->name.c_str());
+        }
     }
 }
 void engine::SkinnedMeshRenderer::OnDraw()
 {
-    
+    for (int i = 0; i < m_bones_.size(); i++)
+    {
+        const auto &bone_info = m_bones_[i];
+        MV1SetFrameUserLocalMatrix(m_model_handle_, bone_info->frame_index, m_transforms_[i]->LocalMatrix());
+    }
+
     MV1DrawModel(m_model_handle_);
+
+    if (m_draw_bones_)
+    {
+        SetFontSize(12);
+        DxLibHelper::DrawModelFrames(m_model_handle_);
+    }
 }
 
 CEREAL_REGISTER_TYPE(engine::SkinnedMeshRenderer)

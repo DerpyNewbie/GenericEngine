@@ -5,7 +5,6 @@
 #include <memory>
 #include <vector>
 
-#include "dxlib_math.h"
 #include "Math/matrix4x4.h"
 #include "Math/vector3.h"
 #include "Math/quaternion.h"
@@ -25,6 +24,7 @@ public:
 
     [[nodiscard]] Matrix4x4 LocalToWorld() const;
     [[nodiscard]] Matrix4x4 WorldToLocal() const;
+    [[nodiscard]] Matrix4x4 LocalMatrix() const;
 
     [[nodiscard]] Vector3 Position() const;
     [[nodiscard]] Quaternion Rotation() const;
@@ -40,14 +40,17 @@ public:
     [[nodiscard]] int ChildCount() const;
     void SetParent(const std::shared_ptr<Transform> &next_parent);
 
-    void SetPosition(Vector3 position);
+    void SetPosition(const Vector3 &position);
     void SetRotation(const Quaternion &rotation);
+    void SetPositionAndRotation(const Vector3 &position, const Quaternion &rotation);
 
-    void SetLocalPosition(Vector3 local_position);
+    void SetLocalPosition(const Vector3 &local_position);
     void SetLocalRotation(const Quaternion &local_rotation);
-    void SetLocalScale(Vector3 local_scale);
+    void SetLocalPositionAndRotation(const Vector3 &local_position, const Quaternion &local_rotation);
+    void SetLocalScale(const Vector3 &local_scale);
 
     void SetLocalMatrix(const Matrix4x4 &matrix);
+    void SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position);
 
     // Rotates around a pivot point in world space
     void RotateAround(const Vector3 &pivot_point, const Vector3 &axis, float angle_degrees);
@@ -57,32 +60,32 @@ public:
 
     [[nodiscard]] Vector3 Forward() const
     {
-        return Vector3{0, 0, 1} * Rotation();
+        return Rotation() * Vector3{0, 0, 1};
     }
 
     [[nodiscard]] Vector3 Back() const
     {
-        return Vector3{0, 0, -1} * Rotation();
+        return Rotation() * Vector3{0, 0, -1};
     }
 
     [[nodiscard]] Vector3 Right() const
     {
-        return Vector3{1, 0, 0} * Rotation();
+        return Rotation() * Vector3{1, 0, 0};
     }
 
     [[nodiscard]] Vector3 Left() const
     {
-        return Vector3{-1, 0, 0} * Rotation();
+        return Rotation() * Vector3{-1, 0, 0};
     }
 
     [[nodiscard]] Vector3 Up() const
     {
-        return Vector3{0, 1, 0} * Rotation();
+        return Rotation() * Vector3{0, 1, 0};
     }
 
     [[nodiscard]] Vector3 Down() const
     {
-        return Vector3{0, -1, 0} * Rotation();
+        return Rotation() * Vector3{0, -1, 0};
     }
 
     template <class Archive>

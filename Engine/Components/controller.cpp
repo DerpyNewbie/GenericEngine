@@ -54,13 +54,13 @@ void Controller::OnUpdate()
         m_rotation_ = m_rotation_ + delta_rot;
         auto pitch = Quaternion::FromEulerDegrees({m_rotation_.x, 0.0F, 0.0F});
         auto yaw = Quaternion::FromEulerDegrees({0.0F, m_rotation_.y, 0.0F});
-        transform->SetRotation(pitch * yaw);
+        transform->SetRotation(yaw * pitch);
     }
 
     // Apply movement in local space
     if (length > 0.001f)
     {
-        const Vector3 world_dir = dir * transform->Rotation();
+        const Vector3 world_dir = transform->Rotation() * dir;
         const Vector3 new_pos = transform->Position() + world_dir;
         transform->SetPosition(new_pos);
     }
