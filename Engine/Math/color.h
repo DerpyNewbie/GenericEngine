@@ -1,4 +1,5 @@
 #pragma once
+#include <DxLib.h>
 
 namespace engine
 {
@@ -6,11 +7,13 @@ using Byte = unsigned char;
 
 struct Color
 {
-    Byte r;
-    Byte g;
-    Byte b;
-    Byte a;
+    Byte r = 0;
+    Byte g = 0;
+    Byte b = 0;
+    Byte a = 255;
 
+    constexpr Color() = default;
+    
     constexpr explicit Color(const unsigned int hex_rgba)
     {
         r = (hex_rgba >> 24) & 0xFF;
@@ -32,6 +35,10 @@ struct Color
 
     constexpr Color(const int r, const int g, const int b) :
         Color(static_cast<Byte>(r), static_cast<Byte>(g), static_cast<Byte>(b))
+    {}
+
+    // ReSharper disable once CppNonExplicitConvertingConstructor
+    constexpr Color(const COLOR_U8 color) : Color(color.r, color.g, color.b, color.a)
     {}
 
     [[nodiscard]] unsigned int Rgba() const;

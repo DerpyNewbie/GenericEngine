@@ -16,23 +16,23 @@ unsigned int Color::Argb() const
 
 void Color::ToHsv(short &h, Byte &s, Byte &v) const
 {
-    const Byte max = std::max(std::max(r, g), b);
-    const Byte min = std::min(std::min(r, g), b);
+    const Byte max_val = max(max(r, g), b);
+    const Byte min_val = min(min(r, g), b);
     if (r == g && g == b)
     {
         h = 0;
     }
     else if (r > g && r > b)
     {
-        h = 60 * ((g - b) / (max - min));
+        h = 60 * ((g - b) / (max_val - min_val));
     }
     else if (g > r && g > b)
     {
-        h = 60 * ((b - r) / (max - min)) + 120;
+        h = 60 * ((b - r) / (max_val - min_val)) + 120;
     }
     else
     {
-        h = 60 * ((r - g) / (max - min)) + 240;
+        h = 60 * ((r - g) / (max_val - min_val)) + 240;
     }
 
     if (h < 0)
@@ -40,8 +40,8 @@ void Color::ToHsv(short &h, Byte &s, Byte &v) const
         h += 360;
     }
 
-    s = (max - min) / max;
-    v = max;
+    s = (max_val - min_val) / max_val;
+    v = max_val;
 }
 
 Color Color::FromHsv(const short h, const Byte s, const Byte v)

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <DxLib.h>
 #include <stdexcept>
 #include <string>
 
@@ -18,6 +19,10 @@ struct Vector2
     {}
 
     constexpr Vector2(const int x, const int y) : x(static_cast<float>(x)), y(static_cast<float>(y))
+    {}
+
+    // ReSharper disable once CppNonExplicitConvertingConstructor
+    constexpr Vector2(const FLOAT2 v) : x(v.u), y(v.v)
     {}
 
     /// @returns (0, 0)
