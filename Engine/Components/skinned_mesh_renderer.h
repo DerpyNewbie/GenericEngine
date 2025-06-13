@@ -2,6 +2,8 @@
 #include "DxLib.h"
 #include "game_object.h"
 #include "renderer.h"
+#include "Rendering/texture2d.h"
+#include "Rendering/mesh.h"
 
 #include <vector>
 
@@ -28,6 +30,11 @@ class SkinnedMeshRenderer : public Renderer
     bool m_draw_bones_ = false;
     std::vector<std::shared_ptr<BoneInfo>> m_bones_;
     std::vector<std::shared_ptr<Transform>> m_transforms_;
+    std::vector<VERTEX3D> m_raw_vertices_;
+    Mesh m_mesh_;
+    int m_vertex_buffer_handle_ = -1;
+    int m_index_buffer_handle_ = -1;
+    Texture2D m_texture_;
 
 public:
 
@@ -35,7 +42,7 @@ public:
     
     void OnDraw() override;
 
-    void LoadModel(const std::string &file_path);
+    void LoadFromMV1(const std::string &file_path);
 
     template <class Archive>
     void serialize(Archive &ar)

@@ -42,6 +42,10 @@
         <ClCompile Include="Engine\Math\vector2.cpp" />
         <ClCompile Include="Engine\Math\vector3.cpp" />
         <ClCompile Include="Engine\object.cpp" />
+        <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <ClCompile Include="Engine\Rendering\mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture2d.cpp"/>
         <ClCompile Include="Engine\scene.cpp" />
         <ClCompile Include="Engine\scene_manager.cpp" />
         <ClCompile Include="Engine\serializer.cpp" />
@@ -85,6 +89,10 @@
         <ClInclude Include="Engine\Math\vector3.h" />
         <ClInclude Include="Engine\Math\vector4.h" />
         <ClInclude Include="Engine\object.h" />
+        <ClInclude Include="Engine\Rendering\bone_weight.h" />
+        <ClInclude Include="Engine\Rendering\mesh.h" />
+        <ClInclude Include="Engine\Rendering\sub_mesh.h" />
+        <ClInclude Include="Engine\Rendering\texture2d.h" />
         <ClInclude Include="Engine\scene.h" />
         <ClInclude Include="Engine\scene_manager.h" />
         <ClInclude Include="Engine\serializer.h" />

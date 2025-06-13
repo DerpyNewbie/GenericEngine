@@ -34,7 +34,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 
         const auto skinned_mesh = engine::Object::Instantiate<engine::GameObject>("Hackadoll");
         const auto skinned_mesh_renderer = skinned_mesh->AddComponent<engine::SkinnedMeshRenderer>();
-        skinned_mesh_renderer->LoadModel("Resources/hackadoll/hackadoll.pmx");
+        skinned_mesh_renderer->LoadFromMV1("Resources/hackadoll/hackadoll.pmx");
     }
 
     engine->MainLoop();
