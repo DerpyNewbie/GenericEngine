@@ -1,5 +1,4 @@
 #include <format>
-#include "quaternion.h"
 #include "vector3.h"
 #include "vector2.h"
 #include "mathf.h"
@@ -16,16 +15,18 @@ Vector3 Vector3::Rounded() const
     return {static_cast<int>(x), static_cast<int>(y), static_cast<int>(z)};
 }
 
-void Vector3::Set(const float x, const float y, const float z)
+void Vector3::Set(const float nx, const float ny, const float nz)
 {
-    this->x = x;
-    this->y = y;
-    this->z = z;
+    x = nx;
+    y = ny;
+    z = nz;
 }
 
 void Vector3::SetRounded()
 {
-    Set(static_cast<int>(x), static_cast<int>(y), static_cast<int>(z));
+    Set(static_cast<float>(static_cast<int>(x)),
+        static_cast<float>(static_cast<int>(y)),
+        static_cast<float>(static_cast<int>(z)));
 }
 
 Vector3 Vector3::Copy() const

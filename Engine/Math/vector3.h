@@ -103,7 +103,7 @@ struct Vector3
     [[nodiscard]] Vector3 Rounded() const;
 
     /// @brief Sets the element directly.
-    void Set(float x, float y, float z);
+    void Set(float nx, float ny, float nz);
 
     /// @brief Rounds the element directly.
     void SetRounded();

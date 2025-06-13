@@ -1,1 +1,0 @@
-﻿#include "event_receivers.h"

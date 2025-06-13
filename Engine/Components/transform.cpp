@@ -71,7 +71,7 @@ Vector3 Transform::Position() const
 Quaternion Transform::Rotation() const
 {
     // Get rotation part of the world transform matrix
-    Matrix4x4 rotation_matrix = MGetRotElem(LocalToWorld());
+    const Matrix4x4 rotation_matrix = MGetRotElem(LocalToWorld());
 
     // Extract quaternion using the robust method
     Quaternion rotation = Quaternion::FromMatrix(rotation_matrix);
@@ -94,7 +94,7 @@ Vector3 Transform::LocalPosition() const
 Quaternion Transform::LocalRotation() const
 {
     // Get rotation part of the local matrix
-    Matrix4x4 rotation_matrix = MGetRotElem(m_matrix_);
+    const Matrix4x4 rotation_matrix = MGetRotElem(m_matrix_);
 
     // Extract quaternion using the robust method
     Quaternion rotation = Quaternion::FromMatrix(rotation_matrix);
@@ -271,22 +271,22 @@ void Transform::RotateAround(const Vector3 &pivot_point, const Vector3 &axis, fl
 void Transform::RotateAround(const Vector3 &pivot_point, const Quaternion &rotation)
 {
     // Get current position in world space
-    Vector3 current_position = Position();
+    const Vector3 current_position = Position();
 
     // Step 1: Translate to make the pivot point the origin
-    Vector3 position_relative_to_pivot = VSub(current_position, pivot_point);
+    const Vector3 position_relative_to_pivot = VSub(current_position, pivot_point);
 
     // Step 2: Rotate the position around the origin (now the pivot)
-    Vector3 rotated_position = rotation * position_relative_to_pivot;
+    const Vector3 rotated_position = rotation * position_relative_to_pivot;
 
     // Step 3: Translate back
-    Vector3 new_position = VAdd(rotated_position, pivot_point);
+    const Vector3 new_position = VAdd(rotated_position, pivot_point);
 
     // Step 4: Set the new position
     SetPosition(new_position);
 
     // Step 5: Apply the rotation to the object's current rotation
-    Quaternion current_rotation = Rotation();
+    const Quaternion current_rotation = Rotation();
     SetRotation(current_rotation * rotation);
 }
 }

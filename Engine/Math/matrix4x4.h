@@ -48,7 +48,7 @@ constexpr Matrix4x4 Matrix4x4::Identity()
     Matrix4x4 mat;
     for (int y = 0; y < 4; ++y)
         for (int x = 0; x < 4; ++x)
-            mat.m[y][x] = y == x ? 1 : 0;
+            mat.m[y][x] = y == x ? 1.0F : 0.0F;
     return mat;
 }
 constexpr Vector3 Matrix4x4::TransformPoint(Vector3 point) const

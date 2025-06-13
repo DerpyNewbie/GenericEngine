@@ -6,8 +6,6 @@ namespace engine
 {
 Matrix4x4 Matrix4x4::Inverse() const
 {
-    Matrix4x4 result;
-
     // Calculate the cofactors
     float coef00 = m[2][2] * m[3][3] - m[2][3] * m[3][2];
     float coef02 = m[2][1] * m[3][3] - m[2][3] * m[3][1];
@@ -50,30 +48,30 @@ Matrix4x4 Matrix4x4::Inverse() const
     Vector4 inv2(vec0 * fac1 - vec1 * fac3 + vec3 * fac5);
     Vector4 inv3(vec0 * fac2 - vec1 * fac4 + vec2 * fac5);
 
-    Vector4 signA(+1, -1, +1, -1);
-    Vector4 signB(-1, +1, -1, +1);
+    Vector4 sign_a(+1, -1, +1, -1);
+    Vector4 sign_b(-1, +1, -1, +1);
 
     // Calculate inverse matrix
     Matrix4x4 inverse;
-    inverse.m[0][0] = inv0.x * signA.x;
-    inverse.m[0][1] = inv0.y * signA.y;
-    inverse.m[0][2] = inv0.z * signA.z;
-    inverse.m[0][3] = inv0.w * signA.w;
+    inverse.m[0][0] = inv0.x * sign_a.x;
+    inverse.m[0][1] = inv0.y * sign_a.y;
+    inverse.m[0][2] = inv0.z * sign_a.z;
+    inverse.m[0][3] = inv0.w * sign_a.w;
 
-    inverse.m[1][0] = inv1.x * signB.x;
-    inverse.m[1][1] = inv1.y * signB.y;
-    inverse.m[1][2] = inv1.z * signB.z;
-    inverse.m[1][3] = inv1.w * signB.w;
+    inverse.m[1][0] = inv1.x * sign_b.x;
+    inverse.m[1][1] = inv1.y * sign_b.y;
+    inverse.m[1][2] = inv1.z * sign_b.z;
+    inverse.m[1][3] = inv1.w * sign_b.w;
 
-    inverse.m[2][0] = inv2.x * signA.x;
-    inverse.m[2][1] = inv2.y * signA.y;
-    inverse.m[2][2] = inv2.z * signA.z;
-    inverse.m[2][3] = inv2.w * signA.w;
+    inverse.m[2][0] = inv2.x * sign_a.x;
+    inverse.m[2][1] = inv2.y * sign_a.y;
+    inverse.m[2][2] = inv2.z * sign_a.z;
+    inverse.m[2][3] = inv2.w * sign_a.w;
 
-    inverse.m[3][0] = inv3.x * signB.x;
-    inverse.m[3][1] = inv3.y * signB.y;
-    inverse.m[3][2] = inv3.z * signB.z;
-    inverse.m[3][3] = inv3.w * signB.w;
+    inverse.m[3][0] = inv3.x * sign_b.x;
+    inverse.m[3][1] = inv3.y * sign_b.y;
+    inverse.m[3][2] = inv3.z * sign_b.z;
+    inverse.m[3][3] = inv3.w * sign_b.w;
 
     // Calculate determinant
     float det = m[0][0] * inverse.m[0][0] +
@@ -88,11 +86,11 @@ Matrix4x4 Matrix4x4::Inverse() const
 
     // Divide by determinant
     det = 1.0f / det;
-    for (int i = 0; i < 4; ++i)
+    for (auto &i : inverse.m)
     {
-        for (int j = 0; j < 4; ++j)
+        for (float &j : i)
         {
-            inverse.m[i][j] *= det;
+            j *= det;
         }
     }
 
@@ -112,6 +110,6 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const
 Matrix4x4::operator tagMATRIX() const
 {
     // ReSharper disable once CppCStyleCast
-    return *(tagMATRIX *)this;
+    return *(tagMATRIX *)this;  // NOLINT(clang-diagnostic-cast-qual)
 }
 }

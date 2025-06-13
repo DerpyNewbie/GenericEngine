@@ -4,7 +4,6 @@
 
 #include <memory>
 #include <vector>
-
 #include <cereal/types/vector.hpp>
 
 namespace engine

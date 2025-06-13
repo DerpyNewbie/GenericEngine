@@ -7,37 +7,41 @@ namespace engine
 {
 Quaternion Quaternion::FromMatrix(const Matrix4x4 &matrix)
 {
-    float m00 = matrix.m[0][0], m01 = matrix.m[0][1], m02 = matrix.m[0][2];
-    float m10 = matrix.m[1][0], m11 = matrix.m[1][1], m12 = matrix.m[1][2];
-    float m20 = matrix.m[2][0], m21 = matrix.m[2][1], m22 = matrix.m[2][2];
+    const float m00 = matrix.m[0][0], m01 = matrix.m[0][1], m02 = matrix.m[0][2];
+    const float m10 = matrix.m[1][0], m11 = matrix.m[1][1], m12 = matrix.m[1][2];
+    const float m20 = matrix.m[2][0], m21 = matrix.m[2][1], m22 = matrix.m[2][2];
 
-    // Using a more stable algorithm for matrix to quaternion conversion
-    float trace = m00 + m11 + m22;
+    // Using a more stable algorithm for matrix-to-quaternion conversion
+    const float trace = m00 + m11 + m22;
     Quaternion q;
 
-    if (trace > 0.0f) {
-        float s = sqrtf(trace + 1.0f) * 2.0f;
+    if (trace > 0.0f)
+    {
+        const float s = sqrtf(trace + 1.0f) * 2.0f;
         q.w = 0.25f * s;
         q.x = (m21 - m12) / s;
         q.y = (m02 - m20) / s;
         q.z = (m10 - m01) / s;
-    } 
-    else if ((m00 > m11) && (m00 > m22)) {
-        float s = sqrtf(1.0f + m00 - m11 - m22) * 2.0f;
+    }
+    else if ((m00 > m11) && (m00 > m22))
+    {
+        const float s = sqrtf(1.0f + m00 - m11 - m22) * 2.0f;
         q.w = (m21 - m12) / s;
         q.x = 0.25f * s;
         q.y = (m01 + m10) / s;
         q.z = (m02 + m20) / s;
-    } 
-    else if (m11 > m22) {
-        float s = sqrtf(1.0f + m11 - m00 - m22) * 2.0f;
+    }
+    else if (m11 > m22)
+    {
+        const float s = sqrtf(1.0f + m11 - m00 - m22) * 2.0f;
         q.w = (m02 - m20) / s;
         q.x = (m01 + m10) / s;
         q.y = 0.25f * s;
         q.z = (m12 + m21) / s;
-    } 
-    else {
-        float s = sqrtf(1.0f + m22 - m00 - m11) * 2.0f;
+    }
+    else
+    {
+        const float s = sqrtf(1.0f + m22 - m00 - m11) * 2.0f;
         q.w = (m10 - m01) / s;
         q.x = (m02 + m20) / s;
         q.y = (m12 + m21) / s;
@@ -49,8 +53,8 @@ Quaternion Quaternion::FromMatrix(const Matrix4x4 &matrix)
 Quaternion Quaternion::FromEulerRadians(const Vector3 &euler)
 {
     const float pitch = euler.x * 0.5f; // X rotation
-    const float yaw = euler.y * 0.5f;   // Y rotation
-    const float roll = euler.z * 0.5f;  // Z rotation
+    const float yaw = euler.y * 0.5f; // Y rotation
+    const float roll = euler.z * 0.5f; // Z rotation
 
     // Pre-calculate sines and cosines
     const float cp = cosf(pitch);
@@ -62,10 +66,10 @@ Quaternion Quaternion::FromEulerRadians(const Vector3 &euler)
 
     // ZYX order for left-handed system
     return Quaternion{
-        cr * sp * cy - sr * cp * sy,  // x
-        cr * cp * sy + sr * sp * cy,  // y
-        sr * cp * cy + cr * sp * sy,  // z
-        cr * cp * cy - sr * sp * sy   // w
+        cr * sp * cy - sr * cp * sy, // x
+        cr * cp * sy + sr * sp * cy, // y
+        sr * cp * cy + cr * sp * sy, // z
+        cr * cp * cy - sr * sp * sy // w
     };
 }
 Quaternion Quaternion::FromEulerDegrees(const Vector3 &euler)
@@ -77,26 +81,26 @@ Vector3 Quaternion::ToEulerRadians() const
     Vector3 euler;
 
     // Pitch (x-axis rotation)
-    const float sinp = 2.0f * (w * x + y * z);
-    const float cosp = 1.0f - 2.0f * (x * x + y * y);
-    euler.x = atan2f(sinp, cosp);
+    const float sin_p = 2.0f * (w * x + y * z);
+    const float cos_p = 1.0f - 2.0f * (x * x + y * y);
+    euler.x = atan2f(sin_p, cos_p);
 
     // Yaw (y-axis rotation)
-    const float siny = 2.0f * (w * y - z * x);
-    if (abs(siny) >= 1.0f)
+    const float sin_y = 2.0f * (w * y - z * x);
+    if (abs(sin_y) >= 1.0f)
     {
         // Use 90 degrees if out of range
-        euler.y = copysignf(DX_PI_F / 2.0f, siny);
+        euler.y = copysignf(DX_PI_F / 2.0f, sin_y);
     }
     else
     {
-        euler.y = asinf(siny);
+        euler.y = asinf(sin_y);
     }
 
     // Roll (z-axis rotation)
-    const float sinr = 2.0f * (w * z + x * y);
-    const float cosr = 1.0f - 2.0f * (y * y + z * z);
-    euler.z = atan2f(sinr, cosr);
+    const float sin_r = 2.0f * (w * z + x * y);
+    const float cos_r = 1.0f - 2.0f * (y * y + z * z);
+    euler.z = atan2f(sin_r, cos_r);
 
     return euler;
 }
@@ -192,18 +196,18 @@ Quaternion Quaternion::operator*(const Quaternion &other) const
         w * other.x + x * other.w - y * other.z + z * other.y, // x
         w * other.y + x * other.z + y * other.w - z * other.x, // y
         w * other.z - x * other.y + y * other.x + z * other.w, // z
-        w * other.w - x * other.x - y * other.y - z * other.z  // w
+        w * other.w - x * other.x - y * other.y - z * other.z // w
     };
 }
-Vector3 Quaternion::operator*(const Vector3& v) const
+Vector3 Quaternion::operator*(const Vector3 &v) const
 {
-    // For left-handed coordinate system, we need to adjust the cross product signs
-    Quaternion p(v.x, v.y, v.z, 0);
-    
+    // For the left-handed coordinate system, we need to adjust the cross-product signs
+    const Quaternion p(v.x, v.y, v.z, 0);
+
     // For left-handed system: q * p * q^(-1)
-    auto q_conj = Conjugate();
-    auto result = (*this * p) * q_conj;
-    
-    return Vector3(result.x, result.y, result.z);
+    const auto q_conj = Conjugate();
+    const auto result = (*this * p) * q_conj;
+
+    return {result.x, result.y, result.z};
 }
 }

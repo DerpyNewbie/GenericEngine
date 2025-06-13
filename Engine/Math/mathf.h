@@ -7,9 +7,9 @@ namespace engine
 class Mathf
 {
 public:
-    constexpr static float kPi = std::numbers::pi;
-    constexpr static float kDeg2Rad = kPi / 180;
-    constexpr static float kRad2Deg = 180 / kPi;
+    constexpr static float kPi = std::numbers::pi_v<float>;
+    constexpr static float kDeg2Rad = kPi / 180.0F;
+    constexpr static float kRad2Deg = 180.0F / kPi;
     constexpr static float kEpsilon = 1e-15f;
     constexpr static char kDefaultFloatFormat[] = "{:1.2f}";
 

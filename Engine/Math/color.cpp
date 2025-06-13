@@ -24,15 +24,15 @@ void Color::ToHsv(short &h, Byte &s, Byte &v) const
     }
     else if (r > g && r > b)
     {
-        h = 60 * ((g - b) / (max_val - min_val));
+        h = static_cast<short>(60 * ((g - b) / (max_val - min_val)));
     }
     else if (g > r && g > b)
     {
-        h = 60 * ((b - r) / (max_val - min_val)) + 120;
+        h = static_cast<short>(60 * ((b - r) / (max_val - min_val)) + 120);
     }
     else
     {
-        h = 60 * ((r - g) / (max_val - min_val)) + 240;
+        h = static_cast<short>(60 * ((r - g) / (max_val - min_val)) + 240);
     }
 
     if (h < 0)

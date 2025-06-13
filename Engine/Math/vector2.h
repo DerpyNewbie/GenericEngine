@@ -77,7 +77,7 @@ struct Vector2
     [[nodiscard]] Vector2 Rounded() const;
 
     /// @brief Sets the element directly.
-    void Set(float x, float y);
+    void Set(float nx, float ny);
 
     /// @brief Rounds the element directly.
     void SetRounded();

@@ -32,16 +32,12 @@
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\engine.cpp" />
         <ClCompile Include="Engine\engine_util.cpp" />
-        <ClCompile Include="Engine\event_receivers.cpp" />
         <ClCompile Include="Engine\game_object.cpp" />
-        <ClCompile Include="Engine\logger.cpp" />
         <ClCompile Include="Engine\Math\color.cpp" />
-        <ClCompile Include="Engine\Math\math_serializer.cpp" />
         <ClCompile Include="Engine\Math\matrix4x4.cpp" />
         <ClCompile Include="Engine\Math\quaternion.cpp" />
         <ClCompile Include="Engine\Math\vector2.cpp" />
         <ClCompile Include="Engine\Math\vector3.cpp" />
-        <ClCompile Include="Engine\object.cpp" />
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
