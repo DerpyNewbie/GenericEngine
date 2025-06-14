@@ -38,7 +38,7 @@ public:
     [[nodiscard]] std::shared_ptr<Transform> GetChild(int i) const;
     [[nodiscard]] bool IsChildOf(const std::shared_ptr<Transform> &transform, bool deep = true) const;
     [[nodiscard]] int ChildCount() const;
-    void SetParent(const std::shared_ptr<Transform> &next_parent);
+    void SetParent(const std::weak_ptr<Transform> &next_parent_weak);
 
     void SetPosition(const Vector3 &position);
     void SetRotation(const Quaternion &rotation);

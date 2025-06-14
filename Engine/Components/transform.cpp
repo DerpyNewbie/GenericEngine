@@ -138,10 +138,11 @@ int Transform::ChildCount() const
 {
     return static_cast<int>(m_children_.size());
 }
-void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
+void Transform::SetParent(const std::weak_ptr<Transform> &next_parent_weak)
 {
     // If parent doesn't change, ignore the call.
     auto parent = m_parent_.lock();
+    auto next_parent = next_parent_weak.lock();
     if (parent == next_parent)
         return;
 
@@ -157,7 +158,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
         parent->m_children_.erase(pos);
     }
 
-    m_parent_ = next_parent;
+    m_parent_ = next_parent_weak;
 
     // If parent is not null, Add to parent's child
     if ((parent = m_parent_.lock()))
