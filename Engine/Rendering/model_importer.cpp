@@ -21,7 +21,7 @@ std::string RetrieveNameFromPath(const char *file_path)
 
 std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_path)
 {
-    auto model_handle = MV1LoadModel(file_path);
+    const auto model_handle = MV1LoadModel(file_path);
     if (model_handle == -1)
     {
         Logger::Error<ModelImporter>("Failed to load model from MV1!");
@@ -29,21 +29,21 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_pat
     }
 
     const auto root = Object::Instantiate<GameObject>(RetrieveNameFromPath(file_path));
-    auto root_transform = root->Transform();
+    const auto root_transform = root->Transform();
 
-    auto bone_count = MV1GetFrameNum(model_handle);
-    auto bone_transforms = std::vector<std::weak_ptr<Transform>>(bone_count);
-    auto bone_bind_poses = std::vector<Matrix4x4>(bone_count);
+    const auto frame_count = MV1GetFrameNum(model_handle);
+    auto frame_transforms = std::vector<std::weak_ptr<Transform>>(frame_count);
+    auto frame_local_matrix = std::vector<Matrix4x4>(frame_count);
 
     // Populate frame transforms
-    for (int i = 0; i < bone_count; ++i)
+    for (int i = 0; i < frame_count; ++i)
     {
-        const auto bone_name = EngineUtil::ShiftJisToUtf8(std::string(MV1GetFrameName(model_handle, i)));
-        const auto bone_obj = Object::Instantiate<GameObject>(bone_name);
-        bone_transforms[i] = bone_obj->Transform();
-        bone_bind_poses[i] = MV1GetFrameBaseLocalMatrix(model_handle, i);
+        const auto frame_name = EngineUtil::ShiftJisToUtf8(std::string(MV1GetFrameName(model_handle, i)));
+        const auto frame_obj = Object::Instantiate<GameObject>(frame_name);
+        frame_transforms[i] = frame_obj->Transform();
+        frame_local_matrix[i] = MV1GetFrameBaseLocalMatrix(model_handle, i);
 
-        const auto frame_data = bone_obj->AddComponent<FrameMetaData>();
+        const auto frame_data = frame_obj->AddComponent<FrameMetaData>();
         frame_data->max_vert_pos = MV1GetFrameMaxVertexLocalPosition(model_handle, i);
         frame_data->min_vert_pos = MV1GetFrameMinVertexLocalPosition(model_handle, i);
         frame_data->avg_vert_pos = MV1GetFrameAvgVertexLocalPosition(model_handle, i);
@@ -56,18 +56,18 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_pat
         {
             for (const auto meshes = Mesh::CreateFromMV1(model_handle, i); auto &mesh : meshes)
             {
-                bone_obj->AddComponent<MeshRenderer>()->shared_mesh = mesh;
+                frame_obj->AddComponent<MeshRenderer>()->shared_mesh = mesh;
             }
         }
     }
 
     // Create parent-child relations
-    for (int i = 0; i < bone_count; ++i)
+    for (int i = 0; i < frame_count; ++i)
     {
-        const auto parent = MV1GetFrameParent(model_handle, i);
-        const auto bone_transform = bone_transforms[i].lock();
-        bone_transform->SetParent(parent <= -1 ? root_transform : bone_transforms[parent]);
-        bone_transform->SetLocalMatrix(bone_bind_poses[i]);
+        const auto frame_parent = MV1GetFrameParent(model_handle, i);
+        const auto frame_transform = frame_transforms[i].lock();
+        frame_transform->SetParent(frame_parent <= -1 ? root_transform : frame_transforms[frame_parent]);
+        frame_transform->SetLocalMatrix(frame_local_matrix[i]);
     }
 
     return root;
