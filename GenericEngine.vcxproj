@@ -27,6 +27,8 @@
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp" />
         <ClCompile Include="Engine\Components\cube_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\frame_meta_data.cpp" />
+        <ClCompile Include="Engine\Components\mesh_renderer.cpp" />
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -40,6 +42,7 @@
         <ClCompile Include="Engine\Math\vector3.cpp" />
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\texture2d.cpp"/>
         <ClCompile Include="Engine\scene.cpp" />
@@ -65,6 +68,8 @@
         <ClInclude Include="Engine\Components\component.h" />
         <ClInclude Include="Engine\Components\controller.h" />
         <ClInclude Include="Engine\Components\cube_renderer.h" />
+        <ClInclude Include="Engine\Components\frame_meta_data.h" />
+        <ClInclude Include="Engine\Components\mesh_renderer.h" />
         <ClInclude Include="Engine\Components\renderer.h" />
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
         <ClInclude Include="Engine\Components\transform.h" />
@@ -87,6 +92,8 @@
         <ClInclude Include="Engine\object.h" />
         <ClInclude Include="Engine\Rendering\bone_weight.h" />
         <ClInclude Include="Engine\Rendering\mesh.h" />
+        <ClInclude Include="Engine\Rendering\model_importer.h" />
+        <ClInclude Include="Engine\Rendering\rendering_serializer.h" />
         <ClInclude Include="Engine\Rendering\sub_mesh.h" />
         <ClInclude Include="Engine\Rendering\texture2d.h" />
         <ClInclude Include="Engine\scene.h" />

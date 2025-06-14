@@ -5,6 +5,7 @@
 #include "Engine/Components/controller.h"
 #include "Engine/Components/cube_renderer.h"
 #include "Engine/Components/skinned_mesh_renderer.h"
+#include "Rendering/model_importer.h"
 
 #include <DxLib.h>
 
@@ -16,7 +17,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
     editor->Init();
     editor->Attach();
 
-    { // Sample scene creation
+    {
+        // Sample scene creation
         const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
         camera->AddComponent<engine::Camera>();
         camera->AddComponent<engine::Controller>();
@@ -32,9 +34,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
         child_obj2->Transform()->SetParent(parent_obj2->Transform());
 
-        const auto skinned_mesh = engine::Object::Instantiate<engine::GameObject>("Hackadoll");
-        const auto skinned_mesh_renderer = skinned_mesh->AddComponent<engine::SkinnedMeshRenderer>();
-        skinned_mesh_renderer->LoadFromMV1("Resources/hackadoll/hackadoll.pmx");
+        engine::ModelImporter::LoadModelFromMV1("Resources/primitives/cube.mv1");
+        engine::ModelImporter::LoadModelFromMV1("Resources/hackadoll/hackadoll.pmx");
     }
 
     engine->MainLoop();
