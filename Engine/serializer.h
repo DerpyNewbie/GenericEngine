@@ -2,7 +2,6 @@
 #include <fstream>
 #include "object.h"
 #include "cereal/archives/json.hpp"
-#include <cereal/types/polymorphic.hpp>
 
 namespace engine
 {
