@@ -28,12 +28,14 @@ void Inspector::OnEditorGui()
     for (const auto all_components = selected_go->GetComponents();
          const auto &component : all_components)
     {
+        ImGui::PushID(component.get());
         if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
         {
             ImGui::Indent();
             component->OnInspectorGui();
             ImGui::Unindent();
         }
+        ImGui::PopID();
     }
 }
 }

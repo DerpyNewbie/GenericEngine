@@ -20,7 +20,9 @@ void Hierarchy::OnEditorGui()
     for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
          const auto &scene : current_scenes)
     {
+        ImGui::PushID(scene.get());
         DrawScene(scene);
+        ImGui::PopID();
     }
 
     if (selected_game_object != nullptr)
@@ -68,8 +70,12 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 }
 void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
 {
+    ImGui::PushID(game_object.get());
     if (!DrawObject(game_object))
+    {
+        ImGui::PopID();
         return;
+    }
     // ImGui::Indent();
     {
         const auto transform = game_object->Transform();
@@ -86,8 +92,6 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
 }
 bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
-    ImGui::PushID((game_object->Scene()->Name() + game_object->Path()).c_str());
-
     if (game_object->Transform()->ChildCount() == 0)
     {
         if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
@@ -109,8 +113,6 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
             return true;
         }
     }
-
-    ImGui::PopID();
     return false;
 }
 }
