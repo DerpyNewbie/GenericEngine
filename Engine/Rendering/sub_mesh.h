@@ -1,5 +1,7 @@
 #pragma once
 
+namespace engine
+{
 struct SubMesh
 {
     int base_vertex;
@@ -7,3 +9,4 @@ struct SubMesh
     int base_index;
     int index_count;
 };
+}
