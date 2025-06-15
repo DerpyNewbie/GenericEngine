@@ -33,14 +33,23 @@ void MeshRenderer::OnDraw()
         ReconstructBuffers();
     }
 
+    const MATRIX wtl = GameObject()->Transform()->WorldToLocal();
+
     SetUseZBuffer3D(true);
     SetWriteZBuffer3D(true);
+    SetUseBackCulling(true);
+    MATRIX origin;
+    GetTransformToWorldMatrix(&origin);
+    SetTransformToWorld(&wtl);
+
     for (int i = 0; i < index_buffer_handles.size(); i++)
     {
         const auto ib_handle = index_buffer_handles[i];
         const auto tex_handle = (i < texture_handles.size()) ? texture_handles[i] : DX_NONE_GRAPH;
         DrawPolygonIndexed3D_UseVertexBuffer(vertex_buffer_handle, ib_handle, tex_handle, false);
     }
+
+    SetTransformToWorld(&origin);
 }
 
 void MeshRenderer::ReconstructBuffers()
