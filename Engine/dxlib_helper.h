@@ -7,6 +7,7 @@
 namespace DxLibHelper
 {
 constexpr float kDefaultBillboardSize = 0.01F;
+constexpr float kDefaultAxisLength = 0.5F;
 
 /**
  * 3D空間に文字列を描画します。
@@ -39,7 +40,6 @@ static void DrawString3D(const VECTOR &pos, const char *str,
     DrawBillboard3D(pos, 0.5F, 0.5f, billboard_size, 0, draw_screen, TRUE);
     DeleteGraph(draw_screen);
 }
-
 
 /**
  * 3D空間に文字列をフォントハンドルを使用して描画します。
@@ -106,7 +106,7 @@ static void GetLocalAxis(const MATRIX &matrix, VECTOR &out_left, VECTOR &out_up,
  * @param m 座標軸の変換行列(位置、回転、スケール)
  * @param len 座標軸の長さ
  */
-static void DrawAxis3D(const MATRIX &m, const float len = 0.5F)
+static void DrawAxis3D(const MATRIX &m, const float len = kDefaultAxisLength)
 {
     const auto origin = VTransform({0, 0, 0}, m);
     DrawSphere3D(origin, len * 0.1F, 8, 0xFFFFFFFF, 0xFFFFFFFF, false);
@@ -175,13 +175,14 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
  *                    NULL終端文字列である必要があります。
  * @param object_matrix オブジェクトのローカル変換(位置、回転、拡大縮小)を
  *                      表す3D空間上の変換行列。
- * @param size モデルの原点に表示される名前のサイズ
+ * @param name_size フレームに表示される名前のサイズ
+ * @param axis_len フレームに表示される軸のサイズ
  */
-static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix, const float size = kDefaultBillboardSize) // NOLINT(clang-diagnostic-unused-function)
+static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix, const float name_size = kDefaultBillboardSize, const float axis_len = kDefaultAxisLength) // NOLINT(clang-diagnostic-unused-function)
 {
     const auto pos = VTransform({0, 0, 0}, object_matrix);
-    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0, size);
-    DrawAxis3D(object_matrix);
+    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0, name_size);
+    DrawAxis3D(object_matrix, axis_len);
 }
 
 /**
@@ -193,18 +194,20 @@ static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix
  *
  * @param model_handle 描画するフレームを持つ3Dモデルのハンドル
  * @param model_name モデルの原点に表示する名前。デフォルトは"Model Origin"
- * @param size モデルの原点に表示される名前のサイズ
+ * @param name_size フレームに表示される名前のサイズ
+ * @param axis_len フレームに表示される軸のサイズ
+ * 
  */
-static void DrawModelFrames(const int model_handle, const TCHAR *model_name = "Model Origin", const float size = kDefaultBillboardSize) // NOLINT(clang-diagnostic-unused-function)
+static void DrawModelFrames(const int model_handle, const TCHAR *model_name = "Model Origin", const float name_size = kDefaultBillboardSize, const float axis_len = kDefaultAxisLength) // NOLINT(clang-diagnostic-unused-function)
 {
-    DrawObjectInfo(model_name, MV1GetMatrix(model_handle), size);
+    DrawObjectInfo(model_name, MV1GetMatrix(model_handle), name_size, axis_len);
 
     const int frame_num = MV1GetFrameNum(model_handle);
     for (int frame_index = 0; frame_index < frame_num; ++frame_index)
     {
         MATRIX frame_mat = MV1GetFrameLocalWorldMatrix(model_handle, frame_index);
         const TCHAR *frame_name = MV1GetFrameName(model_handle, frame_index);
-        DrawObjectInfo(frame_name, frame_mat, size);
+        DrawObjectInfo(frame_name, frame_mat, name_size, axis_len);
 
         const int child_frame_num = MV1GetFrameChildNum(model_handle, frame_index);
         for (int j = 0; j < child_frame_num; ++j)
