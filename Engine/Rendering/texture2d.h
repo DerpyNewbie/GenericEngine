@@ -1,12 +1,25 @@
 #pragma once
+#include "object.h"
 #include "Math/color.h"
 
 namespace engine
 {
-struct Texture2D
+class Texture2D : public Object
 {
-    int graphic_handle = -1;
+    std::vector<Color> m_pixels_;
+    int m_width_ = 0;
+    int m_height_ = 0;
 
-    static Texture2D GetColoredTexture(Color color);
+public:
+    int Width() const;
+    int Height() const;
+    const std::vector<Color> &Pixels() const;
+
+    void FillPixel(Color color);
+    void SetPixel(int x, int y, Color color);
+    void Resize(int width, int height);
+
+    static std::shared_ptr<Texture2D> GetColoredTexture(Color color);
 };
+
 }

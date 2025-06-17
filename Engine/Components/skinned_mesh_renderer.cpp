@@ -28,7 +28,7 @@ void SkinnedMeshRenderer::OnInspectorGui()
         ImGui::Text("Normals: %d", shared_mesh->normals.size());
     }
 
-    ImGui::Text("Texture: %d", m_texture_.graphic_handle);
+    // ImGui::Text("Texture: %d", m_texture_[]);
 }
 }
 

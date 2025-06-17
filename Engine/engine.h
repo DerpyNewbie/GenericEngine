@@ -1,4 +1,11 @@
 ﻿#pragma once
+#ifdef _DEBUG
+#pragma comment(lib, "assimp-vc143-mtd")
+#else
+#pragma comment(lib, "assimp-vc143-mt")
+#endif
+
+#include "engine_profiler.h"
 #include "scene_manager.h"
 #include "engine_time.h"
 #include "update_manager.h"
@@ -13,6 +20,12 @@ public:
 
     bool Init()
     {
+#ifdef _DEBUG
+        LoadLibraryExA("assimp-vc143-mtd.dll", nullptr, NULL);
+#else
+        LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
+#endif
+
         SetGraphMode(1280, 720, 32);
         ChangeWindowMode(TRUE);
         if (DxLib_Init() == -1)

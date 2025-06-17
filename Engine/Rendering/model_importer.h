@@ -6,6 +6,7 @@ namespace engine
 class ModelImporter
 {
 public:
-    static std::shared_ptr<GameObject> LoadModelFromMV1(const char* file_path);
+    static std::shared_ptr<GameObject> LoadModelFromFBX(const char *file_path);
+    static std::shared_ptr<GameObject> LoadModelFromMV1(const char *file_path);
 };
 }

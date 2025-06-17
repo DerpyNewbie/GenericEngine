@@ -2,10 +2,7 @@
 #include "DxLib.h"
 #include "game_object.h"
 #include "mesh_renderer.h"
-#include "renderer.h"
 #include "Rendering/texture2d.h"
-#include "Rendering/mesh.h"
-#include "Rendering/rendering_serializer.h"
 
 #include <vector>
 
@@ -20,7 +17,7 @@ public:
     std::vector<std::weak_ptr<Transform>> transforms;
 
     void OnInspectorGui() override;
-    
+
     template <class Archive>
     void serialize(Archive &ar)
     {
