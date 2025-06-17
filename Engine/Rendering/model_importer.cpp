@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #ifdef _DEBUG
 #pragma comment(lib, "assimp-vc143-mtd")
 #else
@@ -11,8 +13,6 @@
 #include "model_importer.h"
 
 #include "game_object.h"
-
-#include <filesystem>
 
 #include "logger.h"
 #include "mesh.h"

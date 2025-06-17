@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "renderer.h"
 
 #include "update_manager.h"

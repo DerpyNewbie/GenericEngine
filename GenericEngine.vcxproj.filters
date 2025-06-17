@@ -128,6 +128,28 @@
     <ClCompile Include="Engine\Math\vector3.cpp">
       <Filter>engine</Filter>
     </ClCompile>
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Engine\engine_profiler.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\implot\implot.cpp">
+      <Filter>implot</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\implot\implot_demo.cpp">
+      <Filter>implot</Filter>
+    </ClCompile>
+    <ClCompile Include="ThirdParty\implot\implot_items.cpp">
+      <Filter>implot</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\mv1_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\profiler.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Editor\update_man_debugger.cpp">
+      <Filter>editor</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\engine.h">
@@ -289,6 +311,29 @@
     <ClInclude Include="Engine\Math\vector4.h">
       <Filter>engine</Filter>
     </ClInclude>
+    <ClInclude Include="Editor\application.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Engine\engine_profiler.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\implot\implot.h">
+      <Filter>implot</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\implot\implot_internal.h">
+      <Filter>implot</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\mv1_renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\profiler.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\str_util.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Editor\update_man_debugger.h">
+      <Filter>editor</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -297,11 +342,11 @@
     <Filter Include="engine">
       <UniqueIdentifier>{3e9a80d6-9ee8-4d20-bb4a-3ef1b0632782}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dxlib">
-      <UniqueIdentifier>{de7f9d39-2fe4-4c41-911b-20081be0b28d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{85fd8929-4b22-4e2c-a917-fc42037f2f08}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="implot">
+      <UniqueIdentifier>{27463cd6-262e-4180-b96b-20b4b52dea5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

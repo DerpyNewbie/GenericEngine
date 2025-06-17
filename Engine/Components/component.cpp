@@ -1,6 +1,8 @@
+#include "pch.h"
+
 #include "component.h"
+
 #include "game_object.h"
-#include "imgui.h"
 
 namespace engine
 {

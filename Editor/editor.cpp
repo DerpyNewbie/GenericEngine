@@ -1,11 +1,10 @@
-﻿#include "editor.h"
+﻿#include "pch.h"
+
+#include "editor.h"
 
 #include "dxlib_helper.h"
-#include "../Engine/scene_manager.h"
-#include "../ThirdParty/implot/implot.h"
+#include "update_manager.h"
 
-#include <DxLib.h>
-#include <imgui.h>
 #include <backends/imgui_impl_win32.h>
 #include <backends/imgui_impl_dx11.h>
 

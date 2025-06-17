@@ -1,8 +1,10 @@
-﻿#include "hierarchy.h"
+﻿#include "pch.h"
+
+#include "hierarchy.h"
 
 #include "dxlib_helper.h"
-#include "imgui.h"
 #include "str_util.h"
+
 #include "../Engine/scene.h"
 #include "../Engine/scene_manager.h"
 #include "../Engine/serializer.h"

@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "texture2d.h"
 
 #include "Math/color.h"

@@ -1,6 +1,7 @@
+#include "pch.h"
+
 #include "camera.h"
 
-#include "DxLib.h"
 #include "game_object.h"
 
 namespace engine

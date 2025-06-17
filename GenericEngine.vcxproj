@@ -59,16 +59,38 @@
         <ClCompile Include="Engine\engine_time.cpp"/>
         <ClCompile Include="Engine\update_manager.cpp"/>
         <ClCompile Include="main.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot_demo.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot_items.cpp"/>
+        <ClCompile Include="pch.cpp">
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot_demo.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot_items.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="Editor\editor_window.h"/>
@@ -121,6 +143,7 @@
         <ClInclude Include="Engine\engine_time.h"/>
         <ClInclude Include="Engine\str_util.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
+        <ClInclude Include="pch.h"/>
         <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h"/>
         <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h"/>
         <ClInclude Include="ThirdParty\imgui\imconfig.h"/>
@@ -215,10 +238,11 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include
-            </AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
+            <PrecompiledHeader>Create</PrecompiledHeader>
+            <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>

@@ -1,12 +1,10 @@
+#include "pch.h"
+
 #include "engine_util.h"
 
 #include "logger.h"
-#include "Components/component.h"
 
-#include <cassert>
-#include <codecvt>
-#include <locale>
-#include <vector>
+#include "Components/component.h"
 
 namespace engine
 {

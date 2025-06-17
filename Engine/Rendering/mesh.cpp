@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #ifdef _DEBUG
 #pragma comment(lib, "assimp-vc143-mtd.lib")
 #else
@@ -8,8 +10,6 @@
 #include <assimp/scene.h>
 
 #include "mesh.h"
-
-#include <utility>
 
 #include "logger.h"
 #include "Math/vector2.h"

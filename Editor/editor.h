@@ -1,8 +1,11 @@
 ﻿#pragma once
+#include "pch.h"
+
+#include "enable_shared_from_base.h"
+#include "event_receivers.h"
+
 #include "hierarchy.h"
 #include "inspector.h"
-#include "enable_shared_from_base.h"
-#include "engine.h"
 #include "profiler.h"
 #include "update_man_debugger.h"
 

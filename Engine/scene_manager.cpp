@@ -1,8 +1,7 @@
-﻿#include "scene_manager.h"
+﻿#include "pch.h"
 
+#include "scene_manager.h"
 #include "scene.h"
-
-#include <cassert>
 
 namespace engine
 {

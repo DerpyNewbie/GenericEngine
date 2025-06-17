@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "mv1_renderer.h"
 
 #include "dxlib_helper.h"

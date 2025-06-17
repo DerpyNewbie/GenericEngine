@@ -1,4 +1,6 @@
-﻿#include "matrix4x4.h"
+﻿#include "pch.h"
+
+#include "matrix4x4.h"
 
 #include "vector4.h"
 
@@ -110,6 +112,6 @@ Matrix4x4 Matrix4x4::operator*(const Matrix4x4 &other) const
 Matrix4x4::operator tagMATRIX() const
 {
     // ReSharper disable once CppCStyleCast
-    return *(tagMATRIX *)this;  // NOLINT(clang-diagnostic-cast-qual)
+    return *(tagMATRIX *)this; // NOLINT(clang-diagnostic-cast-qual)
 }
 }

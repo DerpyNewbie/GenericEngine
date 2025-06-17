@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "engine_profiler.h"
 
 namespace engine

@@ -1,6 +1,10 @@
+#include "pch.h"
+
 #include "controller.h"
+
 #include "game_object.h"
 #include "transform.h"
+
 #include "Math/vector3.h"
 
 namespace engine

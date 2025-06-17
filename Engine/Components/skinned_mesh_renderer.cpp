@@ -1,7 +1,9 @@
+#include "pch.h"
+
 #include "skinned_mesh_renderer.h"
 
 #include "dxlib_helper.h"
-#include "imgui.h"
+
 #include "Rendering/texture2d.h"
 
 namespace engine

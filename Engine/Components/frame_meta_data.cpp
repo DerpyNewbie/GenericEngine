@@ -1,6 +1,7 @@
+#include "pch.h"
+
 #include "frame_meta_data.h"
 
-#include "imgui.h"
 void engine::FrameMetaData::OnInspectorGui()
 {
     ImGui::Text("max: %.2f, %.2f, %.2f", max_vert_pos.x, max_vert_pos.y, max_vert_pos.z);

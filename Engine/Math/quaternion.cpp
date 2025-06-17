@@ -1,7 +1,9 @@
+#include "pch.h"
+
 #include "quaternion.h"
+
 #include "vector3.h"
 #include "matrix4x4.h"
-#include <cmath>
 
 namespace engine
 {

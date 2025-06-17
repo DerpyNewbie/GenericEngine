@@ -1,10 +1,11 @@
+#include "pch.h"
+
 #include "mesh_renderer.h"
 
 #include "dxlib_helper.h"
 #include "game_object.h"
-#include "imgui.h"
-#include "imgui_internal.h"
 #include "logger.h"
+
 #include "Rendering/texture2d.h"
 
 namespace engine

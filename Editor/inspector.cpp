@@ -1,6 +1,7 @@
-﻿#include "inspector.h"
+﻿#include "pch.h"
 
-#include "imgui.h"
+#include "inspector.h"
+
 #include "game_object.h"
 
 namespace editor

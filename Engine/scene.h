@@ -1,10 +1,9 @@
 ﻿#pragma once
-#include "event_receivers.h"
 #include "object.h"
+#include "event_receivers.h"
 
 #include <memory>
 #include <vector>
-#include <cereal/types/vector.hpp>
 
 namespace engine
 {

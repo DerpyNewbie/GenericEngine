@@ -1,6 +1,7 @@
+#include "pch.h"
+
 #include "cube_renderer.h"
 
-#include "DxLib.h"
 #include "game_object.h"
 #include "transform.h"
 

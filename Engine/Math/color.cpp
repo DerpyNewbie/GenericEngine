@@ -1,6 +1,6 @@
-#include "color.h"
+#include "pch.h"
 
-#include <algorithm>
+#include "color.h"
 
 namespace engine
 {
