@@ -2,6 +2,7 @@
 
 #include "dxlib_helper.h"
 #include "../Engine/scene_manager.h"
+#include "../ThirdParty/implot/implot.h"
 
 #include <DxLib.h>
 #include <imgui.h>
@@ -27,6 +28,7 @@ void Editor::Init()
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+        ImPlot::CreateContext();
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -51,8 +53,12 @@ void Editor::Init()
 
     {
         m_hierarchy_ = engine::Object::Instantiate<Hierarchy>();
+
         m_inspector_ = engine::Object::Instantiate<Inspector>();
         m_inspector_->selected_game_object_ptr = &m_hierarchy_->selected_game_object;
+
+        m_profiler_ = engine::Object::Instantiate<Profiler>();
+        m_update_man_debugger_ = engine::Object::Instantiate<UpdateManDebugger>();
     }
 }
 void Editor::Update()
@@ -75,6 +81,8 @@ void Editor::OnDraw()
 
     m_hierarchy_->DrawGui();
     m_inspector_->DrawGui();
+    m_profiler_->DrawGui();
+    m_update_man_debugger_->DrawGui();
 
     {
         ImGui::Render();
@@ -92,6 +100,7 @@ void Editor::Finalize()
 {
     ImGui_ImplWin32_Shutdown();
     ImGui_ImplDX11_Shutdown();
+    ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
 }

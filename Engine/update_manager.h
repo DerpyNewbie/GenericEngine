@@ -40,5 +40,20 @@ public:
     {
         return static_cast<int>(m_draw_call_receivers_.size());
     }
+
+    static const std::vector<std::shared_ptr<IUpdateReceiver>> &GetUpdateReceivers()
+    {
+        return m_update_receivers_;
+    }
+
+    static const std::vector<std::shared_ptr<IFixedUpdateReceiver>> &GetFixedUpdateReceivers()
+    {
+        return m_fixed_update_receivers_;
+    }
+
+    static const std::vector<std::shared_ptr<IDrawCallReceiver>> &GetDrawCallReceivers()
+    {
+        return m_draw_call_receivers_;
+    }
 };
 }

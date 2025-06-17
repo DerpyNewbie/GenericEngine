@@ -22,37 +22,19 @@
     <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\component.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\engine.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\engine_util.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\event_receivers.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\game_object.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\logger.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\object.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\scene.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\scene_manager.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\time.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\transform.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\update_manager.cpp">
@@ -65,52 +47,89 @@
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Engine\factory.cpp" />
-    <ClCompile Include="Engine\camera.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\color.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\cube_renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Editor\editor.cpp">
       <Filter>editor</Filter>
     </ClCompile>
     <ClCompile Include="Editor\editor_window.cpp">
       <Filter>editor</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\serializer.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\skinned_mesh_renderer.cpp">
+    <ClCompile Include="Engine\Rendering\bone_weight.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\bounds.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\camera.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\color.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\component.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\controller.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\cube_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\engine_time.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\frame_meta_data.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\material.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\material_block.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\matrix4x4.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\mesh.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\mesh_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\model_importer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\quaternion.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\shader.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\sub_mesh.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Rendering\texture2d.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Components\transform.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\vector2.cpp">
+      <Filter>engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\Math\vector3.cpp">
       <Filter>engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\enable_shared_from_base.h" />
-    <ClInclude Include="ThirdParty\dxlib_h\DxCompileConfig.h">
-      <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\dxlib_h\DxDataType.h">
-      <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\dxlib_h\DxDataTypeWin.h">
-      <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\dxlib_h\DxFunctionWin.h">
-      <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\dxlib_h\DxLib.h">
-      <Filter>dxlib</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\component.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\engine.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -135,12 +154,6 @@
     <ClInclude Include="Engine\scene_manager.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\time.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\transform.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\update_manager.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -150,28 +163,130 @@
     <ClInclude Include="Editor\inspector.h">
       <Filter>editor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\camera.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\color.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\cube_renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Editor\editor.h">
       <Filter>editor</Filter>
     </ClInclude>
     <ClInclude Include="Editor\editor_window.h">
       <Filter>editor</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\serializer.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\skinned_mesh_renderer.h">
+    <ClInclude Include="Engine\Rendering\bone_weight.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\bounds.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\camera.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\color.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\component.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\controller.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\cube_renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\dxlib_helper.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\dxlib_serializer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\enable_shared_from_base.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\engine_time.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\frame_meta_data.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\material.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\material_block.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\math_serializer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\mathf.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\matrix4x4.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\mesh.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\mesh_renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\model_importer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\quaternion.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\rendering_serializer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\shader.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\skinned_mesh_renderer.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\sub_mesh.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Rendering\texture2d.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Components\transform.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\vector2.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\vector3.h">
+      <Filter>engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Math\vector4.h">
       <Filter>engine</Filter>
     </ClInclude>
   </ItemGroup>

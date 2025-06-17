@@ -18,7 +18,7 @@ void Inspector::OnEditorGui()
         return;
     }
 
-    std::shared_ptr<engine::GameObject> selected_go = *selected_game_object_ptr;
+    const std::shared_ptr<engine::GameObject> selected_go = *selected_game_object_ptr;
     if (selected_go == nullptr)
     {
         ImGui::Text("Select game object to inspect...");
@@ -29,7 +29,8 @@ void Inspector::OnEditorGui()
          const auto &component : all_components)
     {
         ImGui::PushID(component.get());
-        if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str()))
+        if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str(),
+                                    ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent();
             component->OnInspectorGui();

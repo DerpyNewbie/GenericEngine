@@ -2,6 +2,7 @@
 
 #include "dxlib_helper.h"
 #include "imgui.h"
+#include "str_util.h"
 #include "../Engine/scene.h"
 #include "../Engine/scene_manager.h"
 #include "../Engine/serializer.h"
@@ -28,7 +29,7 @@ void Hierarchy::OnEditorGui()
     if (selected_game_object != nullptr)
     {
         SetFontSize(12);
-        DxLibHelper::DrawObjectInfo(engine::EngineUtil::ShiftJisToUtf8(selected_game_object->Name()).c_str(),
+        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(selected_game_object->Name()).c_str(),
                                     selected_game_object->Transform()->WorldToLocal());
     }
 }
@@ -76,17 +77,14 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
         ImGui::PopID();
         return;
     }
-    // ImGui::Indent();
+
+    const auto transform = game_object->Transform();
+    const auto child_count = transform->ChildCount();
+    for (int i = 0; i < child_count; ++i)
     {
-        const auto transform = game_object->Transform();
-        const auto child_count = transform->ChildCount();
-        for (int i = 0; i < child_count; ++i)
-        {
-            const auto child_go = transform->GetChild(i)->GameObject();
-            DrawObjectRecursive(child_go);
-        }
+        const auto child_go = transform->GetChild(i)->GameObject();
+        DrawObjectRecursive(child_go);
     }
-    // ImGui::Unindent();
     ImGui::TreePop();
     ImGui::PopID();
 }
@@ -94,6 +92,8 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 {
     if (game_object->Transform()->ChildCount() == 0)
     {
+        ImGui::Dummy(ImVec2{20, 2});
+        ImGui::SameLine();
         if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
         {
             selected_game_object = game_object;

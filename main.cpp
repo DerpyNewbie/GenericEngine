@@ -3,7 +3,6 @@
 #include "Engine/scene.h"
 #include "Engine/Components/camera.h"
 #include "Engine/Components/controller.h"
-#include "Engine/Components/cube_renderer.h"
 #include "Engine/Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 
@@ -23,9 +22,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         camera->AddComponent<engine::Camera>();
         camera->AddComponent<engine::Controller>();
 
-        const auto cube_renderer = engine::Object::Instantiate<engine::GameObject>("Cube");
-        cube_renderer->AddComponent<engine::CubeRenderer>();
-
         const auto parent_obj = engine::Object::Instantiate<engine::GameObject>("Parent");
         const auto child_obj = engine::Object::Instantiate<engine::GameObject>("Child");
         child_obj->Transform()->SetParent(parent_obj->Transform());
@@ -34,8 +30,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
         const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
         child_obj2->Transform()->SetParent(parent_obj2->Transform());
 
-        engine::ModelImporter::LoadModelFromMV1("Resources/primitives/cube.mv1");
-        engine::ModelImporter::LoadModelFromMV1("Resources/hackadoll/hackadoll.pmx");
+        engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
+        engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
+        engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
     }
 
     engine->MainLoop();

@@ -46,15 +46,22 @@ public:
     {
         while (ProcessMessage() == 0 && !should_exit)
         {
+            Profiler::NewFrame();
             Time::Get()->IncrementFrame();
-            UpdateManager::InvokeUpdate();
 
+            Profiler::Begin("Update");
+            UpdateManager::InvokeUpdate();
+            Profiler::End("Update");
+
+            Profiler::Begin("Fixed Update");
             const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
             for (int i = 0; i < fixed_update_count; i++)
             {
                 UpdateManager::InvokeFixedUpdate();
             }
+            Profiler::End("Fixed Update");
 
+            Profiler::Begin("Draw Call");
             ClearDrawScreen();
             UpdateManager::InvokeDrawCall();
 
@@ -68,6 +75,7 @@ public:
                                  UpdateManager::DrawCallCount());
             }
             ScreenFlip();
+            Profiler::End("Draw Call");
         }
     }
 };

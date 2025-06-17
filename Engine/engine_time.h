@@ -5,8 +5,12 @@
 
 #include "DxLib.h"
 
+#include <chrono>
+
 namespace engine
 {
+using Instant = std::chrono::time_point<std::chrono::steady_clock>;
+
 class Time
 {
     friend class Engine;
@@ -18,9 +22,10 @@ class Time
 
     void WaitForNextFrame();
 
-    LONGLONG m_time_ = 0;
-    LONGLONG m_fps_check_time_ = 0;
-    LONGLONG m_fixed_update_check_time_ = 0;
+    Instant m_start_up_time_;
+    Instant m_time_;
+    Instant m_fps_check_time_;
+    Instant m_fixed_update_check_time_;
     float m_dt_ = 0;
     float m_time_scale_ = 1;
     float m_time_since_start_up_ = 0;
@@ -47,16 +52,15 @@ public:
         return Get()->DeltaTime();
     }
 
-    [[nodiscard]] const LONGLONG &SourceTime() const
+    [[nodiscard]] LONGLONG SourceTime() const
     {
-        return m_time_;
+        return m_time_.time_since_epoch().count();
     }
 
-    [[nodiscard]] const LONGLONG &LastCheckedSourceTime() const
+    [[nodiscard]] LONGLONG LastCheckedSourceTime() const
     {
-        return m_fps_check_time_;
+        return m_fps_check_time_.time_since_epoch().count();
     }
-
 
     [[nodiscard]] float DeltaTime() const
     {
@@ -120,5 +124,7 @@ public:
     }
 
     [[nodiscard]] double CurrentFrameTime() const;
+
+    static Instant Instant();
 };
 }

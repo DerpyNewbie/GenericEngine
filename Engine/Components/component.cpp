@@ -8,7 +8,7 @@ Component::Component() : Object()
 {}
 void Component::OnInspectorGui()
 {
-    ImGui::Text("Default Inspector Gui");
+    ImGui::Text("OnInspectorGui not implemented for %s", typeid(*this).name());
 }
 
 template <class Archive>

@@ -3,8 +3,11 @@
 #pragma once
 #include "DxLib.h"
 
+// ReSharper disable once CppInconsistentNaming
 namespace DxLibHelper
 {
+constexpr float kDefaultBillboardSize = 0.01F;
+
 /**
  * 3D空間に文字列を描画します。
  *
@@ -14,10 +17,10 @@ namespace DxLibHelper
  * @param str 表示する文字列
  * @param color 文字色(0xRRGGBB形式)
  * @param edge_color エッジの色(0xAARRGGBB形式)。デフォルトは0(エッジなし)
- * @param size 描画するビルボードのサイズ。デフォルトは24
+ * @param size 描画するビルボードのサイズ。
  */
 static void DrawString3D(const VECTOR &pos, const char *str,
-                         const unsigned int color, const unsigned int edge_color = 0, const float size = 0.01)
+                         const unsigned int color, const unsigned int edge_color = 0, const float size = kDefaultBillboardSize) // NOLINT(clang-diagnostic-unused-function)
 {
     int size_x, size_y, line_count;
     GetDrawStringSize(&size_x, &size_y, &line_count, str, static_cast<int>(strlen(str)));
@@ -32,8 +35,8 @@ static void DrawString3D(const VECTOR &pos, const char *str,
         }
         SetUseSetDrawScreenSettingReset(prev_draw_screen_setting);
     }
-
-    DrawBillboard3D(pos, 0.5F, 0.5f, size_x * size, 0, draw_screen, TRUE);
+    const auto billboard_size = static_cast<float>(size_x) * size;
+    DrawBillboard3D(pos, 0.5F, 0.5f, billboard_size, 0, draw_screen, TRUE);
     DeleteGraph(draw_screen);
 }
 
@@ -49,11 +52,11 @@ static void DrawString3D(const VECTOR &pos, const char *str,
  * @param color 文字色(0xRRGGBB形式)
  * @param font_handle 使用するフォントのハンドル
  * @param edge_color エッジの色(0xAARRGGBB形式)。デフォルトは0(エッジなし)
- * @param size 描画するビルボードのサイズ。デフォルトは24
+ * @param size 描画するビルボードのサイズ。
  */
-static void DrawString3DToHandle(const VECTOR &pos, const char *str,
+static void DrawString3DToHandle(const VECTOR &pos, const char *str, // NOLINT(clang-diagnostic-unused-function)
                                  const unsigned int color, const int font_handle,
-                                 const unsigned int edge_color = 0, const float size = 24)
+                                 const unsigned int edge_color = 0, const float size = kDefaultBillboardSize)
 {
     int size_x, size_y, line_count;
     GetDrawStringSizeToHandle(&size_x, &size_y, &line_count, str, static_cast<int>(strlen(str)), font_handle);
@@ -69,7 +72,8 @@ static void DrawString3DToHandle(const VECTOR &pos, const char *str,
         SetUseSetDrawScreenSettingReset(prev_draw_screen_setting);
     }
 
-    DrawBillboard3D(pos, 0.5F, 0.5f, size_x * size, 0, draw_screen, TRUE);
+    const auto billboard_size = static_cast<float>(size_x) * size;
+    DrawBillboard3D(pos, 0.5F, 0.5f, billboard_size, 0, draw_screen, TRUE);
     DeleteGraph(draw_screen);
 }
 
@@ -84,7 +88,7 @@ static void DrawString3DToHandle(const VECTOR &pos, const char *str,
  * @param out_up 計算されたローカルY軸方向が格納されます
  * @param out_forward 計算されたローカルZ軸方向が格納されます
  */
-static void GetLocalAxis(const MATRIX &matrix, VECTOR &out_left, VECTOR &out_up, VECTOR &out_forward)
+static void GetLocalAxis(const MATRIX &matrix, VECTOR &out_left, VECTOR &out_up, VECTOR &out_forward) // NOLINT(clang-diagnostic-unused-function)
 {
     const MATRIX rot = MGetRotElem(matrix);
     out_left = VNorm(VTransform({1, 0, 0}, rot));
@@ -121,29 +125,29 @@ static void DrawAxis3D(const MATRIX &m, const float len = 0.5F)
  * @param spacing グリッドの間隔を指定する2Dベクトル(u方向の間隔, v方向の間隔)。デフォルト値は(100, 100)
  * @param count 描画するグリッドの全体の個数。デフォルト値は50
  */
-static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50)
+static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50) // NOLINT(clang-diagnostic-unused-function)
 {
     SetUseZBuffer3D(TRUE);
-    
-    MATRIX camera_view_matrix = MInverse(GetCameraViewMatrix());
-    const VECTOR camera_pos = VTransform({0, 0, 0}, camera_view_matrix);
+
+    const MATRIX camera_view_matrix = MInverse(GetCameraViewMatrix());
+    const auto [cam_x, cam_y, cam_z] = VTransform({0, 0, 0}, camera_view_matrix);
     const int half_count = count / 2;
-    const int center_x_index = static_cast<int>(camera_pos.x / spacing.u);
-    const int center_z_index = static_cast<int>(camera_pos.z / spacing.v);
+    const int center_x_index = static_cast<int>(cam_x / spacing.u);
+    const int center_z_index = static_cast<int>(cam_z / spacing.v);
     const int max_x = center_x_index + half_count;
     const int min_x = center_x_index - half_count;
     const int max_z = center_z_index + half_count;
     const int min_z = center_z_index - half_count;
 
-    const float x_end = spacing.u * min_x;
-    const float z_end = spacing.v * min_z;
+    const float x_end = spacing.u * static_cast<float>(min_x);
+    const float z_end = spacing.v * static_cast<float>(min_z);
 
     for (int z = min_z; z < max_z; ++z)
     {
         for (int x = min_x; x < max_x; ++x)
         {
-            const auto dx = spacing.u * x;
-            const auto dz = spacing.v * z;
+            const auto dx = spacing.u * static_cast<float>(x);
+            const auto dz = spacing.v * static_cast<float>(z);
 
             const VECTOR z_line_begin = {dx, 0, dz};
             const VECTOR z_line_end = {dx, 0, z_end};
@@ -156,7 +160,7 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
 
             if (x % 5 == 0 && z % 5 == 0)
             {
-                DrawLine3D({dx, 0, dz}, {dx, camera_pos.y, dz}, 0xffa1ffa1);
+                DrawLine3D({dx, 0, dz}, {dx, cam_y, dz}, 0xffa1ffa1);
             }
         }
     }
@@ -171,11 +175,12 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
  *                    NULL終端文字列である必要があります。
  * @param object_matrix オブジェクトのローカル変換(位置、回転、拡大縮小)を
  *                      表す3D空間上の変換行列。
+ * @param size モデルの原点に表示される名前のサイズ
  */
-static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix)
+static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix, const float size = kDefaultBillboardSize) // NOLINT(clang-diagnostic-unused-function)
 {
     const auto pos = VTransform({0, 0, 0}, object_matrix);
-    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0);
+    DrawString3D(VSub(pos, {0, 1, 0}), object_name, GetColor(255, 255, 255), 0, size);
     DrawAxis3D(object_matrix);
 }
 
@@ -188,17 +193,18 @@ static void DrawObjectInfo(const TCHAR *object_name, const MATRIX &object_matrix
  *
  * @param model_handle 描画するフレームを持つ3Dモデルのハンドル
  * @param model_name モデルの原点に表示する名前。デフォルトは"Model Origin"
+ * @param size モデルの原点に表示される名前のサイズ
  */
-static void DrawModelFrames(const int model_handle, const TCHAR *model_name = "Model Origin")
+static void DrawModelFrames(const int model_handle, const TCHAR *model_name = "Model Origin", const float size = kDefaultBillboardSize) // NOLINT(clang-diagnostic-unused-function)
 {
-    DrawObjectInfo(model_name, MV1GetMatrix(model_handle));
+    DrawObjectInfo(model_name, MV1GetMatrix(model_handle), size);
 
     const int frame_num = MV1GetFrameNum(model_handle);
     for (int frame_index = 0; frame_index < frame_num; ++frame_index)
     {
         MATRIX frame_mat = MV1GetFrameLocalWorldMatrix(model_handle, frame_index);
         const TCHAR *frame_name = MV1GetFrameName(model_handle, frame_index);
-        DrawObjectInfo(frame_name, frame_mat);
+        DrawObjectInfo(frame_name, frame_mat, size);
 
         const int child_frame_num = MV1GetFrameChildNum(model_handle, frame_index);
         for (int j = 0; j < child_frame_num; ++j)

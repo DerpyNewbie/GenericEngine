@@ -17,14 +17,16 @@ class Transform : public Component
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
-    [[nodiscard]] Matrix4x4 ParentMatrix() const;
+    void RenderLocalTransformGui();
+    void RenderGlobalTransformGui();
 
 public:
     void OnInspectorGui() override;
 
+    [[nodiscard]] Matrix4x4 LocalMatrix() const;
+    [[nodiscard]] Matrix4x4 WorldMatrix() const;
     [[nodiscard]] Matrix4x4 LocalToWorld() const;
     [[nodiscard]] Matrix4x4 WorldToLocal() const;
-    [[nodiscard]] Matrix4x4 LocalMatrix() const;
 
     [[nodiscard]] Vector3 Position() const;
     [[nodiscard]] Quaternion Rotation() const;
@@ -38,7 +40,7 @@ public:
     [[nodiscard]] std::shared_ptr<Transform> GetChild(int i) const;
     [[nodiscard]] bool IsChildOf(const std::shared_ptr<Transform> &transform, bool deep = true) const;
     [[nodiscard]] int ChildCount() const;
-    void SetParent(const std::weak_ptr<Transform> &next_parent_weak);
+    void SetParent(const std::weak_ptr<Transform> &next_parent);
 
     void SetPosition(const Vector3 &position);
     void SetRotation(const Quaternion &rotation);
@@ -57,6 +59,7 @@ public:
 
     // Rotates around a pivot point using a quaternion
     void RotateAround(const Vector3 &pivot_point, const Quaternion &rotation);
+
 
     [[nodiscard]] Vector3 Forward() const
     {
