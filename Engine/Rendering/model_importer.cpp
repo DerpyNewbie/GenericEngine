@@ -28,6 +28,7 @@ namespace
 {
 Matrix4x4 ConvertAi(const aiMatrix4x4 &m)
 {
+    // TODO: conversion may not be accurate as rotation is invalid
     Matrix4x4 result;
     result.m[0][0] = m.a1;
     result.m[0][1] = m.a2;
@@ -65,6 +66,7 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         node_transform->SetParent(parent_node->Transform());
     }
 
+    // TODO: local matrix is incorrect
     node_transform->SetLocalMatrix(ConvertAi(node->mTransformation));
 
     // apply meshes
