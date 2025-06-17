@@ -20,7 +20,7 @@ struct ScrollingBuffer
         if (data.size() < max_size)
         {
             data.push_back(value);
-            offset = data.size() - 1;
+            offset = static_cast<int>(data.size()) - 1;
         }
         else
         {
