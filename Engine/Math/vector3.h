@@ -1,5 +1,7 @@
 #pragma once
 #include <DxLib.h>
+
+#include <string>
 #include <stdexcept>
 
 namespace engine
@@ -188,7 +190,7 @@ struct Vector3
     {
         return {x * v.x, y * v.y, z * v.z};
     }
-    
+
     constexpr Vector3 operator*(const float &v) const
     {
         return {x * v, y * v, z * v};
@@ -246,6 +248,6 @@ struct Vector3
 
     Vector3 &operator=(const VECTOR &vec);
 
-    Vector3 operator*(const MATRIX& m) const;
+    Vector3 operator*(const MATRIX &m) const;
 };
 }

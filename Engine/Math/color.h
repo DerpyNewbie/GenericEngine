@@ -13,7 +13,7 @@ struct Color
     Byte a = 255;
 
     constexpr Color() = default;
-    
+
     constexpr explicit Color(const unsigned int hex_rgba)
     {
         r = (hex_rgba >> 24) & 0xFF;
@@ -35,6 +35,11 @@ struct Color
 
     constexpr Color(const int r, const int g, const int b) :
         Color(static_cast<Byte>(r), static_cast<Byte>(g), static_cast<Byte>(b))
+    {}
+
+    constexpr Color(const float r, const float g, const float b, const float a) :
+        Color(static_cast<Byte>(r * 255), static_cast<Byte>(g * 255), static_cast<Byte>(b * 255),
+              static_cast<Byte>(a * 255))
     {}
 
     // ReSharper disable once CppNonExplicitConvertingConstructor
