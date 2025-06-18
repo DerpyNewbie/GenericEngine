@@ -2,7 +2,6 @@
 #include "DxLib.h"
 #include "game_object.h"
 #include "mesh_renderer.h"
-#include "Rendering/texture2d.h"
 
 #include <vector>
 
@@ -11,9 +10,9 @@ namespace engine
 class SkinnedMeshRenderer : public MeshRenderer
 {
     bool m_draw_bones_ = false;
-    Texture2D m_texture_;
 
 public:
+    constexpr static int kLimitBonesPerVertex = 4;
     std::vector<std::weak_ptr<Transform>> transforms;
 
     void OnInspectorGui() override;

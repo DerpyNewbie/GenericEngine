@@ -27,11 +27,10 @@ public:
 
     PrimitiveShape(ShapeType type);
     void Draw();
-    
+
 private:
-    
-    std::shared_ptr<Mesh> m_Mesh;
-    std::shared_ptr<VertexBuffer> m_VertexBuffer;
+    std::shared_ptr<CabotMesh> m_Mesh;
+    std::shared_ptr<engine::VertexBuffer> m_VertexBuffer;
     std::shared_ptr<IndexBuffer> m_IndexBuffer;
     std::shared_ptr<ConstantBuffer> m_WVPBuffer[RenderEngine::FRAME_BUFFER_COUNT];
     std::shared_ptr<DescriptorHandle> m_MaterialHandle;

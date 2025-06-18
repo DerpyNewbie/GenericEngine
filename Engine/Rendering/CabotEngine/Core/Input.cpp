@@ -1,7 +1,8 @@
-﻿#include <windows.h>
+﻿#include "pch.h"
+
 #include "Input.h"
 
-#include "../../App.h"
+#include "application.h"
 
 std::unique_ptr<Input> g_pInput;
 
@@ -13,7 +14,7 @@ Input::Input()
 
 void Input::Initialize()
 {
-    m_Mouse->SetWindow(g_App->HWnd());
+    m_Mouse->SetWindow(g_app->GetWindowHandle());
     m_Mouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 }
 

@@ -1,7 +1,10 @@
-﻿#include "PSOManager.h"
+﻿#include "pch.h"
+
+#include "PSOManager.h"
 
 #include "RootSignatureManager.h"
 #include "SharedStruct.h"
+#include "Rendering/Vertex.h"
 
 PSOManager g_PSOManager;
 
@@ -18,7 +21,7 @@ void PSOManager::Initialize()
 
 bool PSOManager::Register(PSOSetting setting)
 {
-    PipelineState* pso = new PipelineState;
+    PipelineState *pso = new PipelineState;
     pso->SetInputLayout(setting.InputLayout);
     pso->SetRootSignature(setting.RootSignature);
     pso->SetVS(setting.VSPath);
@@ -35,9 +38,9 @@ bool PSOManager::Register(PSOSetting setting)
     return true;
 }
 
-bool PSOManager::Register(ShaderObject& shaderObject)
+bool PSOManager::Register(ShaderObject &shaderObject)
 {
-    PipelineState* pso = new PipelineState;
+    PipelineState *pso = new PipelineState;
     pso->SetInputLayout(Vertex::InputLayout);
     pso->SetRootSignature(g_RootSignatureManager.Get("Basic"));
     pso->SetVS(shaderObject.VSPath);

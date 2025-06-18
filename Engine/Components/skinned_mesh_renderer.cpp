@@ -1,6 +1,5 @@
 #include "pch.h"
 
-#include "Rendering/texture2d.h"
 #include "skinned_mesh_renderer.h"
 
 namespace engine
@@ -21,13 +20,11 @@ void SkinnedMeshRenderer::OnInspectorGui()
     {
         ImGui::Text("Vertices: %d", shared_mesh->vertices.size());
         ImGui::Text("Indices: %d", shared_mesh->indices.size());
-        ImGui::Text("UVs: %d", shared_mesh->uv.size());
-        ImGui::Text("UV2s: %d", shared_mesh->uv2.size());
+        ImGui::Text("UVs: %d", shared_mesh->uvs[0].size());
+        ImGui::Text("UV2s: %d", shared_mesh->uvs[1].size());
         ImGui::Text("Colors: %d", shared_mesh->colors.size());
         ImGui::Text("Normals: %d", shared_mesh->normals.size());
     }
-
-    // ImGui::Text("Texture: %d", m_texture_[]);
 }
 }
 

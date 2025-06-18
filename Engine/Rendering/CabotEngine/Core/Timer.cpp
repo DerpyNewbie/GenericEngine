@@ -1,6 +1,8 @@
-﻿#include "Timer.h"
+﻿#include "pch.h"
 
-Timer* g_Timer;
+#include "Timer.h"
+
+Timer *g_Timer;
 
 Timer::Timer()
 {

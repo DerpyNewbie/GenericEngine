@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "ComPtr.h"
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include <vector>
 #include "RenderEngine.h"
 #include "StructuredBuffer.h"
@@ -19,9 +19,9 @@ class DescriptorHeap
 {
 public:
     DescriptorHeap(); // コンストラクタで生成する
-    ID3D12DescriptorHeap* GetHeap(); // ディスクリプタヒープを返す
+    ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
-    template<typename T>
+    template <typename T>
     std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structuredBuffer);
 
 private:

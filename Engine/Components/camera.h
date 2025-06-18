@@ -6,13 +6,13 @@ namespace engine
 {
 class Camera : public Component
 {
-    static std::weak_ptr<Camera> MainCamera;
-
     enum kViewMode
     {
         kPerspective,
         kOrthographic
     };
+
+    static std::weak_ptr<Camera> m_main_camera_;
 
     kViewMode m_view_mode_ = kPerspective;
     float m_field_of_view_ = 70;
@@ -24,14 +24,14 @@ class Camera : public Component
     void ApplyCameraSettingToDxLib() const;
 
 public:
-
-    static std::weak_ptr<Camera> Main(){return MainCamera;}
     void OnAwake() override;
     void OnUpdate() override;
 
-    Matrix4x4 GetViewMatrix();
-    Matrix4x4 GetProjectionMatrix() const;
-    
+    static std::weak_ptr<Camera> Main();
+
+    Matrix GetViewMatrix() const;
+    Matrix GetProjectionMatrix() const;
+
     template <class Archive>
     void serialize(Archive &ar)
     {

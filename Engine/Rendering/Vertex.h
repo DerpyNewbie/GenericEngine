@@ -1,20 +1,18 @@
 #pragma once
-#include "bone_weight.h"
 #include "Math/color.h"
-#include "Math/vector2.h"
-#include "Math/vector3.h"
-#include "Math/vector4.h"
 
 #include <d3d12.h>
+#include <directxtk12/SimpleMath.h>
+using namespace DirectX::SimpleMath;
 
 struct Vertex
 {
 public:
-    engine::Vector3 vertex;
+    Vector3 vertex;
     engine::Color color;
-    engine::Vector2 uvs[8];
-    engine::Vector3 normal;
-    engine::Vector4 tangent;
+    Vector2 uvs[8];
+    Vector3 normal;
+    Vector4 tangent;
     unsigned char bones_per_vertex;
     unsigned int bone_index[4];
     float bone_weight[4];

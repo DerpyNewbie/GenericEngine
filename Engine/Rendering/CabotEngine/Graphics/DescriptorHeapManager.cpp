@@ -1,6 +1,8 @@
-﻿#include "DescriptorHeapManager.h"
+﻿#include "pch.h"
 
-DescriptorHeapManager* g_DescriptorHeapManager;
+#include "DescriptorHeapManager.h"
+
+DescriptorHeapManager *g_DescriptorHeapManager;
 
 DescriptorHeapManager::DescriptorHeapManager()
 {

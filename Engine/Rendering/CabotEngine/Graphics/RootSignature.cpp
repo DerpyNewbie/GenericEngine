@@ -1,6 +1,8 @@
-﻿#include "RootSignature.h"
+﻿#include "pch.h"
+
+#include "RootSignature.h"
 #include "RenderEngine.h"
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include <array>
 
 RootSignature::RootSignature()
@@ -9,7 +11,7 @@ RootSignature::RootSignature()
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS; // ドメインシェーダーのルートシグネチャへんアクセスを拒否する
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS; // ハルシェーダーのルートシグネチャへんアクセスを拒否する
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS; // ジオメトリシェーダーのルートシグネチャへんアクセスを拒否する
-    
+
     std::vector<CD3DX12_ROOT_PARAMETER> rootParam(ConstantBufferMaxSize + 1);
 
     for (int i = 0; i < ConstantBufferMaxSize; ++i)
@@ -20,7 +22,7 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRange[1] = {};
     tableRange[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, DescriptorHeapMaxSize, 0);
     rootParam[ConstantBufferMaxSize].InitAsDescriptorTable(std::size(tableRange), tableRange,
-                                                            D3D12_SHADER_VISIBILITY_ALL);
+                                                           D3D12_SHADER_VISIBILITY_ALL);
 
     // スタティックサンプラーの設定
     D3D12_STATIC_SAMPLER_DESC sampler[2];
@@ -74,7 +76,7 @@ bool RootSignature::IsValid()
     return m_IsValid;
 }
 
-ID3D12RootSignature* RootSignature::Get()
+ID3D12RootSignature *RootSignature::Get()
 {
     return m_pRootSignature.Get();
 }

@@ -4,12 +4,14 @@
 
 #include <DirectXMath.h>
 #include "DxLib/dxlib_converter.h"
-#include "App.h"
+#include "application.h"
 #include "game_object.h"
 
 
 namespace engine
 {
+std::weak_ptr<Camera> Camera::m_main_camera_;
+
 void Camera::ApplyCameraSettingToDxLib() const
 {
     switch (m_view_mode_)
@@ -30,27 +32,27 @@ void Camera::ApplyCameraSettingToDxLib() const
                                        DxLibConverter::From(transform->Position() + transform->Forward()),
                                        DxLibConverter::From(transform->Up()));
 }
-
 void Camera::OnAwake()
 {
-    MainCamera = shared_from_base<Camera>();
+    m_main_camera_ = shared_from_base<Camera>();
 }
-
 void Camera::OnUpdate()
 {
     ApplyCameraSettingToDxLib();
 }
-
-Matrix Camera::GetViewMatrix()
+std::weak_ptr<Camera> Camera::Main()
+{
+    return m_main_camera_;
+}
+Matrix Camera::GetViewMatrix() const
 {
     const auto transform = GameObject()->Transform();
     return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
                                      transform->Up());
 }
-
 Matrix Camera::GetProjectionMatrix() const
 {
-    float aspect = static_cast<float>(Application::WindowWidth() / Application::WindowHeight());
+    const float aspect = static_cast<float>(Application::WindowWidth() / Application::WindowHeight());
     return DirectX::XMMatrixPerspectiveFovRH(m_field_of_view_, aspect, 0.3f, 1000.0f);
 }
 }

@@ -1,19 +1,21 @@
-﻿#include "RenderEngine.h"
+﻿#include "pch.h"
+
+#include "RenderEngine.h"
 #include <d3d12.h>
 #include <stdio.h>
 #include <Windows.h>
 #include <DirectXTex.h>
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 
 
-RenderEngine* g_RenderEngine;
+RenderEngine *g_RenderEngine;
 
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 {
     m_FrameBufferWidth = windowWidth;
     m_FrameBufferHeight = windowHeight;
     m_hWnd = hwnd;
-    
+
     if (!CreateDevice())
     {
         printf("デバイスの生成に失敗");
@@ -77,14 +79,15 @@ void RenderEngine::BeginRender()
     auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
 
     // レンダーターゲットが使用可能になるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
+                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_pCommandList->ResourceBarrier(1, &barrier);
 
     // レンダーターゲットを設定
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+    const float clearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
@@ -94,14 +97,15 @@ void RenderEngine::BeginRender()
 void RenderEngine::EndRender()
 {
     // レンダーターゲットに書き込み終わるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                                        D3D12_RESOURCE_STATE_PRESENT);
     m_pCommandList->ResourceBarrier(1, &barrier);
 
     // コマンドの記録を終了
     m_pCommandList->Close();
 
     // コマンドを実行
-    ID3D12CommandList* ppCmdLists[] = { m_pCommandList.Get() };
+    ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
     m_pQueue->ExecuteCommandLists(1, ppCmdLists);
 
     // スワップチェーンを切り替え
@@ -136,7 +140,7 @@ bool RenderEngine::CreateCommandQueue()
 bool RenderEngine::CreateSwapChain()
 {
     // DXGIファクトリーの生成
-    IDXGIFactory4* pFactory = nullptr;
+    IDXGIFactory4 *pFactory = nullptr;
     HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
     if (FAILED(hr))
     {
@@ -162,7 +166,7 @@ bool RenderEngine::CreateSwapChain()
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     // スワップチェインの生成
-    IDXGISwapChain* pSwapChain = nullptr;
+    IDXGISwapChain *pSwapChain = nullptr;
     hr = pFactory->CreateSwapChain(m_pQueue.Get(), &desc, &pSwapChain);
     if (FAILED(hr))
     {
@@ -210,7 +214,7 @@ bool RenderEngine::CreateCommandList()
         m_pAllocator[m_CurrentBackBufferIndex].Get(),
         nullptr,
         IID_PPV_ARGS(&m_pCommandList)
-    );
+        );
 
     if (FAILED(hr))
     {
@@ -282,7 +286,7 @@ bool RenderEngine::CreateRenderTarget()
 
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-    
+
     for (UINT i = 0; i < FRAME_BUFFER_COUNT; i++)
     {
         m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(m_pRenderTargets[i].ReleaseAndGetAddressOf()));
@@ -334,7 +338,7 @@ bool RenderEngine::CreateDepthStencil()
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         &dsvClearValue,
         IID_PPV_ARGS(m_pDepthStencilBuffer.ReleaseAndGetAddressOf())
-    );
+        );
 
     if (FAILED(hr))
     {

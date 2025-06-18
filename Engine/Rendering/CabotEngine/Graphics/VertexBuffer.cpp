@@ -1,11 +1,13 @@
-﻿#include "VertexBuffer.h"
+﻿#include "pch.h"
+
+#include "VertexBuffer.h"
 #include "RenderEngine.h"
 #include "Rendering/Vertex.h"
 #include "Components/skinned_mesh_renderer.h"
 
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 
-engine::VertexBuffer::VertexBuffer(std::shared_ptr<Mesh> pInitData)
+engine::VertexBuffer::VertexBuffer(const Mesh *pInitData)
 {
     auto size = sizeof(Vertex) * pInitData->vertices.size();
     auto stride = sizeof(Vertex);
@@ -71,7 +73,7 @@ engine::VertexBuffer::VertexBuffer(std::shared_ptr<Mesh> pInitData)
         }
         for (size_t i = 0; i < pInitData->bone_weights.size(); i++)
         {
-            for (unsigned char j = 0; j < SkinnedMeshRenderer::limit_bones_per_vertex; j++)
+            for (unsigned char j = 0; j < SkinnedMeshRenderer::kLimitBonesPerVertex; j++)
             {
                 ptr_.at(i).bone_index[j] = pInitData->bone_weights[i][j].bone_index;
                 ptr_.at(i).bone_weight[j] = pInitData->bone_weights[i][j].weight;

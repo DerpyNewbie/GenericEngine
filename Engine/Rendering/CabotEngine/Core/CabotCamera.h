@@ -1,12 +1,12 @@
-﻿#pragma once
-#include "../../Object.h"
+#pragma once
+#include "Object.h"
 
-class Camera: public Object
+class CabotCamera : public engine::Object
 {
 public:
-    Camera();
+    CabotCamera();
     void SetPosAndLookAt(DirectX::XMVECTOR position, DirectX::XMVECTOR lookAt);
-    
+
 private:
     DirectX::XMMATRIX m_ViewMatrix;
     DirectX::XMMATRIX m_ProjectionMatrix;

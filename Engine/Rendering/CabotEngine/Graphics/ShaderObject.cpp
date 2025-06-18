@@ -1,4 +1,6 @@
-﻿#include "ShaderObject.h"
+﻿#include "pch.h"
+
+#include "ShaderObject.h"
 
 void ShaderObject::AddMaterialValues(std::string name, ValueType valueType)
 {

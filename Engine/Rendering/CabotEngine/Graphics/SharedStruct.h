@@ -1,15 +1,13 @@
 ﻿#pragma once
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include <DirectXMath.h>
-#include <unordered_map>
 #include <assimp/anim.h>
-#include <assimp/matrix4x4.h>
 #include <assimp/mesh.h>
 
 #include "ComPtr.h"
 #include "Texture2D.h"
 
-struct Vertex
+struct CabotVertex
 {
     DirectX::XMFLOAT3 Position; // 位置座標
     DirectX::XMFLOAT3 Normal; // 法線
@@ -34,10 +32,10 @@ struct AnimationData
     std::vector<std::shared_ptr<aiNodeAnim>> Channels;
 };
 
-struct Mesh
+struct CabotMesh
 {
     static constexpr char BoneNumMax = 4;
-    
+
     std::vector<DirectX::XMFLOAT3> Position;
     std::vector<DirectX::XMFLOAT3> Normal;
     std::vector<DirectX::XMFLOAT2> UV;
@@ -49,11 +47,11 @@ struct Mesh
     std::vector<uint32_t> Indices; // インデックスの配列
 };
 
-struct Bone
+struct CabotBone
 {
     std::vector<aiBone> Offsets;
     std::vector<DirectX::XMMATRIX> Transforms;
-    aiNode* RootNode;
+    aiNode *RootNode;
 };
 
 struct alignas(256) Transform
@@ -65,9 +63,9 @@ struct alignas(256) Transform
 
 struct SkinnedMeshData
 {
-    std::vector<std::shared_ptr<Mesh>> Meshes;
+    std::vector<std::shared_ptr<CabotMesh>> Meshes;
     std::vector<std::shared_ptr<aiBone>> Bones;
     std::shared_ptr<std::vector<DirectX::XMMATRIX>> Armature;
     //shared_ptrにすると都合が悪いのでraw_ptrで扱う;
-    aiNode* RootNode;
+    aiNode *RootNode;
 };

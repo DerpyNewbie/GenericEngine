@@ -5,7 +5,6 @@
 #include <array>
 #include "DxLib/dxlib_helper.h"
 #include "DxLib/dxlib_converter.h"
-#include "Rendering/texture2d.h"
 #include "Rendering/Vertex.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
@@ -86,17 +85,26 @@ void MeshRenderer::OnDraw()
     commandList->SetGraphicsRootConstantBufferView(0, WVPBuffers[currentIndex]->GetAddress());
 
     auto vbView = vertex_buffer->View();
-    for (int i = 0; i < index_buffers.size(); i++)
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList->IASetVertexBuffers(0, 1, &vbView);
+    auto ibView = index_buffers[0]->View();
+    commandList->IASetIndexBuffer(&ibView);
+    commandList->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
+                                          ? shared_mesh->sub_meshes[0].base_index
+                                          : shared_mesh->indices.size(), 1, 0, 0, 0);
+    // sub-meshes
+    for (int i = 1; i < index_buffers.size(); i++)
     {
-        auto ibView = index_buffers[i]->View();
-
-        commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        commandList->IASetVertexBuffers(0, 1, &vbView);
+        auto ib = index_buffers[i + 1];
+        auto sub_mesh = shared_mesh->sub_meshes[i + 1];
+        ibView = ib->View();
         commandList->IASetIndexBuffer(&ibView);
+        commandList->DrawIndexedInstanced(sub_mesh.index_count, 1, sub_mesh.base_index, sub_mesh.base_vertex, 0);
 
-        commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
-
-        commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
+        // FIXME: do material stuff
+        // commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
+        //
+        // commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
     }
 }
 
@@ -116,7 +124,7 @@ void MeshRenderer::ReconstructBuffers()
     }
 
     // create vertex buffer
-    vertex_buffer = std::make_shared<VertexBuffer>(shared_mesh);
+    vertex_buffer = std::make_shared<VertexBuffer>(shared_mesh.get());
     if (!vertex_buffer->IsValid())
     {
         Logger::Error<MeshRenderer>("Failed to create vertex buffer!: %s", GameObject()->Name().c_str());

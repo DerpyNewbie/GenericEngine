@@ -1,8 +1,10 @@
-﻿#include "Animator.h"
+﻿#include "pch.h"
+
+#include "Animator.h"
 #include "../Converter/D3D12ToAssimp.h"
 #include <DirectXMath.h>
 
-Animator::Animator(const std::shared_ptr<SkinnedModel>& model, const std::shared_ptr<Animation>& animation):
+Animator::Animator(const std::shared_ptr<SkinnedModel> &model, const std::shared_ptr<Animation> &animation):
     m_Model(model),
     m_Animation(animation),
     m_CurrentTime(0)
@@ -12,21 +14,21 @@ Animator::Animator(const std::shared_ptr<SkinnedModel>& model, const std::shared
 
 void Animator::Update(float delta_time)
 {
-    auto& node_anims = m_Animation->m_AnimRootNode.Channels;
+    auto &node_anims = m_Animation->m_AnimRootNode.Channels;
 
     //アニメーションの時間まで切り詰める
     m_CurrentTime += delta_time * m_Animation->m_AnimRootNode.TicksPerSecond;
     m_CurrentTime = fmod(m_CurrentTime, m_Animation->m_AnimRootNode.Duration);
-    
+
     UpdateNodeAnimation(m_CurrentTime, node_anims);
-    
-    auto& armature = m_Model->m_Bone.Transforms;
-    
+
+    auto &armature = m_Model->m_Bone.Transforms;
+
     GetBoneFinalTransform(armature);
     m_Model->ApplyAnimation();
 }
 
-void Animator::SetAnimation(const std::shared_ptr<Animation>& animation)
+void Animator::SetAnimation(const std::shared_ptr<Animation> &animation)
 {
     m_Animation = animation;
 }
@@ -43,15 +45,15 @@ void Animator::UpdateNodeAnimation(float time, std::vector<std::shared_ptr<aiNod
             auto rotation = CalcInterpolatedRotation(time, node_anim);
             auto position = CalcInterpolatedPosition(time, node_anim);
 
-            node_handle->mTransformation = CreateTransform(scale,rotation,position);
+            node_handle->mTransformation = CreateTransform(scale, rotation, position);
         }
     }
 }
 
-aiMatrix4x4 Animator::GetGlobalTransform(aiNode* node)
+aiMatrix4x4 Animator::GetGlobalTransform(aiNode *node)
 {
     aiMatrix4x4 transform = node->mTransformation;
-    aiNode* parent = node->mParent;
+    aiNode *parent = node->mParent;
 
     while (parent)
     {
@@ -62,7 +64,8 @@ aiMatrix4x4 Animator::GetGlobalTransform(aiNode* node)
     return transform;
 }
 
-aiMatrix4x4 Animator::CreateTransform(const aiVector3D& scaling, const aiQuaternion& rotation, const aiVector3D& position)
+aiMatrix4x4 Animator::CreateTransform(const aiVector3D &scaling, const aiQuaternion &rotation,
+                                      const aiVector3D &position)
 {
     aiMatrix4x4 scaleMatrix;
     aiMatrix4x4::Scaling(scaling, scaleMatrix);
@@ -75,18 +78,18 @@ aiMatrix4x4 Animator::CreateTransform(const aiVector3D& scaling, const aiQuatern
     return translationMatrix * rotationMatrix * scaleMatrix;
 }
 
-void Animator::CreateMappedNode(aiNode* node)
+void Animator::CreateMappedNode(aiNode *node)
 {
-    m_ModelNodes.emplace(node->mName.C_Str(),node);
+    m_ModelNodes.emplace(node->mName.C_Str(), node);
     for (unsigned int i = 0; i < node->mNumChildren; ++i)
     {
         CreateMappedNode(node->mChildren[i]);
     }
 }
 
-void Animator::GetBoneFinalTransform(std::vector<DirectX::XMMATRIX>& dst)
+void Animator::GetBoneFinalTransform(std::vector<DirectX::XMMATRIX> &dst)
 {
-    auto& bones = m_Model->m_Bone.Offsets;
+    auto &bones = m_Model->m_Bone.Offsets;
     for (int i = 0; i < bones.size(); ++i)
     {
         auto handle_node = m_ModelNodes[bones[i].mName.C_Str()];
@@ -132,8 +135,8 @@ aiVector3D Animator::CalcInterpolatedPosition(float animationTime, const std::sh
 
     float factor = (animationTime - t1) / deltaTime;
 
-    const aiVector3D& start = nodeAnim->mPositionKeys[positionIndex].mValue;
-    const aiVector3D& end = nodeAnim->mPositionKeys[nextPositionIndex].mValue;
+    const aiVector3D &start = nodeAnim->mPositionKeys[positionIndex].mValue;
+    const aiVector3D &end = nodeAnim->mPositionKeys[nextPositionIndex].mValue;
 
     // 線形補間 (LERP)
     return start + factor * (end - start);
@@ -165,8 +168,8 @@ aiQuaternion Animator::CalcInterpolatedRotation(float animationTime, const std::
 
     float factor = (animationTime - t1) / deltaTime;
 
-    const aiQuaternion& startRotation = nodeAnim->mRotationKeys[rotationIndex].mValue;
-    const aiQuaternion& endRotation = nodeAnim->mRotationKeys[nextRotationIndex].mValue;
+    const aiQuaternion &startRotation = nodeAnim->mRotationKeys[rotationIndex].mValue;
+    const aiQuaternion &endRotation = nodeAnim->mRotationKeys[nextRotationIndex].mValue;
 
     aiQuaternion interpolated;
     aiQuaternion::Interpolate(interpolated, startRotation, endRotation, factor);
@@ -203,8 +206,8 @@ aiVector3D Animator::CalcInterpolatedScale(float animationTime, const std::share
 
     float factor = (animationTime - t1) / deltaTime;
 
-    const aiVector3D& start = nodeAnim->mScalingKeys[ScalingIndex].mValue;
-    const aiVector3D& end = nodeAnim->mScalingKeys[nextScalingIndex].mValue;
+    const aiVector3D &start = nodeAnim->mScalingKeys[ScalingIndex].mValue;
+    const aiVector3D &end = nodeAnim->mScalingKeys[nextScalingIndex].mValue;
 
     // 線形補間 (LERP)
     return start + factor * (end - start);

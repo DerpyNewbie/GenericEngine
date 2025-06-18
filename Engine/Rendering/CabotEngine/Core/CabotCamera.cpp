@@ -1,10 +1,12 @@
-﻿#include "Camera.h"
-#include "../../App.h"
+﻿#include "pch.h"
 
-void Camera::SetPosAndLookAt(DirectX::XMVECTOR position, DirectX::XMVECTOR lookAt)
+#include "CabotCamera.h"
+#include "application.h"
+
+void CabotCamera::SetPosAndLookAt(DirectX::XMVECTOR position, DirectX::XMVECTOR lookAt)
 {
     auto aspect = static_cast<float>(Application::WindowWidth()) / static_cast<float>(
-        Application::WindowHeight()); // アスペクト比
+                      Application::WindowHeight()); // アスペクト比
     auto fov = DirectX::XMConvertToRadians(60);
     auto upward = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
     m_ViewMatrix = DirectX::XMMatrixLookAtRH(position, lookAt, upward);

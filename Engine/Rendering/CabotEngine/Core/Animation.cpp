@@ -1,4 +1,6 @@
-﻿#include "Animation.h"
+﻿#include "pch.h"
+
+#include "Animation.h"
 
 #include "AssimpLoader.h"
 
@@ -14,6 +16,6 @@ bool Animation::LoadAnim(std::wstring anim_path)
     {
         return false;
     }
-    
+
     return true;
 }

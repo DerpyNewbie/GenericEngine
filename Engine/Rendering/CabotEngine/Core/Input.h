@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <memory>
-#include "Keyboard.h"
-#include "Mouse.h"
+#include <directxtk12/Keyboard.h>
+#include <directxtk12/Mouse.h>
 
 class Input
 {
@@ -25,7 +25,7 @@ public:
 private:
     DirectX::Keyboard::State m_KeyboardState;
     DirectX::Keyboard::KeyboardStateTracker m_KeyboardTracker;
-    
+
     std::unique_ptr<DirectX::Mouse> m_Mouse;
     DirectX::Mouse::State m_MouseState;
     DirectX::Mouse::ButtonStateTracker m_MouseTracker;

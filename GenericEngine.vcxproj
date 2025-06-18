@@ -19,6 +19,7 @@
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
+        <ClCompile Include="application.cpp"/>
         <ClCompile Include="Editor\editor_window.cpp"/>
         <ClCompile Include="Editor\editor.cpp"/>
         <ClCompile Include="Editor\hierarchy.cpp"/>
@@ -46,19 +47,17 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animation.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animator.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Core\Camera.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Core\CabotCamera.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\Input.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\Timer.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Material.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp"/>
@@ -77,7 +76,6 @@
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
-        <ClCompile Include="Engine\Rendering\texture2d.cpp"/>
         <ClCompile Include="Engine\Rendering\Vertex.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
         <ClCompile Include="Engine\scene_manager.cpp"/>
@@ -89,7 +87,7 @@
         </ClCompile>
     </ItemGroup>
     <ItemGroup>
-        <ClInclude Include="App.h"/>
+        <ClInclude Include="application.h"/>
         <ClInclude Include="Editor\editor_window.h"/>
         <ClInclude Include="Editor\editor.h"/>
         <ClInclude Include="Editor\hierarchy.h"/>
@@ -127,7 +125,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animation.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animator.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Core\Camera.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Core\CabotCamera.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\Input.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.h"/>
@@ -139,7 +137,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Material.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.h"/>
@@ -159,7 +157,6 @@
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
-        <ClInclude Include="Engine\Rendering\texture2d.h"/>
         <ClInclude Include="Engine\Rendering\Vertex.h"/>
         <ClInclude Include="Engine\scene.h"/>
         <ClInclude Include="Engine\scene_manager.h"/>
@@ -171,6 +168,7 @@
     <ItemGroup>
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
+        <Content Include="vcpkg.json"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

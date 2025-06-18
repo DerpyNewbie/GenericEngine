@@ -1,8 +1,8 @@
-﻿#include "SkinnedMeshRenderer.h"
+﻿#include "pch.h"
+
+#include "SkinnedMeshRenderer.h"
 #include "../Graphics/DescriptorHeapManager.h"
 #include "../Graphics/PSOManager.h"
-#include "../../App.h"
-#include <GeometricPrimitive.h>
 
 void SkinnedMeshRenderer::LoadFromFBX(std::wstring file_path)
 {

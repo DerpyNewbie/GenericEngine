@@ -1,21 +1,23 @@
-﻿#include "PrimitiveShape.h"
+﻿#include "pch.h"
+
+#include "PrimitiveShape.h"
 #include "../../Graphics/DescriptorHeapManager.h"
 #include "../../Graphics/PSOManager.h"
-#include "../../../App.h"
-#include <GeometricPrimitive.h>
+#include "application.h"
+#include <directxtk12/GeometricPrimitive.h>
 using namespace DirectX;
 
 PrimitiveShape::PrimitiveShape(ShapeType type)
 {
 
     CreateMesh(type);
-    
+
     auto eyePos = XMVectorSet(0.0f, 120.0, 275.0, 0.0f);
     auto targetPos = XMVectorSet(0.0f, 120.0, 0.0, 0.0f);
     auto upward = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
     auto fov = XMConvertToRadians(60);
     auto aspect = static_cast<float>(Application::WindowWidth()) / static_cast<float>(
-        Application::WindowHeight()); // アスペクト比
+                      Application::WindowHeight()); // アスペクト比
 
     for (size_t i = 0; i < RenderEngine::FRAME_BUFFER_COUNT; i++)
     {
@@ -24,20 +26,17 @@ PrimitiveShape::PrimitiveShape(ShapeType type)
         // 変換行列の登録
         auto ptr = m_WVPBuffer[i]->GetPtr<Transform>();
         ptr->World = XMMatrixIdentity() * XMMatrixRotationY(XMConvertToRadians(90)) * XMMatrixTranslation(
-            0.0f, 100.0f, 0.0f);
+                         0.0f, 100.0f, 0.0f);
         ptr->View = XMMatrixLookAtRH(eyePos, targetPos, upward);
         ptr->Proj = XMMatrixPerspectiveFovRH(fov, aspect, 0.3f, 1000.0f);
     }
-
 
     auto handle = g_DescriptorHeapManager->Get().Register(Texture2D::GetWhite());
     m_MaterialHandle = handle;
 }
 
 void PrimitiveShape::Draw()
-{
-    
-}
+{}
 
 void PrimitiveShape::CreateMesh(ShapeType type)
 {
@@ -85,5 +84,4 @@ void PrimitiveShape::CreateMesh(ShapeType type)
         break;
     }
 
-    
 }

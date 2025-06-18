@@ -1,8 +1,10 @@
-﻿#include "MaterialBuffer.h"
+﻿#include "pch.h"
+
+#include "MaterialBuffer.h"
 
 #include "DescriptorHeapManager.h"
 
-void MaterialBuffer::Initialize(Material& material)
+void MaterialBuffer::Initialize(CabotMaterial &material)
 {
     auto values = material.Values();
     auto textures = material.Textures();
@@ -14,7 +16,7 @@ void MaterialBuffer::Initialize(Material& material)
         Handle = g_DescriptorHeapManager->Get().Register(m_ValuesBuffer);
     }
 
-    for (const auto& texture : textures)
+    for (const auto &texture : textures)
     {
         if (!Handle)
         {

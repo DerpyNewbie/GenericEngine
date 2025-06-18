@@ -1,10 +1,12 @@
-﻿#include "AssimpLoader.h"
+﻿#include "pch.h"
+
+#include "AssimpLoader.h"
 #include "../Graphics/SharedStruct.h"
 #include "../Graphics/Texture2D.h"
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -12,7 +14,7 @@
 
 namespace fs = std::filesystem;
 
-aiString TruncateWtfNodePath(const aiString& nodePath)
+aiString TruncateWtfNodePath(const aiString &nodePath)
 {
     std::string case1_str("mixamorig:LeftArm_$AssimpFbx$_PreRotation");
     std::string case2_str("mixamorig:RightArm_$AssimpFbx$_PreRotation");
@@ -29,13 +31,13 @@ aiString TruncateWtfNodePath(const aiString& nodePath)
     return nodePath;
 }
 
-std::wstring GetDirectoryPath(const std::wstring& origin)
+std::wstring GetDirectoryPath(const std::wstring &origin)
 {
     fs::path p = origin.c_str();
     return p.remove_filename().c_str();
 }
 
-std::string ToUTF8(const std::wstring& value)
+std::string ToUTF8(const std::wstring &value)
 {
     auto length = WideCharToMultiByte(CP_UTF8, 0U, value.data(), -1, nullptr, 0, nullptr, nullptr);
     auto buffer = new char[length];
@@ -50,7 +52,7 @@ std::string ToUTF8(const std::wstring& value)
 }
 
 // std::string(マルチバイト文字列)からstd::wstring(ワイド文字列)を得る
-std::wstring ToWideString(const std::string& str)
+std::wstring ToWideString(const std::string &str)
 {
     auto num1 = MultiByteToWideChar(CP_ACP, MB_PRECOMPOSED | MB_ERR_INVALID_CHARS, str.c_str(), -1, nullptr, 0);
 
@@ -70,11 +72,11 @@ bool AssimpLoader::ImportModel(ModelResource settings)
         return false;
     }
 
-    auto& meshes = settings.Meshes;
-    auto& boneOffsets = settings.Bone.Offsets;
-    auto& boneRootNode = settings.Bone.RootNode;
-    auto& boneTransforms = settings.Bone.Transforms;
-    auto& materials = settings.Materials;
+    auto &meshes = settings.Meshes;
+    auto &boneOffsets = settings.Bone.Offsets;
+    auto &boneRootNode = settings.Bone.RootNode;
+    auto &boneTransforms = settings.Bone.Transforms;
+    auto &materials = settings.Materials;
     auto inverseU = settings.inverseU;
     auto inverseV = settings.inverseV;
 
@@ -127,7 +129,7 @@ bool AssimpLoader::ImportModel(ModelResource settings)
     boneRootNode = new aiNode;
     boneRootNode->mNumChildren = scene->mRootNode->mNumChildren;
     boneRootNode->mTransformation = scene->mRootNode->mTransformation;
-    boneRootNode->mChildren = new aiNode*;
+    boneRootNode->mChildren = new aiNode *;
     for (size_t i = 0; i < boneRootNode->mNumChildren; ++i)
     {
         boneRootNode->mChildren[i] = new aiNode;
@@ -147,7 +149,7 @@ bool AssimpLoader::ImportAnim(AnimResource settings)
         return false;
     }
 
-    auto& animation = settings.Animation;
+    auto &animation = settings.Animation;
 
     auto path = ToUTF8(settings.FileName);
 
@@ -174,7 +176,7 @@ bool AssimpLoader::ImportAnim(AnimResource settings)
     return true;
 }
 
-void AssimpLoader::LoadMeshAndBone(std::vector<aiBone>& dst_bone, Mesh& dst_mesh, const aiMesh* src, bool inverseU,
+void AssimpLoader::LoadMeshAndBone(std::vector<aiBone> &dst_bone, CabotMesh &dst_mesh, const aiMesh *src, bool inverseU,
                                    bool inverseV)
 {
     aiVector3D zero3D(0.0f, 0.0f, 0.0f);
@@ -185,7 +187,7 @@ void AssimpLoader::LoadMeshAndBone(std::vector<aiBone>& dst_bone, Mesh& dst_mesh
     dst_mesh.Tangent.resize(src->mNumVertices);
     dst_mesh.UV.resize(src->mNumVertices);
     dst_mesh.Color.resize(src->mNumVertices);
-    for (auto i = 0; i < Mesh::BoneNumMax; ++i)
+    for (auto i = 0; i < CabotMesh::BoneNumMax; ++i)
     {
         dst_mesh.BoneIDs[i].resize(src->mNumVertices);
         dst_mesh.BoneWeights[i].resize(src->mNumVertices);
@@ -221,7 +223,7 @@ void AssimpLoader::LoadMeshAndBone(std::vector<aiBone>& dst_bone, Mesh& dst_mesh
 
     for (auto i = 0u; i < src->mNumFaces; ++i)
     {
-        const auto& face = src->mFaces[i];
+        const auto &face = src->mFaces[i];
 
         dst_mesh.Indices[i * 3 + 0] = face.mIndices[0];
         dst_mesh.Indices[i * 3 + 1] = face.mIndices[1];
@@ -249,9 +251,9 @@ void AssimpLoader::LoadMeshAndBone(std::vector<aiBone>& dst_bone, Mesh& dst_mesh
     }
 }
 
-void AssimpLoader::LoadNode(aiNode& dst, aiNode& src, aiNode& parent)
+void AssimpLoader::LoadNode(aiNode &dst, aiNode &src, aiNode &parent)
 {
-    dst.mChildren = new aiNode*[src.mNumChildren];
+    dst.mChildren = new aiNode *[src.mNumChildren];
     dst.mName = src.mName;
     dst.mNumChildren = src.mNumChildren;
     dst.mTransformation = src.mTransformation;
@@ -270,7 +272,7 @@ void AssimpLoader::LoadNode(aiNode& dst, aiNode& src, aiNode& parent)
     }
 }
 
-void AssimpLoader::LoadAnim(AnimationData& dst, aiAnimation* src)
+void AssimpLoader::LoadAnim(AnimationData &dst, aiAnimation *src)
 {
     dst.Duration = src->mDuration;
     dst.TicksPerSecond = src->mTicksPerSecond;
@@ -279,30 +281,31 @@ void AssimpLoader::LoadAnim(AnimationData& dst, aiAnimation* src)
         auto src_channel = src->mChannels[i];
         dst.Channels.emplace_back(new aiNodeAnim);
 
-        auto& dst_channel = dst.Channels.back();
+        auto &dst_channel = dst.Channels.back();
         dst_channel->mNodeName = src_channel->mNodeName;
         dst_channel->mNumPositionKeys = src_channel->mNumPositionKeys;
         dst_channel->mNumRotationKeys = src_channel->mNumRotationKeys;
         dst_channel->mNumScalingKeys = src_channel->mNumScalingKeys;
 
-        dst_channel->mPositionKeys = static_cast<aiVectorKey*>(malloc(
+        dst_channel->mPositionKeys = static_cast<aiVectorKey *>(malloc(
             sizeof(aiVectorKey) * src_channel->mNumPositionKeys));
         for (unsigned int j = 0; j < src_channel->mNumPositionKeys; ++j)
         {
-            auto& src_position_key = src_channel->mPositionKeys[j];
+            auto &src_position_key = src_channel->mPositionKeys[j];
             dst_channel->mPositionKeys[j] = src_position_key;
         }
-        dst_channel->mRotationKeys = static_cast<aiQuatKey*>(malloc(sizeof(aiQuatKey) * src_channel->mNumRotationKeys));
+        dst_channel->mRotationKeys = static_cast<aiQuatKey *>(
+            malloc(sizeof(aiQuatKey) * src_channel->mNumRotationKeys));
         for (unsigned int j = 0; j < src_channel->mNumRotationKeys; ++j)
         {
-            auto& src_rotation_key = src_channel->mRotationKeys[j];
+            auto &src_rotation_key = src_channel->mRotationKeys[j];
             dst_channel->mRotationKeys[j] = src_rotation_key;
         }
-        dst_channel->mScalingKeys = static_cast<aiVectorKey*>(
+        dst_channel->mScalingKeys = static_cast<aiVectorKey *>(
             malloc(sizeof(aiVectorKey) * src_channel->mNumScalingKeys));
         for (unsigned int j = 0; j < src_channel->mNumScalingKeys; ++j)
         {
-            auto& src_ScalingKey = src_channel->mScalingKeys[j];
+            auto &src_ScalingKey = src_channel->mScalingKeys[j];
             dst_channel->mScalingKeys[j] = src_ScalingKey;
         }
     }

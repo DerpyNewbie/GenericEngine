@@ -1,13 +1,15 @@
-﻿#include "Material.h"
+﻿#include "pch.h"
+
+#include "CabotMaterial.h"
 
 #include "ShaderImporter.h"
 
-Material::Material()
+CabotMaterial::CabotMaterial()
 {
     SetShader(ShaderImporter::GetDefault());
 }
 
-void Material::SetShader(ShaderObject shaderObject)
+void CabotMaterial::SetShader(ShaderObject shaderObject)
 {
     for (auto materialValue : shaderObject.MaterialValues)
     {
@@ -27,12 +29,12 @@ void Material::SetShader(ShaderObject shaderObject)
     }
 }
 
-void Material::SetTexture(const std::string& string, const std::shared_ptr<Texture2D>& tex)
+void CabotMaterial::SetTexture(const std::string &string, const std::shared_ptr<Texture2D> &tex)
 {
     m_Textures[string] = tex;
 }
 
-std::vector<float> Material::Values()
+std::vector<float> CabotMaterial::Values()
 {
     std::vector<float> result;
     for (auto value : m_Values)
@@ -42,7 +44,7 @@ std::vector<float> Material::Values()
     return result;
 }
 
-std::vector<std::shared_ptr<Texture2D>> Material::Textures()
+std::vector<std::shared_ptr<Texture2D>> CabotMaterial::Textures()
 {
     std::vector<std::shared_ptr<Texture2D>> result;
     for (auto texture : m_Textures)

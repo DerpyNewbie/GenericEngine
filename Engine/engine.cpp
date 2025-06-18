@@ -14,7 +14,7 @@
 #include "update_manager.h"
 #include "scene_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "App.h"
+#include "application.h"
 
 #include <DxLib.h>
 
@@ -29,7 +29,7 @@ bool Engine::Init()
 #endif
 
     g_RenderEngine = new RenderEngine();
-    if (!g_RenderEngine->Init(Application::GetHWnd(), Application::WindowWidth(), Application::WindowHeight()))
+    if (!g_RenderEngine->Init(Application::GetWindowHandle(), Application::WindowWidth(), Application::WindowHeight()))
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }

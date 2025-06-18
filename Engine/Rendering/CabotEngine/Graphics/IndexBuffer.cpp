@@ -1,11 +1,13 @@
-﻿#include "IndexBuffer.h"
-#include <d3dx12.h>
+﻿#include "pch.h"
+
+#include "IndexBuffer.h"
+#include <directx/d3dx12.h>
 #include "RenderEngine.h"
 
-IndexBuffer::IndexBuffer(size_t size, const uint32_t* pInitData)
+IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
 {
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD); // ヒーププロパティ
-    D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size);	// リソースの設定
+    D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
     auto hr = g_RenderEngine->Device()->CreateCommittedResource(
@@ -30,7 +32,7 @@ IndexBuffer::IndexBuffer(size_t size, const uint32_t* pInitData)
     // マッピングする
     if (pInitData != nullptr)
     {
-        void* ptr = nullptr;
+        void *ptr = nullptr;
         hr = m_pBuffer->Map(0, nullptr, &ptr);
         if (FAILED(hr))
         {

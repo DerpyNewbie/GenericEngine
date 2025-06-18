@@ -1,6 +1,8 @@
-﻿#include "DescriptorHeap.h"
+﻿#include "pch.h"
+
+#include "DescriptorHeap.h"
 #include "Texture2D.h"
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include "RenderEngine.h"
 
 const UINT HANDLE_MAX = 512;
@@ -33,7 +35,7 @@ DescriptorHeap::DescriptorHeap()
     m_IsValid = true;
 }
 
-ID3D12DescriptorHeap* DescriptorHeap::GetHeap()
+ID3D12DescriptorHeap *DescriptorHeap::GetHeap()
 {
     return m_pHeap.Get();
 }

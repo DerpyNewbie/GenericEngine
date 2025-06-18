@@ -1,6 +1,8 @@
-﻿#include "PipelineState.h"
+﻿#include "pch.h"
+
+#include "PipelineState.h"
 #include "RenderEngine.h"
-#include <d3dx12.h>
+#include <directx/d3dx12.h>
 #include <d3dcompiler.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
@@ -31,7 +33,7 @@ void PipelineState::SetInputLayout(D3D12_INPUT_LAYOUT_DESC layout)
     desc.InputLayout = layout;
 }
 
-void PipelineState::SetRootSignature(ID3D12RootSignature* rootSignature)
+void PipelineState::SetRootSignature(ID3D12RootSignature *rootSignature)
 {
     desc.pRootSignature = rootSignature;
 }
@@ -77,7 +79,8 @@ void PipelineState::SetGS(std::wstring filePath)
 void PipelineState::Create()
 {
     // パイプラインステートを生成
-    auto hr = g_RenderEngine->Device()->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(m_pPipelineState.ReleaseAndGetAddressOf()));
+    auto hr = g_RenderEngine->Device()->CreateGraphicsPipelineState(
+        &desc, IID_PPV_ARGS(m_pPipelineState.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
         printf("パイプラインステートの生成に失敗");
@@ -87,7 +90,7 @@ void PipelineState::Create()
     m_IsValid = true;
 }
 
-ID3D12PipelineState* PipelineState::Get()
+ID3D12PipelineState *PipelineState::Get()
 {
     return m_pPipelineState.Get();
 }

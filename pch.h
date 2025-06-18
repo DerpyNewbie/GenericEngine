@@ -13,8 +13,7 @@
 #include <thread>
 #include <utility>
 
-#include <DxLib.h>
+#include <windows.h>
 
 #include <imgui.h>
-
 #include <implot.h>

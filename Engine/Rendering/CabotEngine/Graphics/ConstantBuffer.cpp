@@ -1,4 +1,6 @@
-﻿#include "ConstantBuffer.h"
+﻿#include "pch.h"
+
+#include "ConstantBuffer.h"
 #include "RenderEngine.h"
 
 ConstantBuffer::ConstantBuffer(size_t size)
@@ -51,4 +53,3 @@ D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::ViewDesc()
 {
     return m_Desc;
 }
-
