@@ -13,7 +13,6 @@
 #include <thread>
 #include <utility>
 
-
 #include <DxLib.h>
 
 #include <imgui.h>

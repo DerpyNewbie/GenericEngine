@@ -2,8 +2,5 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ThirdParty/cereal" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ThirdParty/imgui" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/ThirdParty/implot" vcs="Git" />
   </component>
 </project>

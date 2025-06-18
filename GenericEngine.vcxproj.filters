@@ -1,27 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ThirdParty\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\engine.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -120,15 +99,6 @@
     <ClCompile Include="Engine\engine_profiler.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="ThirdParty\implot\implot.cpp">
-      <Filter>implot</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\implot\implot_demo.cpp">
-      <Filter>implot</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\implot\implot_items.cpp">
-      <Filter>implot</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Components\mv1_renderer.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -212,30 +182,6 @@
     <ClInclude Include="Engine\Components\frame_meta_data.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Rendering\material.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -282,12 +228,6 @@
     <ClInclude Include="Engine\engine_profiler.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="ThirdParty\implot\implot.h">
-      <Filter>implot</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\implot\implot_internal.h">
-      <Filter>implot</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Components\mv1_renderer.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -305,17 +245,11 @@
     <ClInclude Include="Engine\DxLib\dxlib_serializer.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{2127dccf-e4d4-477c-b8ec-8505d7be7d22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{3e9a80d6-9ee8-4d20-bb4a-3ef1b0632782}</UniqueIdentifier>
     </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{85fd8929-4b22-4e2c-a917-fc42037f2f08}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="implot">
-      <UniqueIdentifier>{27463cd6-262e-4180-b96b-20b4b52dea5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
