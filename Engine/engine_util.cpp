@@ -2,9 +2,9 @@
 
 #include "engine_util.h"
 
+#include "Components/component.h"
 #include "logger.h"
 
-#include "Components/component.h"
 
 namespace engine
 {
@@ -21,7 +21,7 @@ std::string EngineUtil::GetTypeName(const std::shared_ptr<Component> &component)
 {
     return GetTypeName(typeid(component.get()).name());
 }
-void EngineUtil::ToFloat3(float buff[3], const VECTOR vec)
+void EngineUtil::ToFloat3(float buff[3], const Vector3 vec)
 {
     buff[0] = vec.x;
     buff[1] = vec.y;

@@ -2,6 +2,7 @@
 
 #include "camera.h"
 
+#include "DxLib/dxlib_converter.h"
 #include "game_object.h"
 
 namespace engine
@@ -22,9 +23,9 @@ void Camera::ApplyCameraSettingToDxLib() const
     SetCameraNearFar(m_near_plane_, m_far_plane_);
     const auto transform = GameObject()->Transform();
 
-    SetCameraPositionAndTargetAndUpVec(transform->Position(),
-                                       transform->Position() + transform->Forward(),
-                                       transform->Up());
+    SetCameraPositionAndTargetAndUpVec(DxLibConverter::From(transform->Position()),
+                                       DxLibConverter::From(transform->Position() + transform->Forward()),
+                                       DxLibConverter::From(transform->Up()));
 }
 
 void Camera::OnUpdate()

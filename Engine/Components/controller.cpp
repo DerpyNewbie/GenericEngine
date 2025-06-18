@@ -5,8 +5,6 @@
 #include "game_object.h"
 #include "transform.h"
 
-#include "Math/vector3.h"
-
 namespace engine
 {
 void Controller::OnUpdate()
@@ -32,14 +30,14 @@ void Controller::OnUpdate()
         dir.y -= 1.0f;
 
     // Normalize movement vector if not zero
-    const float length = VSize(dir);
+    const float length = dir.Length();
     if (length > 0.001f)
     {
-        dir = VScale(dir, move_speed / length);
+        dir = dir * move_speed / length;
     }
 
     // Rotation input
-    VECTOR delta_rot = {0, 0, 0};
+    Vector3 delta_rot = {0, 0, 0};
     if (CheckHitKey(KEY_INPUT_UP))
         delta_rot.x += rotate_speed;
     if (CheckHitKey(KEY_INPUT_DOWN))
@@ -53,12 +51,10 @@ void Controller::OnUpdate()
     const auto transform = GameObject()->Transform();
 
     // Apply rotation around the object's position
-    if (VSize(delta_rot) > 0.001f)
+    if (delta_rot.Length() > 0.001f)
     {
         m_rotation_ = m_rotation_ + delta_rot;
-        auto pitch = Quaternion::FromEulerDegrees({m_rotation_.x, 0.0F, 0.0F});
-        auto yaw = Quaternion::FromEulerDegrees({0.0F, m_rotation_.y, 0.0F});
-        transform->SetRotation(yaw * pitch);
+        transform->SetRotation(Quaternion::CreateFromYawPitchRoll(m_rotation_.y, m_rotation_.x, 0.0F));
     }
 
     // Apply movement in local space

@@ -19,7 +19,7 @@ public:
     std::unordered_map<std::string, Vector2> params_vec2;
     std::unordered_map<std::string, Vector3> params_vec3;
     std::unordered_map<std::string, Vector4> params_vec4;
-    std::unordered_map<std::string, Matrix4x4> params_mat4;
+    std::unordered_map<std::string, Matrix> params_mat4;
     std::unordered_map<std::string, std::shared_ptr<Texture2D>> params_tex2d;
 
     template <class Archive>

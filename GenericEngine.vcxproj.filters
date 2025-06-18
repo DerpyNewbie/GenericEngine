@@ -311,7 +311,6 @@
     <ClInclude Include="Engine\Math\vector4.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\application.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Engine\engine_profiler.h">
       <Filter>engine</Filter>
@@ -348,5 +347,8 @@
     <Filter Include="implot">
       <UniqueIdentifier>{27463cd6-262e-4180-b96b-20b4b52dea5b}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

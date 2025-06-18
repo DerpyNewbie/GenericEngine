@@ -1,15 +1,10 @@
 #pragma once
-#include "Math/color.h"
-#include "Math/matrix4x4.h"
-#include "Math/vector3.h"
-#include "Math/vector4.h"
+#include <vector>
+#include "Math/bounds.h"
 #include "bone_weight.h"
 #include "object.h"
 #include "sub_mesh.h"
-
-#include <vector>
 #include "rendering_serializer.h"
-#include "Math/bounds.h"
 
 struct aiMesh;
 struct aiScene;
@@ -35,7 +30,7 @@ public:
     std::vector<Vector4> tangents;
     std::vector<unsigned char> bones_per_vertex;
     std::vector<BoneWeight> bone_weights;
-    std::vector<Matrix4x4> bind_poses;
+    std::vector<Matrix> bind_poses;
     std::vector<SubMesh> sub_meshes;
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh);
@@ -55,6 +50,7 @@ public:
     template <class Archive>
     void serialize(Archive &archive)
     {
+        // FIXME: something is wrong in here
         archive(
             cereal::base_class<Object>(this),
             CEREAL_NVP(vertices),

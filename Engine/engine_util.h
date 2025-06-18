@@ -1,5 +1,5 @@
 #pragma once
-#include <DxLib.h>
+#include <directxtk12/SimpleMath.h>
 
 #include <string>
 #include <memory>
@@ -13,6 +13,6 @@ public:
     static std::string GetTypeName(const char *typeid_name);
     static std::string GetTypeName(Component *component);
     static std::string GetTypeName(const std::shared_ptr<Component> &component);
-    static void ToFloat3(float buff[3], VECTOR vec);
+    static void ToFloat3(float buff[3], DirectX::SimpleMath::Vector3 vec);
 };
 }

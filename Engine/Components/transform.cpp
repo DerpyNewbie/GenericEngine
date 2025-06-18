@@ -11,50 +11,65 @@ void Transform::OnInspectorGui()
     RenderLocalTransformGui();
     RenderGlobalTransformGui();
 }
-Matrix4x4 Transform::LocalMatrix() const
+Matrix Transform::LocalMatrix() const
 {
     return m_matrix_;
 }
-Matrix4x4 Transform::WorldMatrix() const
+Matrix Transform::WorldMatrix() const
 {
     return m_parent_.expired()
                ? m_matrix_
                : m_parent_.lock()->WorldMatrix() * m_matrix_;
 }
-Matrix4x4 Transform::WorldToLocal() const
+Matrix Transform::WorldToLocal() const
 {
-    return WorldMatrix().Inverse();
+    return WorldMatrix().Invert();
 }
-Matrix4x4 Transform::LocalToWorld() const
+Matrix Transform::LocalToWorld() const
 {
     return WorldMatrix();
 }
 Vector3 Transform::Position() const
 {
-    MATRIX local_to_world = LocalToWorld();
-    return MGetTranslateElem(local_to_world);
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalToWorld().Decompose(sca, rot, pos);
+    return pos;
 }
 Quaternion Transform::Rotation() const
 {
-    return Quaternion::FromMatrix(MGetRotElem(LocalToWorld())).Normalized();
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalToWorld().Decompose(sca, rot, pos);
+    return rot;
 }
 Vector3 Transform::Scale() const
 {
-    const Matrix4x4 local_to_world = LocalToWorld();
-    return MGetSize(local_to_world * MGetRotElem(MInverse(local_to_world)));
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalToWorld().Decompose(sca, rot, pos);
+    return sca;
 }
 Vector3 Transform::LocalPosition() const
 {
-    MATRIX v = m_matrix_;
-    return MGetTranslateElem(v);
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalMatrix().Decompose(sca, rot, pos);
+    return pos;
 }
 Quaternion Transform::LocalRotation() const
 {
-    return Quaternion::FromMatrix(MGetRotElem(m_matrix_)).Normalized();
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalMatrix().Decompose(sca, rot, pos);
+    return rot;
 }
 Vector3 Transform::LocalScale() const
 {
-    return MGetSize(m_matrix_ * MInverse(MGetRotElem(m_matrix_)));
+    Vector3 pos, sca;
+    Quaternion rot;
+    LocalMatrix().Decompose(sca, rot, pos);
+    return sca;
 }
 std::shared_ptr<Transform> Transform::Parent() const
 {
@@ -117,7 +132,8 @@ void Transform::SetPosition(const Vector3 &position)
         return;
     }
 
-    const Vector3 local_position = position * m_parent_.lock()->WorldToLocal();
+    const Vector3 local_position;
+    position.Transform(local_position, m_parent_.lock()->WorldToLocal());
     SetLocalPosition(local_position);
 }
 void Transform::SetRotation(const Quaternion &rotation)
@@ -127,10 +143,10 @@ void Transform::SetRotation(const Quaternion &rotation)
         SetLocalRotation(rotation);
         return;
     }
-
-    const Quaternion parent_world_rot = Quaternion::FromMatrix(
-        MGetRotElem(m_parent_.lock()->WorldToLocal()));
-    SetLocalRotation(parent_world_rot.Inverse() * rotation.Normalized());
+    const Quaternion parent_world_rot = Quaternion::CreateFromRotationMatrix(m_parent_.lock()->WorldToLocal());
+    Quaternion inversed_world_rot;
+    parent_world_rot.Inverse(inversed_world_rot);
+    SetLocalRotation(inversed_world_rot * rotation);
 }
 
 void Transform::SetPositionAndRotation(const Vector3 &position, const Quaternion &rotation)
@@ -142,10 +158,14 @@ void Transform::SetPositionAndRotation(const Vector3 &position, const Quaternion
     }
 
     const auto parent_world_to_local = m_parent_.lock()->WorldToLocal();
-    const Vector3 local_position = position * parent_world_to_local;
-    const Quaternion local_rotation = Quaternion::FromMatrix(MGetRotElem(parent_world_to_local)).Inverse()
-                                      * rotation.Normalized();
+    const Vector3 local_position;
+    position.Transform(local_position, parent_world_to_local);
 
+    const Quaternion parent_world_to_local_rot = Quaternion::CreateFromRotationMatrix(parent_world_to_local);
+    Quaternion inversed_parent_world_to_local_rot;
+    parent_world_to_local_rot.Inverse(inversed_parent_world_to_local_rot);
+
+    const Quaternion local_rotation = inversed_parent_world_to_local_rot * rotation;
     SetLocalPositionAndRotation(local_position, local_rotation);
 }
 
@@ -167,39 +187,14 @@ void Transform::SetLocalScale(const Vector3 &local_scale)
 {
     SetTRS(local_scale, LocalRotation(), LocalPosition());
 }
-void Transform::SetLocalMatrix(const Matrix4x4 &matrix)
+void Transform::SetLocalMatrix(const Matrix &matrix)
 {
-    MATRIX m = matrix;
-    const auto scale = MGetSize(m);
-    const auto rotation = Quaternion::FromMatrix(MGetRotElem(m));
-    const auto position = MGetTranslateElem(m);
-    SetTRS(scale, rotation, position);
+    m_matrix_ = matrix;
 }
 void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
 {
-    m_matrix_ = static_cast<Matrix4x4>(MGetScale(scale)) * rotation.ToMatrix() * MGetTranslate(position);
-}
-void Transform::RotateAround(const Vector3 &pivot_point, const Vector3 &axis, const float angle_degrees)
-{
-    const float angle_radians = angle_degrees * (DX_PI_F / 180.0f);
-    const Vector3 normalized_axis = VNorm(axis);
-    const Quaternion rotation(
-        normalized_axis.x * sinf(angle_radians * 0.5f),
-        normalized_axis.y * sinf(angle_radians * 0.5f),
-        normalized_axis.z * sinf(angle_radians * 0.5f),
-        cosf(angle_radians * 0.5f)
-        );
-
-    RotateAround(pivot_point, rotation);
-}
-void Transform::RotateAround(const Vector3 &pivot_point, const Quaternion &rotation)
-{
-    const Vector3 position_relative_to_pivot = VSub(Position(), pivot_point);
-    const Vector3 rotated_position = rotation * position_relative_to_pivot;
-    const Vector3 new_position = VAdd(rotated_position, pivot_point);
-
-    SetPosition(new_position);
-    SetRotation(Rotation() * rotation);
+    m_matrix_ = Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) *
+                Matrix::CreateTranslation(position);
 }
 void Transform::RenderLocalTransformGui()
 {
@@ -210,10 +205,8 @@ void Transform::RenderLocalTransformGui()
 
     float local_pos[3], local_rot_euler[3], local_scale[3];
     EngineUtil::ToFloat3(local_pos, LocalPosition());
-    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEulerDegrees());
+    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEuler());
     EngineUtil::ToFloat3(local_scale, LocalScale());
-
-    ImGui::Text("Position: %f, %f, %f", local_pos[0], local_pos[1], local_pos[2]);
 
     if (ImGui::InputFloat3("Position", local_pos) && ImGui::IsItemDeactivatedAfterEdit())
     {
@@ -224,7 +217,8 @@ void Transform::RenderLocalTransformGui()
     if (ImGui::InputFloat3("Rotation", local_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
     {
         Logger::Log<Transform>("New Rotation: %f, %f, %f", local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]);
-        SetLocalRotation(Quaternion::FromEulerDegrees({local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]}));
+        SetLocalRotation(
+            Quaternion::CreateFromYawPitchRoll(local_rot_euler[1], local_rot_euler[0], local_rot_euler[2]));
     }
 
     if (ImGui::InputFloat3("Scale", local_scale) && ImGui::IsItemDeactivatedAfterEdit())
@@ -244,10 +238,8 @@ void Transform::RenderGlobalTransformGui()
 
     float global_pos[3], global_rot_euler[3], global_scale[3];
     EngineUtil::ToFloat3(global_pos, Position());
-    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEulerDegrees());
+    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEuler());
     EngineUtil::ToFloat3(global_scale, Scale());
-
-    ImGui::Text("Position: %f, %f, %f", global_pos[0], global_pos[1], global_pos[2]);
 
     if (ImGui::InputFloat3("Position", global_pos) && ImGui::IsItemDeactivatedAfterEdit())
     {
@@ -259,7 +251,7 @@ void Transform::RenderGlobalTransformGui()
     {
         Logger::Log<Transform>("New Rotation: %f, %f, %f",
                                global_rot_euler[0], global_rot_euler[1], global_rot_euler[2]);
-        SetRotation(Quaternion::FromEulerDegrees({global_rot_euler[0], global_rot_euler[1], global_rot_euler[2]}));
+        SetRotation(Quaternion::CreateFromYawPitchRoll(global_rot_euler[1], global_rot_euler[0], global_rot_euler[2]));
     }
 
     if (ImGui::InputFloat3("Scale", global_scale) && ImGui::IsItemDeactivatedAfterEdit())

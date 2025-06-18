@@ -8,12 +8,9 @@
 
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
-
+#include "DxLib/dxlib_converter.h"
 #include "mesh.h"
-
 #include "logger.h"
-#include "Math/vector2.h"
-
 
 namespace engine
 {
@@ -86,10 +83,10 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
         {
             for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
             {
-                const Vector3 tangent = {mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z};
-                const Vector3 normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
-                const Vector3 bitangent = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
-                const float w = Vector3::Dot(Vector3::Cross(tangent, normal), bitangent);
+                Vector3 tangent = {mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z};
+                Vector3 normal = {mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z};
+                Vector3 bitangent = {mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z};
+                const float w = bitangent.Dot(tangent.Cross(normal));
                 result->tangents[i] = Vector4(tangent.x, tangent.y, tangent.z, w);
             }
         }
@@ -187,11 +184,11 @@ std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST
     for (int i = 0; i < mv1_ref_polygon_list.VertexNum; i++)
     {
         const auto vertex = mv1_ref_polygon_list.Vertexs[i];
-        result->vertices[i] = vertex.Position;
-        result->uv[i] = vertex.TexCoord[0];
-        result->uv2[i] = vertex.TexCoord[1];
+        result->vertices[i] = DxLibConverter::To(vertex.Position);
+        result->uv[i] = DxLibConverter::To(vertex.TexCoord[0]);
+        result->uv2[i] = DxLibConverter::To(vertex.TexCoord[1]);
         result->colors[i] = vertex.DiffuseColor;
-        result->normals[i] = vertex.Normal;
+        result->normals[i] = DxLibConverter::To(vertex.Normal);
     }
 
     result->indices.resize(3ULL * mv1_ref_polygon_list.PolygonNum);

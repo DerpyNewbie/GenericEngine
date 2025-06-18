@@ -2,12 +2,12 @@
 
 #include "hierarchy.h"
 
-#include "dxlib_helper.h"
+#include "DxLib/dxlib_helper.h"
+#include "DxLib/dxlib_converter.h"
+#include "scene.h"
+#include "scene_manager.h"
+#include "serializer.h"
 #include "str_util.h"
-
-#include "../Engine/scene.h"
-#include "../Engine/scene_manager.h"
-#include "../Engine/serializer.h"
 
 namespace editor
 {
@@ -32,7 +32,7 @@ void Hierarchy::OnEditorGui()
     {
         SetFontSize(12);
         DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(selected_game_object->Name()).c_str(),
-                                    selected_game_object->Transform()->WorldToLocal());
+                                    DxLibConverter::From(selected_game_object->Transform()->WorldToLocal()));
     }
 }
 void Hierarchy::DrawMenu()
