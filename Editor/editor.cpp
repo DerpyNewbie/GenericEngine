@@ -1,13 +1,11 @@
-﻿#include "editor.h"
+﻿#include "pch.h"
 
-#include "dxlib_helper.h"
-#include "../Engine/scene_manager.h"
-#include "../ThirdParty/implot/implot.h"
+#include "editor.h"
 
-#include <DxLib.h>
-#include <imgui.h>
-#include <backends/imgui_impl_win32.h>
-#include <backends/imgui_impl_dx11.h>
+#include <imgui_impl_win32.h>
+#include <imgui_impl_dx11.h>
+#include "DxLib/dxlib_helper.h"
+#include "update_manager.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 

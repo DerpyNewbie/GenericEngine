@@ -1,4 +1,5 @@
 ﻿#include "pch.h"
+
 #include "update_manager.h"
 #include "logger.h"
 #include <algorithm>

@@ -432,3 +432,6 @@ Log.txt
 
 # Dear IMGUI
 imgui.ini
+
+# Vcpkg
+vcpkg_installed/

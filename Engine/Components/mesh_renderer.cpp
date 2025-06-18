@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "mesh_renderer.h"
 
 #include <array>
@@ -9,7 +11,6 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "imgui.h"
-#include "dxlib_helper.h"
 #include "game_object.h"
 #include "logger.h"
 #include "camera.h"

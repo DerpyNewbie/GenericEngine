@@ -1,27 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="ThirdParty\imgui\imgui.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
-      <Filter>imgui</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\engine.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -89,9 +68,6 @@
     <ClCompile Include="Engine\Rendering\material_block.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\matrix4x4.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Rendering\mesh.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -99,9 +75,6 @@
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Rendering\model_importer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\quaternion.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Components\renderer.cpp">
@@ -122,14 +95,16 @@
     <ClCompile Include="Engine\Components\transform.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\vector2.cpp">
+    <ClCompile Include="pch.cpp" />
+    <ClCompile Include="Engine\engine_profiler.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\vector3.cpp">
+    <ClCompile Include="Engine\Components\mv1_renderer.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Editor\profiler.cpp" />
-    <ClCompile Include="Editor\update_man_debugger.cpp" />
+    <ClCompile Include="Editor\profiler.cpp">
+      <Filter>editor</Filter> 
+    <ClCompile/>
     <ClCompile Include="Engine\Components\mv1_renderer.cpp" />
     <ClCompile Include="Engine\engine_profiler.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp" />
@@ -161,9 +136,6 @@
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp" />
-    <ClCompile Include="ThirdParty\implot\implot.cpp" />
-    <ClCompile Include="ThirdParty\implot\implot_demo.cpp" />
-    <ClCompile Include="ThirdParty\implot\implot_items.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\engine.h">
@@ -229,12 +201,6 @@
     <ClInclude Include="Engine\Components\cube_renderer.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\dxlib_helper.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\dxlib_serializer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\enable_shared_from_base.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -243,30 +209,6 @@
     </ClInclude>
     <ClInclude Include="Engine\Components\frame_meta_data.h">
       <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imconfig.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imgui_internal.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_rectpack.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_textedit.h">
-      <Filter>imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="ThirdParty\imgui\imstb_truetype.h">
-      <Filter>imgui</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Rendering\material.h">
       <Filter>engine</Filter>
@@ -280,9 +222,6 @@
     <ClInclude Include="Engine\Math\mathf.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\matrix4x4.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Rendering\mesh.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -290,9 +229,6 @@
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Rendering\model_importer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\quaternion.h">
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Components\renderer.h">
@@ -316,62 +252,29 @@
     <ClInclude Include="Engine\Components\transform.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\vector2.h">
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Engine\engine_profiler.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\vector3.h">
+    <ClInclude Include="Engine\Components\mv1_renderer.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\vector4.h">
+    <ClInclude Include="Editor\profiler.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\str_util.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Editor\profiler.h" />
-    <ClInclude Include="Editor\update_man_debugger.h" />
-    <ClInclude Include="Engine\Components\mv1_renderer.h" />
-    <ClInclude Include="Engine\engine_profiler.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animation.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animator.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Camera.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Input.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Timer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Engine.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Material.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderImporter.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderObject.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\SharedStruct.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h" />
-    <ClInclude Include="Engine\str_util.h" />
-    <ClInclude Include="ThirdParty\implot\implot.h" />
-    <ClInclude Include="ThirdParty\implot\implot_internal.h" />
+    <ClInclude Include="Editor\update_man_debugger.h">
+      <Filter>editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\DxLib\dxlib_converter.h" />
+    <ClInclude Include="Engine\DxLib\dxlib_helper.h" />
+    <ClInclude Include="Engine\DxLib\dxlib_serializer.h" />
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="imgui">
-      <UniqueIdentifier>{2127dccf-e4d4-477c-b8ec-8505d7be7d22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="engine">
       <UniqueIdentifier>{3e9a80d6-9ee8-4d20-bb4a-3ef1b0632782}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dxlib">
-      <UniqueIdentifier>{de7f9d39-2fe4-4c41-911b-20081be0b28d}</UniqueIdentifier>
     </Filter>
     <Filter Include="editor">
       <UniqueIdentifier>{85fd8929-4b22-4e2c-a917-fc42037f2f08}</UniqueIdentifier>

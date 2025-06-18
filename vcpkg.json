@@ -1,5 +1,18 @@
 {
   "dependencies": [
-    "fmt"
+    "cereal",
+    "directx-headers",
+    "directxtex",
+    "directxtk12",
+    {
+      "name": "imgui",
+      "features": [
+        "docking-experimental",
+        "dx11-binding",
+        "win32-binding"
+      ]
+    },
+    "implot",
+    "assimp"
   ]
 }
