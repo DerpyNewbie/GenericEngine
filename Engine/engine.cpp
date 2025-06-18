@@ -65,3 +65,4 @@ void engine::Engine::MainLoop() const
         Profiler::End("Draw Call");
     }
 }
+#include "RenderEngine.h"

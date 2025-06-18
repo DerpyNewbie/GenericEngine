@@ -119,15 +119,14 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
         }
         // copy bone weights
         result->bone_weights.reserve(mesh->mNumVertices);
-        result->bones_per_vertex.resize(mesh->mNumVertices);
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
         {
             const auto &pair_map = vertex_bone_map.at(i);
-            result->bones_per_vertex[i] = static_cast<unsigned char>(pair_map.size());
 
+            result->bone_weights.reserve(pair_map.size());
             for (auto [index, vert_weight] : pair_map)
             {
-                result->bone_weights.emplace_back(index, vert_weight->mWeight);
+                result->bone_weights[i].emplace_back(index, vert_weight->mWeight);
             }
         }
     }
@@ -176,19 +175,19 @@ std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST
 {
     auto result = Instantiate<Mesh>();
     result->vertices.resize(mv1_ref_polygon_list.VertexNum);
-    result->uv.resize(mv1_ref_polygon_list.VertexNum);
-    result->uv2.resize(mv1_ref_polygon_list.VertexNum);
+    result->uvs[0].resize(mv1_ref_polygon_list.VertexNum);
+    result->uvs[1].resize(mv1_ref_polygon_list.VertexNum);
     result->colors.resize(mv1_ref_polygon_list.VertexNum);
     result->normals.resize(mv1_ref_polygon_list.VertexNum);
 
     for (int i = 0; i < mv1_ref_polygon_list.VertexNum; i++)
     {
         const auto vertex = mv1_ref_polygon_list.Vertexs[i];
-        result->vertices[i] = DxLibConverter::To(vertex.Position);
-        result->uv[i] = DxLibConverter::To(vertex.TexCoord[0]);
-        result->uv2[i] = DxLibConverter::To(vertex.TexCoord[1]);
+        result->vertices[i] = vertex.Position;
+        result->uvs[0][i] = vertex.TexCoord[0];
+        result->uvs[1][i] = vertex.TexCoord[1];
         result->colors[i] = vertex.DiffuseColor;
-        result->normals[i] = DxLibConverter::To(vertex.Normal);
+        result->normals[i] = vertex.Normal;
     }
 
     result->indices.resize(3ULL * mv1_ref_polygon_list.PolygonNum);
@@ -220,65 +219,26 @@ void Mesh::Append(Mesh other)
 
     vertices.insert(vertices.end(), other.vertices.begin(), other.vertices.end());
     // TODO: may require additional checks for appending to empty uv
-    uv.insert(uv.end(), other.uv.begin(), other.uv.end());
-    uv2.insert(uv2.end(), other.uv2.begin(), other.uv2.end());
-    uv3.insert(uv3.end(), other.uv3.begin(), other.uv3.end());
-    uv4.insert(uv4.end(), other.uv4.begin(), other.uv4.end());
-    uv5.insert(uv5.end(), other.uv5.begin(), other.uv5.end());
-    uv6.insert(uv6.end(), other.uv6.begin(), other.uv6.end());
-    uv7.insert(uv7.end(), other.uv7.begin(), other.uv7.end());
-    uv8.insert(uv8.end(), other.uv8.begin(), other.uv8.end());
+    for (size_t i = 0; i < uvs.size(); i++)
+    uvs[0].insert(uvs[0].end(), other.uvs[0].begin(), other.uvs[0].end());
+    uvs[1].insert(uvs[1].end(), other.uvs[1].begin(), other.uvs[1].end());
+    uvs[2].insert(uvs[2].end(), other.uvs[2].begin(), other.uvs[2].end());
+    uvs[3].insert(uvs[3].end(), other.uvs[3].begin(), other.uvs[3].end());
+    uvs[4].insert(uvs[4].end(), other.uvs[4].begin(), other.uvs[4].end());
+    uvs[5].insert(uvs[5].end(), other.uvs[5].begin(), other.uvs[5].end());
+    uvs[6].insert(uvs[6].end(), other.uvs[6].begin(), other.uvs[6].end());
+    uvs[7].insert(uvs[7].end(), other.uvs[7].begin(), other.uvs[7].end());
     colors.insert(colors.end(), other.colors.begin(), other.colors.end());
     normals.insert(normals.end(), other.normals.begin(), other.normals.end());
     indices.insert(indices.end(), other.indices.begin(), other.indices.end());
 }
 std::vector<Vector2> *Mesh::GetUV(const int index)
 {
-    switch (index)
-    {
-    case 0:
-        return &uv;
-    case 1:
-        return &uv2;
-    case 2:
-        return &uv3;
-    case 3:
-        return &uv4;
-    case 4:
-        return &uv5;
-    case 5:
-        return &uv6;
-    case 6:
-        return &uv7;
-    case 7:
-        return &uv8;
-    default:
-        throw std::out_of_range("Mesh::GetUV: Invalid index");
-    }
+    return &uvs[index];
 }
 bool Mesh::HasUV(const int index) const
 {
-    switch (index)
-    {
-    case 0:
-        return !uv.empty();
-    case 1:
-        return !uv2.empty();
-    case 2:
-        return !uv3.empty();
-    case 3:
-        return !uv4.empty();
-    case 4:
-        return !uv5.empty();
-    case 5:
-        return !uv6.empty();
-    case 6:
-        return !uv7.empty();
-    case 7:
-        return !uv8.empty();
-    default:
-        throw std::out_of_range("Mesh::HasUV: Invalid index");
-    }
+    return !uvs[index].empty();
 }
 bool Mesh::HasTangents() const
 {
@@ -294,7 +254,7 @@ bool Mesh::HasColors() const
 }
 bool Mesh::HasBoneWeights() const
 {
-    return !bones_per_vertex.empty() && !bone_weights.empty();
+    return !bone_weights.empty();
 }
 bool Mesh::HasBindPoses() const
 {

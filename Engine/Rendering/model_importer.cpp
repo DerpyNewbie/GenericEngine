@@ -82,7 +82,7 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         {
             result_mesh->Append(*meshes[i].get());
         }
-
+        
         node_go->AddComponent<MeshRenderer>()->shared_mesh = result_mesh;
     }
 

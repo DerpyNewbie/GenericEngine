@@ -6,6 +6,8 @@
 
 #include "hierarchy.h"
 #include "inspector.h"
+#include "enable_shared_from_base.h"
+#include "RenderEngine.h"
 #include "profiler.h"
 #include "update_man_debugger.h"
 

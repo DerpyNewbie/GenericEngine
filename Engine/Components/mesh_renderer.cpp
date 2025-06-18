@@ -1,37 +1,34 @@
-#include "pch.h"
-
 #include "mesh_renderer.h"
 
 #include "DxLib/dxlib_helper.h"
 #include "DxLib/dxlib_converter.h"
 #include "Rendering/texture2d.h"
+#include "camera.h"
+#include "dxlib_helper.h"
 #include "game_object.h"
+#include "imgui.h"
 #include "logger.h"
+#include "imgui_internal.h"
+#include "Math/matrix4x4.h"
+#include "Rendering/Vertex.h"
+#include "Rendering/texture2d.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
+#include <__msvc_ranges_to.hpp>
 
 namespace engine
 {
 void MeshRenderer::OnInspectorGui()
 {
-    ImGui::Text("Vertex Buffer: %d", vertex_buffer_handle);
-    ImGui::Text("Index Buffer Count: %llu", index_buffer_handles.size());
-    if (ImGui::CollapsingHeader("Index Buffers"))
-    {
-        ImGui::Indent();
-        for (int i = 0; i < index_buffer_handles.size(); i++)
-        {
-            ImGui::Text("Index Buffer %d: %d", i, index_buffer_handles[i]);
-        }
-        ImGui::Unindent();
-    }
-
     if (ImGui::CollapsingHeader("Mesh"))
     {
         ImGui::Indent();
         ImGui::Text("Vertices: %llu", shared_mesh->vertices.size());
         ImGui::Text("Indices : %llu", shared_mesh->indices.size());
         ImGui::Text("Faces(calc): %llu", !shared_mesh->indices.empty() ? shared_mesh->indices.size() / 3 : 0);
-        ImGui::Text("UVs : %llu", shared_mesh->uv.size());
-        ImGui::Text("UV2s: %llu", shared_mesh->uv2.size());
+        ImGui::Text("UVs : %llu", shared_mesh->uvs[0].size());
+        ImGui::Text("UV2s: %llu", shared_mesh->uvs[1].size());
         ImGui::Text("Colors  : %llu", shared_mesh->colors.size());
         ImGui::Text("Normals : %llu", shared_mesh->normals.size());
         ImGui::Text("Tangents: %llu", shared_mesh->tangents.size());
@@ -61,7 +58,7 @@ void MeshRenderer::OnInspectorGui()
 
 void MeshRenderer::OnDraw()
 {
-    if (vertex_buffer_handle == -1 || index_buffer_handles.empty())
+    if (!vertex_buffer || index_buffers.empty())
     {
         if (buffer_creation_failed)
         {
@@ -71,90 +68,68 @@ void MeshRenderer::OnDraw()
         ReconstructBuffers();
     }
 
-    const MATRIX wtl = DxLibConverter::From(GameObject()->Transform()->WorldToLocal());
+    const auto camera = Camera::Main();
+    const Matrix4x4 wtl = GameObject()->Transform()->WorldToLocal();
+    const Matrix4x4 view = camera.lock()->GetViewMatrix();
+    const Matrix4x4 proj = camera.lock()->GetProjectionMatrix();
 
-    SetUseZBuffer3D(true);
-    SetWriteZBuffer3D(true);
-    SetUseBackCulling(true);
-    MATRIX origin;
-    GetTransformToWorldMatrix(&origin);
-    SetTransformToWorld(&wtl);
-
-    for (int i = 0; i < index_buffer_handles.size(); i++)
+    for (auto &wvp_buffer : WVPBuffers)
     {
-        const auto ib_handle = index_buffer_handles[i];
+        auto ptr = wvp_buffer->GetPtr<Matrix4x4[3]>();
+        *ptr[0] = wtl;
+        *ptr[1] = view;
+        *ptr[2] = proj;
+    }
+
+    auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
+    auto commandList = g_RenderEngine->CommandList();
+
+    commandList->SetPipelineState(g_PSOManager.Get("default"));
+    commandList->SetGraphicsRootConstantBufferView(0, WVPBuffers[currentIndex]->GetAddress());
+
+    
+    
+    auto vbView = vertex_buffer->View();
+    for (int i = 0; i < index_buffers.size(); i++)
+    {
+        auto ibView = index_buffers[i]->View();
+    }
+    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    commandList->IASetVertexBuffers(0, 1, &vbView);
+    commandList->IASetIndexBuffer(&ibView);
+
+    commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
+
+    commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
+
+    for (int i = 0; i < index_buffers.size(); i++)
+    {
+        const auto ib = index_buffers[i];
         const auto tex_handle = (i < texture_handles.size()) ? texture_handles[i] : DX_NONE_GRAPH;
         DrawPolygonIndexed3D_UseVertexBuffer(vertex_buffer_handle, ib_handle, tex_handle, false);
     }
-
-    SetTransformToWorld(&origin);
 }
 
 void MeshRenderer::ReconstructBuffers()
 {
     // clean up old buffers
-    if (vertex_buffer_handle != -1)
+    if (vertex_buffer)
     {
-        DeleteVertexBuffer(vertex_buffer_handle);
-        vertex_buffer_handle = -1;
+        vertex_buffer = nullptr;
     }
 
-    if (!index_buffer_handles.empty())
+    if (!index_buffers.empty())
     {
-        for (const auto ib_handle : index_buffer_handles)
-            DeleteIndexBuffer(ib_handle);
-        index_buffer_handles.clear();
+        for (auto &index_buffer : index_buffers)
+            index_buffer = nullptr;
+        index_buffers.clear();
     }
 
     // create vertex buffer
-    vertex_buffer_handle = CreateVertexBuffer(static_cast<int>(shared_mesh->vertices.size()), DX_VERTEX_TYPE_NORMAL_3D);
-    if (vertex_buffer_handle == -1)
+    vertex_buffer = std::make_shared<VertexBuffer>(shared_mesh);
+    if (!vertex_buffer->IsValid())
     {
         Logger::Error<MeshRenderer>("Failed to create vertex buffer!: %s", GameObject()->Name().c_str());
-        buffer_creation_failed = true;
-        return;
-    }
-
-    // convert to dxlib-compatible type
-    std::vector<VERTEX3D> raw_vertices;
-    raw_vertices.reserve(shared_mesh->vertices.size());
-    raw_vertices.resize(shared_mesh->vertices.size());
-    for (int i = 0; i < shared_mesh->vertices.size(); i++)
-    {
-        raw_vertices[i].pos = DxLibConverter::From(shared_mesh->vertices[i]);
-        raw_vertices[i].norm = DxLibConverter::From(shared_mesh->normals[i]);
-
-        COLOR_U8 color = {255, 255, 255, 255};
-        if (!shared_mesh->colors.empty())
-        {
-            color = {
-                .b = shared_mesh->colors[i].b,
-                .g = shared_mesh->colors[i].g,
-                .r = shared_mesh->colors[i].r,
-                .a = shared_mesh->colors[i].a
-            };
-        }
-
-        raw_vertices[i].dif = color;
-        raw_vertices[i].spc = color;
-
-        if (!shared_mesh->uv.empty())
-        {
-            raw_vertices[i].u = shared_mesh->uv[i].x;
-            raw_vertices[i].v = shared_mesh->uv[i].y;
-        }
-
-        if (!shared_mesh->uv2.empty())
-        {
-            raw_vertices[i].su = shared_mesh->uv2[i].x;
-            raw_vertices[i].sv = shared_mesh->uv2[i].y;
-        }
-    }
-
-    if (SetVertexBufferData(0, raw_vertices.data(), static_cast<int>(shared_mesh->vertices.size()),
-                            vertex_buffer_handle) == -1)
-    {
-        Logger::Error<MeshRenderer>("Failed to set vertex buffer data for '%s'", GameObject()->Path().c_str());
         buffer_creation_failed = true;
         return;
     }
@@ -163,10 +138,11 @@ void MeshRenderer::ReconstructBuffers()
     const auto ib_size = shared_mesh->sub_meshes.empty()
                              ? shared_mesh->indices.size()
                              : shared_mesh->sub_meshes[0].base_index;
+    const auto indices = shared_mesh->indices.data();
 
-    const auto ib_handle = CreateIndexBuffer(static_cast<int>(ib_size),DX_INDEX_TYPE_16BIT);
+    auto ib = std::make_shared<IndexBuffer>(ib_size, indices);
 
-    if (ib_handle == -1)
+    if (!ib->IsValid())
     {
         Logger::Error<MeshRenderer>("Failed to create index buffer of '%d' for '%s'", ib_size,
                                     GameObject()->Path().c_str());
@@ -174,39 +150,36 @@ void MeshRenderer::ReconstructBuffers()
         return;
     }
 
-    if (SetIndexBufferData(0, shared_mesh->indices.data(), static_cast<int>(ib_size), ib_handle))
-    {
-        Logger::Error<MeshRenderer>("Failed to set index buffer data for '%s'", GameObject()->Path().c_str());
-        buffer_creation_failed = true;
-        return;
-    }
-
-    index_buffer_handles.emplace_back(ib_handle);
+    index_buffers.emplace_back(ib);
 
     // create index buffers for sub meshes
     for (auto i = 0; i < shared_mesh->sub_meshes.size(); i++)
     {
         const auto sub_mesh = shared_mesh->sub_meshes[i];
-        const auto sub_ib_handle = CreateIndexBuffer(sub_mesh.index_count, DX_INDEX_TYPE_16BIT);
-        if (sub_ib_handle == -1)
+
+        std::vector<uint32_t> sub_indices;
+        sub_indices.insert(sub_indices.begin(),
+                           shared_mesh->indices.begin() + sub_mesh.base_index,
+                           shared_mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count);
+
+        const auto sub_ib = std::make_shared<IndexBuffer>(sub_mesh.index_count, sub_indices.data());
+        if (!sub_ib->IsValid())
         {
             Logger::Error<MeshRenderer>("Failed to create sub index buffer!: sub mesh index: %d", i);
             continue;
         }
 
-        std::vector<short> sub_indices;
-        sub_indices.insert(sub_indices.begin(),
-                           shared_mesh->indices.begin() + sub_mesh.base_index,
-                           shared_mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count);
+        index_buffers.emplace_back(sub_ib);
+    }
 
-        if (SetIndexBufferData(0, sub_indices.data(), static_cast<int>(sub_indices.size()), sub_ib_handle))
+    for (auto &wvp_buffer : WVPBuffers)
+    {
+        wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix4x4) * 3);
+        if (!wvp_buffer->IsValid())
         {
-            Logger::Error<MeshRenderer>("Failed to set sub index buffer data for %d!", i);
-            DeleteIndexBuffer(sub_ib_handle);
+            Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
             continue;
         }
-
-        index_buffer_handles.emplace_back(sub_ib_handle);
     }
 }
 }

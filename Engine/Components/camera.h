@@ -6,6 +6,8 @@ namespace engine
 {
 class Camera : public Component
 {
+    static std::weak_ptr<Camera> MainCamera;
+
     enum kViewMode
     {
         kPerspective,
@@ -22,8 +24,14 @@ class Camera : public Component
     void ApplyCameraSettingToDxLib() const;
 
 public:
+
+    static std::weak_ptr<Camera> Main(){return MainCamera;}
+    void OnAwake() override;
     void OnUpdate() override;
 
+    Matrix4x4 GetViewMatrix();
+    Matrix4x4 GetProjectionMatrix() const;
+    
     template <class Archive>
     void serialize(Archive &ar)
     {
