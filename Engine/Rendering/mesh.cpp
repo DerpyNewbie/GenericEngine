@@ -6,6 +6,7 @@
 #pragma comment(lib, "assimp-vc143-mt.lib")
 #endif
 
+#include <array>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include "DxLib/dxlib_converter.h"
@@ -183,11 +184,11 @@ std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST
     for (int i = 0; i < mv1_ref_polygon_list.VertexNum; i++)
     {
         const auto vertex = mv1_ref_polygon_list.Vertexs[i];
-        result->vertices[i] = vertex.Position;
-        result->uvs[0][i] = vertex.TexCoord[0];
-        result->uvs[1][i] = vertex.TexCoord[1];
+        result->vertices[i] = DxLibConverter::To(vertex.Position);
+        result->uvs[0][i] = DxLibConverter::To(vertex.TexCoord[0]);
+        result->uvs[1][i] = DxLibConverter::To(vertex.TexCoord[1]);
         result->colors[i] = vertex.DiffuseColor;
-        result->normals[i] = vertex.Normal;
+        result->normals[i] = DxLibConverter::To(vertex.Normal);
     }
 
     result->indices.resize(3ULL * mv1_ref_polygon_list.PolygonNum);
@@ -220,7 +221,7 @@ void Mesh::Append(Mesh other)
     vertices.insert(vertices.end(), other.vertices.begin(), other.vertices.end());
     // TODO: may require additional checks for appending to empty uv
     for (size_t i = 0; i < uvs.size(); i++)
-    uvs[0].insert(uvs[0].end(), other.uvs[0].begin(), other.uvs[0].end());
+        uvs[0].insert(uvs[0].end(), other.uvs[0].begin(), other.uvs[0].end());
     uvs[1].insert(uvs[1].end(), other.uvs[1].begin(), other.uvs[1].end());
     uvs[2].insert(uvs[2].end(), other.uvs[2].begin(), other.uvs[2].end());
     uvs[3].insert(uvs[3].end(), other.uvs[3].begin(), other.uvs[3].end());

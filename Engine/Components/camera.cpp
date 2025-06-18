@@ -2,13 +2,11 @@
 
 #include "camera.h"
 
-#include "DxLib/dxlib_converter.h"
-#include "game_object.h"
-#include "../../App.h"
-
 #include <DirectXMath.h>
-#include <__msvc_ranges_to.hpp>
-#include <algorithm>
+#include "DxLib/dxlib_converter.h"
+#include "App.h"
+#include "game_object.h"
+
 
 namespace engine
 {
@@ -43,14 +41,14 @@ void Camera::OnUpdate()
     ApplyCameraSettingToDxLib();
 }
 
-Matrix4x4 Camera::GetViewMatrix()
+Matrix Camera::GetViewMatrix()
 {
     const auto transform = GameObject()->Transform();
     return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
                                      transform->Up());
 }
 
-Matrix4x4 Camera::GetProjectionMatrix() const
+Matrix Camera::GetProjectionMatrix() const
 {
     float aspect = static_cast<float>(Application::WindowWidth() / Application::WindowHeight());
     return DirectX::XMMatrixPerspectiveFovRH(m_field_of_view_, aspect, 0.3f, 1000.0f);

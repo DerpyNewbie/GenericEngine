@@ -1,35 +1,51 @@
 ﻿#include "pch.h"
 
+#pragma once
+#ifdef _DEBUG
+#pragma comment(lib, "assimp-vc143-mtd")
+#else
+#pragma comment(lib, "assimp-vc143-mt")
+#endif
+
 #include "engine.h"
 
 #include "engine_profiler.h"
-#include "scene_manager.h"
+#include "engine_time.h"
 #include "update_manager.h"
+#include "scene_manager.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "App.h"
 
-bool engine::Engine::Init()
+#include <DxLib.h>
+
+namespace engine
+{
+bool Engine::Init()
 {
 #ifdef _DEBUG
     LoadLibraryExA("assimp-vc143-mtd.dll", nullptr, NULL);
 #else
-        LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
+    LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
 
-    SetGraphMode(1280, 720, 32);
-    ChangeWindowMode(TRUE);
+    g_RenderEngine = new RenderEngine();
+    if (!g_RenderEngine->Init(Application::GetHWnd(), Application::WindowWidth(), Application::WindowHeight()))
+    {
+        Logger::Log<Engine>("Failed to initialize render engine");
+    }
+
     if (DxLib_Init() == -1)
     {
         should_exit = true;
         return false;
     }
 
-    SetUseZBuffer3D(true);
-
     Time::Get()->Init();
     SceneManager::CreateScene("Default Scene");
 
     return true;
 }
-void engine::Engine::MainLoop() const
+void Engine::MainLoop() const
 {
     while (ProcessMessage() == 0 && !should_exit)
     {
@@ -49,20 +65,10 @@ void engine::Engine::MainLoop() const
         Profiler::End("Fixed Update");
 
         Profiler::Begin("Draw Call");
-        ClearDrawScreen();
+        g_RenderEngine->BeginRender();
         UpdateManager::InvokeDrawCall();
-
-        {
-            // temporary engine info drawer
-            const auto time = Time::Get();
-            DrawFormatString(20, 20, 0xffffffff, "fps: %3d, f: %03d, dt: %f",
-                             time->Fps(), time->Frames() % 1000, time->DeltaTime());
-            DrawFormatString(20, 60, 0xffffffff, "update: %d, fixed_update: %d, draw_call: %d",
-                             UpdateManager::UpdateCount(), UpdateManager::FixedUpdateCount(),
-                             UpdateManager::DrawCallCount());
-        }
-        ScreenFlip();
+        g_RenderEngine->EndRender();
         Profiler::End("Draw Call");
     }
 }
-#include "RenderEngine.h"
+}

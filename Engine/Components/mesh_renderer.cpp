@@ -1,21 +1,18 @@
 #include "mesh_renderer.h"
 
+#include <array>
 #include "DxLib/dxlib_helper.h"
 #include "DxLib/dxlib_converter.h"
 #include "Rendering/texture2d.h"
-#include "camera.h"
-#include "dxlib_helper.h"
-#include "game_object.h"
-#include "imgui.h"
-#include "logger.h"
-#include "imgui_internal.h"
-#include "Math/matrix4x4.h"
 #include "Rendering/Vertex.h"
-#include "Rendering/texture2d.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
-#include <__msvc_ranges_to.hpp>
+#include "imgui.h"
+#include "dxlib_helper.h"
+#include "game_object.h"
+#include "logger.h"
+#include "camera.h"
 
 namespace engine
 {
@@ -69,13 +66,13 @@ void MeshRenderer::OnDraw()
     }
 
     const auto camera = Camera::Main();
-    const Matrix4x4 wtl = GameObject()->Transform()->WorldToLocal();
-    const Matrix4x4 view = camera.lock()->GetViewMatrix();
-    const Matrix4x4 proj = camera.lock()->GetProjectionMatrix();
+    const Matrix wtl = GameObject()->Transform()->WorldToLocal();
+    const Matrix view = camera.lock()->GetViewMatrix();
+    const Matrix proj = camera.lock()->GetProjectionMatrix();
 
     for (auto &wvp_buffer : WVPBuffers)
     {
-        auto ptr = wvp_buffer->GetPtr<Matrix4x4[3]>();
+        auto ptr = wvp_buffer->GetPtr<Matrix[3]>();
         *ptr[0] = wtl;
         *ptr[1] = view;
         *ptr[2] = proj;
@@ -87,26 +84,18 @@ void MeshRenderer::OnDraw()
     commandList->SetPipelineState(g_PSOManager.Get("default"));
     commandList->SetGraphicsRootConstantBufferView(0, WVPBuffers[currentIndex]->GetAddress());
 
-    
-    
     auto vbView = vertex_buffer->View();
     for (int i = 0; i < index_buffers.size(); i++)
     {
         auto ibView = index_buffers[i]->View();
-    }
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    commandList->IASetVertexBuffers(0, 1, &vbView);
-    commandList->IASetIndexBuffer(&ibView);
 
-    commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
+        commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        commandList->IASetVertexBuffers(0, 1, &vbView);
+        commandList->IASetIndexBuffer(&ibView);
 
-    commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
+        commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
 
-    for (int i = 0; i < index_buffers.size(); i++)
-    {
-        const auto ib = index_buffers[i];
-        const auto tex_handle = (i < texture_handles.size()) ? texture_handles[i] : DX_NONE_GRAPH;
-        DrawPolygonIndexed3D_UseVertexBuffer(vertex_buffer_handle, ib_handle, tex_handle, false);
+        commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
     }
 }
 
@@ -174,7 +163,7 @@ void MeshRenderer::ReconstructBuffers()
 
     for (auto &wvp_buffer : WVPBuffers)
     {
-        wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix4x4) * 3);
+        wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 3);
         if (!wvp_buffer->IsValid())
         {
             Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
