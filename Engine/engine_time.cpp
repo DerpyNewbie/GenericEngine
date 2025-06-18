@@ -1,11 +1,6 @@
-//
-// Created by derpy on 2024/08/26.
-//
+#include "pch.h"
 
 #include "engine_time.h"
-
-#include <chrono>
-#include <thread>
 
 namespace engine
 {

@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "update_man_debugger.h"
 
 #include "update_manager.h"

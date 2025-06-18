@@ -1,11 +1,12 @@
+#include "pch.h"
+
 #include "mesh_renderer.h"
 
-#include "dxlib_helper.h"
-#include "game_object.h"
-#include "imgui.h"
-#include "imgui_internal.h"
-#include "logger.h"
+#include "DxLib/dxlib_helper.h"
+#include "DxLib/dxlib_converter.h"
 #include "Rendering/texture2d.h"
+#include "game_object.h"
+#include "logger.h"
 
 namespace engine
 {
@@ -70,7 +71,7 @@ void MeshRenderer::OnDraw()
         ReconstructBuffers();
     }
 
-    const MATRIX wtl = GameObject()->Transform()->WorldToLocal();
+    const MATRIX wtl = DxLibConverter::From(GameObject()->Transform()->WorldToLocal());
 
     SetUseZBuffer3D(true);
     SetWriteZBuffer3D(true);
@@ -120,8 +121,8 @@ void MeshRenderer::ReconstructBuffers()
     raw_vertices.resize(shared_mesh->vertices.size());
     for (int i = 0; i < shared_mesh->vertices.size(); i++)
     {
-        raw_vertices[i].pos = shared_mesh->vertices[i];
-        raw_vertices[i].norm = shared_mesh->normals[i];
+        raw_vertices[i].pos = DxLibConverter::From(shared_mesh->vertices[i]);
+        raw_vertices[i].norm = DxLibConverter::From(shared_mesh->normals[i]);
 
         COLOR_U8 color = {255, 255, 255, 255};
         if (!shared_mesh->colors.empty())

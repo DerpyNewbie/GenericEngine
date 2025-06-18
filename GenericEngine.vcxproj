@@ -41,10 +41,6 @@
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\Math\bounds.cpp"/>
         <ClCompile Include="Engine\Math\color.cpp"/>
-        <ClCompile Include="Engine\Math\matrix4x4.cpp"/>
-        <ClCompile Include="Engine\Math\quaternion.cpp"/>
-        <ClCompile Include="Engine\Math\vector2.cpp"/>
-        <ClCompile Include="Engine\Math\vector3.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
@@ -59,16 +55,38 @@
         <ClCompile Include="Engine\engine_time.cpp"/>
         <ClCompile Include="Engine\update_manager.cpp"/>
         <ClCompile Include="main.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp"/>
-        <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot_demo.cpp"/>
-        <ClCompile Include="ThirdParty\implot\implot_items.cpp"/>
+        <ClCompile Include="pch.cpp">
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_dx11.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\backends\imgui_impl_win32.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_demo.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_draw.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_tables.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\imgui\imgui_widgets.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot_demo.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
+        <ClCompile Include="ThirdParty\implot\implot_items.cpp">
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+        </ClCompile>
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="Editor\editor_window.h"/>
@@ -87,8 +105,9 @@
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
-        <ClInclude Include="Engine\dxlib_helper.h"/>
-        <ClInclude Include="Engine\dxlib_serializer.h"/>
+        <ClInclude Include="Engine\DxLib\dxlib_converter.h"/>
+        <ClInclude Include="Engine\DxLib\dxlib_helper.h"/>
+        <ClInclude Include="Engine\DxLib\dxlib_serializer.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
         <ClInclude Include="Engine\engine_profiler.h"/>
@@ -100,11 +119,6 @@
         <ClInclude Include="Engine\Math\color.h"/>
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
-        <ClInclude Include="Engine\Math\matrix4x4.h"/>
-        <ClInclude Include="Engine\Math\quaternion.h"/>
-        <ClInclude Include="Engine\Math\vector2.h"/>
-        <ClInclude Include="Engine\Math\vector3.h"/>
-        <ClInclude Include="Engine\Math\vector4.h"/>
         <ClInclude Include="Engine\object.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
@@ -121,6 +135,7 @@
         <ClInclude Include="Engine\engine_time.h"/>
         <ClInclude Include="Engine\str_util.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
+        <ClInclude Include="pch.h"/>
         <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_dx11.h"/>
         <ClInclude Include="ThirdParty\imgui\backends\imgui_impl_win32.h"/>
         <ClInclude Include="ThirdParty\imgui\imconfig.h"/>
@@ -167,7 +182,7 @@
             <ConformanceMode>true</ConformanceMode>
             <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include
             </AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
         <Link>
@@ -192,7 +207,7 @@
             <ConformanceMode>true</ConformanceMode>
             <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include
             </AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
         <Link>
@@ -215,10 +230,11 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include
-            </AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include</AdditionalIncludeDirectories>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
+            <PrecompiledHeader>Create</PrecompiledHeader>
+            <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -242,7 +258,7 @@
             <ConformanceMode>true</ConformanceMode>
             <AdditionalIncludeDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\include
             </AdditionalIncludeDirectories>
-            <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
         </ClCompile>
         <Link>

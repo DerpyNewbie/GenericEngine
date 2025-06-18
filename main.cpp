@@ -1,12 +1,12 @@
-﻿#include "Engine/engine.h"
+﻿#include "pch.h"
+
+#include "Engine/engine.h"
 #include "Editor/editor.h"
 #include "Engine/scene.h"
 #include "Engine/Components/camera.h"
 #include "Engine/Components/controller.h"
 #include "Engine/Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
-
-#include <DxLib.h>
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {

@@ -1,19 +1,14 @@
 ﻿#pragma once
 #include "component.h"
 
-#include <DxLib.h>
 #include <memory>
 #include <vector>
-
-#include "Math/matrix4x4.h"
-#include "Math/vector3.h"
-#include "Math/quaternion.h"
 
 namespace engine
 {
 class Transform : public Component
 {
-    Matrix4x4 m_matrix_ = MGetIdent();
+    Matrix m_matrix_ = Matrix::Identity;
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
@@ -23,10 +18,10 @@ class Transform : public Component
 public:
     void OnInspectorGui() override;
 
-    [[nodiscard]] Matrix4x4 LocalMatrix() const;
-    [[nodiscard]] Matrix4x4 WorldMatrix() const;
-    [[nodiscard]] Matrix4x4 LocalToWorld() const;
-    [[nodiscard]] Matrix4x4 WorldToLocal() const;
+    [[nodiscard]] Matrix LocalMatrix() const;
+    [[nodiscard]] Matrix WorldMatrix() const;
+    [[nodiscard]] Matrix LocalToWorld() const;
+    [[nodiscard]] Matrix WorldToLocal() const;
 
     [[nodiscard]] Vector3 Position() const;
     [[nodiscard]] Quaternion Rotation() const;
@@ -51,15 +46,8 @@ public:
     void SetLocalPositionAndRotation(const Vector3 &local_position, const Quaternion &local_rotation);
     void SetLocalScale(const Vector3 &local_scale);
 
-    void SetLocalMatrix(const Matrix4x4 &matrix);
+    void SetLocalMatrix(const Matrix &matrix);
     void SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position);
-
-    // Rotates around a pivot point in world space
-    void RotateAround(const Vector3 &pivot_point, const Vector3 &axis, float angle_degrees);
-
-    // Rotates around a pivot point using a quaternion
-    void RotateAround(const Vector3 &pivot_point, const Quaternion &rotation);
-
 
     [[nodiscard]] Vector3 Forward() const
     {

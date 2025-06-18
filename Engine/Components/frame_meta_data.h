@@ -6,7 +6,7 @@ namespace engine
 class FrameMetaData : public Component
 {
 public:
-    Matrix4x4 bind_pose;
+    Matrix bind_pose;
     Vector3 max_vert_pos;
     Vector3 min_vert_pos;
     Vector3 avg_vert_pos;
@@ -15,7 +15,7 @@ public:
     int meshes;
 
     void OnInspectorGui() override;
-    
+
     template <class Archive>
     void serialize(Archive &ar)
     {

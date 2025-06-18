@@ -1,35 +1,33 @@
+#include "pch.h"
+
 #ifdef _DEBUG
 #pragma comment(lib, "assimp-vc143-mtd")
 #else
 #pragma comment(lib, "assimp-vc143-mt")
 #endif
 
+#include "model_importer.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-
-#include "model_importer.h"
-
-#include "game_object.h"
-
-#include <filesystem>
-
-#include "logger.h"
-#include "mesh.h"
-#include "str_util.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
-
+#include "DxLib/dxlib_converter.h"
+#include "game_object.h"
+#include "str_util.h"
+#include "logger.h"
+#include "mesh.h"
 
 namespace engine
 {
 namespace
 {
-Matrix4x4 ConvertAi(const aiMatrix4x4 &m)
+Matrix ConvertAi(const aiMatrix4x4 &m)
 {
     // TODO: conversion may not be accurate as rotation is invalid
-    Matrix4x4 result;
+    Matrix result;
     result.m[0][0] = m.a1;
     result.m[0][1] = m.a2;
     result.m[0][2] = m.a3;
@@ -134,7 +132,7 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_pat
 
     const auto frame_count = MV1GetFrameNum(model_handle);
     auto frame_transforms = std::vector<std::weak_ptr<Transform>>(frame_count);
-    auto frame_local_matrix = std::vector<Matrix4x4>(frame_count);
+    auto frame_local_matrix = std::vector<Matrix>(frame_count);
 
     // Populate frame transforms
     for (int i = 0; i < frame_count; ++i)
@@ -142,13 +140,13 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_pat
         const auto frame_name = StringUtil::ShiftJisToUtf8(std::string(MV1GetFrameName(model_handle, i)));
         const auto frame_obj = Object::Instantiate<GameObject>(frame_name);
         frame_transforms[i] = frame_obj->Transform();
-        frame_local_matrix[i] = MV1GetFrameBaseLocalMatrix(model_handle, i);
+        frame_local_matrix[i] = DxLibConverter::To(MV1GetFrameBaseLocalMatrix(model_handle, i));
 
         const auto frame_data = frame_obj->AddComponent<FrameMetaData>();
-        frame_data->max_vert_pos = MV1GetFrameMaxVertexLocalPosition(model_handle, i);
-        frame_data->min_vert_pos = MV1GetFrameMinVertexLocalPosition(model_handle, i);
-        frame_data->avg_vert_pos = MV1GetFrameAvgVertexLocalPosition(model_handle, i);
-        frame_data->bind_pose = MV1GetFrameBaseLocalMatrix(model_handle, i);
+        frame_data->max_vert_pos = DxLibConverter::To(MV1GetFrameMaxVertexLocalPosition(model_handle, i));
+        frame_data->min_vert_pos = DxLibConverter::To(MV1GetFrameMinVertexLocalPosition(model_handle, i));
+        frame_data->avg_vert_pos = DxLibConverter::To(MV1GetFrameAvgVertexLocalPosition(model_handle, i));
+        frame_data->bind_pose = DxLibConverter::To(MV1GetFrameBaseLocalMatrix(model_handle, i));
         frame_data->verts = MV1GetFrameVertexNum(model_handle, i);
         frame_data->tris = MV1GetFrameTriangleNum(model_handle, i);
         frame_data->meshes = MV1GetFrameMeshNum(model_handle, i);

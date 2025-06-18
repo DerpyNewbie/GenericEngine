@@ -1,7 +1,8 @@
+#include "pch.h"
+
 #include "profiler.h"
 
 #include "engine_profiler.h"
-#include "implot.h"
 
 template <typename T>
 struct ScrollingBuffer

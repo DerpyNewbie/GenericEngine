@@ -1,4 +1,6 @@
-﻿#include "scene.h"
+﻿#include "pch.h"
+
+#include "scene.h"
 
 #include "game_object.h"
 #include "update_manager.h"

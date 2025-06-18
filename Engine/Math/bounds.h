@@ -1,8 +1,12 @@
 #pragma once
-#include "vector3.h"
+#include "pch.h"
+
+#include <directxtk12/SimpleMath.h>
 
 namespace engine
 {
+using namespace DirectX::SimpleMath;
+
 struct Bounds
 {
     Vector3 center;
@@ -12,7 +16,7 @@ struct Bounds
     Vector3 size;
 
     constexpr Bounds() = default;
-    constexpr Bounds(const Vector3 &center, const Vector3 &extents) : center(center), extents(extents),
+    Bounds(const Vector3 &center, const Vector3 &extents) : center(center), extents(extents),
         min_point(center - extents), max_point(center + extents), size(extents * 2)
     {}
 
