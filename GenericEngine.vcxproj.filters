@@ -89,9 +89,6 @@
     <ClCompile Include="Engine\Rendering\material_block.cpp">
       <Filter>engine</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Math\matrix4x4.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Rendering\mesh.cpp">
       <Filter>engine</Filter>
     </ClCompile>
@@ -99,9 +96,6 @@
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Rendering\model_importer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\quaternion.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Components\renderer.cpp">
@@ -120,12 +114,6 @@
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="Engine\Components\transform.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\vector2.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\vector3.cpp">
       <Filter>engine</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp" />
@@ -215,12 +203,6 @@
     <ClInclude Include="Engine\Components\cube_renderer.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\dxlib_helper.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\dxlib_serializer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\enable_shared_from_base.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -266,9 +248,6 @@
     <ClInclude Include="Engine\Math\mathf.h">
       <Filter>engine</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\Math\matrix4x4.h">
-      <Filter>engine</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Rendering\mesh.h">
       <Filter>engine</Filter>
     </ClInclude>
@@ -276,9 +255,6 @@
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Rendering\model_importer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\quaternion.h">
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Components\renderer.h">
@@ -300,15 +276,6 @@
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="Engine\Components\transform.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\vector2.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\vector3.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\vector4.h">
       <Filter>engine</Filter>
     </ClInclude>
     <ClInclude Include="pch.h" />
@@ -333,6 +300,9 @@
     <ClInclude Include="Editor\update_man_debugger.h">
       <Filter>editor</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\DxLib\dxlib_converter.h" />
+    <ClInclude Include="Engine\DxLib\dxlib_helper.h" />
+    <ClInclude Include="Engine\DxLib\dxlib_serializer.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="imgui">
@@ -347,8 +317,5 @@
     <Filter Include="implot">
       <UniqueIdentifier>{27463cd6-262e-4180-b96b-20b4b52dea5b}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>
