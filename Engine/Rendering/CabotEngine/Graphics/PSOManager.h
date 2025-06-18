@@ -1,0 +1,32 @@
+﻿#pragma once
+#include <d3d12.h>
+#include <string>
+#include <unordered_map>
+
+#include "PipelineState.h"
+#include "RootSignature.h"
+#include "ShaderObject.h"
+
+struct PSOSetting
+{
+    std::string PSOName;
+    std::wstring VSPath;
+    std::wstring PSPath;
+    ID3D12RootSignature* RootSignature;
+    D3D12_INPUT_LAYOUT_DESC InputLayout;
+};
+
+class PSOManager
+{
+public:
+    void Initialize();
+    bool Register(PSOSetting setting);
+    bool Register(ShaderObject& shaderObject);
+
+    ID3D12PipelineState* Get(const std::string& id){return psoCache[id]->Get();}
+
+private:
+    std::unordered_map<std::string,PipelineState*> psoCache;
+};
+
+extern PSOManager g_PSOManager;
