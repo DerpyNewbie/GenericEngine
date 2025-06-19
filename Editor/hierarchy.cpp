@@ -74,47 +74,90 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
 {
     ImGui::PushID(game_object.get());
-    if (!DrawObject(game_object))
+    const bool has_style_color = !game_object->IsActiveInHierarchy();
+    if (has_style_color)
     {
-        ImGui::PopID();
-        return;
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
     }
 
-    const auto transform = game_object->Transform();
-    const auto child_count = transform->ChildCount();
-    for (int i = 0; i < child_count; ++i)
+    const bool draw_tree = DrawObject(game_object);
+    if (ImGui::BeginDragDropTarget())
     {
-        const auto child_go = transform->GetChild(i)->GameObject();
-        DrawObjectRecursive(child_go);
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("HIERARCHY_GAME_OBJECT",
+                                                                       ImGuiDragDropFlags_AcceptBeforeDelivery))
+        {
+            const auto payload_go = static_cast<std::shared_ptr<engine::GameObject> *>(payload->Data);
+            if (*payload_go != nullptr)
+            {
+                const bool can_be_child = !game_object->Transform()->IsChildOf((*payload_go)->Transform());
+
+                ImGui::SetTooltip(can_be_child
+                                      ? "Make '%s' child of '%s'"
+                                      : "Cannot make '%s' child of '%s' as its parent of child",
+                                  payload_go->get()->Name().c_str(),
+                                  game_object->Name().c_str());
+
+                if (can_be_child && payload->IsDelivery())
+                {
+                    engine::Logger::Log<Hierarchy>("appending %s to %s as child",
+                                                   game_object->Path().c_str(), (*payload_go)->Path().c_str());
+
+                    (*payload_go)->Transform()->SetParent(game_object->Transform());
+                }
+            }
+        }
+
+        ImGui::EndDragDropTarget();
     }
-    ImGui::TreePop();
+
+    if (draw_tree)
+    {
+        const auto transform = game_object->Transform();
+        // Child count cannot be stored as it can be changed during DrawObjectRecursive
+        for (int i = 0; i < transform->ChildCount(); ++i)
+        {
+            const auto child_go = transform->GetChild(i)->GameObject();
+            DrawObjectRecursive(child_go);
+        }
+        ImGui::TreePop();
+    }
+
+    if (has_style_color)
+    {
+        ImGui::PopStyleColor();
+    }
+
     ImGui::PopID();
 }
 bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
-    if (game_object->Transform()->ChildCount() == 0)
+    bool is_tree_expanded = false;
+    if (game_object->Transform()->ChildCount() > 0)
     {
-        ImGui::Dummy(ImVec2{20, 2});
-        ImGui::SameLine();
-        if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
-        {
-            selected_game_object = game_object;
-        }
+        is_tree_expanded = ImGui::TreeNode("##CHILD_TREE");
     }
     else
     {
-        bool tree_node = ImGui::TreeNode("##CHILD_TREE");
-        ImGui::SameLine();
-        if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
-        {
-            selected_game_object = game_object;
-        }
-
-        if (tree_node)
-        {
-            return true;
-        }
+        ImGui::Dummy(ImVec2{20, 2});
     }
-    return false;
+
+    ImGui::SameLine();
+    if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
+    {
+        selected_game_object = game_object;
+    }
+
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+    {
+        ImGui::SetDragDropPayload(
+            "HIERARCHY_GAME_OBJECT", &game_object,
+            sizeof(std::shared_ptr<engine::GameObject> *));
+
+        ImGui::Text("Dragging %s", game_object->Path().c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    return is_tree_expanded;
 }
+
 }
