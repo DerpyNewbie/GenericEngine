@@ -4,19 +4,15 @@
 #include "enable_shared_from_base.h"
 #include "event_receivers.h"
 
-#include "hierarchy.h"
-#include "inspector.h"
-#include "profiler.h"
-#include "update_man_debugger.h"
-
 namespace editor
 {
+class IEditorWindow;
+
 class Editor final : public enable_shared_from_base<Editor>, public IDrawCallReceiver
 {
-    std::shared_ptr<Hierarchy> m_hierarchy_;
-    std::shared_ptr<Inspector> m_inspector_;
-    std::shared_ptr<Profiler> m_profiler_;
-    std::shared_ptr<UpdateManDebugger> m_update_man_debugger_;
+    int m_last_editor_style_ = -1;
+    std::unordered_map<std::string, std::shared_ptr<IEditorWindow>> m_editor_windows_;
+    void SetEditorStyle(int i);
 
 public:
     int Order() override
@@ -30,5 +26,10 @@ public:
     void Attach();
     void OnDraw() override;
     void Finalize();
+
+    void AddEditorWindow(const std::string &name, std::shared_ptr<IEditorWindow> window);
+    std::vector<std::string> GetEditorWindowNames();
+    std::shared_ptr<IEditorWindow> GetEditorWindow(const std::string &name);
+    void RemoveEditorWindow(const std::string &name);
 };
 }

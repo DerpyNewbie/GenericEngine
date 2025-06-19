@@ -19,6 +19,7 @@
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
+        <ClCompile Include="Editor\editor_prefs.cpp"/>
         <ClCompile Include="Editor\editor_window.cpp"/>
         <ClCompile Include="Editor\editor.cpp"/>
         <ClCompile Include="Editor\hierarchy.cpp"/>
@@ -58,6 +59,7 @@
         </ClCompile>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="Editor\editor_prefs.h"/>
         <ClInclude Include="Editor\editor_window.h"/>
         <ClInclude Include="Editor\editor.h"/>
         <ClInclude Include="Editor\hierarchy.h"/>

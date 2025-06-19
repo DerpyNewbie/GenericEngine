@@ -2,6 +2,7 @@
 
 #include "hierarchy.h"
 
+#include "editor_prefs.h"
 #include "DxLib/dxlib_helper.h"
 #include "DxLib/dxlib_converter.h"
 #include "scene.h"
@@ -58,6 +59,47 @@ void Hierarchy::DrawMenu()
         }
         ImGui::EndMenu();
     }
+
+    if (ImGui::BeginMenu("Edit"))
+    {
+        if (ImGui::BeginMenu("Prefs"))
+        {
+            ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
+            ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
+
+            ImGui::EndMenu();
+        }
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Object"))
+    {
+        if (ImGui::MenuItem("Create Empty"))
+        {
+            Instantiate<engine::GameObject>("Empty GameObject");
+        }
+        ImGui::EndMenu();
+    }
+
+    if (ImGui::BeginMenu("Window"))
+    {
+        const auto names = editor->GetEditorWindowNames();
+        for (auto &name : names)
+        {
+            // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
+            if (name == "Hierarchy")
+            {
+                ImGui::BeginDisabled();
+                ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
+                ImGui::EndDisabled();
+                continue;
+            }
+            ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
+        }
+
+        ImGui::EndMenu();
+    }
+
     ImGui::EndMenuBar();
 }
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)

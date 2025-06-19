@@ -4,6 +4,9 @@
 
 void editor::IEditorWindow::DrawGui()
 {
+    if (!is_open)
+        return;
+
     if (ImGui::Begin(Name().c_str(), nullptr, window_flags))
     {
         OnEditorGui();

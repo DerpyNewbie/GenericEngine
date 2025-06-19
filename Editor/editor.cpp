@@ -1,11 +1,18 @@
 ﻿#include "pch.h"
 
 #include "editor.h"
+#include "editor_prefs.h"
+#include "hierarchy.h"
+#include "inspector.h"
+#include "profiler.h"
+#include "update_man_debugger.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+
+#include <ranges>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -20,6 +27,26 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+void Editor::SetEditorStyle(const int i)
+{
+    if (m_last_editor_style_ == i)
+        return;
+    switch (i)
+    {
+    default:
+    case 0:
+        ImGui::StyleColorsDark();
+        break;
+    case 1:
+        ImGui::StyleColorsLight();
+        break;
+    case 2:
+        ImGui::StyleColorsClassic();
+        break;
+    }
+
+    m_last_editor_style_ = i;
+}
 void Editor::Init()
 {
     {
@@ -32,7 +59,7 @@ void Editor::Init()
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
-        ImGui::StyleColorsDark();
+        SetEditorStyle(0);
 
         ImFontConfig font_config;
         font_config.MergeMode = true;
@@ -50,13 +77,15 @@ void Editor::Init()
     }
 
     {
-        m_hierarchy_ = engine::Object::Instantiate<Hierarchy>();
+        const auto hierarchy = engine::Object::Instantiate<Hierarchy>();
+        const auto inspector = engine::Object::Instantiate<Inspector>();
+        inspector->selected_game_object_ptr = &hierarchy->selected_game_object;
 
-        m_inspector_ = engine::Object::Instantiate<Inspector>();
-        m_inspector_->selected_game_object_ptr = &m_hierarchy_->selected_game_object;
-
-        m_profiler_ = engine::Object::Instantiate<Profiler>();
-        m_update_man_debugger_ = engine::Object::Instantiate<UpdateManDebugger>();
+        AddEditorWindow("Inspector", inspector);
+        AddEditorWindow("Hierarchy", hierarchy);
+        AddEditorWindow("Editor Prefs", engine::Object::Instantiate<EditorPrefs>());
+        AddEditorWindow("Profiler", engine::Object::Instantiate<Profiler>());
+        AddEditorWindow("Update Manager Debugger", engine::Object::Instantiate<UpdateManDebugger>());
     }
 }
 void Editor::Update()
@@ -75,12 +104,15 @@ void Editor::OnDraw()
         ImGui::NewFrame();
     }
 
-    DxLibHelper::DrawYPlaneGrid();
+    if (EditorPrefs::theme != m_last_editor_style_)
+        SetEditorStyle(EditorPrefs::theme);
+    if (EditorPrefs::show_grid)
+        DxLibHelper::DrawYPlaneGrid();
 
-    m_hierarchy_->DrawGui();
-    m_inspector_->DrawGui();
-    m_profiler_->DrawGui();
-    m_update_man_debugger_->DrawGui();
+    for (const auto &window : m_editor_windows_ | std::views::values)
+    {
+        window->DrawGui();
+    }
 
     {
         ImGui::Render();
@@ -100,5 +132,23 @@ void Editor::Finalize()
     ImGui_ImplDX11_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
+}
+void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<IEditorWindow> window)
+{
+    window->editor = this;
+    m_editor_windows_.emplace(name, window);
+}
+std::vector<std::string> Editor::GetEditorWindowNames()
+{
+    auto keys = std::views::keys(m_editor_windows_);
+    return {keys.begin(), keys.end()};
+}
+std::shared_ptr<IEditorWindow> Editor::GetEditorWindow(const std::string &name)
+{
+    return m_editor_windows_.at(name);
+}
+void Editor::RemoveEditorWindow(const std::string &name)
+{
+    m_editor_windows_.erase(name);
 }
 }
