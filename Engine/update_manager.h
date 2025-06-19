@@ -10,9 +10,9 @@ class UpdateManager
 {
     friend class Engine;
 
-    static std::vector<std::shared_ptr<IUpdateReceiver>> m_update_receivers_;
-    static std::vector<std::shared_ptr<IFixedUpdateReceiver>> m_fixed_update_receivers_;
-    static std::vector<std::shared_ptr<IDrawCallReceiver>> m_draw_call_receivers_;
+    static std::vector<std::weak_ptr<IUpdateReceiver>> m_update_receivers_;
+    static std::vector<std::weak_ptr<IFixedUpdateReceiver>> m_fixed_update_receivers_;
+    static std::vector<std::weak_ptr<IDrawCallReceiver>> m_draw_call_receivers_;
 
     static void InvokeUpdate();
     static void InvokeFixedUpdate();
@@ -41,17 +41,17 @@ public:
         return static_cast<int>(m_draw_call_receivers_.size());
     }
 
-    static const std::vector<std::shared_ptr<IUpdateReceiver>> &GetUpdateReceivers()
+    static const std::vector<std::weak_ptr<IUpdateReceiver>> &GetUpdateReceivers()
     {
         return m_update_receivers_;
     }
 
-    static const std::vector<std::shared_ptr<IFixedUpdateReceiver>> &GetFixedUpdateReceivers()
+    static const std::vector<std::weak_ptr<IFixedUpdateReceiver>> &GetFixedUpdateReceivers()
     {
         return m_fixed_update_receivers_;
     }
 
-    static const std::vector<std::shared_ptr<IDrawCallReceiver>> &GetDrawCallReceivers()
+    static const std::vector<std::weak_ptr<IDrawCallReceiver>> &GetDrawCallReceivers()
     {
         return m_draw_call_receivers_;
     }
