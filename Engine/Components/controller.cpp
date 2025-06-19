@@ -33,8 +33,10 @@ void Controller::OnUpdate()
     // Normalize movement vector if not zero
     dir.Normalize();
 
+    m_last_movement_input_ = dir;
+
     // Rotation input
-    Vector3 delta_rot = {0, 0, 0};
+    Vector2 delta_rot = {0, 0};
     if (CheckHitKey(KEY_INPUT_UP))
         delta_rot.x += rotate_speed;
     if (CheckHitKey(KEY_INPUT_DOWN))
@@ -43,6 +45,8 @@ void Controller::OnUpdate()
         delta_rot.y -= rotate_speed;
     if (CheckHitKey(KEY_INPUT_RIGHT))
         delta_rot.y += rotate_speed;
+
+    m_last_rotation_input_ = delta_rot;
 
     // Get transform
     const auto transform = GameObject()->Transform();
@@ -61,6 +65,13 @@ void Controller::OnUpdate()
         const Vector3 new_pos = transform->Position() + (world_dir * move_speed);
         transform->SetPosition(new_pos);
     }
+}
+void Controller::OnInspectorGui()
+{
+    ImGui::Text("Last Movement Input: {%.2f, %.2f, %.2f}",
+                m_last_movement_input_.x, m_last_movement_input_.y, m_last_movement_input_.z);
+    ImGui::Text("Last Rotation Input: {%.2f, %.2f}",
+                m_last_rotation_input_.x, m_last_rotation_input_.y);
 }
 }
 
