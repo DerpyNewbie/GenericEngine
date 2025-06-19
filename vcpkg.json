@@ -9,6 +9,7 @@
       "features": [
         "docking-experimental",
         "dx11-binding",
+        "dx12-binding",
         "win32-binding"
       ]
     },
