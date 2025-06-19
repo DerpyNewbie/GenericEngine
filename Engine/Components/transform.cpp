@@ -2,6 +2,7 @@
 
 #include "transform.h"
 #include "game_object.h"
+#include "Math/mathf.h"
 
 namespace engine
 {
@@ -198,14 +199,14 @@ void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const V
 }
 void Transform::RenderLocalTransformGui()
 {
-    if (!ImGui::CollapsingHeader("Local"))
+    if (!ImGui::CollapsingHeader("Local", ImGuiTreeNodeFlags_DefaultOpen))
         return;
 
     ImGui::PushID("Local");
 
     float local_pos[3], local_rot_euler[3], local_scale[3];
     EngineUtil::ToFloat3(local_pos, LocalPosition());
-    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEuler());
+    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEuler() * Mathf::kRad2Deg);
     EngineUtil::ToFloat3(local_scale, LocalScale());
 
     if (ImGui::InputFloat3("Position", local_pos) && ImGui::IsItemDeactivatedAfterEdit())
@@ -218,7 +219,10 @@ void Transform::RenderLocalTransformGui()
     {
         Logger::Log<Transform>("New Rotation: %f, %f, %f", local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]);
         SetLocalRotation(
-            Quaternion::CreateFromYawPitchRoll(local_rot_euler[1], local_rot_euler[0], local_rot_euler[2]));
+            Quaternion::CreateFromYawPitchRoll(
+                local_rot_euler[1] * Mathf::kDeg2Rad,
+                local_rot_euler[0] * Mathf::kDeg2Rad,
+                local_rot_euler[2] * Mathf::kDeg2Rad));
     }
 
     if (ImGui::InputFloat3("Scale", local_scale) && ImGui::IsItemDeactivatedAfterEdit())
@@ -238,7 +242,7 @@ void Transform::RenderGlobalTransformGui()
 
     float global_pos[3], global_rot_euler[3], global_scale[3];
     EngineUtil::ToFloat3(global_pos, Position());
-    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEuler());
+    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEuler() * Mathf::kRad2Deg);
     EngineUtil::ToFloat3(global_scale, Scale());
 
     if (ImGui::InputFloat3("Position", global_pos) && ImGui::IsItemDeactivatedAfterEdit())
@@ -251,7 +255,10 @@ void Transform::RenderGlobalTransformGui()
     {
         Logger::Log<Transform>("New Rotation: %f, %f, %f",
                                global_rot_euler[0], global_rot_euler[1], global_rot_euler[2]);
-        SetRotation(Quaternion::CreateFromYawPitchRoll(global_rot_euler[1], global_rot_euler[0], global_rot_euler[2]));
+        SetRotation(Quaternion::CreateFromYawPitchRoll(
+            global_rot_euler[1] * Mathf::kDeg2Rad,
+            global_rot_euler[0] * Mathf::kDeg2Rad,
+            global_rot_euler[2] * Mathf::kDeg2Rad));
     }
 
     if (ImGui::InputFloat3("Scale", global_scale) && ImGui::IsItemDeactivatedAfterEdit())
