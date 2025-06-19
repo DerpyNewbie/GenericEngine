@@ -22,10 +22,9 @@ public:
 
     std::shared_ptr<Transform> Transform() const;
 
-    bool IsActive() const
-    {
-        return m_is_active_;
-    }
+    bool IsActiveInHierarchy() const;
+
+    bool IsActiveSelf() const;
 
     void SetActive(bool is_active);
 
@@ -83,7 +82,7 @@ public:
 
     std::vector<std::shared_ptr<Component>> GetComponents() const
     {
-        return m_components_;    
+        return m_components_;
     }
 
     template <typename T>
@@ -148,12 +147,13 @@ private:
     friend class SceneManager;
     friend class Transform;
 
-    bool m_is_active_ = true;
+    bool m_is_active_self_ = true;
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
 
     void InvokeUpdate() const;
     void InvokeFixedUpdate() const;
+    void NotifyIsActiveChanged() const;
 
     void SetAsRootObject(bool is_root_object);
 
