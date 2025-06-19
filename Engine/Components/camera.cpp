@@ -20,12 +20,18 @@ void Camera::ApplyCameraSettingToDxLib() const
     }
 
     SetBackgroundColor(m_background_color_.r, m_background_color_.g, m_background_color_.b);
-    SetCameraNearFar(m_near_plane_, m_far_plane_);
     const auto transform = GameObject()->Transform();
 
-    SetCameraPositionAndTargetAndUpVec(DxLibConverter::From(transform->Position()),
-                                       DxLibConverter::From(transform->Position() + transform->Forward()),
-                                       DxLibConverter::From(transform->Up()));
+    int x, y;
+    GetDrawScreenSize(&x, &y);
+
+    const float aspect = static_cast<float>(x) / static_cast<float>(y);
+    const auto projection = Matrix::CreatePerspectiveFieldOfView(m_field_of_view_, aspect, m_near_plane_, m_far_plane_);
+    const auto view = Matrix::CreateLookAt(transform->Position(), transform->Position() + transform->Forward(),
+                                           transform->Up());
+
+    SetupCamera_ProjectionMatrix(DxLibConverter::From(projection));
+    SetCameraViewMatrix(DxLibConverter::From(view));
 }
 
 void Camera::OnUpdate()

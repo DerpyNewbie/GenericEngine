@@ -22,9 +22,9 @@ void Controller::OnUpdate()
     if (CheckHitKey(KEY_INPUT_S))
         dir.z += 1.0f;
     if (CheckHitKey(KEY_INPUT_D))
-        dir.x -= 1.0f;
-    if (CheckHitKey(KEY_INPUT_A))
         dir.x += 1.0f;
+    if (CheckHitKey(KEY_INPUT_A))
+        dir.x -= 1.0f;
     if (CheckHitKey(KEY_INPUT_SPACE))
         dir.y += 1.0f;
     if (CheckHitKey(KEY_INPUT_LCONTROL))
@@ -42,9 +42,9 @@ void Controller::OnUpdate()
     if (CheckHitKey(KEY_INPUT_DOWN))
         delta_rot.x -= rotate_speed;
     if (CheckHitKey(KEY_INPUT_LEFT))
-        delta_rot.y -= rotate_speed;
-    if (CheckHitKey(KEY_INPUT_RIGHT))
         delta_rot.y += rotate_speed;
+    if (CheckHitKey(KEY_INPUT_RIGHT))
+        delta_rot.y -= rotate_speed;
 
     m_last_rotation_input_ = delta_rot;
 
