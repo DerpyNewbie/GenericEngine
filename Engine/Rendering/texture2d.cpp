@@ -2,8 +2,6 @@
 
 #include "texture2d.h"
 
-#include "Math/color.h"
-
 namespace engine
 {
 int Texture2D::Width() const

@@ -1,6 +1,5 @@
 #pragma once
 #include "object.h"
-#include "Math/color.h"
 
 namespace engine
 {

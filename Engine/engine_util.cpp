@@ -27,4 +27,11 @@ void EngineUtil::ToFloat3(float buff[3], const Vector3 vec)
     buff[1] = vec.y;
     buff[2] = vec.z;
 }
+void EngineUtil::ToFloat4(float buff[4], const Color vec)
+{
+    buff[0] = vec.x;
+    buff[1] = vec.y;
+    buff[2] = vec.z;
+    buff[3] = vec.w;
+}
 }

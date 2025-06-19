@@ -127,12 +127,7 @@ void MeshRenderer::ReconstructBuffers()
         COLOR_U8 color = {255, 255, 255, 255};
         if (!shared_mesh->colors.empty())
         {
-            color = {
-                .b = shared_mesh->colors[i].b,
-                .g = shared_mesh->colors[i].g,
-                .r = shared_mesh->colors[i].r,
-                .a = shared_mesh->colors[i].a
-            };
+            color = DxLibConverter::From(shared_mesh->colors[i]);
         }
 
         raw_vertices[i].dif = color;
