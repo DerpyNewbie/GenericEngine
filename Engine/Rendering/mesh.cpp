@@ -119,7 +119,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
             }
         }
         // copy bone weights
-        result->bone_weights.reserve(mesh->mNumVertices);
+        result->bone_weights.resize(mesh->mNumVertices);
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
         {
             const auto &pair_map = vertex_bone_map.at(i);
