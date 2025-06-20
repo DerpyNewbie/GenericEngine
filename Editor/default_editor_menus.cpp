@@ -22,7 +22,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
         return;
     }
 
-    if (name == "Files")
+    if (name == "File")
     {
         DrawFilesMenu();
         return;
@@ -34,7 +34,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
         return;
     }
 
-    if (name == "Object")
+    if (name == "GameObject")
     {
         DrawObjectMenu();
         return;
@@ -42,7 +42,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 
     if (name == "Component")
     {
-        DrawComponentMenu();
+        DrawComponentMenu(std::dynamic_pointer_cast<engine::GameObject>(Editor::Instance()->SelectedObject()));
         return;
     }
 
@@ -63,100 +63,76 @@ void editor::DefaultEditorMenu::DrawDefaultMenu()
 }
 void editor::DefaultEditorMenu::DrawFilesMenu()
 {
-    if (ImGui::BeginMenu("Files"))
+    if (ImGui::MenuItem("Unload Scene"))
     {
-        if (ImGui::MenuItem("Unload Scene"))
-        {
-            engine::SceneManager::DestroyScene("Default Scene");
-        }
-        if (ImGui::MenuItem("Load Scene"))
-        {
-            engine::Serializer serializer;
-            engine::SceneManager::AddScene(serializer.Load<engine::Scene>("Default Scene.json"));
-        }
-        if (ImGui::MenuItem("Save Scene"))
-        {
-            engine::Serializer serializer;
-            serializer.Save(engine::SceneManager::GetActiveScene());
-        }
-        ImGui::EndMenu();
+        engine::SceneManager::DestroyScene("Default Scene");
+    }
+    if (ImGui::MenuItem("Load Scene"))
+    {
+        engine::Serializer serializer;
+        engine::SceneManager::AddScene(serializer.Load<engine::Scene>("Default Scene.json"));
+    }
+    if (ImGui::MenuItem("Save Scene"))
+    {
+        engine::Serializer serializer;
+        serializer.Save(engine::SceneManager::GetActiveScene());
     }
 }
 void editor::DefaultEditorMenu::DrawEditMenu()
 {
-    if (ImGui::BeginMenu("Edit"))
+    if (ImGui::BeginMenu("Prefs"))
     {
-        if (ImGui::BeginMenu("Prefs"))
-        {
-            ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
-            ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
+        ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
+        ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
 
-            ImGui::EndMenu();
-        }
         ImGui::EndMenu();
     }
 }
 void editor::DefaultEditorMenu::DrawObjectMenu()
 {
-    if (ImGui::BeginMenu("GameObject"))
+    if (ImGui::MenuItem("Create Empty"))
     {
-        if (ImGui::MenuItem("Create Empty"))
-        {
-            engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
-        }
-        ImGui::EndMenu();
+        engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
     }
 }
-void editor::DefaultEditorMenu::DrawComponentMenu()
+void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go)
 {
-    if (ImGui::BeginMenu("Component"))
+    if (go == nullptr)
     {
-        const auto obj = Editor::Instance()->SelectedObject();
-        const auto go = std::dynamic_pointer_cast<engine::GameObject>(obj);
-        if (go == nullptr)
-        {
-            ImGui::BeginDisabled();
-        }
+        ImGui::BeginDisabled();
+    }
 
 #define ADD_COMPONENT(type) if (ImGui::MenuItem(#type)) go->AddComponent<type>();
 
-        ADD_COMPONENT(engine::Camera)
-        ADD_COMPONENT(engine::Controller)
-        ADD_COMPONENT(engine::CubeRenderer)
-        ADD_COMPONENT(engine::FrameMetaData)
-        ADD_COMPONENT(engine::MeshRenderer)
-        ADD_COMPONENT(engine::MV1Renderer)
-        ADD_COMPONENT(engine::SkinnedMeshRenderer)
+    ADD_COMPONENT(engine::Camera)
+    ADD_COMPONENT(engine::Controller)
+    ADD_COMPONENT(engine::CubeRenderer)
+    ADD_COMPONENT(engine::FrameMetaData)
+    ADD_COMPONENT(engine::MeshRenderer)
+    ADD_COMPONENT(engine::MV1Renderer)
+    ADD_COMPONENT(engine::SkinnedMeshRenderer)
 
 #undef ADD_COMPONENT
 
-        if (go == nullptr)
-        {
-            ImGui::EndDisabled();
-        }
-
-        ImGui::EndMenu();
+    if (go == nullptr)
+    {
+        ImGui::EndDisabled();
     }
 }
 void editor::DefaultEditorMenu::DrawWindowMenu()
 {
-    if (ImGui::BeginMenu("Window"))
+    const auto editor = Editor::Instance();
+    const auto names = editor->GetEditorWindowNames();
+    for (auto &name : names)
     {
-        const auto editor = Editor::Instance();
-        const auto names = editor->GetEditorWindowNames();
-        for (auto &name : names)
+        // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
+        if (name == "Hierarchy")
         {
-            // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
-            if (name == "Hierarchy")
-            {
-                ImGui::BeginDisabled();
-                ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
-                ImGui::EndDisabled();
-                continue;
-            }
+            ImGui::BeginDisabled();
             ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
+            ImGui::EndDisabled();
+            continue;
         }
-
-        ImGui::EndMenu();
+        ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
 }

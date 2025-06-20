@@ -97,6 +97,12 @@ void GameObject::InvokeUpdate()
 
     for (auto &component : m_components_)
     {
+        if (component->IsDestroying())
+        {
+            Scene()->MarkDestroying(component);
+            continue;
+        }
+
         if (!component->m_has_called_start_)
         {
             Logger::Log<GameObject>("[%s] Calling first start for %s",

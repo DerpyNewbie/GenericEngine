@@ -96,9 +96,9 @@ void Editor::Init()
 
     {
         const auto default_menu = std::make_shared<DefaultEditorMenu>();
-        AddEditorMenu("Files", default_menu, -1000);
+        AddEditorMenu("File", default_menu, -1000);
         AddEditorMenu("Edit", default_menu, -990);
-        AddEditorMenu("Object", default_menu, -980);
+        AddEditorMenu("GameObject", default_menu, -980);
         AddEditorMenu("Component", default_menu, -970);
         AddEditorMenu("Window", default_menu, -960);
     }
@@ -201,7 +201,11 @@ void Editor::DrawEditorMenuBar() const
 
     for (const auto &menu : m_editor_menus_)
     {
-        menu.menu->OnEditorMenuGui(menu.name);
+        if (ImGui::BeginMenu(menu.name.c_str()))
+        {
+            menu.menu->OnEditorMenuGui(menu.name);
+            ImGui::EndMenu();
+        }
     }
 
     ImGui::EndMenuBar();

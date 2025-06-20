@@ -2,6 +2,7 @@
 
 #include "inspector.h"
 
+#include "default_editor_menus.h"
 #include "imgui_stdlib.h"
 #include "game_object.h"
 
@@ -77,9 +78,20 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
              const auto &component : all_components)
         {
             ImGui::PushID(component.get());
-            if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str(),
+            auto component_name = engine::EngineUtil::GetTypeName(typeid(*component).name());
+            if (ImGui::CollapsingHeader(component_name.c_str(),
                                         ImGuiTreeNodeFlags_DefaultOpen))
             {
+                if (ImGui::BeginPopupContextItem("##INSPECTOR_COMPONENT_POPUP"))
+                {
+                    if (ImGui::MenuItem("Remove", nullptr, false, component_name != "Transform"))
+                    {
+                        engine::Object::Destroy(component);
+                    }
+
+                    ImGui::EndPopup();
+                }
+
                 ImGui::Indent();
                 component->OnInspectorGui();
                 ImGui::Unindent();
@@ -87,5 +99,18 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
             ImGui::PopID();
         }
     }
+
+    ImGui::Separator();
+    if (ImGui::BeginPopup("##INSPECTOR_ADD_COMPONENT_POPUP"))
+    {
+        DefaultEditorMenu::DrawComponentMenu(game_object);
+        ImGui::EndPopup();
+    }
+
+    if (ImGui::Button("Add Component"))
+    {
+        ImGui::OpenPopup("##INSPECTOR_ADD_COMPONENT_POPUP");
+    }
+
 }
 }

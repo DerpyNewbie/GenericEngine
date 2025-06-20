@@ -16,6 +16,19 @@ void Scene::OnConstructed()
 }
 void Scene::OnUpdate()
 {
+    if (!m_destroying_components_.empty())
+    {
+        Logger::Log<Scene>("Destroying %d components", m_destroying_components_.size());
+        for (const auto &component : m_destroying_components_)
+        {
+            component->OnDestroy();
+            const auto go = component->GameObject();
+            go->m_components_.erase(std::ranges::find(component->GameObject()->m_components_, component));
+        }
+
+        m_destroying_components_.clear();
+    }
+
     if (!m_destroying_objects_.empty())
     {
         Logger::Log<Scene>("Destroying %d game objects", m_destroying_objects_.size());
@@ -59,6 +72,10 @@ void Scene::MarkDestroying(const std::shared_ptr<GameObject> &game_object)
     {
         MarkDestroying(transform->GetChild(i)->GameObject());
     }
+}
+void Scene::MarkDestroying(const std::shared_ptr<Component> &component)
+{
+    m_destroying_components_.emplace(component);
 }
 const std::vector<std::shared_ptr<GameObject>> &Scene::RootGameObjects()
 {
