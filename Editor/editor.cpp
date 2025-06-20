@@ -87,10 +87,8 @@ void Editor::Init()
     }
 
     {
-        const auto hierarchy = std::make_shared<Hierarchy>();
-
-        AddEditorWindow("Hierarchy", hierarchy);
-        AddEditorWindow("Inspector", std::make_shared<Inspector>(&hierarchy->selected_game_object));
+        AddEditorWindow("Hierarchy", std::make_shared<Hierarchy>());
+        AddEditorWindow("Inspector", std::make_shared<Inspector>());
         AddEditorWindow("Editor Prefs", std::make_shared<EditorPrefs>());
         AddEditorWindow("Profiler", std::make_shared<Profiler>());
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
@@ -148,6 +146,14 @@ void Editor::Finalize()
     ImGui_ImplDX11_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
+}
+void Editor::SetSelectedObject(const std::shared_ptr<engine::Object> &object)
+{
+    m_selected_object_ = object;
+}
+std::shared_ptr<engine::Object> Editor::SelectedObject() const
+{
+    return m_selected_object_.lock();
 }
 void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
 {

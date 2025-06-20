@@ -30,6 +30,7 @@ class Editor final : public enable_shared_from_base<Editor>, public IDrawCallRec
     static Editor *m_instance_;
 
     int m_last_editor_style_ = -1;
+    std::weak_ptr<engine::Object> m_selected_object_;
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
     std::vector<PrioritizedEditorMenu> m_editor_menus_;
 
@@ -50,6 +51,9 @@ public:
     void Update();
     void Attach();
     void Finalize();
+
+    void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
+    std::shared_ptr<engine::Object> SelectedObject() const;
 
     void AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window);
     std::vector<std::string> GetEditorWindowNames();

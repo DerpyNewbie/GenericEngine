@@ -7,30 +7,46 @@
 
 namespace editor
 {
-Inspector::Inspector(std::shared_ptr<engine::GameObject> *selected_obj_ptr) : selected_game_object_ptr(selected_obj_ptr)
-{}
 std::string Inspector::Name()
 {
     return "Inspector";
 }
 void Inspector::OnEditorGui()
 {
-    if (selected_game_object_ptr == nullptr)
+    if (ImGui::BeginPopupContextItem("Context!"))
     {
-        ImGui::Text("Inspector is uninitialized!");
+        ImGui::MenuItem("Locked", nullptr, &m_locked_);
+        ImGui::EndPopup();
+    }
+
+    if (!m_locked_)
+    {
+        m_last_seen_object_ = Editor::Instance()->SelectedObject();
+    }
+
+    const auto selected_obj = m_last_seen_object_.lock();
+
+    if (selected_obj == nullptr)
+    {
+        ImGui::Text("Select a object to inspect...");
         return;
     }
 
-    const std::shared_ptr<engine::GameObject> selected_go = *selected_game_object_ptr;
-    if (selected_go == nullptr)
+    const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(selected_obj);
+    if (game_object != nullptr)
     {
-        ImGui::Text("Select game object to inspect...");
+        DrawGameObject(game_object);
         return;
     }
 
+    ImGui::Text("Unknown object type is selected!");
+    ImGui::Text("Object Name: '%s'", selected_obj->Name().c_str());
+}
+void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
+{
     // game object path info
     {
-        std::string path = selected_go->Path();
+        std::string path = game_object->Path();
         ImGui::InputText("##INSPECTOR_GAME_OBJECT_PATH", &path, ImGuiInputTextFlags_ReadOnly);
     }
 
@@ -38,18 +54,18 @@ void Inspector::OnEditorGui()
 
     // game object header
     {
-        bool is_active_self = selected_go->IsActiveSelf();
+        bool is_active_self = game_object->IsActiveSelf();
         if (ImGui::Checkbox("##INSPECTOR_GAME_OBJECT_ACTIVE", &is_active_self))
         {
-            selected_go->SetActive(is_active_self);
+            game_object->SetActive(is_active_self);
         }
 
         ImGui::SameLine();
 
-        std::string buff = selected_go->Name();
+        std::string buff = game_object->Name();
         if (ImGui::InputText("##INSPECTOR_GAME_OBJECT_NAME", &buff))
         {
-            selected_go->SetName(buff);
+            game_object->SetName(buff);
         }
     }
 
@@ -57,7 +73,7 @@ void Inspector::OnEditorGui()
 
     // game object components
     {
-        for (const auto all_components = selected_go->GetComponents();
+        for (const auto all_components = game_object->GetComponents();
              const auto &component : all_components)
         {
             ImGui::PushID(component.get());

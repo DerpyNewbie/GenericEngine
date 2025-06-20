@@ -123,6 +123,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
     {
         selected_game_object = game_object;
+        Editor::Instance()->SetSelectedObject(selected_game_object);
     }
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
@@ -133,6 +134,13 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
         ImGui::Text("Dragging %s", game_object->Path().c_str());
         ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        ImGui::Text("Game Object Context Menu for %s", game_object->Path().c_str());
+
+        ImGui::EndPopup();
     }
 
     return is_tree_expanded;

@@ -10,10 +10,12 @@ namespace editor
 {
 class Inspector final : public EditorWindow
 {
-public:
-    std::shared_ptr<engine::GameObject> *selected_game_object_ptr;
+    bool m_locked_ = false;
+    std::weak_ptr<engine::Object> m_last_seen_object_;
 
-    explicit Inspector(std::shared_ptr<engine::GameObject> *selected_obj_ptr);
+    static void DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object);
+
+public:
     std::string Name() override;
     void OnEditorGui() override;
 };
