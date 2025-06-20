@@ -13,6 +13,7 @@ public:
     /// @brief アプリケーションのスタート
     void StartApp();
 
+    static LRESULT WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
     static int WindowWidth();
     static int WindowHeight();
     static HWND GetWindowHandle();
