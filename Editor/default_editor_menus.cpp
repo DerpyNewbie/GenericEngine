@@ -6,6 +6,13 @@
 #include "serializer.h"
 #include "game_object.h"
 #include "scene.h"
+#include "Components/camera.h"
+#include "Components/controller.h"
+#include "Components/cube_renderer.h"
+#include "Components/frame_meta_data.h"
+#include "Components/mesh_renderer.h"
+#include "Components/mv1_renderer.h"
+#include "Components/skinned_mesh_renderer.h"
 
 void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 {
@@ -30,6 +37,12 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
     if (name == "Object")
     {
         DrawObjectMenu();
+        return;
+    }
+
+    if (name == "Component")
+    {
+        DrawComponentMenu();
         return;
     }
 
@@ -85,12 +98,43 @@ void editor::DefaultEditorMenu::DrawEditMenu()
 }
 void editor::DefaultEditorMenu::DrawObjectMenu()
 {
-    if (ImGui::BeginMenu("Object"))
+    if (ImGui::BeginMenu("GameObject"))
     {
         if (ImGui::MenuItem("Create Empty"))
         {
             engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
         }
+        ImGui::EndMenu();
+    }
+}
+void editor::DefaultEditorMenu::DrawComponentMenu()
+{
+    if (ImGui::BeginMenu("Component"))
+    {
+        const auto obj = Editor::Instance()->SelectedObject();
+        const auto go = std::dynamic_pointer_cast<engine::GameObject>(obj);
+        if (go == nullptr)
+        {
+            ImGui::BeginDisabled();
+        }
+
+#define ADD_COMPONENT(type) if (ImGui::MenuItem(#type)) go->AddComponent<type>();
+
+        ADD_COMPONENT(engine::Camera)
+        ADD_COMPONENT(engine::Controller)
+        ADD_COMPONENT(engine::CubeRenderer)
+        ADD_COMPONENT(engine::FrameMetaData)
+        ADD_COMPONENT(engine::MeshRenderer)
+        ADD_COMPONENT(engine::MV1Renderer)
+        ADD_COMPONENT(engine::SkinnedMeshRenderer)
+
+#undef ADD_COMPONENT
+
+        if (go == nullptr)
+        {
+            ImGui::EndDisabled();
+        }
+
         ImGui::EndMenu();
     }
 }

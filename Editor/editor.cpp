@@ -96,10 +96,11 @@ void Editor::Init()
 
     {
         const auto default_menu = std::make_shared<DefaultEditorMenu>();
-        AddEditorMenu("Edit", default_menu, -990);
-        AddEditorMenu("Window", default_menu, -970);
-        AddEditorMenu("Object", default_menu, -980);
         AddEditorMenu("Files", default_menu, -1000);
+        AddEditorMenu("Edit", default_menu, -990);
+        AddEditorMenu("Object", default_menu, -980);
+        AddEditorMenu("Component", default_menu, -970);
+        AddEditorMenu("Window", default_menu, -960);
     }
 }
 void Editor::Update()

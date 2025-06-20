@@ -12,6 +12,7 @@ public:
     static void DrawFilesMenu();
     static void DrawEditMenu();
     static void DrawObjectMenu();
+    static void DrawComponentMenu();
     static void DrawWindowMenu();
 };
 }
