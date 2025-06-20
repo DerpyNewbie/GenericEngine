@@ -5,12 +5,13 @@
 
 namespace editor
 {
-class Hierarchy : public IEditorWindow
+class Hierarchy final : public EditorWindow
 {
 public:
     std::shared_ptr<engine::GameObject> selected_game_object;
 
-    void OnConstructed() override;
+    Hierarchy();
+    std::string Name() override;
     void OnEditorGui() override;
 
 private:

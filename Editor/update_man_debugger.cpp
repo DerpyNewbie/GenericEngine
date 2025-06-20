@@ -34,11 +34,9 @@ static void DrawBulletText(const std::vector<std::weak_ptr<T>> &vec)
         ImGui::BulletText("%llu: %d, %s", i, locked->Order(), typeid(*locked).name());
     }
 }
-
-void UpdateManDebugger::OnConstructed()
+std::string UpdateManDebugger::Name()
 {
-    IEditorWindow::OnConstructed();
-    SetName("Update Manager Debugger");
+    return "Update Manager Debugger";
 }
 void UpdateManDebugger::OnEditorGui()
 {

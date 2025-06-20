@@ -7,10 +7,11 @@
 
 namespace editor
 {
-void Inspector::OnConstructed()
+Inspector::Inspector(std::shared_ptr<engine::GameObject> *selected_obj_ptr) : selected_game_object_ptr(selected_obj_ptr)
+{}
+std::string Inspector::Name()
 {
-    IEditorWindow::OnConstructed();
-    SetName("Inspector");
+    return "Inspector";
 }
 void Inspector::OnEditorGui()
 {

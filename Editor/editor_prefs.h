@@ -3,13 +3,13 @@
 
 namespace editor
 {
-class EditorPrefs : public IEditorWindow
+class EditorPrefs final : public EditorWindow
 {
 public:
     static bool show_grid;
     static int theme;
 
-    void OnConstructed() override;
+    std::string Name() override;
     void OnEditorGui() override;
 };
 }

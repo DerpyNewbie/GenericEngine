@@ -6,12 +6,13 @@
 
 namespace editor
 {
-class IEditorWindow;
+class EditorWindow;
 
 class Editor final : public enable_shared_from_base<Editor>, public IDrawCallReceiver
 {
     int m_last_editor_style_ = -1;
-    std::unordered_map<std::string, std::shared_ptr<IEditorWindow>> m_editor_windows_;
+    std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
+
     void SetEditorStyle(int i);
 
 public:
@@ -27,9 +28,9 @@ public:
     void OnDraw() override;
     void Finalize();
 
-    void AddEditorWindow(const std::string &name, std::shared_ptr<IEditorWindow> window);
+    void AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window);
     std::vector<std::string> GetEditorWindowNames();
-    std::shared_ptr<IEditorWindow> GetEditorWindow(const std::string &name);
+    std::shared_ptr<EditorWindow> GetEditorWindow(const std::string &name);
     void RemoveEditorWindow(const std::string &name);
 };
 }

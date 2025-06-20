@@ -1,9 +1,12 @@
 #pragma once
 #include "editor_window.h"
 
-class Profiler final : public editor::IEditorWindow
+namespace editor
+{
+class Profiler final : public EditorWindow
 {
 public:
-    void OnConstructed() override;
+    std::string Name() override;
     void OnEditorGui() override;
 };
+}

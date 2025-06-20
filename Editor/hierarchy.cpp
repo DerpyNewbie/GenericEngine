@@ -12,11 +12,13 @@
 
 namespace editor
 {
-void Hierarchy::OnConstructed()
+Hierarchy::Hierarchy()
 {
-    IEditorWindow::OnConstructed();
-    SetName("Hierarchy");
     window_flags = ImGuiWindowFlags_MenuBar;
+}
+std::string Hierarchy::Name()
+{
+    return "Hierarchy";
 }
 void Hierarchy::OnEditorGui()
 {
@@ -76,7 +78,7 @@ void Hierarchy::DrawMenu()
     {
         if (ImGui::MenuItem("Create Empty"))
         {
-            Instantiate<engine::GameObject>("Empty GameObject");
+            engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
         }
         ImGui::EndMenu();
     }

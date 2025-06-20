@@ -77,15 +77,13 @@ void Editor::Init()
     }
 
     {
-        const auto hierarchy = engine::Object::Instantiate<Hierarchy>();
-        const auto inspector = engine::Object::Instantiate<Inspector>();
-        inspector->selected_game_object_ptr = &hierarchy->selected_game_object;
+        const auto hierarchy = std::make_shared<Hierarchy>();
 
-        AddEditorWindow("Inspector", inspector);
         AddEditorWindow("Hierarchy", hierarchy);
-        AddEditorWindow("Editor Prefs", engine::Object::Instantiate<EditorPrefs>());
-        AddEditorWindow("Profiler", engine::Object::Instantiate<Profiler>());
-        AddEditorWindow("Update Manager Debugger", engine::Object::Instantiate<UpdateManDebugger>());
+        AddEditorWindow("Inspector", std::make_shared<Inspector>(&hierarchy->selected_game_object));
+        AddEditorWindow("Editor Prefs", std::make_shared<EditorPrefs>());
+        AddEditorWindow("Profiler", std::make_shared<Profiler>());
+        AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
     }
 }
 void Editor::Update()
@@ -133,7 +131,7 @@ void Editor::Finalize()
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
-void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<IEditorWindow> window)
+void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
 {
     window->editor = this;
     m_editor_windows_.emplace(name, window);
@@ -143,7 +141,7 @@ std::vector<std::string> Editor::GetEditorWindowNames()
     auto keys = std::views::keys(m_editor_windows_);
     return {keys.begin(), keys.end()};
 }
-std::shared_ptr<IEditorWindow> Editor::GetEditorWindow(const std::string &name)
+std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
 {
     return m_editor_windows_.at(name);
 }

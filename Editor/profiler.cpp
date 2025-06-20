@@ -44,10 +44,11 @@ static float g_history_seconds = 5.0f;
 static std::unordered_map<std::string, ScrollingBuffer<ImVec2>> g_history;
 static auto g_history_sum = ScrollingBuffer<ImVec2>(g_history_data_size);
 
-void Profiler::OnConstructed()
+namespace editor
 {
-    IEditorWindow::OnConstructed();
-    SetName("Profiler");
+std::string Profiler::Name()
+{
+    return "Profiler";
 }
 void Profiler::OnEditorGui()
 {
@@ -96,4 +97,5 @@ void Profiler::OnEditorGui()
 
         ImPlot::EndPlot();
     }
+}
 }
