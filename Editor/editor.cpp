@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 
 #include "editor.h"
+
+#include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "hierarchy.h"
 #include "inspector.h"
@@ -27,6 +29,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+Editor *Editor::m_instance_ = nullptr;
+
 void Editor::SetEditorStyle(const int i)
 {
     if (m_last_editor_style_ == i)
@@ -47,8 +51,14 @@ void Editor::SetEditorStyle(const int i)
 
     m_last_editor_style_ = i;
 }
+Editor *Editor::Instance()
+{
+    return m_instance_;
+}
 void Editor::Init()
 {
+    m_instance_ = this;
+
     {
         // imgui init
         IMGUI_CHECKVERSION();
@@ -84,6 +94,14 @@ void Editor::Init()
         AddEditorWindow("Editor Prefs", std::make_shared<EditorPrefs>());
         AddEditorWindow("Profiler", std::make_shared<Profiler>());
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
+    }
+
+    {
+        const auto default_menu = std::make_shared<DefaultEditorMenu>();
+        AddEditorMenu("Edit", default_menu, -990);
+        AddEditorMenu("Window", default_menu, -970);
+        AddEditorMenu("Object", default_menu, -980);
+        AddEditorMenu("Files", default_menu, -1000);
     }
 }
 void Editor::Update()
@@ -133,7 +151,6 @@ void Editor::Finalize()
 }
 void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
 {
-    window->editor = this;
     m_editor_windows_.emplace(name, window);
 }
 std::vector<std::string> Editor::GetEditorWindowNames()
@@ -148,5 +165,42 @@ std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
 void Editor::RemoveEditorWindow(const std::string &name)
 {
     m_editor_windows_.erase(name);
+}
+void Editor::AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, const int priority)
+{
+    m_editor_menus_.emplace_back(name, menu, priority);
+    std::ranges::sort(m_editor_menus_, std::ranges::less(), &PrioritizedEditorMenu::priority);
+}
+
+std::vector<Editor::PrioritizedEditorMenu> Editor::GetEditorMenus()
+{
+    return m_editor_menus_;
+}
+std::shared_ptr<EditorMenu> Editor::GetEditorMenu(const std::string &name)
+{
+    const auto item = std::ranges::find(m_editor_menus_, name, &PrioritizedEditorMenu::name);
+    return item->menu;
+}
+void Editor::RemoveEditorMenu(const std::string &name)
+{
+    m_editor_menus_.erase(std::ranges::find_if(m_editor_menus_, [&](const auto &m) {
+        return m.name == name;
+    }));
+}
+void Editor::DrawEditorMenuBar() const
+{
+    if (!ImGui::BeginMenuBar())
+        return;
+
+    for (const auto &menu : m_editor_menus_)
+    {
+        menu.menu->OnEditorMenuGui(menu.name);
+    }
+
+    ImGui::EndMenuBar();
+}
+void Editor::DrawEditorMenu(const std::string &name)
+{
+    GetEditorMenu(name)->OnEditorMenuGui(name);
 }
 }

@@ -19,6 +19,8 @@
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
+        <ClCompile Include="Editor\default_editor_menus.cpp"/>
+        <ClCompile Include="Editor\editor_menu.cpp"/>
         <ClCompile Include="Editor\editor_prefs.cpp"/>
         <ClCompile Include="Editor\editor_window.cpp"/>
         <ClCompile Include="Editor\editor.cpp"/>
@@ -59,6 +61,8 @@
         </ClCompile>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="Editor\default_editor_menus.h"/>
+        <ClInclude Include="Editor\editor_menu.h"/>
         <ClInclude Include="Editor\editor_prefs.h"/>
         <ClInclude Include="Editor\editor_window.h"/>
         <ClInclude Include="Editor\editor.h"/>

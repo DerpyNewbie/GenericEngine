@@ -13,7 +13,6 @@ public:
 
     bool is_open = true;
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
-    Editor *editor;
 
     virtual std::string Name();
     virtual void OnEditorGui() = 0;
