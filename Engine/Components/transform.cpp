@@ -268,7 +268,13 @@ void Transform::RenderGlobalTransformGui()
 
     ImGui::PopID();
 }
-
+void Transform::NotifyDestroy() const
+{
+    for (const auto child : m_children_)
+    {
+        child->GameObject()->NotifyDestroy();
+    }
+}
 } // namespace engine
 
 CEREAL_REGISTER_TYPE(engine::Transform)

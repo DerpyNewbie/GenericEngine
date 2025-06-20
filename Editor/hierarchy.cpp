@@ -31,11 +31,12 @@ void Hierarchy::OnEditorGui()
         ImGui::PopID();
     }
 
-    if (selected_game_object != nullptr)
+    const auto locked = selected_game_object.lock();
+    if (locked != nullptr)
     {
         SetFontSize(12);
-        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(selected_game_object->Name()).c_str(),
-                                    DxLibConverter::From(selected_game_object->Transform()->WorldToLocal()));
+        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(locked->Name()).c_str(),
+                                    DxLibConverter::From(locked->Transform()->WorldToLocal()));
     }
 }
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
@@ -120,10 +121,12 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     }
 
     ImGui::SameLine();
-    if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
+
+    const auto locked = selected_game_object.lock();
+    if (ImGui::Selectable(game_object->Name().c_str(), game_object == locked))
     {
         selected_game_object = game_object;
-        Editor::Instance()->SetSelectedObject(selected_game_object);
+        Editor::Instance()->SetSelectedObject(locked);
     }
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
@@ -139,6 +142,10 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     if (ImGui::BeginPopupContextItem())
     {
         ImGui::Text("Game Object Context Menu for %s", game_object->Path().c_str());
+        if (ImGui::MenuItem("Delete"))
+        {
+            engine::Object::Destroy(game_object);
+        }
 
         ImGui::EndPopup();
     }

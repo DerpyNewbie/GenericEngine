@@ -8,7 +8,7 @@ namespace editor
 class Hierarchy final : public EditorWindow
 {
 public:
-    std::shared_ptr<engine::GameObject> selected_game_object;
+    std::weak_ptr<engine::GameObject> selected_game_object;
 
     Hierarchy();
     std::string Name() override;

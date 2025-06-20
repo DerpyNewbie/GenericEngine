@@ -20,6 +20,10 @@ public:
 
     void OnConstructed() override;
 
+    void OnDestroy() override;
+
+    void NotifyDestroy();
+
     std::shared_ptr<Transform> Transform() const;
 
     bool IsActiveInHierarchy() const;
@@ -31,7 +35,8 @@ public:
     std::shared_ptr<Scene> Scene() const;
 
     std::string Path() const;
-    std::string PathFrom(const std::shared_ptr<GameObject> &parent);
+
+    std::string PathFrom(const std::shared_ptr<GameObject> &parent) const;
 
     template <typename T>
     std::shared_ptr<T> AddComponent()
@@ -45,7 +50,7 @@ public:
         m_components_.push_back(instance);
 
         instance->OnAwake();
-        Logger::Log<GameObject>("(%s): Added component '%s'", Path().c_str(), instance->m_name_.c_str());
+        Logger::Log<GameObject>("(%s): Added component '%s'", Path().c_str(), instance->Name().c_str());
         return instance;
     }
 
@@ -151,7 +156,7 @@ private:
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
 
-    void InvokeUpdate() const;
+    void InvokeUpdate();
     void InvokeFixedUpdate() const;
     void NotifyIsActiveChanged() const;
 
