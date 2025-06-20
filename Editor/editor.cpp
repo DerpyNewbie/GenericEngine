@@ -2,10 +2,13 @@
 
 #include "editor.h"
 
+#include "application.h"
+
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -20,9 +23,11 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+
 void Editor::Init()
 {
     {
+        Application::AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
