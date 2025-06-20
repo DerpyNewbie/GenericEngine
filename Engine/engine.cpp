@@ -15,6 +15,10 @@
 #include "scene_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "application.h"
+#include "Rendering/CabotEngine/Core/Timer.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
+#include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
 
 #include <DxLib.h>
 
@@ -33,12 +37,9 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-
-    if (DxLib_Init() == -1)
-    {
-        should_exit = true;
-        return false;
-    }
+    g_DescriptorHeapManager = new DescriptorHeapManager();
+    g_RootSignatureManager.Initialize();
+    g_PSOManager.Initialize();
 
     Time::Get()->Init();
     SceneManager::CreateScene("Default Scene");
@@ -47,28 +48,37 @@ bool Engine::Init()
 }
 void Engine::MainLoop() const
 {
-    while (ProcessMessage() == 0 && !should_exit)
+    MSG msg = {};
+    while (WM_QUIT != msg.message)
     {
-        Profiler::NewFrame();
-        Time::Get()->IncrementFrame();
-
-        Profiler::Begin("Update");
-        UpdateManager::InvokeUpdate();
-        Profiler::End("Update");
-
-        Profiler::Begin("Fixed Update");
-        const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
-        for (int i = 0; i < fixed_update_count; i++)
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE == TRUE))
         {
-            UpdateManager::InvokeFixedUpdate();
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
-        Profiler::End("Fixed Update");
+        else
+        {
+            Profiler::NewFrame();
+            Time::Get()->IncrementFrame();
 
-        Profiler::Begin("Draw Call");
-        g_RenderEngine->BeginRender();
-        UpdateManager::InvokeDrawCall();
-        g_RenderEngine->EndRender();
-        Profiler::End("Draw Call");
+            Profiler::Begin("Update");
+            UpdateManager::InvokeUpdate();
+            Profiler::End("Update");
+
+            Profiler::Begin("Fixed Update");
+            const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
+            for (int i = 0; i < fixed_update_count; i++)
+            {
+                UpdateManager::InvokeFixedUpdate();
+            }
+            Profiler::End("Fixed Update");
+
+            Profiler::Begin("Draw Call");
+            g_RenderEngine->BeginRender();
+            UpdateManager::InvokeDrawCall();
+            g_RenderEngine->EndRender();
+            Profiler::End("Draw Call");
+        }
     }
 }
 }
