@@ -1,16 +1,15 @@
 #pragma once
 #include <directxtk12/SimpleMath.h>
 #include "bounds.h"
-#include "color.h"
 
 using namespace DirectX::SimpleMath;
 
 namespace cereal
 {
 template <class Archive>
-void serialize(Archive &ar, engine::Color &v)
+void serialize(Archive &ar, Color &v)
 {
-    ar(v.r, v.g, v.b, v.a);
+    ar(v.x, v.y, v.z, v.w);
 }
 template <class Archive>
 void serialize(Archive &ar, engine::Bounds &v)

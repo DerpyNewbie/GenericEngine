@@ -1,4 +1,5 @@
 #pragma once
+#include "editor.h"
 #include "object.h"
 
 #include <imgui.h>
@@ -10,6 +11,7 @@ class IEditorWindow : public engine::Object
 public:
     bool is_open = true;
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
+    Editor *editor;
 
     virtual void OnEditorGui() = 0;
     void DrawGui();

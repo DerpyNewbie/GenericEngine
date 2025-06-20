@@ -1,12 +1,13 @@
 #pragma once
 #include "component.h"
-#include "Math/color.h"
 
 namespace engine
 {
 class Camera : public Component
 {
-    enum kViewMode
+
+
+    enum class kViewMode : unsigned char
     {
         kPerspective,
         kOrthographic
@@ -14,7 +15,7 @@ class Camera : public Component
 
     static std::weak_ptr<Camera> m_main_camera_;
 
-    kViewMode m_view_mode_ = kPerspective;
+    kViewMode m_view_mode_ = kViewMode::kPerspective;
     float m_field_of_view_ = 70;
     float m_near_plane_ = 0.1f;
     float m_far_plane_ = 1000.0f;
@@ -24,8 +25,14 @@ class Camera : public Component
     void ApplyCameraSettingToDxLib() const;
 
 public:
+    static constexpr float min_field_of_view = 1.0f;
+    static constexpr float max_field_of_view = 179.0f;
+    static constexpr float min_clipping_plane = 0.01f;
+    static constexpr float max_clipping_plane = 10000.0f;
+
     void OnAwake() override;
     void OnUpdate() override;
+    void OnInspectorGui() override;
 
     static std::weak_ptr<Camera> Main();
 

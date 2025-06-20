@@ -187,7 +187,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST
         result->vertices[i] = DxLibConverter::To(vertex.Position);
         result->uvs[0][i] = DxLibConverter::To(vertex.TexCoord[0]);
         result->uvs[1][i] = DxLibConverter::To(vertex.TexCoord[1]);
-        result->colors[i] = vertex.DiffuseColor;
+        result->colors[i] = DxLibConverter::To(vertex.DiffuseColor);
         result->normals[i] = DxLibConverter::To(vertex.Normal);
     }
 

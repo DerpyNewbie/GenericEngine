@@ -4,6 +4,7 @@
 
 #include "game_object.h"
 #include "transform.h"
+#include "Math/mathf.h"
 
 namespace engine
 {
@@ -11,15 +12,15 @@ void Controller::OnUpdate()
 {
     Component::OnUpdate();
 
-    const float move_speed = 0.1f; // Adjust this value to control movement speed
-    const float rotate_speed = 2.0f; // Adjust this value to control rotation speed
+    constexpr float move_speed = 2.0f; // Adjust this value to control movement speed
+    constexpr float rotate_speed = 2.0f * Mathf::kDeg2Rad; // Adjust this value to control rotation speed
 
     // Movement input
     Vector3 dir = {0, 0, 0};
     if (CheckHitKey(KEY_INPUT_W))
-        dir.z += 1.0f;
-    if (CheckHitKey(KEY_INPUT_S))
         dir.z -= 1.0f;
+    if (CheckHitKey(KEY_INPUT_S))
+        dir.z += 1.0f;
     if (CheckHitKey(KEY_INPUT_D))
         dir.x += 1.0f;
     if (CheckHitKey(KEY_INPUT_A))
@@ -30,14 +31,12 @@ void Controller::OnUpdate()
         dir.y -= 1.0f;
 
     // Normalize movement vector if not zero
-    const float length = dir.Length();
-    if (length > 0.001f)
-    {
-        dir = dir * move_speed / length;
-    }
+    dir.Normalize();
+
+    m_last_movement_input_ = dir;
 
     // Rotation input
-    Vector3 delta_rot = {0, 0, 0};
+    Vector2 delta_rot = {0, 0};
     if (CheckHitKey(KEY_INPUT_UP))
         delta_rot.x += rotate_speed;
     if (CheckHitKey(KEY_INPUT_DOWN))
@@ -46,6 +45,8 @@ void Controller::OnUpdate()
         delta_rot.y += rotate_speed;
     if (CheckHitKey(KEY_INPUT_RIGHT))
         delta_rot.y -= rotate_speed;
+
+    m_last_rotation_input_ = delta_rot;
 
     // Get transform
     const auto transform = GameObject()->Transform();
@@ -58,12 +59,19 @@ void Controller::OnUpdate()
     }
 
     // Apply movement in local space
-    if (length > 0.001f)
+    if (dir.Length() > 0.001f)
     {
-        const Vector3 world_dir = transform->Rotation() * dir;
-        const Vector3 new_pos = transform->Position() + world_dir;
+        const Vector3 world_dir = Vector3::Transform(dir, transform->Rotation());
+        const Vector3 new_pos = transform->Position() + (world_dir * move_speed);
         transform->SetPosition(new_pos);
     }
+}
+void Controller::OnInspectorGui()
+{
+    ImGui::Text("Last Movement Input: {%.2f, %.2f, %.2f}",
+                m_last_movement_input_.x, m_last_movement_input_.y, m_last_movement_input_.z);
+    ImGui::Text("Last Rotation Input: {%.2f, %.2f}",
+                m_last_rotation_input_.x, m_last_rotation_input_.y);
 }
 }
 

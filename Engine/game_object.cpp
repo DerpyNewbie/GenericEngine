@@ -25,27 +25,33 @@ std::shared_ptr<Transform> GameObject::Transform() const
 {
     return GetComponent<engine::Transform>();
 }
+bool GameObject::IsActiveInHierarchy() const
+{
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        const auto parent = transform->Parent();
+        if (parent != nullptr)
+        {
+            return parent->GameObject()->IsActiveInHierarchy() && m_is_active_self_;
+        }
+    }
 
+    return m_is_active_self_;
+}
+bool GameObject::IsActiveSelf() const
+{
+    return m_is_active_self_;
+}
 void GameObject::SetActive(const bool is_active)
 {
-    if (m_is_active_ == is_active)
+    if (m_is_active_self_ == is_active)
     {
         return;
     }
 
-    m_is_active_ = is_active;
-
-    for (const auto &component : m_components_)
-    {
-        if (m_is_active_)
-        {
-            component->OnEnabled();
-        }
-        else
-        {
-            component->OnDisabled();
-        }
-    }
+    m_is_active_self_ = is_active;
+    NotifyIsActiveChanged();
 }
 std::shared_ptr<Scene> GameObject::Scene() const
 {
@@ -83,6 +89,16 @@ void GameObject::InvokeUpdate() const
         }
         component->OnUpdate();
     }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeUpdate();
+        }
+    }
 }
 
 void GameObject::InvokeFixedUpdate() const
@@ -92,6 +108,40 @@ void GameObject::InvokeFixedUpdate() const
         if (!component->m_has_called_start_)
             continue;
         component->OnFixedUpdate();
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeFixedUpdate();
+        }
+    }
+}
+void GameObject::NotifyIsActiveChanged() const
+{
+    for (auto &component : m_components_)
+    {
+        if (IsActiveInHierarchy())
+        {
+            component->OnEnabled();
+        }
+        else
+        {
+            component->OnDisabled();
+        }
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->NotifyIsActiveChanged();
+        }
     }
 }
 
@@ -121,7 +171,8 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 template <class Archive>
 void GameObject::serialize(Archive &ar)
 {
-    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_is_active_), CEREAL_NVP(m_components_));
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_is_active_self_),
+       CEREAL_NVP(m_components_));
 }
 }
 

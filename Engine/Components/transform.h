@@ -51,32 +51,32 @@ public:
 
     [[nodiscard]] Vector3 Forward() const
     {
-        return Rotation() * Vector3{0, 0, 1};
+        return Vector3::Transform(Vector3::Forward, Rotation());
     }
 
     [[nodiscard]] Vector3 Back() const
     {
-        return Rotation() * Vector3{0, 0, -1};
+        return Vector3::Transform(Vector3::Backward, Rotation());
     }
 
     [[nodiscard]] Vector3 Right() const
     {
-        return Rotation() * Vector3{1, 0, 0};
+        return Vector3::Transform(Vector3::Right, Rotation());
     }
 
     [[nodiscard]] Vector3 Left() const
     {
-        return Rotation() * Vector3{-1, 0, 0};
+        return Vector3::Transform(Vector3::Left, Rotation());
     }
 
     [[nodiscard]] Vector3 Up() const
     {
-        return Rotation() * Vector3{0, 1, 0};
+        return Vector3::Transform(Vector3::Up, Rotation());
     }
 
     [[nodiscard]] Vector3 Down() const
     {
-        return Rotation() * Vector3{0, -1, 0};
+        return Vector3::Transform(Vector3::Down, Rotation());
     }
 
     template <class Archive>

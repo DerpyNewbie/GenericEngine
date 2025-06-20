@@ -14,7 +14,7 @@ void CubeRenderer::OnDraw()
     const auto half_extent = VScale(DxLibConverter::From(extent), 0.5F);
     // DrawBox(0, 0, 500, 500, diffuse_color.Argb(), true);
     DrawCube3D(VTransform(half_extent, matrix), VTransform(VScale(half_extent, -1), matrix),
-               diffuse_color.Argb(), specular_color.Argb(), fill);
+               DxLibConverter::Argb(diffuse_color), DxLibConverter::Argb(specular_color), fill);
 }
 }
 

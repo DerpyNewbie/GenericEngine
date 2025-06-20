@@ -2,6 +2,7 @@
 
 #include "inspector.h"
 
+#include "imgui_stdlib.h"
 #include "game_object.h"
 
 namespace editor
@@ -26,18 +27,48 @@ void Inspector::OnEditorGui()
         return;
     }
 
-    for (const auto all_components = selected_go->GetComponents();
-         const auto &component : all_components)
+    // game object path info
     {
-        ImGui::PushID(component.get());
-        if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str(),
-                                    ImGuiTreeNodeFlags_DefaultOpen))
+        std::string path = selected_go->Path();
+        ImGui::InputText("##INSPECTOR_GAME_OBJECT_PATH", &path, ImGuiInputTextFlags_ReadOnly);
+    }
+
+    ImGui::Separator();
+
+    // game object header
+    {
+        bool is_active_self = selected_go->IsActiveSelf();
+        if (ImGui::Checkbox("##INSPECTOR_GAME_OBJECT_ACTIVE", &is_active_self))
         {
-            ImGui::Indent();
-            component->OnInspectorGui();
-            ImGui::Unindent();
+            selected_go->SetActive(is_active_self);
         }
-        ImGui::PopID();
+
+        ImGui::SameLine();
+
+        std::string buff = selected_go->Name();
+        if (ImGui::InputText("##INSPECTOR_GAME_OBJECT_NAME", &buff))
+        {
+            selected_go->SetName(buff);
+        }
+    }
+
+    ImGui::Separator();
+
+    // game object components
+    {
+        for (const auto all_components = selected_go->GetComponents();
+             const auto &component : all_components)
+        {
+            ImGui::PushID(component.get());
+            if (ImGui::CollapsingHeader(engine::EngineUtil::GetTypeName(typeid(*component).name()).c_str(),
+                                        ImGuiTreeNodeFlags_DefaultOpen))
+            {
+                ImGui::Indent();
+                component->OnInspectorGui();
+                ImGui::Unindent();
+            }
+            ImGui::PopID();
+        }
     }
 }
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include "renderer.h"
 
-#include "Math/color.h"
-
 namespace engine
 {
 class CubeRenderer final : public Renderer
