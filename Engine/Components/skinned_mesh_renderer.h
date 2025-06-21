@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "game_object.h"
 #include "mesh_renderer.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 #include <vector>
 
@@ -13,14 +14,21 @@ class SkinnedMeshRenderer : public MeshRenderer
 
 public:
     constexpr static int kLimitBonesPerVertex = 4;
-    std::vector<std::weak_ptr<Transform>> transforms;
+    std::vector<DirectX::XMMATRIX> transforms;
+
+    StructuredBuffer<DirectX::XMMATRIX> transforms_buffer;
 
     void OnInspectorGui() override;
+
+    void OnDraw() override;
+
+    void ReconstructBuffers() override;
+    void UpdateBuffers() override;
 
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<MeshRenderer>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(transforms));
+        ar(cereal::base_class<MeshRenderer>(this), CEREAL_NVP(shared_mesh));
     }
 };
 }

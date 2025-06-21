@@ -6,6 +6,7 @@
 #include "Rendering/mesh.h"
 #include "Rendering/rendering_serializer.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
@@ -20,16 +21,17 @@ public:
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-
-    std::shared_ptr<ConstantBuffer> WVPBuffers[RenderEngine::FRAME_BUFFER_COUNT];
+    std::shared_ptr<ConstantBuffer> wvp_buffers[RenderEngine::FRAME_BUFFER_COUNT];
+    std::shared_ptr<DescriptorHandle> material_handle;
 
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
-
+    
     void OnDraw() override;
 
-    void ReconstructBuffers();
+    virtual void ReconstructBuffers();
+    virtual void UpdateBuffers();
 
     template <class Archive>
     void serialize(Archive &ar)

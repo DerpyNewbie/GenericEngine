@@ -13,6 +13,8 @@
 #include "game_object.h"
 #include "logger.h"
 #include "camera.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
 
 namespace engine
 {
@@ -55,56 +57,33 @@ void MeshRenderer::OnInspectorGui()
 
 void MeshRenderer::OnDraw()
 {
-    if (!vertex_buffer || index_buffers.empty())
-    {
-        if (buffer_creation_failed)
-        {
-            return;
-        }
+    UpdateBuffers();
 
-        ReconstructBuffers();
-    }
-
-    const auto camera = Camera::Main();
-    const Matrix wtl = GameObject()->Transform()->WorldToLocal();
-    const Matrix view = camera.lock()->GetViewMatrix();
-    const Matrix proj = camera.lock()->GetProjectionMatrix();
-
-    for (auto &wvp_buffer : WVPBuffers)
-    {
-        auto ptr = wvp_buffer->GetPtr<Matrix[3]>();
-        *ptr[0] = wtl;
-        *ptr[1] = view;
-        *ptr[2] = proj;
-    }
-
+    auto cmd_list = g_RenderEngine->CommandList();
+    auto DescriptorHeap = g_DescriptorHeapManager->Get().GetHeap();
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
-    auto commandList = g_RenderEngine->CommandList();
-
-    commandList->SetPipelineState(g_PSOManager.Get("default"));
-    commandList->SetGraphicsRootConstantBufferView(0, WVPBuffers[currentIndex]->GetAddress());
-
     auto vbView = vertex_buffer->View();
-    commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    commandList->IASetVertexBuffers(0, 1, &vbView);
     auto ibView = index_buffers[0]->View();
-    commandList->IASetIndexBuffer(&ibView);
-    commandList->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
+    
+    cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
+    cmd_list->SetDescriptorHeaps(1, &DescriptorHeap);
+
+    cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
+
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmd_list->IASetVertexBuffers(0, 1, &vbView);
+    cmd_list->IASetIndexBuffer(&ibView);
+    cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
                                           ? shared_mesh->sub_meshes[0].base_index
-                                          : shared_mesh->indices.size(), 1, 0, 0, 0);
+                                          : shared_mesh->indices.size(),1, 0, 0, 0);
     // sub-meshes
-    for (int i = 1; i < index_buffers.size(); i++)
+    for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
         auto ib = index_buffers[i + 1];
-        auto sub_mesh = shared_mesh->sub_meshes[i + 1];
+        auto sub_mesh = shared_mesh->sub_meshes[i];
         ibView = ib->View();
-        commandList->IASetIndexBuffer(&ibView);
-        commandList->DrawIndexedInstanced(sub_mesh.index_count, 1, sub_mesh.base_index, sub_mesh.base_vertex, 0);
-
-        // FIXME: do material stuff
-        // commandList->SetGraphicsRootDescriptorTable(6, m_MaterialHandles[i]->HandleGPU); // そのメッシュに対応するディスクリプタテーブルをセット
-        //
-        // commandList->DrawIndexedInstanced(m_Meshes[i].Indices.size(), 1, 0, 0, 0);
+        cmd_list->IASetIndexBuffer(&ibView);
+        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
     }
 }
 
@@ -133,12 +112,12 @@ void MeshRenderer::ReconstructBuffers()
     }
 
     // create index buffer
-    const auto ib_size = shared_mesh->sub_meshes.empty()
-                             ? shared_mesh->indices.size()
-                             : shared_mesh->sub_meshes[0].base_index;
+    const auto ib_size = shared_mesh->HasSubMeshes()
+                             ? shared_mesh->sub_meshes[0].base_index
+                             : shared_mesh->indices.size() ;
     const auto indices = shared_mesh->indices.data();
 
-    auto ib = std::make_shared<IndexBuffer>(ib_size, indices);
+    auto ib = std::make_shared<IndexBuffer>(ib_size * sizeof(uint32_t), indices);
 
     if (!ib->IsValid())
     {
@@ -155,12 +134,13 @@ void MeshRenderer::ReconstructBuffers()
     {
         const auto sub_mesh = shared_mesh->sub_meshes[i];
 
+        const auto sub_ib_size = sub_mesh.index_count * sizeof(uint32_t);
         std::vector<uint32_t> sub_indices;
         sub_indices.insert(sub_indices.begin(),
                            shared_mesh->indices.begin() + sub_mesh.base_index,
                            shared_mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count);
 
-        const auto sub_ib = std::make_shared<IndexBuffer>(sub_mesh.index_count, sub_indices.data());
+        const auto sub_ib = std::make_shared<IndexBuffer>(sub_ib_size, sub_indices.data());
         if (!sub_ib->IsValid())
         {
             Logger::Error<MeshRenderer>("Failed to create sub index buffer!: sub mesh index: %d", i);
@@ -170,7 +150,7 @@ void MeshRenderer::ReconstructBuffers()
         index_buffers.emplace_back(sub_ib);
     }
 
-    for (auto &wvp_buffer : WVPBuffers)
+    for (auto &wvp_buffer : wvp_buffers)
     {
         wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 3);
         if (!wvp_buffer->IsValid())
@@ -178,6 +158,32 @@ void MeshRenderer::ReconstructBuffers()
             Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
             continue;
         }
+    }
+}
+
+void MeshRenderer::UpdateBuffers()
+{
+    if (!vertex_buffer || index_buffers.empty())
+    {
+        if (buffer_creation_failed)
+        {
+            return;
+        }
+
+        ReconstructBuffers();
+    }
+
+    const auto camera = Camera::Main();
+    const Matrix wtl = GameObject()->Transform()->WorldToLocal();
+    const Matrix view = camera.lock()->GetViewMatrix();
+    const Matrix proj = camera.lock()->GetProjectionMatrix();
+
+    for (auto &wvp_buffer : wvp_buffers)
+    {
+        auto ptr = wvp_buffer->GetPtr<Matrix>();
+        ptr[0] = wtl ;//* DirectX::XMMatrixScaling(600, 600, 600);
+        ptr[1] = view;
+        ptr[2] = proj;
     }
 }
 }
