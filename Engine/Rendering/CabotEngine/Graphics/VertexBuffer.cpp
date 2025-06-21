@@ -48,32 +48,33 @@ engine::VertexBuffer::VertexBuffer(const Mesh *pInitData)
 
         std::vector<Vertex> ptr_;
         ptr_.resize(pInitData->vertices.size());
-        for (size_t i = 0; i < pInitData->vertices.size(); i++)
+        for (size_t i = 0; i < pInitData->vertices.size(); ++i)
         {
             ptr_.at(i).vertex = pInitData->vertices[i];
         }
-        for (size_t i = 0; i < pInitData->colors.size(); i++)
+        for (size_t i = 0; i < pInitData->colors.size(); ++i)
         {
             ptr_.at(i).color = pInitData->colors[i];
         }
-        for (size_t i = 0; i < pInitData->normals.size(); i++)
+        for (size_t i = 0; i < pInitData->normals.size(); ++i)
         {
             ptr_.at(i).normal = pInitData->normals[i];
         }
-        for (size_t i = 0; i < pInitData->tangents.size(); i++)
+        for (size_t i = 0; i < pInitData->tangents.size(); ++i)
         {
             ptr_.at(i).tangent = pInitData->tangents[i];
         }
-        for (size_t i = 0; i < pInitData->uvs.size(); i++)
+        for (size_t i = 0; i < pInitData->uvs.size(); ++i)
         {
-            for (size_t j = 0; j < pInitData->uvs[i].size(); j++)
+            for (size_t j = 0; j < pInitData->uvs[i].size(); ++j)
             {
                 ptr_.at(i).uvs[j] = pInitData->uvs[i][j];
             }
         }
-        for (size_t i = 0; i < pInitData->bone_weights.size(); i++)
+        for (size_t i = 0; i < pInitData->bone_weights.size(); ++i)
         {
-            for (unsigned char j = 0; j < SkinnedMeshRenderer::kLimitBonesPerVertex; j++)
+            ptr_.at(i).bones_per_vertex = pInitData->bone_weights[i].size();
+            for (size_t j = 0; j < pInitData->bone_weights[i].size(); ++j)
             {
                 ptr_.at(i).bone_index[j] = pInitData->bone_weights[i][j].bone_index;
                 ptr_.at(i).bone_weight[j] = pInitData->bone_weights[i][j].weight;
