@@ -1,133 +1,53 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Engine\engine.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\engine_util.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\game_object.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\scene.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\scene_manager.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\update_manager.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\hierarchy.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\inspector.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Editor\editor.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\editor_window.cpp">
-      <Filter>editor</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\serializer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\bone_weight.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\bounds.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\camera.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Math\color.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\component.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\controller.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\cube_renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\engine_time.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\frame_meta_data.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\material.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\material_block.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\mesh.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\mesh_renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\model_importer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\shader.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\sub_mesh.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Rendering\texture2d.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\transform.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Engine\engine_profiler.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\Components\mv1_renderer.cpp">
-      <Filter>engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Editor\profiler.cpp">
-      <Filter>editor</Filter> 
-    <ClCompile/>
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="application.cpp" />
+    <ClCompile Include="Editor\editor_prefs.cpp" />
+    <ClCompile Include="Editor\editor_window.cpp" />
+    <ClCompile Include="Editor\editor.cpp" />
+    <ClCompile Include="Editor\hierarchy.cpp" />
+    <ClCompile Include="Editor\inspector.cpp" />
+    <ClCompile Include="Editor\profiler.cpp" />
+    <ClCompile Include="Editor\update_man_debugger.cpp" />
+    <ClCompile Include="Engine\Components\camera.cpp" />
+    <ClCompile Include="Engine\Components\component.cpp" />
+    <ClCompile Include="Engine\Components\controller.cpp" />
+    <ClCompile Include="Engine\Components\cube_renderer.cpp" />
+    <ClCompile Include="Engine\Components\frame_meta_data.cpp" />
+    <ClCompile Include="Engine\Components\mesh_renderer.cpp" />
     <ClCompile Include="Engine\Components\mv1_renderer.cpp" />
+    <ClCompile Include="Engine\Components\renderer.cpp" />
+    <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp" />
+    <ClCompile Include="Engine\Components\transform.cpp" />
+    <ClCompile Include="Engine\engine.cpp" />
     <ClCompile Include="Engine\engine_profiler.cpp" />
+    <ClCompile Include="Engine\engine_util.cpp" />
+    <ClCompile Include="Engine\game_object.cpp" />
+    <ClCompile Include="Engine\Math\bounds.cpp" />
+    <ClCompile Include="Engine\Rendering\bone_weight.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animation.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animator.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\Camera.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Core\CabotCamera.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\Input.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Core\Timer.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Engine.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Material.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ShaderImporter.cpp" />
@@ -136,151 +56,98 @@
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Engine\Rendering\material.cpp" />
+    <ClCompile Include="Engine\Rendering\material_block.cpp" />
+    <ClCompile Include="Engine\Rendering\mesh.cpp" />
+    <ClCompile Include="Engine\Rendering\model_importer.cpp" />
+    <ClCompile Include="Engine\Rendering\shader.cpp" />
+    <ClCompile Include="Engine\Rendering\sub_mesh.cpp" />
+    <ClCompile Include="Engine\Rendering\Vertex.cpp" />
+    <ClCompile Include="Engine\scene.cpp" />
+    <ClCompile Include="Engine\scene_manager.cpp" />
+    <ClCompile Include="Engine\serializer.cpp" />
+    <ClCompile Include="Engine\engine_time.cpp" />
+    <ClCompile Include="Engine\update_manager.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Engine\engine.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\engine_util.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\event_receivers.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\game_object.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\logger.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\object.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\scene.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\scene_manager.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\update_manager.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\hierarchy.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\inspector.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\editor.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\editor_window.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\serializer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\bone_weight.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\bounds.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\camera.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\color.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\component.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\controller.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\cube_renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\enable_shared_from_base.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\engine_time.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\frame_meta_data.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\material.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\material_block.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\math_serializer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Math\mathf.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\mesh.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\mesh_renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\model_importer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\rendering_serializer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\shader.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\skinned_mesh_renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\sub_mesh.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Rendering\texture2d.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\transform.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="pch.h" />
-    <ClInclude Include="Engine\engine_profiler.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\Components\mv1_renderer.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\profiler.h">
-      <Filter>editor</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\str_util.h">
-      <Filter>engine</Filter>
-    </ClInclude>
-    <ClInclude Include="Editor\update_man_debugger.h">
-      <Filter>editor</Filter>
-    </ClInclude>
+    <ClInclude Include="application.h" />
+    <ClInclude Include="Editor\editor_prefs.h" />
+    <ClInclude Include="Editor\editor_window.h" />
+    <ClInclude Include="Editor\editor.h" />
+    <ClInclude Include="Editor\hierarchy.h" />
+    <ClInclude Include="Editor\inspector.h" />
+    <ClInclude Include="Editor\profiler.h" />
+    <ClInclude Include="Editor\update_man_debugger.h" />
+    <ClInclude Include="Engine\Components\camera.h" />
+    <ClInclude Include="Engine\Components\component.h" />
+    <ClInclude Include="Engine\Components\controller.h" />
+    <ClInclude Include="Engine\Components\cube_renderer.h" />
+    <ClInclude Include="Engine\Components\frame_meta_data.h" />
+    <ClInclude Include="Engine\Components\mesh_renderer.h" />
+    <ClInclude Include="Engine\Components\mv1_renderer.h" />
+    <ClInclude Include="Engine\Components\renderer.h" />
+    <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
+    <ClInclude Include="Engine\Components\transform.h" />
     <ClInclude Include="Engine\DxLib\dxlib_converter.h" />
     <ClInclude Include="Engine\DxLib\dxlib_helper.h" />
     <ClInclude Include="Engine\DxLib\dxlib_serializer.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Filter Include="engine">
-      <UniqueIdentifier>{3e9a80d6-9ee8-4d20-bb4a-3ef1b0632782}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="editor">
-      <UniqueIdentifier>{85fd8929-4b22-4e2c-a917-fc42037f2f08}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <ClInclude Include="Engine\enable_shared_from_base.h" />
+    <ClInclude Include="Engine\engine.h" />
+    <ClInclude Include="Engine\engine_profiler.h" />
+    <ClInclude Include="Engine\engine_util.h" />
+    <ClInclude Include="Engine\event_receivers.h" />
+    <ClInclude Include="Engine\game_object.h" />
+    <ClInclude Include="Engine\logger.h" />
+    <ClInclude Include="Engine\Math\bounds.h" />
+    <ClInclude Include="Engine\Math\mathf.h" />
+    <ClInclude Include="Engine\Math\math_serializer.h" />
+    <ClInclude Include="Engine\object.h" />
+    <ClInclude Include="Engine\Rendering\bone_weight.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animation.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animator.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\CabotCamera.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Input.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Timer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderImporter.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderObject.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\SharedStruct.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Engine\Rendering\material.h" />
+    <ClInclude Include="Engine\Rendering\material_block.h" />
+    <ClInclude Include="Engine\Rendering\mesh.h" />
+    <ClInclude Include="Engine\Rendering\model_importer.h" />
+    <ClInclude Include="Engine\Rendering\rendering_serializer.h" />
+    <ClInclude Include="Engine\Rendering\shader.h" />
+    <ClInclude Include="Engine\Rendering\sub_mesh.h" />
+    <ClInclude Include="Engine\Rendering\Vertex.h" />
+    <ClInclude Include="Engine\scene.h" />
+    <ClInclude Include="Engine\scene_manager.h" />
+    <ClInclude Include="Engine\serializer.h" />
+    <ClInclude Include="Engine\engine_time.h" />
+    <ClInclude Include="Engine\str_util.h" />
+    <ClInclude Include="Engine\update_manager.h" />
   </ItemGroup>
 </Project>

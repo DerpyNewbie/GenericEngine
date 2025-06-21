@@ -17,9 +17,9 @@ PipelineState::PipelineState()
     desc.SampleMask = UINT_MAX;
     desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
     desc.NumRenderTargets = 1; // 描画対象は1
-    desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    desc.SampleDesc.Count = 2;
+    desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
 }
 

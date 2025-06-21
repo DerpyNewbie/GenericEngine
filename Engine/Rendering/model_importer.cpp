@@ -46,11 +46,13 @@ Matrix ConvertAi(const aiMatrix4x4 &m)
     result.m[3][3] = m.d4;
     return result;
 }
+
 std::string RetrieveNameFromPath(const char *file_path)
 {
     const std::filesystem::path path = file_path;
     return path.stem().string();
 }
+
 std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *node,
                                            const std::shared_ptr<GameObject> &parent_node)
 {
@@ -82,8 +84,15 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         {
             result_mesh->Append(*meshes[i].get());
         }
-        
-        node_go->AddComponent<MeshRenderer>()->shared_mesh = result_mesh;
+
+        if (result_mesh->HasBoneWeights())
+        {
+            node_go->AddComponent<SkinnedMeshRenderer>()->shared_mesh = result_mesh;
+        }
+        else
+        {
+            node_go->AddComponent<MeshRenderer>()->shared_mesh = result_mesh;
+        }
     }
 
     // create children

@@ -87,7 +87,7 @@ void RenderEngine::BeginRender()
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    const float clearColor[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    const float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
     m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
@@ -284,7 +284,7 @@ bool RenderEngine::CreateRenderTarget()
 
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
 
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
     for (UINT i = 0; i < FRAME_BUFFER_COUNT; i++)

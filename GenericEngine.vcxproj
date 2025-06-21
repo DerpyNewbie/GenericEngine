@@ -53,6 +53,16 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Core\Timer.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl">
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicPS</EntryPointName>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+        </FxCompile>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl">
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicVS</EntryPointName>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp"/>

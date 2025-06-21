@@ -83,7 +83,7 @@ bool SkinnedModel::LoadModel(std::wstring model_path)
     m_IndexBuffers.reserve(meshes.size());
     for (size_t i = 0; i < meshes.size(); i++)
     {
-        auto size = sizeof(uint32_t) * meshes[i].Indices.size();
+        /*auto size = sizeof(uint32_t) * meshes[i].Indices.size();
         auto indices = meshes[i].Indices.data();
         auto pIB = std::make_shared<IndexBuffer>(size, indices);
         if (!pIB->IsValid())
@@ -91,7 +91,7 @@ bool SkinnedModel::LoadModel(std::wstring model_path)
             printf("インデックスバッファの生成に失敗\n");
             return false;
         }
-        m_IndexBuffers.push_back(pIB);
+        m_IndexBuffers.push_back(pIB);*/
     }
 
     m_MaterialHandles.clear();

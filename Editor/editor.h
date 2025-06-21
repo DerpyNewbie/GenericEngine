@@ -3,6 +3,7 @@
 
 #include "enable_shared_from_base.h"
 #include "event_receivers.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace editor
 {
@@ -12,6 +13,7 @@ class Editor final : public enable_shared_from_base<Editor>, public IDrawCallRec
 {
     int m_last_editor_style_ = -1;
     std::unordered_map<std::string, std::shared_ptr<IEditorWindow>> m_editor_windows_;
+    ID3D12DescriptorHeap* m_pD3DSrvDescHeap = nullptr;
     void SetEditorStyle(int i);
 
 public:
@@ -33,3 +35,4 @@ public:
     void RemoveEditorWindow(const std::string &name);
 };
 }
+

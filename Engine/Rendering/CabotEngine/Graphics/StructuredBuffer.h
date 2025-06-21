@@ -4,12 +4,13 @@
 #include "ComPtr.h"
 #include "RenderEngine.h"
 
+
 template <typename T>
 class StructuredBuffer
 {
 public:
     StructuredBuffer() = default;
-    
+
     void Initialize(size_t elementCount)
     {
         m_elementCount = elementCount;
@@ -30,9 +31,9 @@ public:
             D3D12_RESOURCE_STATE_GENERIC_READ,
             nullptr,
             IID_PPV_ARGS(&m_pResource)
-        );
+            );
     }
-    
+
     void Upload(const std::vector<T>& data)
     {
         void* mapped = nullptr;
@@ -40,7 +41,15 @@ public:
         memcpy(mapped, data.data(), sizeof(T) * data.size());
         m_pResource->Unmap(0, nullptr);
     }
-    
+
+    void Upload(const std::vector<std::weak_ptr<T>>& data)
+    {
+        void* mapped = nullptr;
+        m_pResource->Map(0, nullptr, &mapped);
+        memcpy(mapped, data.data(), sizeof(T) * data.size());
+        m_pResource->Unmap(0, nullptr);
+    }
+
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc()
     {
         D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};

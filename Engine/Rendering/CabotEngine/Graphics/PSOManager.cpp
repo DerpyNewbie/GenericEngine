@@ -14,8 +14,8 @@ void PSOManager::Initialize()
     BasicSetting.PSOName = "Basic";
     BasicSetting.RootSignature = g_RootSignatureManager.Get("Basic");
     BasicSetting.InputLayout = Vertex::InputLayout;
-    BasicSetting.VSPath = L"../x64/Debug/BasicVertexShader.cso";
-    BasicSetting.PSPath = L"../x64/Debug/BasicPixelShader.cso";
+    BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
+    BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
     Register(BasicSetting);
 }
 

@@ -75,6 +75,7 @@ void Engine::MainLoop() const
 
             Profiler::Begin("Draw Call");
             g_RenderEngine->BeginRender();
+            g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");

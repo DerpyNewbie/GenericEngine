@@ -50,8 +50,8 @@ void Application::StartApp()
         const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
         child_obj2->Transform()->SetParent(parent_obj2->Transform());
 
-        engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
-        engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
+        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
+        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
         engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
     }
 
