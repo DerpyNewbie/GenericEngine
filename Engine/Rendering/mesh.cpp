@@ -12,9 +12,25 @@
 #include "DxLib/dxlib_converter.h"
 #include "mesh.h"
 #include "logger.h"
+#include "CabotEngine/Converter/D3D12ToAssimp.h"
 
 namespace engine
 {
+
+aiMatrix4x4 GetBindPose(const aiNode *node)
+{
+    aiMatrix4x4 transform = node->mTransformation;
+    const aiNode *parent = node->mParent;
+
+    while (parent)
+    {
+        transform = parent->mTransformation * transform;
+        parent = parent->mParent;
+    }
+
+    return transform;
+}
+
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh)
 {
     const auto result = Instantiate<Mesh>(mesh->mName.C_Str());
@@ -104,35 +120,28 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
     if (mesh->HasBones())
     {
         // vector of vertex id { pair of bone index and vertex weight}
-        std::vector<std::vector<std::pair<int, aiVertexWeight *>>> vertex_bone_map;
-        vertex_bone_map.resize(mesh->mNumVertices);
+        result->bone_weights.resize(mesh->mNumVertices);
 
         for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         {
-            const auto bone = mesh->mBones[i];
+            auto bone = mesh->mBones[i];
+            result->bind_poses.emplace_back(aiMatrixToXMMatrix(GetBindPose(bone->mNode)));
             for (unsigned int j = 0; j < bone->mNumWeights; ++j)
             {
-                auto weight = bone->mWeights[j];
-                auto &pair_map = vertex_bone_map.at(weight.mVertexId);
-
-                pair_map.emplace_back(i, &weight);
+                auto weight = mesh->mBones[i]->mWeights[j];
+                auto vert_itr = weight.mVertexId;
+                BoneWeight bone_weight;
+                bone_weight.bone_index = i;
+                bone_weight.weight = weight.mWeight;
+                result->bone_weights[vert_itr].emplace_back(bone_weight);
             }
         }
         // copy bone weights
-        result->bone_weights.resize(mesh->mNumVertices);
-        for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
-        {
-            const auto &pair_map = vertex_bone_map.at(i);
 
-            result->bone_weights.reserve(pair_map.size());
-            for (auto [index, vert_weight] : pair_map)
-            {
-                result->bone_weights[i].emplace_back(index, vert_weight->mWeight);
-            }
-        }
     }
     return result;
 }
+
 std::vector<std::shared_ptr<Mesh>> Mesh::CreateFromMV1(const int model_handle, const int frame_index)
 {
     auto mesh_num = MV1GetFrameMeshNum(model_handle, frame_index);
@@ -172,6 +181,7 @@ std::vector<std::shared_ptr<Mesh>> Mesh::CreateFromMV1(const int model_handle, c
     }
     return result;
 }
+
 std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_ref_polygon_list)
 {
     auto result = Instantiate<Mesh>();
@@ -202,6 +212,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST
 
     return result;
 }
+
 void Mesh::Append(Mesh other)
 {
     if (other.vertices.empty() && other.indices.empty())
@@ -233,34 +244,42 @@ void Mesh::Append(Mesh other)
     normals.insert(normals.end(), other.normals.begin(), other.normals.end());
     indices.insert(indices.end(), other.indices.begin(), other.indices.end());
 }
+
 std::vector<Vector2> *Mesh::GetUV(const int index)
 {
     return &uvs[index];
 }
+
 bool Mesh::HasUV(const int index) const
 {
     return !uvs[index].empty();
 }
+
 bool Mesh::HasTangents() const
 {
     return !tangents.empty();
 }
+
 bool Mesh::HasNormals() const
 {
     return !normals.empty();
 }
+
 bool Mesh::HasColors() const
 {
     return !colors.empty();
 }
+
 bool Mesh::HasBoneWeights() const
 {
     return !bone_weights.empty();
 }
+
 bool Mesh::HasBindPoses() const
 {
     return !bind_poses.empty();
 }
+
 bool Mesh::HasSubMeshes() const
 {
     return !sub_meshes.empty();
