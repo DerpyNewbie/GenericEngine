@@ -77,7 +77,7 @@ Matrix Camera::GetViewMatrix() const
 }
 Matrix Camera::GetProjectionMatrix() const
 {
-    const float aspect = static_cast<float>(Application::WindowWidth() / Application::WindowHeight());
+    const float aspect = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
     return DirectX::XMMatrixPerspectiveFovRH(m_field_of_view_, aspect, 0.3f, 1000.0f);
 }
 }
