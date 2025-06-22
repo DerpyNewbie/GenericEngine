@@ -6,6 +6,7 @@
 #pragma comment(lib, "assimp-vc143-mt.lib")
 #endif
 
+#include <algorithm>
 #include <array>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
@@ -134,6 +135,10 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
                 bone_weight.bone_index = i;
                 bone_weight.weight = weight.mWeight;
                 result->bone_weights[vert_itr].emplace_back(bone_weight);
+                if (result->max_bones_in_vertex < result->bone_weights[vert_itr].size())
+                {
+                    result->max_bones_in_vertex = result->bone_weights[vert_itr].size();
+                }
             }
         }
         // copy bone weights
@@ -230,19 +235,49 @@ void Mesh::Append(Mesh other)
     }
 
     vertices.insert(vertices.end(), other.vertices.begin(), other.vertices.end());
-    // TODO: may require additional checks for appending to empty uv
-    for (size_t i = 0; i < uvs.size(); i++)
-        uvs[0].insert(uvs[0].end(), other.uvs[0].begin(), other.uvs[0].end());
-    uvs[1].insert(uvs[1].end(), other.uvs[1].begin(), other.uvs[1].end());
-    uvs[2].insert(uvs[2].end(), other.uvs[2].begin(), other.uvs[2].end());
-    uvs[3].insert(uvs[3].end(), other.uvs[3].begin(), other.uvs[3].end());
-    uvs[4].insert(uvs[4].end(), other.uvs[4].begin(), other.uvs[4].end());
-    uvs[5].insert(uvs[5].end(), other.uvs[5].begin(), other.uvs[5].end());
-    uvs[6].insert(uvs[6].end(), other.uvs[6].begin(), other.uvs[6].end());
-    uvs[7].insert(uvs[7].end(), other.uvs[7].begin(), other.uvs[7].end());
-    colors.insert(colors.end(), other.colors.begin(), other.colors.end());
-    normals.insert(normals.end(), other.normals.begin(), other.normals.end());
     indices.insert(indices.end(), other.indices.begin(), other.indices.end());
+
+    for (size_t i = 0; i < uvs.size(); i++)
+    {
+        if (HasUV(i) || other.HasUV(i))
+            uvs[i].resize(sub_mesh.base_vertex);
+        uvs[i].insert(uvs[i].end(), other.uvs[i].begin(), other.uvs[i].end());
+    }
+
+    // copy colors
+    {
+        if (HasColors() || other.HasColors())
+            colors.resize(sub_mesh.base_vertex);
+
+        colors.insert(colors.end(), other.colors.begin(), other.colors.end());
+    }
+
+    // copy normals
+    {
+        if (HasNormals() || other.HasNormals())
+            normals.resize(sub_mesh.base_vertex);
+
+        normals.insert(normals.end(), other.normals.begin(), other.normals.end());
+    }
+
+    // copy tangents
+    {
+        if (HasTangents() || other.HasTangents())
+            tangents.resize(sub_mesh.base_vertex);
+
+        tangents.insert(tangents.end(), other.tangents.begin(), other.tangents.end());
+    }
+
+    // copy bone-weights
+    {
+        if (HasBoneWeights() || other.HasBoneWeights())
+            bone_weights.resize(sub_mesh.base_vertex);
+        bone_weights.insert(bone_weights.end(), other.bone_weights.begin(), other.bone_weights.end());
+    }
+
+    assert(bind_poses.size() == other.bind_poses.size() && "Bind pose must be same");
+
+    max_bones_in_vertex = max(max_bones_in_vertex, other.max_bones_in_vertex);
 }
 
 std::vector<Vector2> *Mesh::GetUV(const int index)

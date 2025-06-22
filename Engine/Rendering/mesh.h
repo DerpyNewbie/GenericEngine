@@ -14,17 +14,17 @@ namespace engine
 class Mesh : public Object
 {
 public:
-    unsigned char max_bones_per_vertex;
+    unsigned int max_bones_in_vertex = 0;
 
     Bounds bounds;
     std::vector<Vector3> vertices;
-    std::vector<Color> colors;
-    std::array<std::vector<Vector2>, 8> uvs;
-    std::vector<uint32_t> indices;
-    std::vector<Vector3> normals;
-    std::vector<Vector4> tangents;
-    std::vector<std::vector<BoneWeight>> bone_weights;
-    std::vector<Matrix> bind_poses;
+    std::vector<Color> colors; // per-vertex
+    std::array<std::vector<Vector2>, 8> uvs; // per-vertex
+    std::vector<uint32_t> indices; // per-face
+    std::vector<Vector3> normals; // per-vertex
+    std::vector<Vector4> tangents; // per-vertex
+    std::vector<std::vector<BoneWeight>> bone_weights; // per-vertex
+    std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh);
