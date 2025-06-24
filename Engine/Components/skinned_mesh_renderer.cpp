@@ -9,8 +9,6 @@ namespace engine
 {
 void SkinnedMeshRenderer::OnInspectorGui()
 {
-    MeshRenderer::OnInspectorGui();
-    
     ImGui::Checkbox("Draw Bones", &m_draw_bones_);
     ImGui::Separator();
     if (ImGui::CollapsingHeader("Bone Info"))
@@ -37,19 +35,23 @@ void SkinnedMeshRenderer::OnDraw()
     UpdateBuffers();
 
     auto cmd_list = g_RenderEngine->CommandList();
+    auto DescriptorHeap = g_DescriptorHeapManager->Get().GetHeap();
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = vertex_buffer->View();
     auto ibView = index_buffers[0]->View();
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
+    cmd_list->SetDescriptorHeaps(1, &DescriptorHeap);
 
     cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
-
-    cmd_list->SetGraphicsRootDescriptorTable(6, material_handle->HandleGPU);
+    if (material_handle)
+    {
+        cmd_list->SetGraphicsRootDescriptorTable(6, material_handle->HandleGPU);
+    }
     cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
                                        ? shared_mesh->sub_meshes[0].base_index
                                        : shared_mesh->indices.size(), 1, 0, 0, 0);
@@ -60,9 +62,8 @@ void SkinnedMeshRenderer::OnDraw()
         auto sub_mesh = shared_mesh->sub_meshes[i];
         ibView = ib->View();
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
     }
-    lineRenderer->Draw();
 }
 
 void SkinnedMeshRenderer::ReconstructBuffers()
@@ -78,28 +79,13 @@ void SkinnedMeshRenderer::ReconstructBuffers()
 
     //TODO:マテリアルが追加され次第そちらに切り替えるべし
     material_handle = g_DescriptorHeapManager->Get().Register(transforms_buffer);
-
-    std::vector<Vertex> vertices(4);
-    vertices[0].vertex = Vector3(0, 0, 0);
-    vertices[0].color = Color(1, 0, 0, 1);
-    vertices[1].vertex = Vector3(500, 500, 500);
-    vertices[1].color = Color(0, 1, 0, 1);
-    vertices[2].vertex = Vector3(500, 0, 0);
-    vertices[2].color = Color(0, 0, 1, 1);
-    vertices[3].vertex = Vector3(500, 0, 500);
-    vertices[3].color = Color(1, 1, 1, 1);
-
-    std::vector<unsigned int> indices(4);
-    indices[0] = 0;
-    indices[1] = 1;
-    indices[2] = 2;
-    indices[3] = 3;
-    lineRenderer = std::make_shared<LineRenderer>(vertices, indices);
 }
 
 void SkinnedMeshRenderer::UpdateBuffers()
 {
     MeshRenderer::UpdateBuffers();
+    if (shared_mesh->bind_poses.size() > 0)
+        transforms_buffer.Upload(transforms);
 }
 }
 

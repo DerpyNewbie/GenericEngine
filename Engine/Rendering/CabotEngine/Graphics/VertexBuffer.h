@@ -2,7 +2,6 @@
 #include <d3d12.h>
 #include "ComPtr.h"
 #include "../../mesh.h"
-#include "Rendering/Vertex.h"
 
 namespace engine
 {
@@ -13,8 +12,7 @@ class VertexBuffer
     D3D12_VERTEX_BUFFER_VIEW m_View = {}; // 頂点バッファビュー
 
 public:
-    VertexBuffer(const Mesh *p_init_data); // コンストラクタでバッファを生成
-    VertexBuffer(UINT num_vertices, const Vertex *p_init_data);
+    VertexBuffer(const Mesh *pInitData); // コンストラクタでバッファを生成
     D3D12_VERTEX_BUFFER_VIEW View() const; // 頂点バッファビューを取得
     bool IsValid(); // バッファの生成に成功したかを取得
 

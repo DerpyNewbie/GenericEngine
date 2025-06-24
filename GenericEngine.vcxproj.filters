@@ -3,8 +3,6 @@
   <ItemGroup>
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
-    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
-    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -72,7 +70,6 @@
     <ClCompile Include="Engine\update_manager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Engine\Rendering\line_renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -152,6 +149,5 @@
     <ClInclude Include="Engine\engine_time.h" />
     <ClInclude Include="Engine\str_util.h" />
     <ClInclude Include="Engine\update_manager.h" />
-    <ClInclude Include="Engine\Rendering\line_renderer.h" />
   </ItemGroup>
 </Project>

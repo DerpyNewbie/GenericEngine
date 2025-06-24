@@ -20,5 +20,5 @@ float4 BasicPS(VSOutput input) : SV_TARGET
     float brightness = dot(-light,input.normal);
     float4 mainColor = _MainTex.Sample(smp, input.uv);
 
-    return float4(1,1,1,1) * brightness;
+    return float4(1,1,1,1);
 }

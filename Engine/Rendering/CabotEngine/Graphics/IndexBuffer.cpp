@@ -4,7 +4,7 @@
 #include <directx/d3dx12.h>
 #include "RenderEngine.h"
 
-engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
+IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
 {
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD); // ヒーププロパティ
     D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
@@ -49,12 +49,12 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
     m_IsValid = true;
 }
 
-bool engine::IndexBuffer::IsValid() const
+bool IndexBuffer::IsValid()
 {
     return m_IsValid;
 }
 
-D3D12_INDEX_BUFFER_VIEW engine::IndexBuffer::View() const
+D3D12_INDEX_BUFFER_VIEW IndexBuffer::View() const
 {
     return m_View;
 }

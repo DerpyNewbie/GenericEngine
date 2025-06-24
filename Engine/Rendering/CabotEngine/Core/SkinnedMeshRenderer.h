@@ -17,7 +17,7 @@ private:
     std::vector<CabotMesh> m_Meshes;
     std::vector<Texture2D> m_Textures;
     std::vector<std::shared_ptr<engine::VertexBuffer>> m_VertexBuffers;
-    std::vector<std::shared_ptr<engine::IndexBuffer>> m_IndexBuffers;
+    std::vector<std::shared_ptr<IndexBuffer>> m_IndexBuffers;
     std::vector<DescriptorHandle> m_MaterialHandle;
     ConstantBuffer m_WVPBuffer[RenderEngine::FRAME_BUFFER_COUNT];
 };
