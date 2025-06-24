@@ -18,7 +18,6 @@ public:
     std::vector<DirectX::XMMATRIX> transforms;
 
     StructuredBuffer<DirectX::XMMATRIX> transforms_buffer;
-    std::shared_ptr<LineRenderer> lineRenderer;
 
     void OnInspectorGui() override;
 

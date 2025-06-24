@@ -62,7 +62,6 @@ void SkinnedMeshRenderer::OnDraw()
         cmd_list->IASetIndexBuffer(&ibView);
         cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
     }
-    lineRenderer->Draw();
 }
 
 void SkinnedMeshRenderer::ReconstructBuffers()
@@ -78,23 +77,6 @@ void SkinnedMeshRenderer::ReconstructBuffers()
 
     //TODO:マテリアルが追加され次第そちらに切り替えるべし
     material_handle = g_DescriptorHeapManager->Get().Register(transforms_buffer);
-
-    std::vector<Vertex> vertices(4);
-    vertices[0].vertex = Vector3(0, 0, 0);
-    vertices[0].color = Color(1, 0, 0, 1);
-    vertices[1].vertex = Vector3(500, 500, 500);
-    vertices[1].color = Color(0, 1, 0, 1);
-    vertices[2].vertex = Vector3(500, 0, 0);
-    vertices[2].color = Color(0, 0, 1, 1);
-    vertices[3].vertex = Vector3(500, 0, 500);
-    vertices[3].color = Color(1, 1, 1, 1);
-
-    std::vector<unsigned int> indices(4);
-    indices[0] = 0;
-    indices[1] = 1;
-    indices[2] = 2;
-    indices[3] = 3;
-    lineRenderer = std::make_shared<LineRenderer>(vertices, indices);
 }
 
 void SkinnedMeshRenderer::UpdateBuffers()
