@@ -2,6 +2,7 @@
 
 #include "editor.h"
 
+#include "asset_browser.h"
 #include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "hierarchy.h"
@@ -92,6 +93,7 @@ void Editor::Init()
         AddEditorWindow("Editor Prefs", std::make_shared<EditorPrefs>());
         AddEditorWindow("Profiler", std::make_shared<Profiler>());
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
+        AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
     }
 
     {

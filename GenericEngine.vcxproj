@@ -19,6 +19,7 @@
         </ProjectConfiguration>
     </ItemGroup>
     <ItemGroup>
+        <ClCompile Include="Editor\asset_browser.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
         <ClCompile Include="Editor\editor_menu.cpp"/>
         <ClCompile Include="Editor\editor_prefs.cpp"/>
@@ -28,6 +29,7 @@
         <ClCompile Include="Editor\inspector.cpp"/>
         <ClCompile Include="Editor\profiler.cpp"/>
         <ClCompile Include="Editor\update_man_debugger.cpp"/>
+        <ClCompile Include="Engine\asset_database.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -61,6 +63,7 @@
         </ClCompile>
     </ItemGroup>
     <ItemGroup>
+        <ClInclude Include="Editor\asset_browser.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
         <ClInclude Include="Editor\editor_menu.h"/>
         <ClInclude Include="Editor\editor_prefs.h"/>
@@ -70,6 +73,7 @@
         <ClInclude Include="Editor\inspector.h"/>
         <ClInclude Include="Editor\profiler.h"/>
         <ClInclude Include="Editor\update_man_debugger.h"/>
+        <ClInclude Include="Engine\asset_database.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>

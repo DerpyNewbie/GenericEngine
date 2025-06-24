@@ -5,6 +5,7 @@
 #include "default_editor_menus.h"
 #include "imgui_stdlib.h"
 #include "game_object.h"
+#include "asset_database.h"
 
 namespace editor
 {
@@ -37,6 +38,13 @@ void Inspector::OnEditorGui()
     if (game_object != nullptr)
     {
         DrawGameObject(game_object);
+        return;
+    }
+
+    const auto asset_hierarchy = std::dynamic_pointer_cast<engine::AssetHierarchy>(selected_obj);
+    if (asset_hierarchy != nullptr)
+    {
+        DrawAssetHierarchy(asset_hierarchy);
         return;
     }
 
@@ -112,5 +120,16 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
         ImGui::OpenPopup("##INSPECTOR_ADD_COMPONENT_POPUP");
     }
 
+}
+void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
+{
+    if (asset_hierarchy->IsFile())
+    {
+        ImGui::Text("File: %s", asset_hierarchy->asset->path.string().c_str());
+    }
+    else
+    {
+        ImGui::Text("Folder: %s", asset_hierarchy->asset->path.string().c_str());
+    }
 }
 }

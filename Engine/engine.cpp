@@ -2,6 +2,7 @@
 
 #include "engine.h"
 
+#include "asset_database.h"
 #include "engine_profiler.h"
 #include "scene_manager.h"
 #include "update_manager.h"
@@ -25,6 +26,7 @@ bool engine::Engine::Init()
     SetUseZBuffer3D(true);
 
     Time::Get()->Init();
+    AssetDatabase::SetProjectDirectory(current_path() / "Resources");
     SceneManager::CreateScene("Default Scene");
 
     return true;
