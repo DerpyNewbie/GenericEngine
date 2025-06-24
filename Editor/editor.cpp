@@ -13,6 +13,7 @@
 #include <imgui_impl_dx12.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 #include <ranges>
@@ -74,24 +75,17 @@ void Editor::Init()
                                                     io.Fonts->GetGlyphRangesJapanese());
         IM_ASSERT(font != nullptr);
 
-        D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
-        heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-        heap_desc.NumDescriptors = 1;
-        heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-        heap_desc.NodeMask = 0;
-
-        g_RenderEngine->Device()->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&m_pD3DSrvDescHeap));
-
+        auto descriptor_handle = g_DescriptorHeapManager->Get().Allocate();
         // フォントディスクリプタ取得
-        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = m_pD3DSrvDescHeap->GetCPUDescriptorHandleForHeapStart();
-        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = m_pD3DSrvDescHeap->GetGPUDescriptorHandleForHeapStart();
+        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
+        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
 
         ImGui_ImplWin32_Init(Application::GetWindowHandle());
         ImGui_ImplDX12_Init(
             g_RenderEngine->Device(),
             RenderEngine::FRAME_BUFFER_COUNT,
             DXGI_FORMAT_R8G8B8A8_UNORM,
-            m_pD3DSrvDescHeap,
+            g_DescriptorHeapManager->Get().GetHeap(),
             font_cpu_desc_handle,
             font_gpu_desc_handle
             );
@@ -143,7 +137,6 @@ void Editor::OnDraw()
         ImGui::Render();
         auto draw_data = ImGui::GetDrawData();
         auto cmd_list = g_RenderEngine->CommandList();
-        g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &m_pD3DSrvDescHeap);
         ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {

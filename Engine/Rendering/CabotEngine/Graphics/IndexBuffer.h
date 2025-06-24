@@ -2,12 +2,13 @@
 #include <cstdint>
 #include <d3d12.h>
 #include "ComPtr.h"
-
+namespace engine
+{
 class IndexBuffer
 {
 public:
     IndexBuffer(size_t size, const uint32_t* pInitData = nullptr);
-    bool IsValid();
+    bool IsValid() const;
     D3D12_INDEX_BUFFER_VIEW View() const;
 
 private:
@@ -18,4 +19,4 @@ private:
     IndexBuffer(const IndexBuffer&) = delete;
     void operator = (const IndexBuffer&) = delete;
 };
-
+}

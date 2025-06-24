@@ -2,6 +2,7 @@
 #include "DxLib.h"
 #include "game_object.h"
 #include "mesh_renderer.h"
+#include "Rendering/line_renderer.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 #include <vector>
@@ -17,6 +18,7 @@ public:
     std::vector<DirectX::XMMATRIX> transforms;
 
     StructuredBuffer<DirectX::XMMATRIX> transforms_buffer;
+    std::shared_ptr<LineRenderer> lineRenderer;
 
     void OnInspectorGui() override;
 

@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
-
 #include "PSOManager.h"
-
 #include "RootSignatureManager.h"
 #include "SharedStruct.h"
 #include "Rendering/Vertex.h"
@@ -16,6 +14,12 @@ void PSOManager::Initialize()
     BasicSetting.InputLayout = Vertex::InputLayout;
     BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
+    Register(BasicSetting);
+
+    //設定の一部が一緒なので使いまわす
+    BasicSetting.PSOName = "Line";
+    BasicSetting.VSPath = L"x64/Debug/LineVertexShader.cso";
+    BasicSetting.PSPath = L"x64/Debug/LinePixelShader.cso";
     Register(BasicSetting);
 }
 
@@ -40,7 +44,7 @@ bool PSOManager::Register(PSOSetting setting)
 
 bool PSOManager::Register(ShaderObject &shaderObject)
 {
-    PipelineState *pso = new PipelineState;
+    std::shared_ptr<PipelineState> pso = std::make_shared<PipelineState>();
     pso->SetInputLayout(Vertex::InputLayout);
     pso->SetRootSignature(g_RootSignatureManager.Get("Basic"));
     pso->SetVS(shaderObject.VSPath);

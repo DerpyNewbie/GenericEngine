@@ -18,21 +18,32 @@
 namespace engine
 {
 
-aiMatrix4x4 GetBindPose(const aiNode *node)
+aiMatrix4x4 GetGlobalTransform(const aiNode* node)
 {
     aiMatrix4x4 transform = node->mTransformation;
-    const aiNode *parent = node->mParent;
-
-    while (parent)
+    while (node->mParent)
     {
-        transform = parent->mTransformation * transform;
-        parent = parent->mParent;
+        node = node->mParent;
+        transform = node->mTransformation * transform;
     }
-
     return transform;
 }
 
-std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh)
+aiMatrix4x4 GetBindPose(const aiBone *bone)
+{
+    if (!bone->mNode)
+    {
+        throw std::runtime_error("bone->mNode == nullptr: " +
+                                 std::string(bone->mName.C_Str()));
+    }
+
+    aiMatrix4x4 global  = GetGlobalTransform(bone->mNode);
+    aiMatrix4x4 skinMat = global * bone->mOffsetMatrix;
+
+    return skinMat;
+}
+
+std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh,aiMatrix4x4 global_transform)
 {
     const auto result = Instantiate<Mesh>(mesh->mName.C_Str());
     Logger::Log<Mesh>("Creating mesh `%s` from aiMesh", result->Name().c_str());
@@ -126,7 +137,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh 
         for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         {
             auto bone = mesh->mBones[i];
-            result->bind_poses.emplace_back(aiMatrixToXMMatrix(GetBindPose(bone->mNode)));
+            result->bind_poses.emplace_back(aiMatrixToXMMatrix(GetBindPose(bone)));
             for (unsigned int j = 0; j < bone->mNumWeights; ++j)
             {
                 auto weight = mesh->mBones[i]->mWeights[j];

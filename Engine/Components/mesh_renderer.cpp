@@ -60,22 +60,20 @@ void MeshRenderer::OnDraw()
     UpdateBuffers();
 
     auto cmd_list = g_RenderEngine->CommandList();
-    auto DescriptorHeap = g_DescriptorHeapManager->Get().GetHeap();
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = vertex_buffer->View();
     auto ibView = index_buffers[0]->View();
     
     cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
-    cmd_list->SetDescriptorHeaps(1, &DescriptorHeap);
 
     cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
-    cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
-                                          ? shared_mesh->sub_meshes[0].base_index
-                                          : shared_mesh->indices.size(),1, 0, 0, 0);
+    //cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
+                                          //? shared_mesh->sub_meshes[0].base_index
+                                          //: shared_mesh->indices.size(),1, 0, 0, 0);
     // sub-meshes
     for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
@@ -83,7 +81,7 @@ void MeshRenderer::OnDraw()
         auto sub_mesh = shared_mesh->sub_meshes[i];
         ibView = ib->View();
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
+        //cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
     }
 }
 
@@ -146,7 +144,7 @@ void MeshRenderer::ReconstructBuffers()
             Logger::Error<MeshRenderer>("Failed to create sub index buffer!: sub mesh index: %d", i);
             continue;
         }
-
+        
         index_buffers.emplace_back(sub_ib);
     }
 
@@ -156,7 +154,6 @@ void MeshRenderer::ReconstructBuffers()
         if (!wvp_buffer->IsValid())
         {
             Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
-            continue;
         }
     }
 }
@@ -174,14 +171,14 @@ void MeshRenderer::UpdateBuffers()
     }
 
     const auto camera = Camera::Main();
-    const Matrix wtl = GameObject()->Transform()->WorldToLocal();
+    Matrix world = GameObject()->Transform()->WorldMatrix();
     const Matrix view = camera.lock()->GetViewMatrix();
     const Matrix proj = camera.lock()->GetProjectionMatrix();
 
     for (auto &wvp_buffer : wvp_buffers)
     {
         auto ptr = wvp_buffer->GetPtr<Matrix>();
-        ptr[0] = wtl ;//* DirectX::XMMatrixScaling(600, 600, 600);
+        ptr[0] = world;
         ptr[1] = view;
         ptr[2] = proj;
     }

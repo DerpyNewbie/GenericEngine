@@ -2,9 +2,7 @@
 #include <d3d12.h>
 #include <string>
 #include <unordered_map>
-
 #include "PipelineState.h"
-#include "RootSignature.h"
 #include "ShaderObject.h"
 
 struct PSOSetting
@@ -22,11 +20,11 @@ public:
     void Initialize();
     bool Register(PSOSetting setting);
     bool Register(ShaderObject& shaderObject);
-
+    
     ID3D12PipelineState* Get(const std::string& id){return psoCache[id]->Get();}
 
 private:
-    std::unordered_map<std::string,PipelineState*> psoCache;
+    std::unordered_map<std::string,std::shared_ptr<PipelineState>> psoCache;
 };
 
 extern PSOManager g_PSOManager;
