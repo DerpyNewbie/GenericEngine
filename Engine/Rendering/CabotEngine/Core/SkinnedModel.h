@@ -25,7 +25,7 @@ private:
     std::vector<CabotMaterial> m_Materials;
     std::vector<MaterialBuffer> m_MaterialBuffers;
     std::vector<std::shared_ptr<engine::VertexBuffer>> m_VertexBuffers;
-    std::vector<std::shared_ptr<IndexBuffer>> m_IndexBuffers;
+    std::vector<std::shared_ptr<engine::IndexBuffer>> m_IndexBuffers;
     std::shared_ptr<ConstantBuffer> m_WVPBuffer[RenderEngine::FRAME_BUFFER_COUNT];
     std::vector<std::shared_ptr<DescriptorHandle>> m_MaterialHandles;
     StructuredBuffer<DirectX::XMMATRIX> m_BoneBuffer;

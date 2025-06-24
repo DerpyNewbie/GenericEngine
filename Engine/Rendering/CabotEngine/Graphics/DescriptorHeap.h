@@ -23,19 +23,22 @@ public:
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
     template <typename T>
     std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structuredBuffer);
+    std::shared_ptr<DescriptorHandle> Allocate();
+
+    void Release();
 
 private:
-    bool m_IsValid = false; // 生成に成功したかどうか
+    bool m_IsValid = false;
     UINT m_IncrementSize = 0;
-    ComPtr<ID3D12DescriptorHeap> m_pHeap = nullptr; // ディスクリプタヒープ本体
-    std::vector<std::shared_ptr<DescriptorHandle>> m_pHandles; // 登録されているハンドル
+    ComPtr<ID3D12DescriptorHeap> m_pHeap = nullptr;
+    std::vector<std::shared_ptr<DescriptorHandle>> m_pHandles;
 };
 
 template <typename T>
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(StructuredBuffer<T> structuredBuffer)
 {
     auto count = m_pHandles.size();
-    //HACK:どうにかしたい
+    
     UINT HANDLE_MAX = 512;
     if (HANDLE_MAX <= count)
     {

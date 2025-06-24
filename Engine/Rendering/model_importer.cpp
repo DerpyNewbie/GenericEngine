@@ -19,11 +19,24 @@
 #include "str_util.h"
 #include "logger.h"
 #include "mesh.h"
+#include "CabotEngine/Converter/D3D12ToAssimp.h"
 
 namespace engine
 {
 namespace
 {
+
+aiMatrix4x4 GetGlobalTransform(const aiNode *node)
+{
+    aiMatrix4x4 transform = node->mTransformation;
+    while (node->mParent)
+    {
+        node = node->mParent;
+        transform = node->mTransformation * transform;
+    }
+    return transform;
+}
+
 Matrix ConvertAi(const aiMatrix4x4 &m)
 {
     // TODO: conversion may not be accurate as rotation is invalid
@@ -67,14 +80,17 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     }
 
     // TODO: local matrix is incorrect
-    node_transform->SetLocalMatrix(ConvertAi(node->mTransformation));
+    aiString exeption;
+    exeption = "Hackadoll";
+
+    node_transform->SetLocalMatrix(aiMatrixToXMMatrix(node->mTransformation));
 
     // apply meshes
     std::vector<std::shared_ptr<Mesh>> meshes;
     meshes.reserve(node->mNumMeshes);
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
-        meshes.emplace_back(Mesh::CreateFromAiMesh(scene, scene->mMeshes[node->mMeshes[i]]));
+        meshes.emplace_back(Mesh::CreateFromAiMesh(scene, scene->mMeshes[node->mMeshes[i]], GetGlobalTransform(node)));
     }
 
     if (!meshes.empty())
@@ -113,7 +129,8 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
         aiProcess_GenSmoothNormals |
         aiProcess_SortByPType |
         aiProcess_OptimizeMeshes |
-        aiProcess_PopulateArmatureData;
+        aiProcess_PopulateArmatureData |
+        aiProcess_JoinIdenticalVertices;
 
     const auto scene = importer.ReadFile(file_path, import_settings);
     if (!scene)

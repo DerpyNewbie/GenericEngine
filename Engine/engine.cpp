@@ -76,6 +76,10 @@ void Engine::MainLoop() const
             Profiler::Begin("Draw Call");
             g_RenderEngine->BeginRender();
             g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+            auto& descriptor_heap_wrapped = g_DescriptorHeapManager->Get();
+            auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+            descriptor_heap_wrapped.Release();
+            g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");

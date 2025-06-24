@@ -21,8 +21,8 @@ struct VSInput
     float2 uv6 : TEXCOOD5;
     float2 uv7 : TEXCOOD6;
     float2 uv8 : TEXCOOD7;
-    uint bones_per_vertex : BONESPERVERTEX; //ボーンのイテレーター
-    uint4 bone_id : BONEINDEX; //ウェイト
+    uint bones_per_vertex : BONESPERVERTEX;
+    uint4 bone_id : BONEINDEX;
     float4 bone_weight : BONEWEIGHT;
 };
 
@@ -65,15 +65,13 @@ VSOutput BasicVS(VSInput input)
         localNormal = boneNormal;
     }
     
-    input.color = input.bone_weight;
-    
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
     float4 projPos = mul(Proj, viewPos); // 投影変換
-
+    
     float3x3 worldRot = ExtractRotation(World);
     float3 worldNormal = mul(worldRot, localNormal); // ワールド座標に変換
-
+    
     output.svpos = projPos; // 投影変換された座標をピクセルシェーダーに渡す
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
