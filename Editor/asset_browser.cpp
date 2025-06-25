@@ -25,7 +25,7 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
             if (ImGui::MenuItem("Save"))
             {
                 engine::Logger::Log<editor::AssetBrowser>("Saving %s", asset_hierarchy->asset->path.string().c_str());
-                engine::AssetDatabase::SaveAsset(asset_hierarchy->asset->path);
+                engine::AssetDatabase::SaveAsset(asset_hierarchy->asset);
             }
 
             ImGui::EndPopup();

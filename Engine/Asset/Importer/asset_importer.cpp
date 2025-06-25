@@ -11,12 +11,12 @@ void AssetImporter::AddImporter(const std::shared_ptr<AssetImporter> &importer)
     for (const auto &type : importer->SupportedExtensions())
         m_asset_importers_[type] = importer;
 }
-void AssetImporter::AddImporter(const std::string &type, const std::shared_ptr<AssetImporter> &importer)
+void AssetImporter::AddImporter(const std::string &file_extension, const std::shared_ptr<AssetImporter> &importer)
 {
-    m_asset_importers_[type] = importer;
+    m_asset_importers_[file_extension] = importer;
 }
-std::shared_ptr<AssetImporter> AssetImporter::GetAssetImporter(const std::string &type)
+std::shared_ptr<AssetImporter> AssetImporter::GetAssetImporter(const std::string &file_extension)
 {
-    return m_asset_importers_[type];
+    return m_asset_importers_[file_extension];
 }
 }

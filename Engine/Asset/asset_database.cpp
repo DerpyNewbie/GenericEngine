@@ -177,22 +177,23 @@ std::vector<std::shared_ptr<Object>> AssetDatabase::GetAssetsByType(const std::s
     }
     return result;
 }
-void AssetDatabase::SaveAsset(const path &path)
+void AssetDatabase::SaveAsset(std::shared_ptr<AssetDescriptor> asset_descriptor)
 {
-    const auto descriptor = GetAssetDescriptor(path);
-    if (descriptor == nullptr)
+    if (asset_descriptor == nullptr)
     {
-        Logger::Warn<AssetDatabase>("Asset '%s' not found", path.string().c_str());
-        return;
-    }
-    const auto importer = AssetImporter::GetAssetImporter(path.extension().string());
-    if (importer == nullptr)
-    {
-        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", path.extension().string().c_str());
+        Logger::Warn<AssetDatabase>("Saving failed: Asset descriptor is null");
         return;
     }
 
-    importer->Export(descriptor.get());
+    const auto extension = asset_descriptor->path.extension().string();
+    const auto importer = AssetImporter::GetAssetImporter(extension);
+    if (importer == nullptr)
+    {
+        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", extension.c_str());
+        return;
+    }
+
+    importer->Export(asset_descriptor.get());
 }
 
 }
