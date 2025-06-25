@@ -1,20 +1,17 @@
 #include "pch.h"
 #include "asset_database.h"
 
-#include "logger.h"
-
 #include <ranges>
+#include "Asset/Importer/asset_importer.h"
+#include "Asset/Importer/txt_importer.h"
+#include "logger.h"
 
 namespace engine
 {
 
 path AssetDatabase::m_project_directory_;
-
 std::shared_ptr<AssetHierarchy> AssetDatabase::m_asset_hierarchy_;
-
-std::unordered_map<std::string, std::vector<std::shared_ptr<AssetDescriptor>>>
-AssetDatabase::m_assets_map_by_type_;
-
+std::unordered_map<std::string, std::vector<std::shared_ptr<AssetDescriptor>>> AssetDatabase::m_assets_map_by_type_;
 
 static std::vector<std::string> GetSplitPath(path path)
 {
@@ -34,6 +31,11 @@ bool AssetHierarchy::IsFile() const
 bool AssetHierarchy::IsDirectory() const
 {
     return asset == nullptr;
+}
+void AssetDatabase::Init()
+{
+    AssetImporter::AddImporter(std::make_shared<TxtImporter>());
+    SetProjectDirectory(current_path() / "Resources");
 }
 void AssetDatabase::SetProjectDirectory(const path &path)
 {
@@ -108,11 +110,11 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetOrCreateAssetHierarchy(const p
 
     return current_node;
 }
-std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetsByType(const std::string &type)
+std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptorsByType(const std::string &type)
 {
     return m_assets_map_by_type_[type];
 }
-std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetAt(const path &path_file)
+std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const path &path_file)
 {
     const auto hierarchy = GetOrCreateAssetHierarchy(path_file);
     if (hierarchy->asset == nullptr)
@@ -122,7 +124,7 @@ std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetAt(const path &path_file
     }
     return hierarchy->asset;
 }
-std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetsAt(const path &path_directory)
+std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptors(const path &path_directory)
 {
     const auto hierarchy = GetOrCreateAssetHierarchy(path_directory);
     auto result = std::vector<std::shared_ptr<AssetDescriptor>>();
@@ -141,4 +143,56 @@ std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetsAt(const p
 
     return result;
 }
+std::shared_ptr<Object> AssetDatabase::GetAsset(const path &path)
+{
+    const auto descriptor = GetAssetDescriptor(path);
+    if (descriptor == nullptr)
+    {
+        Logger::Warn<AssetDatabase>("Asset '%s' not found", path.string().c_str());
+        return nullptr;
+    }
+
+    const auto asset = descriptor->object;
+    if (asset != nullptr)
+    {
+        return asset;
+    }
+
+    const auto importer = AssetImporter::GetAssetImporter(path.extension().string());
+    if (importer == nullptr)
+    {
+        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", path.extension().string().c_str());
+        return nullptr;
+    }
+
+    descriptor->object = importer->Import(descriptor.get());
+    return descriptor->object;
+}
+std::vector<std::shared_ptr<Object>> AssetDatabase::GetAssetsByType(const std::string &type)
+{
+    auto result = std::vector<std::shared_ptr<Object>>();
+    for (const auto &descriptor : GetAssetDescriptorsByType(type))
+    {
+        result.emplace_back(GetAsset(descriptor->path));
+    }
+    return result;
+}
+void AssetDatabase::SaveAsset(const path &path)
+{
+    const auto descriptor = GetAssetDescriptor(path);
+    if (descriptor == nullptr)
+    {
+        Logger::Warn<AssetDatabase>("Asset '%s' not found", path.string().c_str());
+        return;
+    }
+    const auto importer = AssetImporter::GetAssetImporter(path.extension().string());
+    if (importer == nullptr)
+    {
+        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", path.extension().string().c_str());
+        return;
+    }
+
+    importer->Export(descriptor.get());
+}
+
 }
