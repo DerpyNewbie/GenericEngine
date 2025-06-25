@@ -74,9 +74,9 @@ public:
     /// <summary>
     /// Retrieves all AssetDescriptors with a specified type
     /// </summary>
-    /// <param name="type">A file extension that begins with the dot '.'. E.x. ".txt"</param>
-    /// <returns>List of AssetDescriptors that has extension of <paramref name="type"/></returns>
-    static std::vector<std::shared_ptr<AssetDescriptor>> GetAssetDescriptorsByType(const std::string &type);
+    /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
+    /// <returns>List of AssetDescriptors that has extension of <paramref name="file_extension"/></returns>
+    static std::vector<std::shared_ptr<AssetDescriptor>> GetAssetDescriptorsByType(const std::string &file_extension);
 
     /// <summary>
     /// Retrieve the imported object from a corresponding path. 
@@ -88,9 +88,9 @@ public:
     /// <summary>
     /// Retrieve all imported objects with a specified type 
     /// </summary>
-    /// <param name="type">A file extension that begins with the dot '.'. E.x. ".txt"</param>
-    /// <returns>List of the imported objects that has extension of <paramref name="type/></returns>
-    static std::vector<std::shared_ptr<Object>> GetAssetsByType(const std::string &type);
+    /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
+    /// <returns>List of the imported objects that has extension of <paramref name="file_extension"/></returns>
+    static std::vector<std::shared_ptr<Object>> GetAssetsByType(const std::string &file_extension);
 
     /// <summary>
     /// Saves the changed AssetDescriptor.

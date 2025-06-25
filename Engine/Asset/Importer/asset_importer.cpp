@@ -8,8 +8,8 @@ std::unordered_map<std::string, std::shared_ptr<AssetImporter>> AssetImporter::m
 
 void AssetImporter::AddImporter(const std::shared_ptr<AssetImporter> &importer)
 {
-    for (const auto &type : importer->SupportedExtensions())
-        m_asset_importers_[type] = importer;
+    for (const auto &file_extension : importer->SupportedExtensions())
+        m_asset_importers_[file_extension] = importer;
 }
 void AssetImporter::AddImporter(const std::string &file_extension, const std::shared_ptr<AssetImporter> &importer)
 {

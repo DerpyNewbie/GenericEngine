@@ -110,9 +110,10 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetOrCreateAssetHierarchy(const p
 
     return current_node;
 }
-std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptorsByType(const std::string &type)
+std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptorsByType(
+    const std::string &file_extension)
 {
-    return m_assets_map_by_type_[type];
+    return m_assets_map_by_type_[file_extension];
 }
 std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const path &path_file)
 {
@@ -168,10 +169,10 @@ std::shared_ptr<Object> AssetDatabase::GetAsset(const path &path)
     descriptor->object = importer->Import(descriptor.get());
     return descriptor->object;
 }
-std::vector<std::shared_ptr<Object>> AssetDatabase::GetAssetsByType(const std::string &type)
+std::vector<std::shared_ptr<Object>> AssetDatabase::GetAssetsByType(const std::string &file_extension)
 {
     auto result = std::vector<std::shared_ptr<Object>>();
-    for (const auto &descriptor : GetAssetDescriptorsByType(type))
+    for (const auto &descriptor : GetAssetDescriptorsByType(file_extension))
     {
         result.emplace_back(GetAsset(descriptor->path));
     }
