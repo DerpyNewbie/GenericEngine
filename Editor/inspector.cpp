@@ -5,7 +5,7 @@
 #include "default_editor_menus.h"
 #include "imgui_stdlib.h"
 #include "game_object.h"
-#include "asset_database.h"
+#include "Asset/asset_database.h"
 
 namespace editor
 {
@@ -26,22 +26,38 @@ void Inspector::OnEditorGui()
         m_last_seen_object_ = Editor::Instance()->SelectedObject();
     }
 
-    const auto selected_obj = m_last_seen_object_.lock();
-
-    if (selected_obj == nullptr)
+    DrawObject(m_last_seen_object_.lock());
+}
+void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
+{
+    if (object == nullptr)
     {
         ImGui::Text("Select a object to inspect...");
         return;
     }
 
-    const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(selected_obj);
+    const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(object);
     if (game_object != nullptr)
     {
         DrawGameObject(game_object);
         return;
     }
 
-    const auto asset_hierarchy = std::dynamic_pointer_cast<engine::AssetHierarchy>(selected_obj);
+    const auto component = std::dynamic_pointer_cast<engine::Component>(object);
+    if (component != nullptr)
+    {
+        DrawComponent(component);
+        return;
+    }
+
+    const auto inspectable = std::dynamic_pointer_cast<engine::Inspectable>(object);
+    if (inspectable != nullptr)
+    {
+        DrawInspectable(inspectable);
+        return;
+    }
+
+    const auto asset_hierarchy = std::dynamic_pointer_cast<engine::AssetHierarchy>(object);
     if (asset_hierarchy != nullptr)
     {
         DrawAssetHierarchy(asset_hierarchy);
@@ -49,7 +65,7 @@ void Inspector::OnEditorGui()
     }
 
     ImGui::Text("Unknown object type is selected!");
-    ImGui::Text("Object Name: '%s'", selected_obj->Name().c_str());
+    ImGui::Text("Object Name: '%s'", object->Name().c_str());
 }
 void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
@@ -101,7 +117,7 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
                 }
 
                 ImGui::Indent();
-                component->OnInspectorGui();
+                DrawComponent(component);
                 ImGui::Unindent();
             }
             ImGui::PopID();
@@ -119,17 +135,32 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
     {
         ImGui::OpenPopup("##INSPECTOR_ADD_COMPONENT_POPUP");
     }
-
+}
+void Inspector::DrawComponent(const std::shared_ptr<engine::Component> &component)
+{
+    component->OnInspectorGui();
+}
+void Inspector::DrawInspectable(const std::shared_ptr<engine::Inspectable> &inspectable)
+{
+    inspectable->OnInspectorGui();
 }
 void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
 {
     if (asset_hierarchy->IsFile())
     {
         ImGui::Text("File: %s", asset_hierarchy->asset->path.string().c_str());
+        ImGui::Separator();
+        if (asset_hierarchy->asset->object != nullptr)
+        {
+            DrawObject(asset_hierarchy->asset->object);
+        }
+        else
+        {
+            ImGui::Text("Object is null!");
+        }
+        return;
     }
-    else
-    {
-        ImGui::Text("Folder: %s", asset_hierarchy->asset->path.string().c_str());
-    }
+
+    ImGui::Text("Folder: %s", asset_hierarchy->asset->path.string().c_str());
 }
 }
