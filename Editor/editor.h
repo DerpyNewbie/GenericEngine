@@ -19,7 +19,7 @@ public:
     int Order() override
     {
         // Editor will get called very last to prevent issues on drawing
-        return INT_MAX;
+        return INT_MAX - 1000;
     }
 
     void Init();
@@ -34,4 +34,3 @@ public:
     void RemoveEditorWindow(const std::string &name);
 };
 }
-
