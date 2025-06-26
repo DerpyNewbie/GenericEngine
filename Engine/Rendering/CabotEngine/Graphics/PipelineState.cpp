@@ -78,7 +78,7 @@ void PipelineState::SetGS(std::wstring filePath)
         return;
     }
 
-    desc.GS = CD3DX12_SHADER_BYTECODE(m_pGSBlob.Get());
+    desc.GS = CD3DX12_SHADER_BYTECODE(m_pGsBlob.Get());
 }
 
 void PipelineState::SetMaterial(std::shared_ptr<engine::Material> material)
