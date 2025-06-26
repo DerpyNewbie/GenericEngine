@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gizmos.h"
 
+#include "logger.h"
 #include "update_manager.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -10,34 +11,62 @@
 
 namespace engine
 {
-std::shared_ptr<Gizmos> Gizmos::m_instance_;
+std::shared_ptr<Gizmos> Gizmos::m_instance_ = nullptr;
 std::vector<Vertex> Gizmos::m_vertices_;
 
 void Gizmos::Init()
 {
-    assert(g_RenderEngine != nullptr && "Gizmos is already initialized");
+    assert(g_RenderEngine != nullptr && "RenderEngine is not initialized");
+    assert(m_instance_ == nullptr && "Gizmos is already initialized");
 
     m_instance_ = std::make_shared<Gizmos>();
+    m_instance_->m_constant_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 2);
     UpdateManager::SubscribeDrawCall(m_instance_);
 }
 void Gizmos::OnDraw()
 {
+    assert(m_instance_ != nullptr && "Gizmos is not initialized");
+
     if (m_vertices_.empty())
         return;
 
-    const auto camera = Camera::Main();
-    auto constant_buffer = ConstantBuffer(sizeof(Matrix) * 2);
-    const auto mat_ptr = constant_buffer.GetPtr<Matrix>();
-    mat_ptr[0] = camera.lock()->GetViewMatrix();
-    mat_ptr[1] = camera.lock()->GetProjectionMatrix();
+    const auto camera = Camera::Main().lock();
+    if (camera == nullptr)
+    {
+        Logger::Error<Gizmos>("Main Camera is not set!");
+        m_vertices_.clear();
+        return;
+    }
 
-    const auto vertex_buffer = VertexBuffer(m_vertices_.size(), m_vertices_.data());
-    const auto vertex_buffer_view = vertex_buffer.View();
-    auto cmd_list = g_RenderEngine->CommandList();
+    const auto constant_buffer = m_instance_->m_constant_buffer_;
+    if (!constant_buffer->IsValid())
+    {
+        Logger::Error<Gizmos>("ConstantBuffer is invalid!");
+        m_vertices_.clear();
+        return;
+    }
+
+    const auto mat_ptr = constant_buffer->GetPtr<Matrix>();
+    mat_ptr[0] = camera->GetViewMatrix();
+    mat_ptr[1] = camera->GetProjectionMatrix();
+
+    const auto vertex_buffer = std::make_shared<VertexBuffer>(m_vertices_.size(), m_vertices_.data());
+    const auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
+    m_instance_->m_vertex_buffers_[buffer_index] = vertex_buffer;
+
+    if (!vertex_buffer->IsValid())
+    {
+        Logger::Error<Gizmos>("Failed to create VertexBuffer!");
+        m_vertices_.clear();
+        return;
+    }
+
+    const auto vertex_buffer_view = vertex_buffer->View();
+    const auto cmd_list = g_RenderEngine->CommandList();
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
-    cmd_list->SetGraphicsRootConstantBufferView(0, constant_buffer.GetAddress());
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
+    cmd_list->SetGraphicsRootConstantBufferView(0, constant_buffer->GetAddress());
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
     cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);
 

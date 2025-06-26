@@ -19,7 +19,7 @@ public:
     int Order() override
     {
         // Editor will get called very last to prevent issues on drawing
-        return INT_MAX - 1000;
+        return INT_MAX;
     }
 
     void Init();

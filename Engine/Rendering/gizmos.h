@@ -1,5 +1,6 @@
 #pragma once
 #include "event_receivers.h"
+#include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/VertexBuffer.h"
 #include "Math/bounds.h"
 
@@ -22,6 +23,9 @@ class Gizmos : public IDrawCallReceiver
     static std::shared_ptr<Gizmos> m_instance_;
     static std::vector<Vertex> m_vertices_;
 
+    std::shared_ptr<VertexBuffer> m_vertex_buffers_[2];
+    std::shared_ptr<ConstantBuffer> m_constant_buffer_;
+
     static void Init();
 
 public:
@@ -29,7 +33,7 @@ public:
 
     int Order() override
     {
-        return INT_MAX - 100; // at the very last
+        return INT_MAX - 1000; // at the very last
     }
 
     void OnDraw() override;
