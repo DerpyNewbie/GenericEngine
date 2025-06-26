@@ -105,4 +105,16 @@ void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &
     circle.emplace_back(circle[0]);
     DrawLines(circle, color);
 }
+void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &color, const int segments)
+{
+    for (int i = 0; i < segments; i++)
+    {
+        const auto progress = static_cast<float>(i) / static_cast<float>(segments);
+        const auto theta = Mathf::kPi * 2 * progress;
+        DrawCircle(center, radius, color, Quaternion::CreateFromYawPitchRoll(theta, 0, 0), segments);
+
+        // make it uv sphere
+        DrawCircle(center, radius, color, Quaternion::CreateFromYawPitchRoll(0, theta, 0), segments);
+    }
+}
 }

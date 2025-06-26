@@ -42,5 +42,6 @@ public:
     static void DrawLines(const std::vector<Vector3> &line, const Color &color = kDefaultColor);
     static void DrawCircle(const Vector3 &center, float radius, const Color &color = kDefaultColor,
                            const Quaternion &rotation = Quaternion::Identity, int segments = 16);
+    static void DrawSphere(const Vector3 &center, float radius, const Color &color = kDefaultColor, int segments = 16);
 };
 }
