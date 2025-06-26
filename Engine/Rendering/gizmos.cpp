@@ -93,8 +93,8 @@ void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &
     std::vector<Vector3> circle(segments);
     for (auto i = 0; i < segments; i++)
     {
-        const auto theta = Mathf::kPi * 2 * static_cast<float>(i / segments);
-        circle.emplace_back(std::cos(theta) * radius, std::sin(theta) * radius, 0);
+        const auto theta = Mathf::kPi * 2 * static_cast<float>(i) / static_cast<float>(segments);
+        circle[i] = Vector3{std::cos(theta) * radius, std::sin(theta) * radius, 0};
     }
     for (auto &point : circle)
     {
