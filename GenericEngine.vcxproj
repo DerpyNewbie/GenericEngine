@@ -99,6 +99,7 @@
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp" />
+    <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
     <ClCompile Include="Engine\Rendering\line_renderer.cpp" />
     <ClCompile Include="Engine\Rendering\material.cpp" />
     <ClCompile Include="Engine\Rendering\material_block.cpp" />
@@ -192,6 +193,7 @@
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Engine\Rendering\gizmos.h"/>
     <ClInclude Include="Engine\Rendering\line_renderer.h" />
     <ClInclude Include="Engine\Rendering\material.h" />
     <ClInclude Include="Engine\Rendering\material_block.h" />

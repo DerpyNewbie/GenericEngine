@@ -16,6 +16,7 @@
 #include "scene_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "application.h"
+#include "Rendering/gizmos.h"
 #include "Rendering/CabotEngine/Core/Timer.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
@@ -42,6 +43,7 @@ bool Engine::Init()
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
+    Gizmos::Init();
     Time::Get()->Init();
     AssetDatabase::Init();
     SceneManager::CreateScene("Default Scene");
@@ -78,7 +80,7 @@ void Engine::MainLoop() const
             Profiler::Begin("Draw Call");
             g_RenderEngine->BeginRender();
             g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
-            auto& descriptor_heap_wrapped = g_DescriptorHeapManager->Get();
+            auto &descriptor_heap_wrapped = g_DescriptorHeapManager->Get();
             auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
             descriptor_heap_wrapped.Release();
             g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
