@@ -20,6 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
+    <ClCompile Include="Editor\asset_browser.cpp"/>
+    <ClCompile Include="Editor\default_editor_menus.cpp"/>
+    <ClCompile Include="Editor\editor_menu.cpp"/>
     <ClCompile Include="Editor\editor_prefs.cpp" />
     <ClCompile Include="Editor\editor_window.cpp" />
     <ClCompile Include="Editor\editor.cpp" />
@@ -27,6 +30,11 @@
     <ClCompile Include="Editor\inspector.cpp" />
     <ClCompile Include="Editor\profiler.cpp" />
     <ClCompile Include="Editor\update_man_debugger.cpp" />
+    <ClCompile Include="Engine\Asset\asset_database.cpp"/>
+    <ClCompile Include="Engine\Asset\asset_hierarchy.cpp"/>
+    <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
+    <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
+    <ClCompile Include="Engine\Asset\text_asset.cpp"/>
     <ClCompile Include="Engine\Components\camera.cpp" />
     <ClCompile Include="Engine\Components\component.cpp" />
     <ClCompile Include="Engine\Components\controller.cpp" />
@@ -110,6 +118,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
+    <ClInclude Include="Editor\asset_browser.h"/>
+    <ClInclude Include="Editor\default_editor_menus.h"/>
+    <ClInclude Include="Editor\editor_menu.h"/>
     <ClInclude Include="Editor\editor_prefs.h" />
     <ClInclude Include="Editor\editor_window.h" />
     <ClInclude Include="Editor\editor.h" />
@@ -117,6 +128,13 @@
     <ClInclude Include="Editor\inspector.h" />
     <ClInclude Include="Editor\profiler.h" />
     <ClInclude Include="Editor\update_man_debugger.h" />
+    <ClInclude Include="Engine\Asset\asset_database.h"/>
+    <ClInclude Include="Engine\Asset\asset_descriptor.h"/>
+    <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
+    <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
+    <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
+    <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
+    <ClInclude Include="Engine\Asset\text_asset.h"/>
     <ClInclude Include="Engine\Components\camera.h" />
     <ClInclude Include="Engine\Components\component.h" />
     <ClInclude Include="Engine\Components\controller.h" />
@@ -137,6 +155,7 @@
     <ClInclude Include="Engine\engine_util.h" />
     <ClInclude Include="Engine\event_receivers.h" />
     <ClInclude Include="Engine\game_object.h" />
+    <ClInclude Include="Engine\inspectable.h"/>
     <ClInclude Include="Engine\logger.h" />
     <ClInclude Include="Engine\Math\bounds.h" />
     <ClInclude Include="Engine\Math\mathf.h" />
