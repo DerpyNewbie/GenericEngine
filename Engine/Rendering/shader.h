@@ -1,5 +1,9 @@
 #pragma once
 #include "object.h"
+#include "CabotEngine/Graphics/ComPtr.h"
+#include <d3dcommon.h>
+#include <d3dcompiler.h>
+#include <directx/d3dx12_core.h>
 
 namespace engine
 {
@@ -12,12 +16,23 @@ namespace engine
 /// </remarks>
 class Shader : public Object
 {
-    // TODO: compiled shader object
+protected:
+    ComPtr<ID3DBlob> m_pShaderBlob;
+    
+public:
+    virtual bool CompileShader(std::wstring file_path) = 0;
+    CD3DX12_SHADER_BYTECODE GetByteCode() const {return m_pShaderBlob.Get();}
 };
 
 class PixelShader : public Shader
-{};
+{
+    bool CompileShader(std::wstring file_path) override;
+    
+};
 
 class VertexShader : public Shader
-{};
+{
+    bool CompileShader(std::wstring file_path) override;
+    
+};
 }
