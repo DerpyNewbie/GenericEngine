@@ -3,12 +3,9 @@
 
 namespace editor
 {
-class EditorPrefs final : public EditorWindow
+class AssetBrowser : public EditorWindow
 {
 public:
-    static bool show_grid;
-    static int theme;
-
     std::string Name() override;
     void OnEditorGui() override;
 };

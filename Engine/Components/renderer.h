@@ -8,5 +8,6 @@ class Renderer : public Component, public IDrawCallReceiver
 {
 public:
     void OnAwake() override;
+    void OnDestroy() override;
 };
 }

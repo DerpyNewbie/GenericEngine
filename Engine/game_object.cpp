@@ -2,6 +2,7 @@
 
 #include "game_object.h"
 
+#include "engine.h"
 #include "scene.h"
 #include "scene_manager.h"
 
@@ -20,7 +21,18 @@ void GameObject::OnConstructed()
     AddComponent<engine::Transform>();
     SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
 }
-
+void GameObject::OnDestroy()
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnDestroy();
+    }
+    Object::OnDestroy();
+}
+void GameObject::NotifyDestroy()
+{
+    DestroyThis();
+}
 std::shared_ptr<Transform> GameObject::Transform() const
 {
     return GetComponent<engine::Transform>();
@@ -61,24 +73,36 @@ std::shared_ptr<Scene> GameObject::Scene() const
 std::string GameObject::Path() const
 {
     if (Transform() == nullptr || Transform()->Parent() == nullptr)
-        return m_name_;
-    return Transform()->Parent()->GameObject()->Path() + "/" + m_name_;
+        return Name();
+    return Transform()->Parent()->GameObject()->Path() + "/" + Name();
 }
 
-std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent)
+std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent) const
 {
     if (Transform() == nullptr || parent->Transform() == nullptr || !Transform()->IsChildOf(parent->Transform()))
-        return m_name_;
+        return Name();
     const auto path = Path();
     const auto parent_path = parent->Path();
 
     return path.substr(parent_path.size());
 }
 
-void GameObject::InvokeUpdate() const
+void GameObject::InvokeUpdate()
 {
+    if (IsDestroying())
+    {
+        Scene()->MarkDestroying(shared_from_base<GameObject>());
+        return;
+    }
+
     for (auto &component : m_components_)
     {
+        if (component->IsDestroying())
+        {
+            Scene()->MarkDestroying(component);
+            continue;
+        }
+
         if (!component->m_has_called_start_)
         {
             Logger::Log<GameObject>("[%s] Calling first start for %s",

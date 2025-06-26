@@ -12,15 +12,17 @@
 
 namespace editor
 {
-void Hierarchy::OnConstructed()
+Hierarchy::Hierarchy()
 {
-    IEditorWindow::OnConstructed();
-    SetName("Hierarchy");
     window_flags = ImGuiWindowFlags_MenuBar;
+}
+std::string Hierarchy::Name()
+{
+    return "Hierarchy";
 }
 void Hierarchy::OnEditorGui()
 {
-    DrawMenu();
+    Editor::Instance()->DrawEditorMenuBar();
     for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
          const auto &scene : current_scenes)
     {
@@ -29,78 +31,13 @@ void Hierarchy::OnEditorGui()
         ImGui::PopID();
     }
 
-    if (selected_game_object != nullptr)
+    const auto locked = selected_game_object.lock();
+    if (locked != nullptr)
     {
         SetFontSize(12);
-        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(selected_game_object->Name()).c_str(),
-                                    DxLibConverter::From(selected_game_object->Transform()->WorldToLocal()));
+        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(locked->Name()).c_str(),
+                                    DxLibConverter::From(locked->Transform()->WorldToLocal()));
     }
-}
-void Hierarchy::DrawMenu()
-{
-    if (!ImGui::BeginMenuBar())
-        return;
-
-    if (ImGui::BeginMenu("Files"))
-    {
-        if (ImGui::MenuItem("Unload Scene"))
-        {
-            engine::SceneManager::DestroyScene("Default Scene");
-        }
-        if (ImGui::MenuItem("Load Scene"))
-        {
-            engine::Serializer serializer;
-            engine::SceneManager::AddScene(serializer.Load<engine::Scene>("Default Scene.json"));
-        }
-        if (ImGui::MenuItem("Save Scene"))
-        {
-            engine::Serializer serializer;
-            serializer.Save(engine::SceneManager::GetActiveScene());
-        }
-        ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Edit"))
-    {
-        if (ImGui::BeginMenu("Prefs"))
-        {
-            ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
-            ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
-
-            ImGui::EndMenu();
-        }
-        ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Object"))
-    {
-        if (ImGui::MenuItem("Create Empty"))
-        {
-            Instantiate<engine::GameObject>("Empty GameObject");
-        }
-        ImGui::EndMenu();
-    }
-
-    if (ImGui::BeginMenu("Window"))
-    {
-        const auto names = editor->GetEditorWindowNames();
-        for (auto &name : names)
-        {
-            // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
-            if (name == "Hierarchy")
-            {
-                ImGui::BeginDisabled();
-                ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
-                ImGui::EndDisabled();
-                continue;
-            }
-            ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
-        }
-
-        ImGui::EndMenu();
-    }
-
-    ImGui::EndMenuBar();
 }
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 {
@@ -184,9 +121,12 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     }
 
     ImGui::SameLine();
-    if (ImGui::Selectable(game_object->Name().c_str(), game_object == selected_game_object))
+
+    const auto locked = selected_game_object.lock();
+    if (ImGui::Selectable(game_object->Name().c_str(), game_object == locked))
     {
         selected_game_object = game_object;
+        Editor::Instance()->SetSelectedObject(locked);
     }
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
@@ -197,6 +137,17 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
         ImGui::Text("Dragging %s", game_object->Path().c_str());
         ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        ImGui::Text("Game Object Context Menu for %s", game_object->Path().c_str());
+        if (ImGui::MenuItem("Delete"))
+        {
+            engine::Object::Destroy(game_object);
+        }
+
+        ImGui::EndPopup();
     }
 
     return is_tree_expanded;

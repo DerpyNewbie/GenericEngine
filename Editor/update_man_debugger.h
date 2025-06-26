@@ -3,9 +3,9 @@
 
 namespace editor
 {
-class UpdateManDebugger final : public IEditorWindow
+class UpdateManDebugger final : public EditorWindow
 {
-    void OnConstructed() override;
+    std::string Name() override;
     void OnEditorGui() override;
 };
 }

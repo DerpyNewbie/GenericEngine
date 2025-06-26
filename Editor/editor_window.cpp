@@ -2,7 +2,11 @@
 
 #include "editor_window.h"
 
-void editor::IEditorWindow::DrawGui()
+std::string editor::EditorWindow::Name()
+{
+    return typeid(*this).name();
+}
+void editor::EditorWindow::DrawGui()
 {
     if (!is_open)
         return;

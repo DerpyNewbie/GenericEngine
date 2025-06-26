@@ -5,16 +5,16 @@
 
 namespace editor
 {
-class Hierarchy : public IEditorWindow
+class Hierarchy final : public EditorWindow
 {
 public:
-    std::shared_ptr<engine::GameObject> selected_game_object;
+    std::weak_ptr<engine::GameObject> selected_game_object;
 
-    void OnConstructed() override;
+    Hierarchy();
+    std::string Name() override;
     void OnEditorGui() override;
 
 private:
-    void DrawMenu();
     void DrawScene(const std::shared_ptr<engine::Scene> &scene);
     void DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object);
     bool DrawObject(const std::shared_ptr<engine::GameObject> &game_object);

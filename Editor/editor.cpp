@@ -1,6 +1,9 @@
 ﻿#include "pch.h"
 
 #include "editor.h"
+
+#include "asset_browser.h"
+#include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "hierarchy.h"
 #include "inspector.h"
@@ -31,6 +34,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+Editor *Editor::m_instance_ = nullptr;
+
 void Editor::SetEditorStyle(const int i)
 {
     if (m_last_editor_style_ == i)
@@ -52,8 +57,15 @@ void Editor::SetEditorStyle(const int i)
     m_last_editor_style_ = i;
 }
 
+Editor *Editor::Instance()
+{
+    return m_instance_;
+}
+
 void Editor::Init()
 {
+    m_instance_ = this;
+
     {
         Application::AddWindowCallback(WndProc);
         // imgui init
@@ -94,15 +106,21 @@ void Editor::Init()
     }
 
     {
-        const auto hierarchy = engine::Object::Instantiate<Hierarchy>();
-        const auto inspector = engine::Object::Instantiate<Inspector>();
-        inspector->selected_game_object_ptr = &hierarchy->selected_game_object;
+        AddEditorWindow("Hierarchy", std::make_shared<Hierarchy>());
+        AddEditorWindow("Inspector", std::make_shared<Inspector>());
+        AddEditorWindow("Editor Prefs", std::make_shared<EditorPrefs>());
+        AddEditorWindow("Profiler", std::make_shared<Profiler>());
+        AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
+        AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
+    }
 
-        AddEditorWindow("Inspector", inspector);
-        AddEditorWindow("Hierarchy", hierarchy);
-        AddEditorWindow("Editor Prefs", engine::Object::Instantiate<EditorPrefs>());
-        AddEditorWindow("Profiler", engine::Object::Instantiate<Profiler>());
-        AddEditorWindow("Update Manager Debugger", engine::Object::Instantiate<UpdateManDebugger>());
+    {
+        const auto default_menu = std::make_shared<DefaultEditorMenu>();
+        AddEditorMenu("File", default_menu, -1000);
+        AddEditorMenu("Edit", default_menu, -990);
+        AddEditorMenu("GameObject", default_menu, -980);
+        AddEditorMenu("Component", default_menu, -970);
+        AddEditorMenu("Window", default_menu, -960);
     }
 }
 
@@ -156,9 +174,18 @@ void Editor::Finalize()
     ImGui::DestroyContext();
 }
 
-void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<IEditorWindow> window)
+void Editor::SetSelectedObject(const std::shared_ptr<engine::Object> &object)
 {
-    window->editor = this;
+    m_selected_object_ = object;
+}
+
+std::shared_ptr<engine::Object> Editor::SelectedObject() const
+{
+    return m_selected_object_.lock();
+}
+
+void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
+{
     m_editor_windows_.emplace(name, window);
 }
 
@@ -168,7 +195,7 @@ std::vector<std::string> Editor::GetEditorWindowNames()
     return {keys.begin(), keys.end()};
 }
 
-std::shared_ptr<IEditorWindow> Editor::GetEditorWindow(const std::string &name)
+std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
 {
     return m_editor_windows_.at(name);
 }
@@ -176,5 +203,51 @@ std::shared_ptr<IEditorWindow> Editor::GetEditorWindow(const std::string &name)
 void Editor::RemoveEditorWindow(const std::string &name)
 {
     m_editor_windows_.erase(name);
+}
+
+void Editor::AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, const int priority)
+{
+    m_editor_menus_.emplace_back(name, menu, priority);
+    std::ranges::sort(m_editor_menus_, std::ranges::less(), &PrioritizedEditorMenu::priority);
+}
+
+std::vector<Editor::PrioritizedEditorMenu> Editor::GetEditorMenus()
+{
+    return m_editor_menus_;
+}
+
+std::shared_ptr<EditorMenu> Editor::GetEditorMenu(const std::string &name)
+{
+    const auto item = std::ranges::find(m_editor_menus_, name, &PrioritizedEditorMenu::name);
+    return item->menu;
+}
+
+void Editor::RemoveEditorMenu(const std::string &name)
+{
+    m_editor_menus_.erase(std::ranges::find_if(m_editor_menus_, [&](const auto &m) {
+        return m.name == name;
+    }));
+}
+
+void Editor::DrawEditorMenuBar() const
+{
+    if (!ImGui::BeginMenuBar())
+        return;
+
+    for (const auto &menu : m_editor_menus_)
+    {
+        if (ImGui::BeginMenu(menu.name.c_str()))
+        {
+            menu.menu->OnEditorMenuGui(menu.name);
+            ImGui::EndMenu();
+        }
+    }
+
+    ImGui::EndMenuBar();
+}
+
+void Editor::DrawEditorMenu(const std::string &name)
+{
+    GetEditorMenu(name)->OnEditorMenuGui(name);
 }
 }

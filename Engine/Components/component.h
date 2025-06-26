@@ -41,9 +41,6 @@ public:
 
     virtual void OnInspectorGui();
 
-    virtual void OnDestroy()
-    {}
-
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const
     {
         return m_game_object_.lock();

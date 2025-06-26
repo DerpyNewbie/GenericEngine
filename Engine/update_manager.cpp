@@ -21,8 +21,8 @@ void CustomUpdate(It begin_it, const It &end_it, Func func)
         auto locked = (*begin_it).lock();
         if (locked == nullptr)
         {
-            Logger::Warn<UpdateManager>("[Update] Expired pointer for %s detected!",
-                                        Logger::GetTypeName(typeid(It).name()));
+            Logger::Warn<UpdateManager>("Expired pointer for %s detected!",
+                                        Logger::GetTypeName(typeid(It).name()).c_str());
             continue;
         }
 

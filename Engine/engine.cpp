@@ -9,6 +9,7 @@
 
 #include "engine.h"
 
+#include "Asset/asset_database.h"
 #include "engine_profiler.h"
 #include "engine_time.h"
 #include "update_manager.h"
@@ -42,6 +43,7 @@ bool Engine::Init()
     g_PSOManager.Initialize();
 
     Time::Get()->Init();
+    AssetDatabase::Init();
     SceneManager::CreateScene("Default Scene");
 
     return true;

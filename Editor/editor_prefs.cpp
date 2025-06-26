@@ -5,10 +5,10 @@ namespace editor
 {
 bool EditorPrefs::show_grid = true;
 int EditorPrefs::theme = 0;
-void EditorPrefs::OnConstructed()
+
+std::string EditorPrefs::Name()
 {
-    IEditorWindow::OnConstructed();
-    SetName("Editor Preferences");
+    return "Editor Preferences";
 }
 void EditorPrefs::OnEditorGui()
 {

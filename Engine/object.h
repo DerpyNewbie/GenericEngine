@@ -17,20 +17,39 @@ namespace engine
 {
 class Object : public enable_shared_from_base<Object>
 {
+    bool m_is_destroying_ = false;
+    std::string m_name_ = "Unknown Object";
+
+protected:
+    Object() = default;
+
 public:
     virtual ~Object() = default;
 
     virtual void OnConstructed()
     {}
 
-    std::string Name()
+    virtual void OnDestroy()
+    {}
+
+    std::string Name() const
     {
         return m_name_;
     }
 
-    virtual void SetName(const std::string &name)
+    void SetName(const std::string &name)
     {
         m_name_ = name;
+    }
+
+    bool IsDestroying() const
+    {
+        return m_is_destroying_;
+    }
+
+    void DestroyThis()
+    {
+        Destroy(shared_from_this());
     }
 
     template <class T>
@@ -55,16 +74,15 @@ public:
         return obj;
     }
 
+    static void Destroy(const std::shared_ptr<Object> &obj)
+    {
+        obj->m_is_destroying_ = true;
+    }
+
     template <class Archive>
     void serialize(Archive &ar)
     {
         ar(CEREAL_NVP(m_name_));
     }
-
-protected:
-    std::string m_name_ = "Unknown Object";
-
-    Object() = default;
-
 };
 }

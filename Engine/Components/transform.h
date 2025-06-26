@@ -15,6 +15,8 @@ class Transform : public Component
     void RenderLocalTransformGui();
     void RenderGlobalTransformGui();
 
+    void NotifyDestroy() const;
+
 public:
     void OnInspectorGui() override;
 
