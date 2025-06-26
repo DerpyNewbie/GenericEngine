@@ -12,12 +12,14 @@ void PSOManager::Initialize()
     BasicSetting.PSOName = "Basic";
     BasicSetting.RootSignature = g_RootSignatureManager.Get("Basic");
     BasicSetting.InputLayout = Vertex::InputLayout;
+    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
     Register(BasicSetting);
 
     //設定の一部が一緒なので使いまわす
     BasicSetting.PSOName = "Line";
+    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     BasicSetting.VSPath = L"x64/Debug/LineVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/LinePixelShader.cso";
     Register(BasicSetting);

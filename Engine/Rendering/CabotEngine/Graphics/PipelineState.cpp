@@ -38,6 +38,11 @@ void PipelineState::SetRootSignature(ID3D12RootSignature *rootSignature)
     desc.pRootSignature = rootSignature;
 }
 
+void PipelineState::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type)
+{
+    desc.PrimitiveTopologyType = primitive_type;
+}
+
 void PipelineState::SetVS(std::wstring filePath)
 {
     // 頂点シェーダー読み込み
@@ -54,19 +59,19 @@ void PipelineState::SetVS(std::wstring filePath)
 void PipelineState::SetPS(std::wstring filePath)
 {
     // ピクセルシェーダー読み込み
-    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pPSBlob.GetAddressOf());
+    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pPsBlob.GetAddressOf());
     if (FAILED(hr))
     {
         printf("ピクセルシェーダーの読み込みに失敗");
         return;
     }
 
-    desc.PS = CD3DX12_SHADER_BYTECODE(m_pPSBlob.Get());
+    desc.PS = CD3DX12_SHADER_BYTECODE(m_pPsBlob.Get());
 }
 
 void PipelineState::SetGS(std::wstring filePath)
 {
-    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pGSBlob.GetAddressOf());
+    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pGsBlob.GetAddressOf());
     if (FAILED(hr))
     {
         printf("ピクセルシェーダーの読み込みに失敗");
@@ -74,6 +79,12 @@ void PipelineState::SetGS(std::wstring filePath)
     }
 
     desc.GS = CD3DX12_SHADER_BYTECODE(m_pGSBlob.Get());
+}
+
+void PipelineState::SetMaterial(std::shared_ptr<engine::Material> material)
+{
+    desc.VS = material->vertex_shader->GetByteCode();
+    desc.PS = material->pixel_shader->GetByteCode();
 }
 
 void PipelineState::Create()

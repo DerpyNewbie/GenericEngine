@@ -12,6 +12,7 @@ struct PSOSetting
     std::wstring PSPath;
     ID3D12RootSignature* RootSignature;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
 };
 
 class PSOManager
