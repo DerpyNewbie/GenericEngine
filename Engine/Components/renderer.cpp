@@ -4,12 +4,39 @@
 
 #include "update_manager.h"
 
-void engine::Renderer::OnAwake()
+namespace engine
 {
-    UpdateManager::SubscribeDrawCall(shared_from_base<Renderer>());
+void Renderer::SetVisible(const bool visible)
+{
+    if (m_is_visible_ == visible)
+    {
+        return;
+    }
+
+    m_is_visible_ = visible;
+
+    if (m_is_visible_)
+    {
+        UpdateManager::SubscribeDrawCall(shared_from_base<Renderer>());
+    }
+    else
+    {
+        UpdateManager::UnsubscribeDrawCall(shared_from_base<Renderer>());
+    }
 }
-void engine::Renderer::OnDestroy()
+
+void Renderer::OnEnabled()
 {
-    UpdateManager::UnsubscribeDrawCall(shared_from_base<Renderer>());
-    Component::OnDestroy();
+    SetVisible(true);
+}
+
+void Renderer::OnDisabled()
+{
+    SetVisible(false);
+}
+
+void Renderer::OnDestroy()
+{
+    SetVisible(false);
+}
 }

@@ -6,8 +6,14 @@ namespace engine
 {
 class Renderer : public Component, public IDrawCallReceiver
 {
+protected:
+    bool m_is_visible_ = false;
+
+    void SetVisible(bool visible);
+
 public:
-    void OnAwake() override;
+    void OnEnabled() override;
+    void OnDisabled() override;
     void OnDestroy() override;
 };
 }
