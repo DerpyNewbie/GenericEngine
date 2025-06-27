@@ -125,8 +125,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     const auto locked = selected_game_object.lock();
     if (ImGui::Selectable(game_object->Name().c_str(), game_object == locked))
     {
-        selected_game_object = game_object;
-        Editor::Instance()->SetSelectedObject(locked);
+        Editor::Instance()->SetSelectedObject(game_object);
     }
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
