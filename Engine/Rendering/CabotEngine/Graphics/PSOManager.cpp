@@ -30,6 +30,7 @@ bool PSOManager::Register(PSOSetting setting)
     PipelineState *pso = new PipelineState;
     pso->SetInputLayout(setting.InputLayout);
     pso->SetRootSignature(setting.RootSignature);
+    pso->SetPrimitiveTopologyType(setting.PrimitiveType);
     pso->SetVS(setting.VSPath);
     pso->SetPS(setting.PSPath);
     pso->Create();
