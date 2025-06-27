@@ -50,6 +50,10 @@ public:
         m_components_.push_back(instance);
 
         instance->OnAwake();
+        if (IsActiveInHierarchy())
+        {
+            instance->OnEnabled();
+        }
         Logger::Log<GameObject>("[%s]: Added component '%s'", Path().c_str(), instance->Name().c_str());
         return instance;
     }
