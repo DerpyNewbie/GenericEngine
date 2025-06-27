@@ -4,6 +4,7 @@
 #include <vector>
 #include "RenderEngine.h"
 #include "StructuredBuffer.h"
+#include "Rendering/material.h"
 
 class ConstantBuffer;
 class Texture2D;
@@ -21,6 +22,7 @@ public:
     DescriptorHeap(); // コンストラクタで生成する
     ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
+    std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<engine::MaterialBlock> material_block);
     template <typename T>
     std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structuredBuffer);
     std::shared_ptr<DescriptorHandle> Allocate();

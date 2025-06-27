@@ -65,7 +65,30 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Textu
     device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
 
     m_pHandles.push_back(pHandle);
-    return pHandle; // ハンドルを返す
+    return pHandle;
+}
+
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<engine::MaterialBlock> material_block)
+{
+    auto count = m_pHandles.size();
+    if (HANDLE_MAX <= count)
+    {
+        return nullptr;
+    }
+
+    //マテリアルの最初のハンドルさえ確保できればいいのでここで代入する
+    std::shared_ptr<DescriptorHandle> pHandle = Register(material_block->params_float_buffer);
+    Register(material_block->params_int_buffer);
+    Register(material_block->params_vec2_buffer);
+    Register(material_block->params_vec3_buffer);
+    Register(material_block->params_vec4_buffer);
+    Register(material_block->params_mat4_buffer);
+    for (auto tex : material_block->params_tex2d | std::ranges::views::values)
+    {
+        Register(tex);
+    }
+    
+    return pHandle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
