@@ -4,7 +4,9 @@
 #include "Asset/asset_database.h"
 #include "logger.h"
 
-std::string editor::AssetBrowser::Name()
+namespace editor
+{
+std::string AssetBrowser::Name()
 {
     return "Asset Browser";
 }
@@ -17,14 +19,14 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
         {
             if (asset_hierarchy->asset->object == nullptr)
                 engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path);
-            editor::Editor::Instance()->SetSelectedObject(asset_hierarchy);
+            Editor::Instance()->SetSelectedObject(asset_hierarchy);
         }
 
         if (ImGui::BeginPopupContextItem("##ASSET_BROWSER_FILE_CONTEXT"))
         {
             if (ImGui::MenuItem("Save"))
             {
-                engine::Logger::Log<editor::AssetBrowser>("Saving %s", asset_hierarchy->asset->path.string().c_str());
+                engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->path.string().c_str());
                 engine::AssetDatabase::SaveAsset(asset_hierarchy->asset);
             }
 
@@ -47,7 +49,7 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
 
     ImGui::PopID();
 }
-void editor::AssetBrowser::OnEditorGui()
+void AssetBrowser::OnEditorGui()
 {
     if (ImGui::BeginPopupContextWindow())
     {
@@ -58,4 +60,5 @@ void editor::AssetBrowser::OnEditorGui()
 
     const auto asset_hierarchy = engine::AssetDatabase::GetRootAssetHierarchy();
     DrawAssetHierarchy(asset_hierarchy);
+}
 }
