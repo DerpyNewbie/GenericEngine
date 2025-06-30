@@ -5,8 +5,7 @@
 #include "RenderEngine.h"
 #include "StructuredBuffer.h"
 #include "Rendering/material.h"
-
-class ConstantBuffer;
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 class Texture2D;
 
 class DescriptorHandle
@@ -24,7 +23,8 @@ public:
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<engine::MaterialBlock> material_block);
     template <typename T>
-    std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structuredBuffer);
+    std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structured_buffer);
+    std::shared_ptr<DescriptorHandle> Register(ConstantBuffer& constant_buffer);
     std::shared_ptr<DescriptorHandle> Allocate();
 
     void Release();

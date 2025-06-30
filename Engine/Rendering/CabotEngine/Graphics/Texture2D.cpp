@@ -210,7 +210,7 @@ std::shared_ptr<Texture2D> Texture2D::GetWhite()
     ID3D12Resource *buff = GetDefaultResource(4, 4);
 
     std::vector<unsigned char> data(4 * 4 * 4);
-    std::fill(data.begin(), data.end(), 0xff);
+    std::fill(data.begin(), data.end(), 0x00);
 
     auto hr = buff->WriteToSubresource(0, nullptr, data.data(), 4 * 4, data.size());
     if (FAILED(hr))

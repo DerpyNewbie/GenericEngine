@@ -87,12 +87,16 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
 
     // apply meshes
     std::vector<std::shared_ptr<Mesh>> meshes;
+    std::vector<std::shared_ptr<Material>> materials;
     meshes.reserve(node->mNumMeshes);
+    materials.reserve(node->mNumMeshes);
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
         meshes.emplace_back(Mesh::CreateFromAiMesh(scene, scene->mMeshes[node->mMeshes[i]], GetGlobalTransform(node)));
+        materials.emplace_back(Material::CreateFromAiMaterial(scene,scene->mMeshes[node->mMeshes[i]]->mMaterialIndex));
     }
 
+    
     if (!meshes.empty())
     {
         const auto result_mesh = meshes[0];
@@ -104,10 +108,12 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         if (result_mesh->HasBoneWeights())
         {
             node_go->AddComponent<SkinnedMeshRenderer>()->shared_mesh = result_mesh;
+            node_go->GetComponent<SkinnedMeshRenderer>()->shared_materials = materials;
         }
         else
         {
             node_go->AddComponent<MeshRenderer>()->shared_mesh = result_mesh;
+            node_go->GetComponent<MeshRenderer>()->shared_materials = materials;
         }
     }
 

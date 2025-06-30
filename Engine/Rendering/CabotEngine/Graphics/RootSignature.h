@@ -6,7 +6,6 @@ struct ID3D12RootSignature;
 class RootSignature
 {
     static constexpr int ConstantBufferMaxSize = 6;
-    static constexpr int DescriptorHeapMaxSize = 6;
 public:
     RootSignature(); // コンストラクタでルートシグネチャを生成
     bool IsValid(); // ルートシグネチャの生成に成功したかどうかを返す

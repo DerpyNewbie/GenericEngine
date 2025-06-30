@@ -22,7 +22,7 @@ public:
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
     std::shared_ptr<ConstantBuffer> wvp_buffers[RenderEngine::FRAME_BUFFER_COUNT];
-    std::shared_ptr<DescriptorHandle> material_handle;
+    std::vector<std::shared_ptr<DescriptorHandle>> material_handles;
 
     bool buffer_creation_failed = false;
 

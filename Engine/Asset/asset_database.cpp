@@ -5,6 +5,7 @@
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
 #include "logger.h"
+#include "Importer/ShaderImporter.h"
 
 namespace engine
 {
@@ -35,6 +36,7 @@ bool AssetHierarchy::IsDirectory() const
 void AssetDatabase::Init()
 {
     AssetImporter::AddImporter(std::make_shared<TxtImporter>());
+    AssetImporter::AddImporter(std::make_shared<ShaderImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 void AssetDatabase::SetProjectDirectory(const path &path)

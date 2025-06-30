@@ -3,7 +3,6 @@
 #include <string>
 #include <unordered_map>
 #include "PipelineState.h"
-#include "ShaderObject.h"
 
 struct PSOSetting
 {
@@ -20,7 +19,6 @@ class PSOManager
 public:
     void Initialize();
     bool Register(PSOSetting setting);
-    bool Register(ShaderObject& shaderObject);
     
     ID3D12PipelineState* Get(const std::string& id){return psoCache[id]->Get();}
 

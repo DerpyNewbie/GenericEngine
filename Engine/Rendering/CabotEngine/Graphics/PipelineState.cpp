@@ -83,8 +83,8 @@ void PipelineState::SetGS(std::wstring filePath)
 
 void PipelineState::SetMaterial(std::shared_ptr<engine::Material> material)
 {
-    desc.VS = material->vertex_shader->GetByteCode();
-    desc.PS = material->pixel_shader->GetByteCode();
+    desc.VS = material->shared_shader->GetByteCode(engine::Shader::ShaderType::Vertex);
+    desc.PS = material->shared_shader->GetByteCode(engine::Shader::ShaderType::Pixel);
 }
 
 void PipelineState::Create()

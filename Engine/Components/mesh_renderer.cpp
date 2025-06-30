@@ -14,7 +14,6 @@
 #include "logger.h"
 #include "camera.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
-#include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
 
 namespace engine
 {
@@ -63,7 +62,7 @@ void MeshRenderer::OnDraw()
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = vertex_buffer->View();
     auto ibView = index_buffers[0]->View();
-    
+
     cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
 
     cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
@@ -72,8 +71,8 @@ void MeshRenderer::OnDraw()
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
     //cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
-                                          //? shared_mesh->sub_meshes[0].base_index
-                                          //: shared_mesh->indices.size(),1, 0, 0, 0);
+    //? shared_mesh->sub_meshes[0].base_index
+    //: shared_mesh->indices.size(),1, 0, 0, 0);
     // sub-meshes
     for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
@@ -112,7 +111,7 @@ void MeshRenderer::ReconstructBuffers()
     // create index buffer
     const auto ib_size = shared_mesh->HasSubMeshes()
                              ? shared_mesh->sub_meshes[0].base_index
-                             : shared_mesh->indices.size() ;
+                             : shared_mesh->indices.size();
     const auto indices = shared_mesh->indices.data();
 
     auto ib = std::make_shared<IndexBuffer>(ib_size * sizeof(uint32_t), indices);
@@ -144,7 +143,7 @@ void MeshRenderer::ReconstructBuffers()
             Logger::Error<MeshRenderer>("Failed to create sub index buffer!: sub mesh index: %d", i);
             continue;
         }
-        
+
         index_buffers.emplace_back(sub_ib);
     }
 
@@ -156,6 +155,11 @@ void MeshRenderer::ReconstructBuffers()
             Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
         }
     }
+
+    material_handles.resize(shared_materials.size());
+        for (auto &[key,value] : shared_materials[0]->shared_material_block->params_tex2d)
+            if (key == "diffuse")
+                material_handles[0] = g_DescriptorHeapManager->Get().Register(value);
 }
 
 void MeshRenderer::UpdateBuffers()
@@ -183,6 +187,7 @@ void MeshRenderer::UpdateBuffers()
         ptr[2] = proj;
     }
 }
+
 }
 
 CEREAL_REGISTER_TYPE(engine::MeshRenderer)

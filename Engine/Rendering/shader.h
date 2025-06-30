@@ -1,5 +1,7 @@
 #pragma once
 #include "object.h"
+#include "Asset/inspectable_asset.h"
+#include "Asset/Importer/ShaderImporter.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 #include <d3dcommon.h>
 #include <d3dcompiler.h>
@@ -14,25 +16,32 @@ namespace engine
 /// <remarks>
 /// Base of all shaders used in the engine. Shaders such as PS, VS inherits from here.
 /// </remarks>
-class Shader : public Object
+class Shader : public InspectableAsset
 {
-protected:
-    ComPtr<ID3DBlob> m_pShaderBlob;
-    
+    friend ShaderImporter;
+    ComPtr<ID3DBlob> m_pVSBlob;
+    ComPtr<ID3DBlob> m_pPSBlob;
+
 public:
-    virtual bool CompileShader(std::wstring file_path) = 0;
-    CD3DX12_SHADER_BYTECODE GetByteCode() const {return m_pShaderBlob.Get();}
-};
-
-class PixelShader : public Shader
-{
-    bool CompileShader(std::wstring file_path) override;
+    enum class ShaderType
+    {
+        Vertex,
+        Pixel
+    };
     
-};
-
-class VertexShader : public Shader
-{
-    bool CompileShader(std::wstring file_path) override;
+    void OnInspectorGui() override;
+    void OnConstructed() override;
     
+    CD3DX12_SHADER_BYTECODE GetByteCode(ShaderType type) const
+    {
+        switch (type)
+        {
+        case ShaderType::Vertex:
+            return m_pVSBlob.Get();
+        case ShaderType::Pixel:
+            return m_pPSBlob.Get();
+        }
+    }
+
 };
 }

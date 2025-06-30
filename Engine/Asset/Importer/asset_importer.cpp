@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "asset_importer.h"
+#include "ShaderImporter.h"
 
 namespace engine
 {

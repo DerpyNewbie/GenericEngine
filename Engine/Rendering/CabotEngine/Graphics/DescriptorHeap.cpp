@@ -91,6 +91,15 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<engin
     return pHandle;
 }
 
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer& constant_buffer)
+{
+    auto pHandle = Allocate();
+
+    auto view_desc = constant_buffer.ViewDesc();
+    g_RenderEngine->Device()->CreateConstantBufferView(&view_desc,pHandle->HandleCPU);
+    return pHandle;
+}
+
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
     auto count = m_pHandles.size() + 1;

@@ -32,29 +32,15 @@
     <ClCompile Include="Engine\Math\bounds.cpp" />
     <ClCompile Include="Engine\Rendering\bone_weight.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animation.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\Animator.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\CabotCamera.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\Input.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Core\Timer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ShaderImporter.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ShaderObject.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\SharedStruct.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp" />
@@ -73,6 +59,17 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="Engine\Rendering\line_renderer.cpp" />
+    <ClCompile Include="Editor\asset_browser.cpp" />
+    <ClCompile Include="Editor\default_editor_menus.cpp" />
+    <ClCompile Include="Editor\editor_menu.cpp" />
+    <ClCompile Include="Engine\Asset\asset_database.cpp" />
+    <ClCompile Include="Engine\Asset\asset_hierarchy.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp" />
+    <ClCompile Include="Engine\Asset\text_asset.cpp" />
+    <ClCompile Include="Engine\Components\line_renderer.cpp" />
+    <ClCompile Include="Engine\Rendering\gizmos.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -110,31 +107,16 @@
     <ClInclude Include="Engine\Rendering\bone_weight.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animation.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Animator.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\AssimpLoader.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\CabotCamera.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Input.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\PrimitiveShapes\PrimitiveShape.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedMeshRenderer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\SkinnedModel.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Core\Timer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\CabotMaterial.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MaterialBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderImporter.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ShaderObject.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\SharedStruct.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h" />
@@ -153,5 +135,22 @@
     <ClInclude Include="Engine\str_util.h" />
     <ClInclude Include="Engine\update_manager.h" />
     <ClInclude Include="Engine\Rendering\line_renderer.h" />
+    <ClInclude Include="Editor\asset_browser.h" />
+    <ClInclude Include="Editor\default_editor_menus.h" />
+    <ClInclude Include="Editor\editor_menu.h" />
+    <ClInclude Include="Engine\Asset\asset_database.h" />
+    <ClInclude Include="Engine\Asset\asset_descriptor.h" />
+    <ClInclude Include="Engine\Asset\asset_hierarchy.h" />
+    <ClInclude Include="Engine\Asset\Importer\asset_importer.h" />
+    <ClInclude Include="Engine\Asset\Importer\ShaderImporter.h" />
+    <ClInclude Include="Engine\Asset\Importer\txt_importer.h" />
+    <ClInclude Include="Engine\Asset\inspectable_asset.h" />
+    <ClInclude Include="Engine\Asset\text_asset.h" />
+    <ClInclude Include="Engine\Components\line_renderer.h" />
+    <ClInclude Include="Engine\inspectable.h" />
+    <ClInclude Include="Engine\Rendering\gizmos.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\BasicShader.hlsl" />
   </ItemGroup>
 </Project>

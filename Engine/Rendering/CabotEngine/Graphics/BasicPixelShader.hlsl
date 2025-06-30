@@ -12,7 +12,7 @@ struct Material
 };
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t1);
+Texture2D _MainTex : register(t0);
 
 float4 BasicPS(VSOutput input) : SV_TARGET
 {
@@ -20,5 +20,5 @@ float4 BasicPS(VSOutput input) : SV_TARGET
     float brightness = dot(-light,input.normal);
     float4 mainColor = _MainTex.Sample(smp, input.uv);
 
-    return float4(1,1,1,1) * brightness;
+    return mainColor * brightness;
 }

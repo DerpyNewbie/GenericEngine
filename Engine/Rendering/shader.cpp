@@ -1,59 +1,17 @@
 #include "pch.h"
-
 #include "shader.h"
-
 #include "logger.h"
 
-bool engine::PixelShader::CompileShader(std::wstring file_path)
+void engine::Shader::OnInspectorGui()
 {
-    ComPtr<ID3DBlob> errorBlob;
 
-    HRESULT hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "main",
-        "ps_5_0",
-        0,
-        0,
-        &m_pShaderBlob,
-        &errorBlob
-        );
-
-    if (FAILED(hr))
-    {
-        if (errorBlob)
-        {
-            Logger::Error<PixelShader>("Failed to Compile Pixel Shader!");
-            return false;
-        }
-    }
-    return true;
 }
 
-bool engine::VertexShader::CompileShader(std::wstring file_path)
+void engine::Shader::OnConstructed()
 {
-    ComPtr<ID3DBlob> errorBlob;
-
-    HRESULT hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "main",
-        "vs_5_0",
-        0,
-        0,
-        &m_pShaderBlob,
-        &errorBlob
-        );
-
-    if (FAILED(hr))
-    {
-        if (errorBlob)
-        {
-            Logger::Error<PixelShader>("Failed to Compile Vertex Shader!");
-            return false;
-        }
-    }
-    return true;
+    InspectableAsset::OnConstructed();
+    std::wstring file_path = L"x64/Debug/BasicVertexShader.cso";
+    auto hr = D3DReadFileToBlob(file_path.c_str(), m_pVSBlob.GetAddressOf());
+    file_path = L"x64/Debug/BasicPixelShader.cso";
+    D3DReadFileToBlob(file_path.c_str(), m_pPSBlob.GetAddressOf());
 }
