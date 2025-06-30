@@ -5,7 +5,7 @@ cbuffer Transform : register(b0)
     float4x4 Proj; // 投影行列
 }
 
-StructuredBuffer<float4x4> BoneMatrices : register(t1);
+StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
 struct VSInput
 {
@@ -44,14 +44,13 @@ float3x3 ExtractRotation(float4x4 m)
 }
 
 
-VSOutput BasicVS(VSInput input)
+VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
     float4 localPos = float4(input.pos, 1.0f); // 頂点座標
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-    
     for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
@@ -78,4 +77,16 @@ VSOutput BasicVS(VSInput input)
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
     output.uv = input.uv1;
     return output;
+}
+
+SamplerState smp : register(s0);
+Texture2D _MainTex : register(t1);
+
+float4 pix(VSOutput input) : SV_TARGET
+{
+    float3 light = normalize(float3(0.9, 0.3, -0.8));
+    float brightness = dot(-light,input.normal);
+    float4 mainColor = _MainTex.Sample(smp, input.uv);
+
+    return float4(1,1,1,1) * brightness;
 }
