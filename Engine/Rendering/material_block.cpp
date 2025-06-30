@@ -1,6 +1,13 @@
 #include "pch.h"
 #include "material_block.h"
 
+void engine::MaterialBlock::OnConstructed()
+{
+    Object::OnConstructed();
+    std::pair<std::string, std::shared_ptr<Texture2D>> diffuse_tex = {"diffuse", nullptr};
+    params_tex2d.emplace_back(diffuse_tex);
+}
+
 void engine::MaterialBlock::CreateBuffer()
 {
     params_float_buffer.Initialize(params_float.size());

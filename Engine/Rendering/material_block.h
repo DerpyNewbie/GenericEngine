@@ -34,6 +34,8 @@ public:
     StructuredBuffer<Vector4> params_vec4_buffer;
     StructuredBuffer<Matrix> params_mat4_buffer;
 
+    void OnConstructed() override;
+
     void CreateBuffer();
     void UpdateBuffer();
 
