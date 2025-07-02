@@ -149,14 +149,19 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
     if (asset_hierarchy->IsFile())
     {
         ImGui::Text("File: %s", asset_hierarchy->asset->path.string().c_str());
+        ImGui::Text("Guid: %s", asset_hierarchy->asset->guid.str().c_str());
         ImGui::Separator();
-        if (asset_hierarchy->asset->object != nullptr)
+        if (asset_hierarchy->asset->managed_object != nullptr)
         {
-            DrawObject(asset_hierarchy->asset->object);
+            DrawObject(asset_hierarchy->asset->managed_object);
         }
         else
         {
             ImGui::Text("Object is null!");
+            if (ImGui::Button("Import"))
+            {
+                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->guid);
+            }
         }
         return;
     }

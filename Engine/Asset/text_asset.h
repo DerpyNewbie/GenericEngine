@@ -10,5 +10,11 @@ public:
     std::string content;
 
     void OnInspectorGui() override;
+
+    template <typename Archive>
+    void serialize(Archive &ar)
+    {
+        ar(content);
+    }
 };
 }

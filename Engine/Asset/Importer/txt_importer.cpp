@@ -13,22 +13,11 @@ std::vector<std::string> TxtImporter::SupportedExtensions()
 }
 std::shared_ptr<Object> TxtImporter::Import(AssetDescriptor *asset)
 {
-    auto text = Object::Instantiate<TextAsset>(asset->path.string().c_str());
+    auto text = Object::Instantiate<TextAsset>(asset->path.string());
     std::stringstream ss;
     ss << std::ifstream(asset->path).rdbuf();
     text->content = ss.str();
+    asset->managed_object = text;
     return text;
-}
-void TxtImporter::Export(AssetDescriptor *asset)
-{
-    const auto text = std::dynamic_pointer_cast<TextAsset>(asset->object);
-    if (text == nullptr)
-    {
-        Logger::Warn<TxtImporter>("Asset '%s' has not been imported or not a TextAsset", asset->path.string().c_str());
-        return;
-    }
-    std::ofstream file(asset->path);
-    file << text->content;
-    file.close();
 }
 }
