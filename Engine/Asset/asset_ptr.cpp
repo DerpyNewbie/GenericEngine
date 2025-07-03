@@ -30,13 +30,19 @@ std::shared_ptr<Object> IAssetPtr::Lock()
 {
     if (m_ptr_.expired())
     {
-        auto asset_descriptor = AssetDatabase::GetAssetDescriptor(m_guid_);
+        const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(m_guid_);
         if (asset_descriptor == nullptr)
         {
             throw std::runtime_error("Asset not found");
         }
 
-        auto importer = AssetImporter::GetAssetImporter(asset_descriptor->type_hint);
+        if (asset_descriptor->managed_object != nullptr)
+        {
+            m_ptr_ = asset_descriptor->managed_object;
+            return m_ptr_.lock();
+        }
+
+        const auto importer = AssetImporter::GetAssetImporter(asset_descriptor->type_hint);
         if (importer == nullptr)
         {
             throw std::runtime_error("Asset importer not found");

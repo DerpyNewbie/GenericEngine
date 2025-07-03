@@ -51,6 +51,7 @@ public:
     void serialize(Archive &ar)
     {
         ar(m_guid_);
+        auto _ = Lock(); // try to import the object associated with guid
     }
 };
 
