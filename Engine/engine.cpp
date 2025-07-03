@@ -2,6 +2,7 @@
 
 #include "engine.h"
 
+#include "component_factory.h"
 #include "Asset/asset_database.h"
 #include "engine_profiler.h"
 #include "scene_manager.h"
@@ -27,6 +28,7 @@ bool engine::Engine::Init()
 
     Time::Get()->Init();
     AssetDatabase::Init();
+    IComponentFactory::Init();
     SceneManager::CreateScene("Default Scene");
 
     return true;
