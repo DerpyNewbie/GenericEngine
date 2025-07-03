@@ -42,7 +42,7 @@ std::shared_ptr<Object> IAssetPtr::Lock()
             return m_ptr_.lock();
         }
 
-        const auto importer = AssetImporter::GetAssetImporter(asset_descriptor->type_hint);
+        const auto importer = AssetImporter::Get(asset_descriptor->type_hint);
         if (importer == nullptr)
         {
             throw std::runtime_error("Asset importer not found");

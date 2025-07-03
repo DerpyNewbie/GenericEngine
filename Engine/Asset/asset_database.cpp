@@ -28,8 +28,8 @@ static std::vector<std::string> GetSplitPath(path path)
 
 void AssetDatabase::Init()
 {
-    AssetImporter::AddImporter(std::make_shared<TxtImporter>());
-    AssetExporter::AddExporter(std::make_shared<TxtExporter>());
+    AssetImporter::Register(std::make_shared<TxtImporter>());
+    AssetExporter::Register(std::make_shared<TxtExporter>());
 
     SetProjectDirectory(current_path() / "Resources");
 }
@@ -181,7 +181,7 @@ std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 
 void AssetDatabase::WriteAsset(const AssetDescriptor *asset_descriptor)
 {
-    const auto exporter = AssetExporter::GetAssetExporter(asset_descriptor->type_hint);
+    const auto exporter = AssetExporter::Get(asset_descriptor->type_hint);
     if (exporter == nullptr)
     {
         Logger::Warn<AssetDatabase>("Asset exporter for type '%s' not found! Will ignore file '%s'",

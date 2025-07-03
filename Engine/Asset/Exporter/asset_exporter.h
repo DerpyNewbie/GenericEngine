@@ -30,20 +30,20 @@ public:
     /// Add AssetExporter implementations to make impl retrievable with supported file extension.
     /// </summary>
     /// <param name="exporter">AssetExporter instance</param>
-    static void AddExporter(const std::shared_ptr<AssetExporter> &exporter);
+    static void Register(const std::shared_ptr<AssetExporter> &exporter);
 
     /// <summary>
     /// Add AssetExporter implementations to make impl retrievable with specified file extension.
     /// </summary>
     /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
     /// <param name="exporter">AssetExporter instance</param>
-    static void AddExporter(const std::string &file_extension, const std::shared_ptr<AssetExporter> &exporter);
+    static void Register(const std::string &file_extension, const std::shared_ptr<AssetExporter> &exporter);
 
     /// <summary>
     /// Retrieve AssetExporter implementation that supports file extension.
     /// </summary>
     /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
     /// <returns>AssetExporter instance if a supported instance were found. `nullptr` otherwise.</returns>
-    static std::shared_ptr<AssetExporter> GetAssetExporter(const std::string &file_extension);
+    static std::shared_ptr<AssetExporter> Get(const std::string &file_extension);
 };
 }

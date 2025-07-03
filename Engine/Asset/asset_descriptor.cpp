@@ -79,7 +79,7 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const std::filesystem::pa
     result->guid = xg::Guid(document.FindMember("guid")->value.GetString());
     result->type_hint = document.FindMember("type")->value.GetString();
 
-    auto asset_importer = AssetImporter::GetAssetImporter(result->type_hint);
+    auto asset_importer = AssetImporter::Get(result->type_hint);
     if (asset_importer == nullptr)
     {
         Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
