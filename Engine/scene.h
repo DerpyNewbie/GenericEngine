@@ -20,6 +20,7 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
     void OnConstructed() override;
     void OnUpdate() override;
     void OnFixedUpdate() override;
+    void OnDestroy() override;
 
     void MarkDestroying(const std::shared_ptr<GameObject> &game_object);
     void MarkDestroying(const std::shared_ptr<Component> &component);

@@ -64,6 +64,11 @@ void Scene::OnFixedUpdate()
         game_object->InvokeFixedUpdate();
     }
 }
+void Scene::OnDestroy()
+{
+    UpdateManager::UnsubscribeUpdate(shared_from_base<Scene>());
+    UpdateManager::UnsubscribeFixedUpdate(shared_from_base<Scene>());
+}
 void Scene::MarkDestroying(const std::shared_ptr<GameObject> &game_object)
 {
     m_destroying_objects_.emplace(game_object);
