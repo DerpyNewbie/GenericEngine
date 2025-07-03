@@ -17,6 +17,8 @@ void Controller::OnUpdate()
 
     // Movement input
     Vector3 dir = {0, 0, 0};
+    float up_down = 0.0f;
+
     if (CheckHitKey(KEY_INPUT_W))
         dir.z -= 1.0f;
     if (CheckHitKey(KEY_INPUT_S))
@@ -26,14 +28,15 @@ void Controller::OnUpdate()
     if (CheckHitKey(KEY_INPUT_A))
         dir.x -= 1.0f;
     if (CheckHitKey(KEY_INPUT_SPACE))
-        dir.y += 1.0f;
+        up_down += 1.0f;
     if (CheckHitKey(KEY_INPUT_LCONTROL))
-        dir.y -= 1.0f;
+        up_down -= 1.0f;
 
     // Normalize movement vector if not zero
     dir.Normalize();
 
-    m_last_movement_input_ = dir;
+    m_last_movement_input_ = dir + Vector3::Up * up_down;
+    m_last_movement_input_.Normalize();
 
     // Rotation input
     Vector2 delta_rot = {0, 0};
@@ -52,16 +55,18 @@ void Controller::OnUpdate()
     const auto transform = GameObject()->Transform();
 
     // Apply rotation around the object's position
-    if (delta_rot.Length() > 0.001f)
+    if (!Mathf::Approximately(delta_rot.Length(), 0.0F))
     {
         m_rotation_ = m_rotation_ + delta_rot;
         transform->SetRotation(Quaternion::CreateFromYawPitchRoll(m_rotation_.y, m_rotation_.x, 0.0F));
     }
 
     // Apply movement in local space
-    if (dir.Length() > 0.001f)
+    if (!Mathf::Approximately(dir.Length(), 0.0F) || !Mathf::Approximately(up_down, 0.0F))
     {
-        const Vector3 world_dir = Vector3::Transform(dir, transform->Rotation());
+        Vector3 world_dir = Vector3::Transform(dir, transform->Rotation()) + Vector3::Up * up_down;
+        world_dir.Normalize();
+
         const Vector3 new_pos = transform->Position() + (world_dir * move_speed);
         transform->SetPosition(new_pos);
     }
