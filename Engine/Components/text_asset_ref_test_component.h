@@ -12,7 +12,7 @@ class TextAssetRefTestComponent : public Component
 public:
     void OnInspectorGui() override;
 
-    template <typename Archive>
+    template <class Archive>
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this), m_text_asset_);

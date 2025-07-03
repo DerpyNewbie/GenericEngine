@@ -10,3 +10,5 @@ void engine::TextAssetRefTestComponent::OnInspectorGui()
     else
         ImGui::Text("Not loaded");
 }
+
+CEREAL_REGISTER_TYPE(engine::TextAssetRefTestComponent)

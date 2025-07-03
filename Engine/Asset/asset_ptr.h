@@ -1,7 +1,9 @@
 #pragma once
 #include "crossguid/guid.hpp"
 
+#include "guid_serializer.h"
 #include <cereal/types/base_class.hpp>
+#include <cereal/types/polymorphic.hpp>
 
 namespace engine
 {
@@ -61,12 +63,6 @@ struct AssetPtr : IAssetPtr
             return nullptr;
 
         return std::dynamic_pointer_cast<T>(m_ptr_.lock());
-    }
-
-    template <class Archive>
-    void serialize(Archive &ar)
-    {
-        ar(cereal::base_class<IAssetPtr>(this));
     }
 };
 }

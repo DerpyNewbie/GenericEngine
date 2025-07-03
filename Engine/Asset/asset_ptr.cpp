@@ -63,3 +63,5 @@ bool IAssetPtr::IsNull() const
     return m_guid_ == kNullGuid;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::IAssetPtr)
