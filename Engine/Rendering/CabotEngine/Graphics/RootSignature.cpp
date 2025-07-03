@@ -5,35 +5,35 @@
 #include <directx/d3dx12.h>
 #include <array>
 
-RootSignature::RootSignature()
+engine::RootSignature::RootSignature()
 {
     auto flag = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT; // アプリケーションの入力アセンブラを使用する
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS; // ドメインシェーダーのルートシグネチャへんアクセスを拒否する
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS; // ハルシェーダーのルートシグネチャへんアクセスを拒否する
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS; // ジオメトリシェーダーのルートシグネチャへんアクセスを拒否する
 
-    std::vector<CD3DX12_ROOT_PARAMETER> rootParam(ConstantBufferMaxSize + 4);
-
-    for (int i = 0; i < ConstantBufferMaxSize; ++i)
-    {
-        rootParam[i].InitAsConstantBufferView(i, 0, D3D12_SHADER_VISIBILITY_ALL);
-    }
-
+    std::vector<CD3DX12_ROOT_PARAMETER> rootParam(kRootParameterIndexCount);
     //DescriptorHeapの作成
-    CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
-    CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
+    CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
+    CD3DX12_DESCRIPTOR_RANGE tableRangeVSUAV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangePSCBV = {};
-    
-    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
+    CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
+
     tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0);//CBVはちょっと多めに確保
-    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6,0);
     tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0);
-    
-    rootParam[ConstantBufferMaxSize].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_VERTEX);
-    rootParam[ConstantBufferMaxSize + 1].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_VERTEX);
-    rootParam[ConstantBufferMaxSize + 2].InitAsDescriptorTable(1, &tableRangePSSRV, D3D12_SHADER_VISIBILITY_PIXEL);
-    rootParam[ConstantBufferMaxSize + 3].InitAsDescriptorTable(1, &tableRangePSCBV, D3D12_SHADER_VISIBILITY_PIXEL);
+    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6,0);
+
+    rootParam[kVertexCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_VERTEX);
+    rootParam[kVertexSRV].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_VERTEX);
+    rootParam[kVertexUAV].InitAsDescriptorTable(1, &tableRangeVSUAV, D3D12_SHADER_VISIBILITY_VERTEX);
+    rootParam[kPixelCBV].InitAsDescriptorTable(1, &tableRangePSCBV, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootParam[kPixelSRV].InitAsDescriptorTable(1, &tableRangePSSRV, D3D12_SHADER_VISIBILITY_PIXEL);
+    rootParam[kVertexUAV].InitAsDescriptorTable(1, &tableRangePSUAV, D3D12_SHADER_VISIBILITY_PIXEL);
 
     // スタティックサンプラーの設定
     D3D12_STATIC_SAMPLER_DESC sampler[2];
@@ -82,12 +82,12 @@ RootSignature::RootSignature()
     m_IsValid = true;
 }
 
-bool RootSignature::IsValid()
+bool engine::RootSignature::IsValid()
 {
     return m_IsValid;
 }
 
-ID3D12RootSignature *RootSignature::Get()
+ID3D12RootSignature *engine::RootSignature::Get()
 {
     return m_pRootSignature.Get();
 }

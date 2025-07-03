@@ -71,9 +71,6 @@ void SkinnedMeshRenderer::ReconstructBuffers()
     transforms.reserve(shared_mesh->bind_poses.size());
     for (size_t i = 0; i < shared_mesh->bind_poses.size(); i++)
         transforms.emplace_back(shared_mesh->bind_poses[i]);
-
-    transforms_buffer.Initialize(transforms.size());
-    transforms_buffer.Upload(transforms);
     
     g_DescriptorHeapManager->Get().Register(transforms_buffer);
 }

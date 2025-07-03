@@ -1,14 +1,23 @@
 ﻿#pragma once
 #include <directx/d3dx12.h>
 #include "ComPtr.h"
+#include "Rendering/buffers.h"
 
-class ConstantBuffer
+class ConstantBuffer : public IBuffer
 {
 public:
-    ConstantBuffer(size_t size); // コンストラクタで定数バッファを生成
-    bool IsValid(); // バッファ生成に成功したかを返す
+    ConstantBuffer(size_t size);
     D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const; // バッファのGPU上のアドレスを返す
     D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc(); // 定数バッファビューを返す
+
+    void CreateBuffer() override;
+    void UpdateBuffer(void *data) override;
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+
+    bool CanUpdate() override
+    {
+        return true;
+    }
 
     void *GetPtr() const
     {
@@ -22,7 +31,7 @@ public:
     }
 
 private:
-    bool m_IsValid = false; // 定数バッファ生成に成功したか
+    UINT64 m_SizeAligned;
     ComPtr<ID3D12Resource> m_pBuffer; // 定数バッファ
     D3D12_CONSTANT_BUFFER_VIEW_DESC m_Desc; // 定数バッファビューの設定
     void *m_pMappedPtr = nullptr;

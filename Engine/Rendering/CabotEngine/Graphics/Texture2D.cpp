@@ -46,6 +46,46 @@ Texture2D::Texture2D(std::wstring path)
     m_IsValid = Load(path);
 }
 
+void Texture2D::CreateBuffer()
+{
+    auto desc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
+                                            width,
+                                            height,
+                                            1,
+                                            1);
+
+    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
+
+    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+        &prop,
+        D3D12_HEAP_FLAG_NONE,
+        &desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&m_pResource)
+        );
+
+    if (FAILED(hr))
+    {
+        return;
+    }
+
+    D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
+    hr = m_pResource->WriteToSubresource(0,
+                                         &destRegion, // copy all
+                                         tex_data.data(), // origin data addr
+                                         width * sizeof(PackedVector::XMCOLOR), // 1 line size
+                                         width * height * sizeof(PackedVector::XMCOLOR) // all line sizes
+        );
+
+    if (FAILED(hr))
+    {
+        return;
+    }
+
+    m_IsValid = true;
+}
+
 Texture2D::Texture2D(aiTexture *src)
 {
     ComPtr<IWICBitmapDecoder> decoder;
@@ -72,50 +112,27 @@ Texture2D::Texture2D(aiTexture *src)
         0.0f,
         WICBitmapPaletteTypeCustom
         );
-
-    UINT width, height;
+    
     frame->GetSize(&width, &height);
 
     std::vector<uint8_t> imageRGBA(width * height * 4);
+    tex_data.reserve(width * height);
+    for (UINT i = 0; i < width * height; ++i)
+    {
+        uint8_t r = imageRGBA[i * 4 + 0];
+        uint8_t g = imageRGBA[i * 4 + 1];
+        uint8_t b = imageRGBA[i * 4 + 2];
+        uint8_t a = imageRGBA[i * 4 + 3];
+
+        DirectX::PackedVector::XMCOLOR color;
+        color.b = b;
+        color.g = g;
+        color.r = r;
+        color.a = a;
+
+        tex_data.emplace_back(color);
+    }
     converter->CopyPixels(nullptr, width * 4, static_cast<UINT>(imageRGBA.size()), imageRGBA.data());
-
-    auto desc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-                                             width,
-                                             height,
-                                             1,
-                                             1);
-
-    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
-
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_pResource)
-        );
-
-    if (FAILED(hr))
-    {
-        return;
-    }
-
-    D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
-    hr = m_pResource->WriteToSubresource(0,
-                                         &destRegion, // copy all
-                                         imageRGBA.data(), // origin data addr
-                                         width * 4, // 1 line size
-                                         width * height * 4 // all line sizes
-        );
-
-    if (FAILED(hr))
-    {
-        return;
-    }
-
-    m_IsValid = true;
-    return;
 }
 
 Texture2D::Texture2D(ID3D12Resource *buffer)

@@ -3,6 +3,8 @@
 #include "logger.h"
 #include "Rendering/shader.h"
 
+#include <d3dcompiler.h>
+
 namespace engine
 {
 bool ShaderImporter::CompileShader(std::shared_ptr<Shader> shader, std::wstring file_path)

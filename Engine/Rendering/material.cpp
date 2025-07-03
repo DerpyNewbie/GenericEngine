@@ -4,7 +4,7 @@
 std::shared_ptr<engine::Material> engine::Material::CreateFromAiMaterial(const aiScene* scene, int material_idx)
 {
     auto result = Instantiate<Material>();
-    auto& tex2ds = result->shared_material_block->params_tex2d;
+    auto& tex2ds = result->shared_material_block->;
 
     aiMaterial* mat = scene->mMaterials[material_idx];
     
@@ -43,4 +43,9 @@ void engine::Material::OnConstructed()
     shared_shader = Instantiate<Shader>();
     shared_material_block = Instantiate<MaterialBlock>();
     
+}
+
+void engine::Material::CreateMaterialBlock()
+{
+    shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
 }

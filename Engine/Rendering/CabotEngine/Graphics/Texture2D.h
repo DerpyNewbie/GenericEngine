@@ -3,6 +3,7 @@
 #include <directx/d3dx12.h>
 #include <string>
 #include <memory>
+#include <directxtk12/SimpleMath.h>
 
 struct aiTexture;
 class DescriptorHeap;
@@ -11,15 +12,21 @@ class DescriptorHandle;
 class Texture2D
 {
 public:
-    explicit Texture2D(aiTexture *src);
-    static std::shared_ptr<Texture2D> Get(std::string path); /* stringで受け取ったパスからテクスチャを読み込む */
-    static std::shared_ptr<Texture2D> Get(std::wstring path); /* wstringで受け取ったパスからテクスチャを読み込む */
-    static std::shared_ptr<Texture2D> GetWhite(); /* 白の単色テクスチャを生成する */
-    static Texture2D *CreateGrayGradationTexture();
-    bool IsValid(); /* 正常に読み込まれているかどうかを返す */
+    std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
+    UINT width;
+    UINT height;
 
-    ID3D12Resource *Resource(); /* リソースを返す */
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc(); /* シェーダーリソースビューの設定を返す */
+    void CreateBuffer();
+    
+    explicit Texture2D(aiTexture *src);
+    static std::shared_ptr<Texture2D> Get(std::string path);
+    static std::shared_ptr<Texture2D> Get(std::wstring path);
+    static std::shared_ptr<Texture2D> GetWhite();
+    static Texture2D *CreateGrayGradationTexture();
+    bool IsValid();
+
+    ID3D12Resource *Resource();
+    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
 
     explicit Texture2D(ID3D12Resource *buffer);
     explicit Texture2D(std::wstring path);
@@ -29,8 +36,8 @@ public:
 
 private:
     explicit Texture2D(std::string path);
-    bool m_IsValid; /* 正常に読み込まれているか */
-    ComPtr<ID3D12Resource> m_pResource; /* リソース */
+    bool m_IsValid;
+    ComPtr<ID3D12Resource> m_pResource;
     bool Load(std::string &path);
     bool Load(std::wstring &path);
 

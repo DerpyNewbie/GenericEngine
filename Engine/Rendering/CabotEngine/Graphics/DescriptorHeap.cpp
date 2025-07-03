@@ -4,6 +4,8 @@
 #include "Texture2D.h"
 #include <directx/d3dx12.h>
 #include "RenderEngine.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
+#include "Rendering/material_block.h"
 
 const UINT HANDLE_MAX = 512;
 

@@ -4,11 +4,37 @@
 #include "Asset/Importer/ShaderImporter.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 #include <d3dcommon.h>
-#include <d3dcompiler.h>
 #include <directx/d3dx12_core.h>
 
 namespace engine
 {
+
+enum kParameterBufferType
+{
+    kParameterBufferType_CBV,
+    kParameterBufferType_SRV,
+    kParameterBufferType_UAV,
+
+    kParameterBufferType_Count
+};
+
+enum kShaderType
+{
+    kShaderType_Vertex,
+    kShaderType_Pixel,
+
+    kShaderType_Count
+};
+
+
+struct ShaderParameter
+{
+    std::string name;
+    int index;
+    kShaderType shader_type;
+    kParameterBufferType buffer_type;
+    std::string type_hint;
+};
 
 /// <summary>
 /// Shader object representation
@@ -28,7 +54,12 @@ public:
         Vertex,
         Pixel
     };
-    
+
+    static std::shared_ptr<Shader> default_shader;
+    std::vector<ShaderParameter> parameters;
+
+    static std::shared_ptr<Shader> GetDefault();
+
     void OnInspectorGui() override;
     void OnConstructed() override;
     
@@ -42,6 +73,6 @@ public:
             return m_pPSBlob.Get();
         }
     }
-
 };
+
 }

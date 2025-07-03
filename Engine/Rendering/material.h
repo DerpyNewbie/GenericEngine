@@ -1,7 +1,6 @@
 #pragma once
 #include "material_block.h"
 #include "shader.h"
-
 #include <assimp/scene.h>
 
 namespace engine
@@ -16,13 +15,13 @@ namespace engine
 class Material : public Object
 {
 public:
-    // TODO: should vertex shader be swappable? 
     std::shared_ptr<Shader> shared_shader;
     std::shared_ptr<MaterialBlock> shared_material_block;
 
     static std::shared_ptr<Material> CreateFromAiMaterial(const aiScene* scene, int material_idx);
 
     void OnConstructed() override;
+    void CreateMaterialBlock();
     
     template <class Archive>
     void serialize(Archive &ar)

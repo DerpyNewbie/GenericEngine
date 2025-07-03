@@ -3,10 +3,17 @@
 #include <directx/d3dx12.h>
 #include <vector>
 #include "RenderEngine.h"
-#include "StructuredBuffer.h"
-#include "Rendering/material.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
+
+class ConstantBuffer;
 class Texture2D;
+
+
+namespace engine
+{
+class MaterialBlock;
+template <typename T>
+class StructuredBuffer;
+}
 
 class DescriptorHandle
 {
@@ -22,9 +29,10 @@ public:
     ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<engine::MaterialBlock> material_block);
+
     template <typename T>
-    std::shared_ptr<DescriptorHandle> Register(StructuredBuffer<T> structured_buffer);
-    std::shared_ptr<DescriptorHandle> Register(ConstantBuffer& constant_buffer);
+    std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer<T> structured_buffer);
+    std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
     std::shared_ptr<DescriptorHandle> Allocate();
 
     void Release();
@@ -37,10 +45,10 @@ private:
 };
 
 template <typename T>
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(StructuredBuffer<T> structuredBuffer)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuffer<T> structured_buffer)
 {
     auto count = m_pHandles.size();
-    
+
     UINT HANDLE_MAX = 512;
     if (HANDLE_MAX <= count)
     {
@@ -59,8 +67,8 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(StructuredBuffer<T> s
     pHandle->HandleGPU = handleGPU;
 
     auto device = g_RenderEngine->Device();
-    auto resource = structuredBuffer.Resource();
-    auto desc = structuredBuffer.ViewDesc();
+    auto resource = structured_buffer.Resource();
+    auto desc = structured_buffer.ViewDesc();
     device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
 
     m_pHandles.push_back(pHandle);

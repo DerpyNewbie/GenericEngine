@@ -1,19 +1,24 @@
 ﻿#pragma once
-#include <vector>
 #include "ComPtr.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "RenderEngine.h"
+#include "Engine/Rendering/buffers.h"
 
-
-template <typename T>
+namespace engine
+{
+template
+<typename T>
 class StructuredBuffer
 {
 public:
-    StructuredBuffer() = default;
-
-    void Initialize(size_t elementCount)
+    explicit StructuredBuffer(size_t elem_count)
     {
-        m_elementCount = elementCount;
-        size_t totalSize = sizeof(T) * elementCount;
+        m_elementCount = elem_count;
+    }
+
+    void CreateBuffer()
+    {
+        size_t totalSize = sizeof(T) * m_elementCount;
 
         // GPU側リソース
         CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(totalSize);
@@ -42,11 +47,11 @@ public:
             );
     }
 
-    void Upload(const std::vector<T> &data)
+    void UpdateBuffer(void *data)
     {
         void *mapped = nullptr;
         m_pUploadBuffer->Map(0, nullptr, &mapped);
-        memcpy(mapped, data.data(), sizeof(T) * data.size());
+        memcpy(mapped, data, sizeof(T) * m_elementCount);
         m_pUploadBuffer->Unmap(0, nullptr);
 
         g_RenderEngine->CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
@@ -57,6 +62,18 @@ public:
             D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
             );
         g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    }
+
+    std::shared_ptr<DescriptorHandle> UploadBuffer()
+    {
+        auto me = this;
+        auto pHandle = g_DescriptorHeapManager->Get().Register(me);
+        return pHandle;
+    }
+
+    bool CanUpdate()
+    {
+        return true;
     }
 
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc()
@@ -82,3 +99,4 @@ private:
     ComPtr<ID3D12Resource> m_pUploadBuffer;
     size_t m_elementCount = 0;
 };
+}

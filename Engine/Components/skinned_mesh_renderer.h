@@ -4,6 +4,7 @@
 #include "mesh_renderer.h"
 #include "Rendering/line_renderer.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
+#include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
 
 #include <vector>
 

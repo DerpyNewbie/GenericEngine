@@ -13,6 +13,7 @@
 #include "game_object.h"
 #include "logger.h"
 #include "camera.h"
+#include "Rendering/MaterialData.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 
 namespace engine
@@ -64,8 +65,6 @@ void MeshRenderer::OnDraw()
     auto ibView = index_buffers[0]->View();
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
-
-    cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
@@ -147,19 +146,24 @@ void MeshRenderer::ReconstructBuffers()
         index_buffers.emplace_back(sub_ib);
     }
 
-    for (auto &wvp_buffer : wvp_buffers)
+    
+    for (size_t i = 0; i < shared_materials.size(); ++i)
     {
-        wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 3);
-        if (!wvp_buffer->IsValid())
+        auto& find_material_data = dynamic_cast<MaterialData>(shared_materials[i]->shared_material_block->FindMaterialDataFromName("WVP"));
+        for (auto &wvp_buffer : material_wvp_buffers[i])
         {
-            Logger::Error<MeshRenderer>("Failed to create WVP buffer!");
+            wvp_buffer = find_material_data;
         }
     }
 
     material_handles.resize(shared_materials.size());
-        for (auto &[key,value] : shared_materials[0]->shared_material_block->params_tex2d)
-            if (key == "diffuse")
-                material_handles[0] = g_DescriptorHeapManager->Get().Register(value);
+    for (size_t i = 0; i < material_handles.size(); ++i)
+        for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+            for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
+                material_handles[i][shader_type][params_type] = shared_materials[i]->shared_material_block->
+                    GetDescriptorHandle(static_cast<kShaderType>(shader_type),
+                                        static_cast<kParameterBufferType>(params_type));
+
 }
 
 void MeshRenderer::UpdateBuffers()
@@ -174,17 +178,20 @@ void MeshRenderer::UpdateBuffers()
         ReconstructBuffers();
     }
 
+    std::vector<Matrix> wvp;
     const auto camera = Camera::Main();
-    Matrix world = GameObject()->Transform()->WorldMatrix();
-    const Matrix view = camera.lock()->GetViewMatrix();
-    const Matrix proj = camera.lock()->GetProjectionMatrix();
-
-    for (auto &wvp_buffer : wvp_buffers)
+    
+    wvp.emplace_back(GameObject()->Transform()->WorldMatrix());
+    wvp.emplace_back(camera.lock()->GetViewMatrix());
+    wvp.emplace_back(camera.lock()->GetProjectionMatrix());
+    
+    for (size_t i = 0; i < shared_materials.size(); ++i)
     {
-        auto ptr = wvp_buffer->GetPtr<Matrix>();
-        ptr[0] = world;
-        ptr[1] = view;
-        ptr[2] = proj;
+        for (auto &wvp_buffer : material_wvp_buffers[i])
+        {
+            wvp_buffer.lock()->Set(wvp);
+            wvp_buffer.lock()->UpdateBuffer();
+        }
     }
 }
 
