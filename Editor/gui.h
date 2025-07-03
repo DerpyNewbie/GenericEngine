@@ -37,11 +37,21 @@ bool Gui::PropertyField(const char *label, engine::IAssetPtr &value, std::string
         {
             for (auto &asset : assets)
             {
-                auto name = asset.IsLoaded() ? asset.Lock()->Name() + ": " + asset.Guid().str() : asset.Guid().str();
-                if (ImGui::Button(name.c_str()))
+                auto name = asset.IsLoaded()
+                                ? std::filesystem::path(asset.Lock()->Name()).stem().string()
+                                : asset.Guid().str();
+                if (ImGui::MenuItem(name.c_str()))
                 {
                     value = asset;
                     ImGui::CloseCurrentPopup();
+                }
+
+                if (ImGui::BeginItemTooltip())
+                {
+                    ImGui::Text(asset.Guid().str().c_str());
+                    if (asset.IsLoaded())
+                        ImGui::Text(asset.Lock()->Name().c_str());
+                    ImGui::EndTooltip();
                 }
             }
         }
