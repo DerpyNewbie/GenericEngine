@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "default_editor_menus.h"
 
+#include "component_factory.h"
 #include "editor_prefs.h"
 #include "scene_manager.h"
 #include "serializer.h"
@@ -103,18 +104,12 @@ void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::
         ImGui::BeginDisabled();
     }
 
-#define ADD_COMPONENT(type) if (ImGui::MenuItem(#type)) go->AddComponent<type>();
-
-    ADD_COMPONENT(engine::Camera)
-    ADD_COMPONENT(engine::Controller)
-    ADD_COMPONENT(engine::CubeRenderer)
-    ADD_COMPONENT(engine::FrameMetaData)
-    ADD_COMPONENT(engine::MeshRenderer)
-    ADD_COMPONENT(engine::MV1Renderer)
-    ADD_COMPONENT(engine::SkinnedMeshRenderer)
-    ADD_COMPONENT(engine::TextAssetRefTestComponent)
-
-#undef ADD_COMPONENT
+    const auto component_names = engine::IComponentFactory::GetNames();
+    for (auto component_name : component_names)
+    {
+        if (ImGui::MenuItem(component_name.c_str()))
+            engine::IComponentFactory::Get(component_name)->AddComponentTo(go);
+    }
 
     if (go == nullptr)
     {

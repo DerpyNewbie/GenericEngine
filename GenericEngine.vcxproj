@@ -51,6 +51,7 @@
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
+        <ClCompile Include="Engine\component_factory.cpp"/>
         <ClCompile Include="Engine\engine.cpp"/>
         <ClCompile Include="Engine\engine_profiler.cpp"/>
         <ClCompile Include="Engine\engine_util.cpp"/>
@@ -107,6 +108,7 @@
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
+        <ClInclude Include="Engine\component_factory.h"/>
         <ClInclude Include="Engine\DxLib\dxlib_converter.h"/>
         <ClInclude Include="Engine\DxLib\dxlib_helper.h"/>
         <ClInclude Include="Engine\DxLib\dxlib_serializer.h"/>
