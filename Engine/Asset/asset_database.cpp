@@ -5,12 +5,14 @@
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
 #include "logger.h"
+#include "Exporter/asset_exporter.h"
+#include "Exporter/txt_exporter.h"
 
 namespace engine
 {
-
 path AssetDatabase::m_project_directory_;
 std::shared_ptr<AssetHierarchy> AssetDatabase::m_asset_hierarchy_;
+std::unordered_map<xg::Guid, std::shared_ptr<AssetDescriptor>> AssetDatabase::m_assets_by_guid_map_;
 std::unordered_map<std::string, std::vector<std::shared_ptr<AssetDescriptor>>> AssetDatabase::m_assets_map_by_type_;
 
 static std::vector<std::string> GetSplitPath(path path)
@@ -24,30 +26,24 @@ static std::vector<std::string> GetSplitPath(path path)
     return result;
 }
 
-bool AssetHierarchy::IsFile() const
-{
-    return asset != nullptr;
-}
-bool AssetHierarchy::IsDirectory() const
-{
-    return asset == nullptr;
-}
 void AssetDatabase::Init()
 {
     AssetImporter::AddImporter(std::make_shared<TxtImporter>());
+    AssetExporter::AddExporter(std::make_shared<TxtExporter>());
+
     SetProjectDirectory(current_path() / "Resources");
 }
-void AssetDatabase::SetProjectDirectory(const path &path)
-{
-    m_project_directory_ = path;
-    m_asset_hierarchy_ = Object::Instantiate<AssetHierarchy>("Assets");
-    ImportAll();
-}
+
 void AssetDatabase::Import(const path &path)
 {
     if (!exists(path))
     {
         Logger::Log<AssetDatabase>("Path '%s' does not exist. ignoring", path.string().c_str());
+        return;
+    }
+
+    if (path.string().ends_with(".meta"))
+    {
         return;
     }
 
@@ -62,10 +58,38 @@ void AssetDatabase::Import(const path &path)
 
     if (is_regular_file(path))
     {
-        auto asset_descriptor = std::make_shared<AssetDescriptor>(path);
-        const auto hierarchy = GetOrCreateAssetHierarchy(path);
-        hierarchy->asset = asset_descriptor;
-        m_assets_map_by_type_[path.extension().string()].emplace_back(asset_descriptor);
+        const auto rel_path = relative(path, m_project_directory_);
+        auto split_rel_path = GetSplitPath(rel_path);
+        auto current_node = m_asset_hierarchy_;
+        int depth = 0;
+        std::string current_node_path;
+        for (const auto &node : split_rel_path)
+        {
+            ++depth;
+            if (!current_node_path.empty())
+                current_node_path += "/";
+            current_node_path += node;
+
+            auto found_node = std::ranges::find(current_node->children, node, &AssetHierarchy::Name);
+            if (found_node == current_node->children.end())
+            {
+                auto next = Object::Instantiate<AssetHierarchy>(node);
+                if (depth < split_rel_path.size())
+                    next->m_is_directory_ = true;
+                next->asset = AssetDescriptor::Read(current_node_path);
+                next->parent = current_node;
+                current_node->children.emplace_back(next);
+                current_node = next;
+
+                m_assets_by_guid_map_[next->asset->guid] = next->asset;
+                m_assets_map_by_type_[next->asset->type_hint].emplace_back(next->asset);
+                continue;
+            }
+
+            current_node = *found_node;
+        }
+
+        current_node->m_is_file_ = true;
 
         Logger::Log<AssetDatabase>("Asset '%s' loaded", path.string().c_str());
         return;
@@ -73,128 +97,118 @@ void AssetDatabase::Import(const path &path)
 
     Logger::Warn<AssetDatabase>("Path '%s' is not a file or directory. ignoring", path.string().c_str());
 }
+
 void AssetDatabase::ImportAll()
 {
-    for (const auto &child : directory_iterator(m_project_directory_))
-    {
-        Import(child);
-    }
+    Import(m_project_directory_);
 }
+
+void AssetDatabase::SetProjectDirectory(const path &path)
+{
+    m_project_directory_ = path;
+    m_asset_hierarchy_ = Object::Instantiate<AssetHierarchy>("Root");
+    m_asset_hierarchy_->m_is_directory_ = true;
+    ImportAll();
+}
+
 path AssetDatabase::GetProjectDirectory()
 {
     return m_project_directory_;
 }
+
 std::shared_ptr<AssetHierarchy> AssetDatabase::GetRootAssetHierarchy()
 {
     return m_asset_hierarchy_;
 }
-std::shared_ptr<AssetHierarchy> AssetDatabase::GetOrCreateAssetHierarchy(const path &path)
+std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const xg::Guid &guid)
 {
-    const auto rel_path = relative(path, m_project_directory_);
-    const auto split_rel_path = GetSplitPath(rel_path);
-    auto current_node = m_asset_hierarchy_;
-    for (const auto &node : split_rel_path)
+    if (!m_assets_by_guid_map_.contains(guid))
+        return nullptr;
+    return m_assets_by_guid_map_[guid];
+}
+
+IAssetPtr AssetDatabase::GetAsset(const path &path)
+{
+    const auto peek = AssetDescriptor::Read(path);
+    const auto guid = peek->guid;
+    auto asset_desc_it = m_assets_by_guid_map_.find(guid);
+    if (asset_desc_it == m_assets_by_guid_map_.end())
     {
-        auto found_node = std::ranges::find(current_node->children, node, &AssetHierarchy::Name);
-        if (found_node == current_node->children.end())
+        Logger::Log<AssetDatabase>("Asset '%s' not found. Importing...", path.string().c_str());
+        Import(path);
+        asset_desc_it = m_assets_by_guid_map_.find(guid);
+        if (asset_desc_it == m_assets_by_guid_map_.end())
         {
-            auto next = Object::Instantiate<AssetHierarchy>(node);
-            next->parent = current_node;
-            current_node->children.emplace_back(next);
-            current_node = next;
-            continue;
+            Logger::Error<AssetDatabase>("Asset '%s' not found", path.string().c_str());
+            return {};
         }
-
-        current_node = *found_node;
     }
 
-    return current_node;
+    const auto asset_desc = asset_desc_it->second;
+    return IAssetPtr::FromAssetDescriptor(asset_desc);
 }
-std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptorsByType(
-    const std::string &file_extension)
+
+IAssetPtr AssetDatabase::GetAsset(const xg::Guid &guid)
 {
-    return m_assets_map_by_type_[file_extension];
-}
-std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const path &path_file)
-{
-    const auto hierarchy = GetOrCreateAssetHierarchy(path_file);
-    if (hierarchy->asset == nullptr)
+    const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
+    if (asset_desc_it == m_assets_by_guid_map_.end())
     {
-        Logger::Warn<AssetDatabase>("Asset '%s' not found", path_file.string().c_str());
-        return nullptr;
-    }
-    return hierarchy->asset;
-}
-std::vector<std::shared_ptr<AssetDescriptor>> AssetDatabase::GetAssetDescriptors(const path &path_directory)
-{
-    const auto hierarchy = GetOrCreateAssetHierarchy(path_directory);
-    auto result = std::vector<std::shared_ptr<AssetDescriptor>>();
-    if (hierarchy->IsFile())
-    {
-        Logger::Warn<AssetDatabase>("Asset '%s' is not a directory", path_directory.string().c_str());
-        result.emplace_back(hierarchy->asset);
+        Logger::Error<AssetDatabase>("Asset with guid '%s' not found", guid.str().c_str());
+        return {};
     }
 
-    for (const auto &child : hierarchy->children)
-    {
-        if (child->asset == nullptr)
-            continue;
-        result.emplace_back(child->asset);
-    }
-
-    return result;
+    const auto asset_desc = asset_desc_it->second;
+    return IAssetPtr::FromAssetDescriptor(asset_desc);
 }
-std::shared_ptr<Object> AssetDatabase::GetAsset(const path &path)
+std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 {
-    const auto descriptor = GetAssetDescriptor(path);
-    if (descriptor == nullptr)
+    auto assets = std::vector<IAssetPtr>();
+    const auto assets_it = m_assets_map_by_type_.find(type);
+    if (assets_it == m_assets_map_by_type_.end())
     {
-        Logger::Warn<AssetDatabase>("Asset '%s' not found", path.string().c_str());
-        return nullptr;
+        Logger::Warn<AssetDatabase>("No assets of type '%s' found", type.c_str());
+        return assets;
     }
 
-    const auto asset = descriptor->object;
-    if (asset != nullptr)
+    const auto asset_descriptors = assets_it->second;
+    for (const auto &asset_descriptor : asset_descriptors)
     {
-        return asset;
+        assets.emplace_back(IAssetPtr::FromAssetDescriptor(asset_descriptor));
     }
 
-    const auto importer = AssetImporter::GetAssetImporter(path.extension().string());
-    if (importer == nullptr)
-    {
-        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", path.extension().string().c_str());
-        return nullptr;
-    }
-
-    descriptor->object = importer->Import(descriptor.get());
-    return descriptor->object;
+    return assets;
 }
-std::vector<std::shared_ptr<Object>> AssetDatabase::GetAssetsByType(const std::string &file_extension)
+
+void AssetDatabase::WriteAsset(const AssetDescriptor *asset_descriptor)
 {
-    auto result = std::vector<std::shared_ptr<Object>>();
-    for (const auto &descriptor : GetAssetDescriptorsByType(file_extension))
+    const auto exporter = AssetExporter::GetAssetExporter(asset_descriptor->type_hint);
+    if (exporter == nullptr)
     {
-        result.emplace_back(GetAsset(descriptor->path));
-    }
-    return result;
-}
-void AssetDatabase::SaveAsset(std::shared_ptr<AssetDescriptor> asset_descriptor)
-{
-    if (asset_descriptor == nullptr)
-    {
-        Logger::Warn<AssetDatabase>("Saving failed: Asset descriptor is null");
+        Logger::Warn<AssetDatabase>("Asset exporter for type '%s' not found! Will ignore file '%s'",
+                                    asset_descriptor->type_hint.c_str(), asset_descriptor->path.c_str());
         return;
     }
 
-    const auto extension = asset_descriptor->path.extension().string();
-    const auto importer = AssetImporter::GetAssetImporter(extension);
-    if (importer == nullptr)
+    exporter->Export(asset_descriptor);
+    asset_descriptor->Write(asset_descriptor->path);
+}
+
+void AssetDatabase::WriteAsset(const xg::Guid &guid)
+{
+    const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
+    if (asset_desc_it == m_assets_by_guid_map_.end())
     {
-        Logger::Warn<AssetDatabase>("No importer found for extension '%s'", extension.c_str());
+        Logger::Error<AssetDatabase>("Could not write asset as asset with guid '%s' is not found.", guid.str().c_str());
         return;
     }
 
-    importer->Export(asset_descriptor.get());
+    const auto asset_descriptor = asset_desc_it->second;
+    WriteAsset(asset_descriptor.get());
+}
+
+void AssetDatabase::WriteAsset(const IAssetPtr &ptr)
+{
+    WriteAsset(ptr.Guid());
 }
 
 }

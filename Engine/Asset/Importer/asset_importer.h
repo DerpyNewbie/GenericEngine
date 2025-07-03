@@ -25,12 +25,6 @@ public:
     virtual std::shared_ptr<Object> Import(AssetDescriptor *asset) = 0;
 
     /// <summary>
-    /// Write Object to the file that AssetDescriptor points to.
-    /// </summary>
-    /// <param name="asset">A valid AssetDescriptor</param>
-    virtual void Export(AssetDescriptor *asset) = 0;
-
-    /// <summary>
     /// Add AssetImporter implementations to make impl retrievable with supported file extension.
     /// </summary>
     /// <param name="importer">AssetImporter instance</param>

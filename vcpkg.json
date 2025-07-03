@@ -1,5 +1,6 @@
 {
   "dependencies": [
+    "assimp",
     "cereal",
     "directx-headers",
     "directxtex",
@@ -14,6 +15,6 @@
       ]
     },
     "implot",
-    "assimp"
+    "crossguid"
   ]
 }

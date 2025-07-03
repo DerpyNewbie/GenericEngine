@@ -6,6 +6,7 @@
 #include "serializer.h"
 #include "game_object.h"
 #include "scene.h"
+#include "Components/text_asset_ref_test_component.h"
 #include "Components/camera.h"
 #include "Components/controller.h"
 #include "Components/cube_renderer.h"
@@ -111,6 +112,7 @@ void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::
     ADD_COMPONENT(engine::MeshRenderer)
     ADD_COMPONENT(engine::MV1Renderer)
     ADD_COMPONENT(engine::SkinnedMeshRenderer)
+    ADD_COMPONENT(engine::TextAssetRefTestComponent)
 
 #undef ADD_COMPONENT
 
