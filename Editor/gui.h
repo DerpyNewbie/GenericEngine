@@ -5,8 +5,12 @@
 #include "Asset/asset_hierarchy.h"
 #include "Asset/asset_ptr.h"
 
+#include <shtypes.h>
+
 namespace editor
 {
+using FilterSpec = COMDLG_FILTERSPEC;
+
 class Gui
 {
 public:
@@ -15,6 +19,11 @@ public:
         static constexpr auto kObject = "ENGINE_OBJECT";
         static constexpr auto kAsset = "ENGINE_ASSET";
     };
+
+    static bool OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters = {});
+
+    static bool SaveFileDialog(std::string &file_path, const std::string &default_name,
+                               const std::vector<FilterSpec> &filters = {});
 
     template <typename T>
     static bool PropertyField(const char *label, engine::IAssetPtr &value, std::string type_hint);
