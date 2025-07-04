@@ -38,7 +38,6 @@ void SceneManager::DestroyScene(const std::string &name)
         return;
 
     Object::Destroy(*pos);
-    (*pos)->OnDestroy();
     m_scenes_.erase(pos);
 }
 

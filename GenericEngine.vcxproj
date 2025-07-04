@@ -57,6 +57,7 @@
         <ClCompile Include="Engine\engine_util.cpp"/>
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\Math\bounds.cpp"/>
+        <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>

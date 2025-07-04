@@ -11,6 +11,10 @@ std::vector<std::weak_ptr<IUpdateReceiver>> UpdateManager::m_update_receivers_;
 std::vector<std::weak_ptr<IFixedUpdateReceiver>> UpdateManager::m_fixed_update_receivers_;
 std::vector<std::weak_ptr<IDrawCallReceiver>> UpdateManager::m_draw_call_receivers_;
 
+bool UpdateManager::m_in_update_cycle_ = false;
+bool UpdateManager::m_in_fixed_update_cycle_ = false;
+bool UpdateManager::m_in_draw_call_cycle_ = false;
+
 namespace
 {
 template <typename It, typename V>
@@ -55,21 +59,27 @@ void Erase(It &it, V &v)
 
 void UpdateManager::InvokeUpdate()
 {
+    m_in_update_cycle_ = true;
     Update(m_update_receivers_, [&](const auto &receiver) {
         receiver->OnUpdate();
     });
+    m_in_update_cycle_ = false;
 }
 void UpdateManager::InvokeFixedUpdate()
 {
+    m_in_fixed_update_cycle_ = true;
     Update(m_fixed_update_receivers_, [&](const auto &receiver) {
         receiver->OnFixedUpdate();
     });
+    m_in_fixed_update_cycle_ = false;
 }
 void UpdateManager::InvokeDrawCall()
 {
+    m_in_draw_call_cycle_ = true;
     Update(m_draw_call_receivers_, [&](const auto &receiver) {
         receiver->OnDraw();
     });
+    m_in_draw_call_cycle_ = false;
 }
 void UpdateManager::SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver)
 {
@@ -94,5 +104,17 @@ void UpdateManager::SubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &
 void UpdateManager::UnsubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &receiver)
 {
     Erase(m_draw_call_receivers_, receiver);
+}
+bool UpdateManager::InUpdateCycle()
+{
+    return m_in_update_cycle_;
+}
+bool UpdateManager::InFixedUpdateCycle()
+{
+    return m_in_fixed_update_cycle_;
+}
+bool UpdateManager::InDrawCallCycle()
+{
+    return m_in_draw_call_cycle_;
 }
 }
