@@ -25,13 +25,8 @@ void GameObject::OnDestroy()
 {
     for (const auto &component : m_components_)
     {
-        component->OnDestroy();
+        DestroyImmediate(component);
     }
-    Object::OnDestroy();
-}
-void GameObject::NotifyDestroy()
-{
-    DestroyThis();
 }
 std::shared_ptr<Transform> GameObject::Transform() const
 {
@@ -91,15 +86,15 @@ void GameObject::InvokeUpdate()
 {
     if (IsDestroying())
     {
-        Scene()->MarkDestroying(shared_from_base<GameObject>());
         return;
     }
 
+    bool has_destroying_component = false;
     for (auto &component : m_components_)
     {
         if (component->IsDestroying())
         {
-            Scene()->MarkDestroying(component);
+            has_destroying_component = true;
             continue;
         }
 
@@ -112,6 +107,13 @@ void GameObject::InvokeUpdate()
             component->m_has_called_start_ = true;
         }
         component->OnUpdate();
+    }
+
+    if (has_destroying_component)
+    {
+        std::erase_if(m_components_, [](const auto &component) {
+            return component->IsDestroying();
+        });
     }
 
     const auto transform = Transform();

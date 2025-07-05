@@ -1,18 +1,14 @@
 #include "pch.h"
 #include "default_editor_menus.h"
 
+#include "component_factory.h"
 #include "editor_prefs.h"
 #include "scene_manager.h"
 #include "serializer.h"
 #include "game_object.h"
+#include "gui.h"
 #include "scene.h"
-#include "Components/camera.h"
-#include "Components/controller.h"
-#include "Components/cube_renderer.h"
-#include "Components/frame_meta_data.h"
-#include "Components/mesh_renderer.h"
-#include "Components/mv1_renderer.h"
-#include "Components/skinned_mesh_renderer.h"
+#include <shobjidl.h>
 
 void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 {
@@ -63,19 +59,42 @@ void editor::DefaultEditorMenu::DrawDefaultMenu()
 }
 void editor::DefaultEditorMenu::DrawFilesMenu()
 {
-    if (ImGui::MenuItem("Unload Scene"))
+    static std::vector<FilterSpec> scene_filter =
     {
-        engine::SceneManager::DestroyScene("Default Scene");
-    }
+        {L"Scene Files (*.scene)", L"*.scene"},
+        {L"All Files (*.*)", L"*.*"}
+    };
+
     if (ImGui::MenuItem("Load Scene"))
     {
+        std::string file_path;
+
+        if (!Gui::OpenFileDialog(file_path, scene_filter))
+        {
+            engine::Logger::Error<DefaultEditorMenu>("Failed to open file dialog");
+            return;
+        }
+
         engine::Serializer serializer;
-        engine::SceneManager::AddScene(serializer.Load<engine::Scene>("Default Scene.json"));
+        std::ifstream ifs(file_path);
+        engine::SceneManager::AddScene(serializer.Load<engine::Scene>(ifs));
     }
+
     if (ImGui::MenuItem("Save Scene"))
     {
+        std::string file_path = engine::AssetDatabase::GetProjectDirectory().string();
+
+        auto target_scene = engine::SceneManager::GetActiveScene();
+        auto default_file_name = target_scene->Name() + ".scene";
+        if (!Gui::SaveFileDialog(file_path, default_file_name, scene_filter))
+        {
+            engine::Logger::Error<DefaultEditorMenu>("Failed to open save file dialog");
+            return;
+        }
+
         engine::Serializer serializer;
-        serializer.Save(engine::SceneManager::GetActiveScene());
+        std::ofstream ofs(file_path);
+        serializer.Save(ofs, target_scene);
     }
 }
 void editor::DefaultEditorMenu::DrawEditMenu()
@@ -102,17 +121,12 @@ void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::
         ImGui::BeginDisabled();
     }
 
-#define ADD_COMPONENT(type) if (ImGui::MenuItem(#type)) go->AddComponent<type>();
-
-    ADD_COMPONENT(engine::Camera)
-    ADD_COMPONENT(engine::Controller)
-    ADD_COMPONENT(engine::CubeRenderer)
-    ADD_COMPONENT(engine::FrameMetaData)
-    ADD_COMPONENT(engine::MeshRenderer)
-    ADD_COMPONENT(engine::MV1Renderer)
-    ADD_COMPONENT(engine::SkinnedMeshRenderer)
-
-#undef ADD_COMPONENT
+    const auto component_names = engine::IComponentFactory::GetNames();
+    for (auto component_name : component_names)
+    {
+        if (ImGui::MenuItem(component_name.c_str()))
+            engine::IComponentFactory::Get(component_name)->AddComponentTo(go);
+    }
 
     if (go == nullptr)
     {

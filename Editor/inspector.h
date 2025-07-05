@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "editor_window.h"
 #include "inspectable.h"
+#include "scene.h"
 
 namespace engine
 {
@@ -20,6 +21,7 @@ class Inspector final : public EditorWindow
     std::weak_ptr<engine::Object> m_last_seen_object_;
 
     static void DrawObject(const std::shared_ptr<engine::Object> &object);
+    static void DrawScene(const std::shared_ptr<engine::Scene> &scene);
     static void DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object);
     static void DrawComponent(const std::shared_ptr<engine::Component> &component);
     static void DrawInspectable(const std::shared_ptr<engine::Inspectable> &inspectable);

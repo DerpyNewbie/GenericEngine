@@ -37,6 +37,7 @@ void SceneManager::DestroyScene(const std::string &name)
     if (pos == m_scenes_.end())
         return;
 
+    Object::Destroy(*pos);
     m_scenes_.erase(pos);
 }
 

@@ -6,6 +6,7 @@
 #include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "hierarchy.h"
+#include "imgui_demo_window.h"
 #include "inspector.h"
 #include "profiler.h"
 #include "update_man_debugger.h"
@@ -112,6 +113,7 @@ void Editor::Init()
         AddEditorWindow("Profiler", std::make_shared<Profiler>());
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
         AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
+        AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
     }
 
     {

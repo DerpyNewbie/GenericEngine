@@ -9,6 +9,7 @@
 
 #include "engine.h"
 
+#include "component_factory.h"
 #include "Asset/asset_database.h"
 #include "engine_profiler.h"
 #include "engine_time.h"
@@ -45,6 +46,7 @@ bool Engine::Init()
     Gizmos::Init();
     Time::Get()->Init();
     AssetDatabase::Init();
+    IComponentFactory::Init();
     SceneManager::CreateScene("Default Scene");
 
     return true;
@@ -86,6 +88,10 @@ void Engine::MainLoop() const
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");
+
+            Profiler::Begin("Cleanup Objects");
+            Object::DestroyObjects();
+            Profiler::End("Cleanup Objects");
         }
     }
 }

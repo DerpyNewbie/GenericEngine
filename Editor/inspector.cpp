@@ -36,6 +36,13 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
         return;
     }
 
+    const auto scene = std::dynamic_pointer_cast<engine::Scene>(object);
+    if (scene != nullptr)
+    {
+        DrawScene(scene);
+        return;
+    }
+
     const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(object);
     if (game_object != nullptr)
     {
@@ -66,6 +73,16 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
 
     ImGui::Text("Unknown object type is selected!");
     ImGui::Text("Object Name: '%s'", object->Name().c_str());
+}
+void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
+{
+    std::string buff = scene->Name();
+    if (ImGui::InputText("##INSPECTOR_GAME_OBJECT_NAME", &buff))
+    {
+        scene->SetName(buff);
+    }
+
+    ImGui::Separator();
 }
 void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
@@ -149,14 +166,19 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
     if (asset_hierarchy->IsFile())
     {
         ImGui::Text("File: %s", asset_hierarchy->asset->path.string().c_str());
+        ImGui::Text("Guid: %s", asset_hierarchy->asset->guid.str().c_str());
         ImGui::Separator();
-        if (asset_hierarchy->asset->object != nullptr)
+        if (asset_hierarchy->asset->managed_object != nullptr)
         {
-            DrawObject(asset_hierarchy->asset->object);
+            DrawObject(asset_hierarchy->asset->managed_object);
         }
         else
         {
             ImGui::Text("Object is null!");
+            if (ImGui::Button("Import"))
+            {
+                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->guid);
+            }
         }
         return;
     }

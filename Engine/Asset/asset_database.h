@@ -1,6 +1,7 @@
 #pragma once
 #include "asset_hierarchy.h"
 #include "asset_descriptor.h"
+#include "asset_ptr.h"
 #include "object.h"
 
 namespace engine
@@ -13,89 +14,43 @@ class AssetDatabase
 
     static path m_project_directory_;
     static std::shared_ptr<AssetHierarchy> m_asset_hierarchy_;
+    static std::unordered_map<xg::Guid, std::shared_ptr<AssetDescriptor>> m_assets_by_guid_map_;
     static std::unordered_map<std::string, std::vector<std::shared_ptr<AssetDescriptor>>> m_assets_map_by_type_;
 
     static void Init();
 
 public:
-    /// <summary>
-    /// Sets the project directory to load assets from.
-    /// </summary>
-    /// <remarks>
-    /// Calling this will unload all assets that are currently active.
-    /// </remarks>
-    /// <param name="path">Path to the project asset directory.</param>
-    static void SetProjectDirectory(const path &path);
-
-    /// <summary>
-    /// Imports all assets from the specified path.
-    /// </summary>
-    /// <param name="path">Path to the asset path</param>
     static void Import(const path &path);
-
-    /// <summary>
-    /// Import all assets from the project directory.
-    /// </summary>
     static void ImportAll();
 
-    /// <summary>
-    /// Retrieves a path of the project directory.
-    /// </summary>
-    /// <returns>Absolute path of the current project directory.</returns>
+    static void SetProjectDirectory(const path &path);
     static path GetProjectDirectory();
 
-    /// <summary>
-    /// Get or create AssetHierarchy at a corresponding path.
-    /// </summary>
-    /// <param name="path">A path to retrieve AssetHierarchy from.</param>
-    /// <returns>AssetHierarchy instance for the corresponding path.</returns>
-    static std::shared_ptr<AssetHierarchy> GetOrCreateAssetHierarchy(const path &path);
-
-    /// <summary>
-    /// Retrieves the root of AssetHierarchy.
-    /// </summary>
-    /// <returns>The root AssetHierarchy</returns>
     static std::shared_ptr<AssetHierarchy> GetRootAssetHierarchy();
 
-    /// <summary>
-    /// Retrieves the AssetDescriptor at a corresponding path.
-    /// </summary>
-    /// <param name="path_file">A path to retrieve AssetDescriptor from.</param>
-    /// <returns>Corresponding AssetDescriptor if the path points to a file, `nullptr` otherwise. </returns>
-    static std::shared_ptr<AssetDescriptor> GetAssetDescriptor(const path &path_file);
+    static std::shared_ptr<AssetDescriptor> GetAssetDescriptor(const xg::Guid &guid);
 
-    /// <summary>
-    /// Retrieves all child AssetDescriptors from the directory.
-    /// </summary>
-    /// <param name="path_directory">A path to retrieve all child AssetDescriptors from.</param>
-    /// <returns>List of AssetDescriptors</returns>
-    static std::vector<std::shared_ptr<AssetDescriptor>> GetAssetDescriptors(const path &path_directory);
+    static IAssetPtr GetAsset(const path &path);
+    static IAssetPtr GetAsset(const xg::Guid &guid);
 
-    /// <summary>
-    /// Retrieves all AssetDescriptors with a specified type
-    /// </summary>
-    /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
-    /// <returns>List of AssetDescriptors that has extension of <paramref name="file_extension"/></returns>
-    static std::vector<std::shared_ptr<AssetDescriptor>> GetAssetDescriptorsByType(const std::string &file_extension);
+    static std::vector<IAssetPtr> GetAssetsByType(const std::string &type);
 
-    /// <summary>
-    /// Retrieve the imported object from a corresponding path. 
-    /// </summary>
-    /// <param name="path">A path to retrieve AssetDescriptor from.</param>
-    /// <returns>The imported object if import has been successful. `nullptr` otherwise.</returns>
-    static std::shared_ptr<Object> GetAsset(const path &path);
+    static void WriteAsset(const AssetDescriptor *asset_descriptor);
+    static void WriteAsset(const xg::Guid &guid);
+    static void WriteAsset(const IAssetPtr &ptr);
 
-    /// <summary>
-    /// Retrieve all imported objects with a specified type 
-    /// </summary>
-    /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
-    /// <returns>List of the imported objects that has extension of <paramref name="file_extension"/></returns>
-    static std::vector<std::shared_ptr<Object>> GetAssetsByType(const std::string &file_extension);
+    template <typename T>
+    static AssetPtr<T> GetAsset(const path &path)
+    {
+        return reinterpret_cast<AssetPtr<T>>(GetAsset(path));
+    }
 
-    /// <summary>
-    /// Saves the changed AssetDescriptor.
-    /// </summary>
-    /// <param name="asset_descriptor">An AssetDescriptor to write</param>
-    static void SaveAsset(std::shared_ptr<AssetDescriptor> asset_descriptor);
+    template <typename T>
+    static AssetPtr<T> GetAsset(const xg::Guid &guid)
+    {
+        return reinterpret_cast<AssetPtr<T>>(GetAsset(guid));
+    }
+
+
 };
 }

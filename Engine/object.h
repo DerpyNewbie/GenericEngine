@@ -17,8 +17,15 @@ namespace engine
 {
 class Object : public enable_shared_from_base<Object>
 {
+    friend class Engine;
+
+    static unsigned int m_last_immediately_destroyed_objects_;
+    static std::vector<std::shared_ptr<Object>> m_destroying_objects_;
+
     bool m_is_destroying_ = false;
     std::string m_name_ = "Unknown Object";
+
+    static void DestroyObjects();
 
 protected:
     Object() = default;
@@ -32,25 +39,14 @@ public:
     virtual void OnDestroy()
     {}
 
-    std::string Name() const
-    {
-        return m_name_;
-    }
+    std::string Name() const;
+    void SetName(const std::string &name);
 
-    void SetName(const std::string &name)
-    {
-        m_name_ = name;
-    }
+    bool IsDestroying() const;
+    void DestroyThis();
 
-    bool IsDestroying() const
-    {
-        return m_is_destroying_;
-    }
-
-    void DestroyThis()
-    {
-        Destroy(shared_from_this());
-    }
+    static void Destroy(const std::shared_ptr<Object> &obj);
+    static void DestroyImmediate(const std::shared_ptr<Object> &obj);
 
     template <class T>
     static std::shared_ptr<T> Instantiate()
@@ -72,11 +68,6 @@ public:
         ptr->SetName(name);
         ptr->OnConstructed();
         return obj;
-    }
-
-    static void Destroy(const std::shared_ptr<Object> &obj)
-    {
-        obj->m_is_destroying_ = true;
     }
 
     template <class Archive>

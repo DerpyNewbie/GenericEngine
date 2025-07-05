@@ -16,45 +16,23 @@ void Scene::OnConstructed()
 }
 void Scene::OnUpdate()
 {
-    if (!m_destroying_components_.empty())
+    bool has_destroying_game_object = false;
+    for (const auto &game_object : m_root_game_objects_)
     {
-        Logger::Log<Scene>("Destroying %d components", m_destroying_components_.size());
-        for (const auto &component : m_destroying_components_)
+        if (game_object->IsDestroying())
         {
-            component->OnDestroy();
-            const auto go = component->GameObject();
-            go->m_components_.erase(std::ranges::find(component->GameObject()->m_components_, component));
+            has_destroying_game_object = true;
+            continue;
         }
 
-        m_destroying_components_.clear();
-    }
-
-    if (!m_destroying_objects_.empty())
-    {
-        Logger::Log<Scene>("Destroying %d game objects", m_destroying_objects_.size());
-        for (const auto &game_object : m_destroying_objects_)
-        {
-            game_object->OnDestroy();
-        }
-
-        for (const auto &game_object : m_destroying_objects_)
-        {
-            const auto all_obj_it = std::ranges::find(m_all_game_objects_, game_object);
-            if (all_obj_it != m_all_game_objects_.end())
-                m_all_game_objects_.erase(all_obj_it);
-
-            const auto root_obj_it = std::ranges::find(m_root_game_objects_, game_object);
-            if (root_obj_it != m_root_game_objects_.end())
-                m_root_game_objects_.erase(root_obj_it);
-        }
-
-        m_destroying_objects_.clear();
-    }
-
-    auto buff = m_root_game_objects_;
-    for (const auto &game_object : buff)
-    {
         game_object->InvokeUpdate();
+    }
+
+    if (has_destroying_game_object)
+    {
+        std::erase_if(m_root_game_objects_, [](const auto &go) {
+            return go->IsDestroying();
+        });
     }
 }
 void Scene::OnFixedUpdate()
@@ -64,19 +42,16 @@ void Scene::OnFixedUpdate()
         game_object->InvokeFixedUpdate();
     }
 }
-void Scene::MarkDestroying(const std::shared_ptr<GameObject> &game_object)
+void Scene::OnDestroy()
 {
-    m_destroying_objects_.emplace(game_object);
-    const auto transform = game_object->Transform();
-    for (int i = 0; i < transform->ChildCount(); i++)
+    UpdateManager::UnsubscribeUpdate(shared_from_base<Scene>());
+    UpdateManager::UnsubscribeFixedUpdate(shared_from_base<Scene>());
+    for (const auto &game_object : m_root_game_objects_)
     {
-        MarkDestroying(transform->GetChild(i)->GameObject());
+        DestroyImmediate(game_object);
     }
 }
-void Scene::MarkDestroying(const std::shared_ptr<Component> &component)
-{
-    m_destroying_components_.emplace(component);
-}
+
 const std::vector<std::shared_ptr<GameObject>> &Scene::RootGameObjects()
 {
     return m_root_game_objects_;
