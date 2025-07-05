@@ -67,5 +67,9 @@ void engine::Engine::MainLoop() const
         }
         ScreenFlip();
         Profiler::End("Draw Call");
+
+        Profiler::Begin("Cleanup Objects");
+        Object::DestroyObjects();
+        Profiler::End("Cleanup Objects");
     }
 }

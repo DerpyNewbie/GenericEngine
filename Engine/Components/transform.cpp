@@ -268,11 +268,12 @@ void Transform::RenderGlobalTransformGui()
 
     ImGui::PopID();
 }
-void Transform::NotifyDestroy() const
+
+void Transform::OnDestroy()
 {
     for (const auto child : m_children_)
     {
-        child->GameObject()->NotifyDestroy();
+        DestroyImmediate(child->GameObject());
     }
 }
 } // namespace engine

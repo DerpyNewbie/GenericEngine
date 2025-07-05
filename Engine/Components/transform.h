@@ -15,9 +15,8 @@ class Transform : public Component
     void RenderLocalTransformGui();
     void RenderGlobalTransformGui();
 
-    void NotifyDestroy() const;
-
 public:
+    void OnDestroy() override;
     void OnInspectorGui() override;
 
     [[nodiscard]] Matrix LocalMatrix() const;
