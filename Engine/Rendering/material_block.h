@@ -30,5 +30,11 @@ public:
     void CreateParamsFromShaderParams(std::vector<ShaderParameter> shader_params);
 
     std::array<std::array<std::vector<std::pair<ShaderParameter, std::shared_ptr<IMaterialData>>>, kParameterBufferType_Count>,kShaderType_Count> parameters;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Object>(this));
+    }
 };
 }

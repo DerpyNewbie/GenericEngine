@@ -15,6 +15,7 @@
 #include "camera.h"
 #include "Rendering/MaterialData.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -69,6 +70,8 @@ void MeshRenderer::OnDraw()
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
+    SetDescriptorTable(cmd_list, 0);
+    
     //cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
     //? shared_mesh->sub_meshes[0].base_index
     //: shared_mesh->indices.size(),1, 0, 0, 0);
@@ -79,6 +82,7 @@ void MeshRenderer::OnDraw()
         auto sub_mesh = shared_mesh->sub_meshes[i];
         ibView = ib->View();
         cmd_list->IASetIndexBuffer(&ibView);
+        SetDescriptorTable(cmd_list, i + 1);
         //cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
     }
 }
@@ -145,11 +149,10 @@ void MeshRenderer::ReconstructBuffers()
 
         index_buffers.emplace_back(sub_ib);
     }
-
     
     for (size_t i = 0; i < shared_materials.size(); ++i)
     {
-        auto& find_material_data = dynamic_cast<MaterialData>(shared_materials[i]->shared_material_block->FindMaterialDataFromName("WVP"));
+        auto find_material_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(shared_materials[i]->shared_material_block->FindMaterialDataFromName("WVP").lock());
         for (auto &wvp_buffer : material_wvp_buffers[i])
         {
             wvp_buffer = find_material_data;
@@ -163,7 +166,6 @@ void MeshRenderer::ReconstructBuffers()
                 material_handles[i][shader_type][params_type] = shared_materials[i]->shared_material_block->
                     GetDescriptorHandle(static_cast<kShaderType>(shader_type),
                                         static_cast<kParameterBufferType>(params_type));
-
 }
 
 void MeshRenderer::UpdateBuffers()
@@ -193,6 +195,13 @@ void MeshRenderer::UpdateBuffers()
             wvp_buffer.lock()->UpdateBuffer();
         }
     }
+}
+
+void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx)
+{
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
+            cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV]->HandleGPU);
 }
 
 }

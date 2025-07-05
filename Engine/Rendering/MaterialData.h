@@ -1,8 +1,11 @@
 #pragma once
+#include <cereal/archives/portable_binary.hpp>
 #include "buffers.h"
 #include "engine_traits.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
+#include "CabotEngine/Graphics/StructuredBuffer.h"
+
 
 namespace engine
 {
@@ -14,6 +17,11 @@ struct IMaterialData
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
     virtual int SizeInBytes() = 0;
     virtual void *Data() =0;
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar();
+    }
 };
 
 template <typename T>
@@ -36,13 +44,16 @@ struct MaterialData : IMaterialData
 
     void CreateBuffer() override
     {
-        if constexpr (!engine_traits::is_vector<T>())
+        if constexpr (!engine_traits::is_vector<T>::value)
         {
             using ElementType = typename engine_traits::vector_element_type<T>::type;
-            buffer = std::make_unique<StructuredBuffer<ElementType>>(Count());
+            buffer = std::make_unique<StructuredBuffer>(sizeof(ElementType), Count());
         }
-
-        buffer = std::make_unique<ConstantBuffer>(SizeInBytes());
+        else
+        {
+            buffer = std::make_unique<ConstantBuffer>(SizeInBytes());
+        }
+        buffer->CreateBuffer();
     }
 
     void UpdateBuffer() override
@@ -60,7 +71,7 @@ struct MaterialData : IMaterialData
 
     int SizeInBytes() override
     {
-        if constexpr (!engine_traits::is_vector<T>())
+        if constexpr (!engine_traits::is_vector<T>::value)
         {
             return sizeof(T);
         }
@@ -73,21 +84,34 @@ struct MaterialData : IMaterialData
 
     size_t Count()
     {
-        if (!engine_traits::is_vector<T>())
+        if constexpr (engine_traits::is_vector<T>::value)   // T が vector のときだけ
+        {
+            return value.size();
+        }
+        else                                               // それ以外（スカラ型など）
+        {
             return 1;
-
-        return value.size();
+        }
     }
 
     void *Data() override
     {
-        if constexpr (!engine_traits::is_vector<T>())
+        if constexpr (!engine_traits::is_vector<T>::value)
         {
             return &value;
         }
         else
         {
             return value.data();
+        }
+    }
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<IMaterialData>(this), value);
+        if (!buffer)
+        {
+            CreateBuffer();
         }
     }
 };
@@ -108,7 +132,22 @@ struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
         return value;
     }
 
-    int SizeInByte()
+    void CreateBuffer() override
+    {
+        value.lock()->CreateBuffer();
+    }
+
+    void UpdateBuffer() override
+    {
+        return;
+    }
+
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override
+    {
+        return value.lock()->UploadBuffer();
+    }
+
+    int SizeInBytes() override
     {
         return sizeof(Texture2D);
     }
@@ -117,5 +156,15 @@ struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
     {
         return &value.lock()->tex_data;
     }
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<IMaterialData>(this), value);
+        if (!value.lock()->IsValid())
+        {
+            CreateBuffer();
+        }
+    }
 };
+
 }

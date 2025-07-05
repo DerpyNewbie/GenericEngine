@@ -18,8 +18,6 @@ public:
     constexpr static int kLimitBonesPerVertex = 4;
     std::vector<DirectX::XMMATRIX> transforms;
 
-    StructuredBuffer<DirectX::XMMATRIX> transforms_buffer;
-
     void OnInspectorGui() override;
 
     void OnDraw() override;

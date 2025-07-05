@@ -2,6 +2,8 @@
 
 #include "Texture2D.h"
 
+#include "DescriptorHeapManager.h"
+
 #include <cassert>
 #include <DirectXTex.h>
 #include <assimp/texture.h>
@@ -10,6 +12,7 @@
 #include <wincodec.h>
 
 #include "RenderEngine.h"
+#include "logger.h"
 
 #pragma comment(lib, "DirectXTex.lib")
 
@@ -84,6 +87,16 @@ void Texture2D::CreateBuffer()
     }
 
     m_IsValid = true;
+}
+
+void Texture2D::UpdateBuffer(void *data)
+{
+    engine::Logger::Error("Can not Update Texture2D");
+}
+
+std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
+{
+    return g_DescriptorHeapManager->Get().Register(shared_from_this());
 }
 
 Texture2D::Texture2D(aiTexture *src)

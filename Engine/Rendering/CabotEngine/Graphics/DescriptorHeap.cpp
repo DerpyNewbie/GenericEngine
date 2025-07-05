@@ -70,27 +70,34 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Textu
     return pHandle;
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<engine::MaterialBlock> material_block)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuffer structured_buffer)
 {
     auto count = m_pHandles.size();
+
+    UINT HANDLE_MAX = 512;
     if (HANDLE_MAX <= count)
     {
         return nullptr;
     }
 
-    //マテリアルの最初のハンドルさえ確保できればいいのでここで代入する
-    std::shared_ptr<DescriptorHandle> pHandle = Register(material_block->params_float_buffer);
-    Register(material_block->params_int_buffer);
-    Register(material_block->params_vec2_buffer);
-    Register(material_block->params_vec3_buffer);
-    Register(material_block->params_vec4_buffer);
-    Register(material_block->params_mat4_buffer);
-    for (auto tex : material_block->params_tex2d | std::ranges::views::values)
-    {
-        Register(tex);
-    }
-    
-    return pHandle;
+    std::shared_ptr<DescriptorHandle> pHandle = std::make_shared<DescriptorHandle>();
+
+    auto handleCPU = m_pHeap->GetCPUDescriptorHandleForHeapStart(); // ディスクリプタヒープの最初のアドレス
+    handleCPU.ptr += m_IncrementSize * count; // 最初のアドレスからcount番目が今回追加されたリソースのハンドル
+
+    auto handleGPU = m_pHeap->GetGPUDescriptorHandleForHeapStart(); // ディスクリプタヒープの最初のアドレス
+    handleGPU.ptr += m_IncrementSize * count; // 最初のアドレスからcount番目が今回追加されたリソースのハンドル
+
+    pHandle->HandleCPU = handleCPU;
+    pHandle->HandleGPU = handleGPU;
+
+    auto device = g_RenderEngine->Device();
+    auto resource = structured_buffer.Resource();
+    auto desc = structured_buffer.ViewDesc();
+    device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
+
+    m_pHandles.push_back(pHandle);
+    return pHandle; // ハンドルを返す
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer& constant_buffer)

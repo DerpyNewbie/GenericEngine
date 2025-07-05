@@ -6,19 +6,18 @@
 
 namespace engine
 {
-template
-<typename T>
-class StructuredBuffer
+class StructuredBuffer : public IBuffer
 {
 public:
-    explicit StructuredBuffer(size_t elem_count)
+    explicit StructuredBuffer(size_t stride, size_t elem_count)
     {
+        m_stride = stride;
         m_elementCount = elem_count;
     }
 
-    void CreateBuffer()
+    void CreateBuffer() override
     {
-        size_t totalSize = sizeof(T) * m_elementCount;
+        size_t totalSize = m_stride * m_elementCount;
 
         // GPU側リソース
         CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(totalSize);
@@ -47,11 +46,11 @@ public:
             );
     }
 
-    void UpdateBuffer(void *data)
+    void UpdateBuffer(void *data) override
     {
         void *mapped = nullptr;
         m_pUploadBuffer->Map(0, nullptr, &mapped);
-        memcpy(mapped, data, sizeof(T) * m_elementCount);
+        memcpy(mapped, data, m_stride * m_elementCount);
         m_pUploadBuffer->Unmap(0, nullptr);
 
         g_RenderEngine->CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
@@ -64,14 +63,13 @@ public:
         g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
     }
 
-    std::shared_ptr<DescriptorHandle> UploadBuffer()
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override
     {
-        auto me = this;
-        auto pHandle = g_DescriptorHeapManager->Get().Register(me);
+        auto pHandle = g_DescriptorHeapManager->Get().Register(*this);
         return pHandle;
     }
 
-    bool CanUpdate()
+    bool CanUpdate() override
     {
         return true;
     }
@@ -84,7 +82,7 @@ public:
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         srvDesc.Buffer.FirstElement = 0;
         srvDesc.Buffer.NumElements = m_elementCount;
-        srvDesc.Buffer.StructureByteStride = sizeof(T);
+        srvDesc.Buffer.StructureByteStride = m_stride;
         srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
         return srvDesc;
     }
@@ -98,5 +96,6 @@ private:
     ComPtr<ID3D12Resource> m_pDefaultBuffer;
     ComPtr<ID3D12Resource> m_pUploadBuffer;
     size_t m_elementCount = 0;
+    size_t m_stride = 0;
 };
 }

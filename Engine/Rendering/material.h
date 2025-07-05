@@ -18,15 +18,13 @@ public:
     std::shared_ptr<Shader> shared_shader;
     std::shared_ptr<MaterialBlock> shared_material_block;
 
-    static std::shared_ptr<Material> CreateFromAiMaterial(const aiScene* scene, int material_idx);
-
     void OnConstructed() override;
     void CreateMaterialBlock();
     
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Object>(this), shared_shader, shared_material_block);
+        ar(cereal::base_class<Object>(this), shared_material_block);
     }
 };
 }

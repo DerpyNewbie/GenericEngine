@@ -80,9 +80,6 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     }
 
     // TODO: local matrix is incorrect
-    aiString exeption;
-    exeption = "Hackadoll";
-
     node_transform->SetLocalMatrix(aiMatrixToXMMatrix(node->mTransformation));
 
     // apply meshes
@@ -93,7 +90,7 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
         meshes.emplace_back(Mesh::CreateFromAiMesh(scene, scene->mMeshes[node->mMeshes[i]], GetGlobalTransform(node)));
-        materials.emplace_back(Material::CreateFromAiMaterial(scene,scene->mMeshes[node->mMeshes[i]]->mMaterialIndex));
+        materials.emplace_back(Object::Instantiate<Material>());
     }
 
     

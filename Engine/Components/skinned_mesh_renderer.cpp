@@ -43,13 +43,10 @@ void SkinnedMeshRenderer::OnDraw()
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
 
-    cmd_list->SetGraphicsRootConstantBufferView(0, wvp_buffers[currentIndex]->GetAddress());
-
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
 
-    cmd_list->SetGraphicsRootDescriptorTable(6, material_handles[0]->HandleGPU);
     cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
                                        ? shared_mesh->sub_meshes[0].base_index
                                        : shared_mesh->indices.size(), 1, 0, 0, 0);
@@ -71,8 +68,6 @@ void SkinnedMeshRenderer::ReconstructBuffers()
     transforms.reserve(shared_mesh->bind_poses.size());
     for (size_t i = 0; i < shared_mesh->bind_poses.size(); i++)
         transforms.emplace_back(shared_mesh->bind_poses[i]);
-    
-    g_DescriptorHeapManager->Get().Register(transforms_buffer);
 }
 
 void SkinnedMeshRenderer::UpdateBuffers()

@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "component.h"
 #include "renderer.h"
 #include "transform.h"
@@ -40,7 +41,10 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh));
+        ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(shared_materials));
     }
+
+private:
+    void SetDescriptorTable(ID3D12GraphicsCommandList* cmd_list, int material_idx);
 };
 }

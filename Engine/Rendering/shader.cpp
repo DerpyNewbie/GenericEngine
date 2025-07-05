@@ -3,6 +3,8 @@
 #include <d3dcompiler.h>
 #include <memory>
 
+std::shared_ptr<engine::Shader> engine::Shader::default_shader;
+
 std::shared_ptr<engine::Shader> engine::Shader::GetDefault()
 {
     if (!default_shader)

@@ -34,6 +34,12 @@ struct ShaderParameter
     kShaderType shader_type;
     kParameterBufferType buffer_type;
     std::string type_hint;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(name, index, shader_type, buffer_type, type_hint);
+    }
 };
 
 /// <summary>

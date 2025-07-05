@@ -1,5 +1,7 @@
 ﻿#pragma once
 #include "ComPtr.h"
+#include "Rendering/buffers.h"
+
 #include <directx/d3dx12.h>
 #include <string>
 #include <memory>
@@ -9,14 +11,20 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D
+class Texture2D :public std::enable_shared_from_this<Texture2D>, public IBuffer
 {
 public:
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
     UINT width;
     UINT height;
 
-    void CreateBuffer();
+    bool CanUpdate() override
+    {
+        return false;
+    }
+    void CreateBuffer() override;
+    void UpdateBuffer(void *data) override;
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     
     explicit Texture2D(aiTexture *src);
     static std::shared_ptr<Texture2D> Get(std::string path);
@@ -30,9 +38,6 @@ public:
 
     explicit Texture2D(ID3D12Resource *buffer);
     explicit Texture2D(std::wstring path);
-
-    Texture2D(const Texture2D &) = delete;
-    void operator =(const Texture2D &) = delete;
 
 private:
     explicit Texture2D(std::string path);
