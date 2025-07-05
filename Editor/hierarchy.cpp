@@ -40,7 +40,20 @@ void Hierarchy::OnEditorGui()
 }
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 {
-    if (ImGui::CollapsingHeader(scene->Name().c_str()))
+    auto draw = ImGui::CollapsingHeader(scene->Name().c_str());
+    if (ImGui::IsItemClicked())
+    {
+        Editor::Instance()->SetSelectedObject(scene);
+    }
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        if (ImGui::MenuItem("Unload"))
+            engine::SceneManager::DestroyScene(scene->Name());
+        ImGui::EndPopup();
+    }
+
+    if (draw)
     {
         for (const auto all_root_objects = scene->RootGameObjects();
              const auto &root_object : all_root_objects)

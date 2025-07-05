@@ -36,6 +36,13 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
         return;
     }
 
+    const auto scene = std::dynamic_pointer_cast<engine::Scene>(object);
+    if (scene != nullptr)
+    {
+        DrawScene(scene);
+        return;
+    }
+
     const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(object);
     if (game_object != nullptr)
     {
@@ -66,6 +73,16 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
 
     ImGui::Text("Unknown object type is selected!");
     ImGui::Text("Object Name: '%s'", object->Name().c_str());
+}
+void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
+{
+    std::string buff = scene->Name();
+    if (ImGui::InputText("##INSPECTOR_GAME_OBJECT_NAME", &buff))
+    {
+        scene->SetName(buff);
+    }
+
+    ImGui::Separator();
 }
 void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
