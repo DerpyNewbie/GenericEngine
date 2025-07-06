@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "component.h"
-
 #include "game_object.h"
 
 namespace engine
@@ -11,6 +10,11 @@ Component::Component() : Object()
 void Component::OnInspectorGui()
 {
     ImGui::Text("OnInspectorGui not implemented for %s", typeid(*this).name());
+}
+
+std::shared_ptr<GameObject> Component::GameObject() const
+{
+    return m_game_object_.lock();
 }
 
 template <class Archive>

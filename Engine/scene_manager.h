@@ -1,9 +1,6 @@
 ﻿#pragma once
 #include "game_object.h"
 
-#include <memory>
-#include <vector>
-
 namespace engine
 {
 class SceneManager

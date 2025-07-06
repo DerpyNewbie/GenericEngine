@@ -1,6 +1,5 @@
 #pragma once
 #include "asset_descriptor.h"
-#include "object.h"
 
 namespace engine
 {

@@ -1,10 +1,7 @@
 #pragma once
-#include "DxLib.h"
-#include "game_object.h"
+
 #include "mesh_renderer.h"
 #include "Rendering/texture2d.h"
-
-#include <vector>
 
 namespace engine
 {

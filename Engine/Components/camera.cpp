@@ -1,10 +1,7 @@
 #include "pch.h"
 
 #include "camera.h"
-
-#include "DxLib/dxlib_converter.h"
 #include "game_object.h"
-#include "Math/mathf.h"
 
 namespace engine
 {

@@ -1,14 +1,11 @@
 #pragma once
 #include "crossguid/guid.hpp"
 
-#include "guid_serializer.h"
-#include <cereal/types/base_class.hpp>
-#include <cereal/types/polymorphic.hpp>
-
 namespace engine
 {
 struct AssetDescriptor;
 class Object;
+
 struct IAssetPtr
 {
 protected:

@@ -1,8 +1,6 @@
 #pragma once
 #include "asset_hierarchy.h"
-#include "asset_descriptor.h"
 #include "asset_ptr.h"
-#include "object.h"
 
 namespace engine
 {

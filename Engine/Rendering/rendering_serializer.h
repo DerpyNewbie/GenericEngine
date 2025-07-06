@@ -2,10 +2,6 @@
 #include "sub_mesh.h"
 #include "bone_weight.h"
 
-#include <cereal/cereal.hpp>
-#include <cereal/types/polymorphic.hpp>
-#include <cereal/types/vector.hpp>
-
 namespace cereal
 {
 template <class Archive>

@@ -1,7 +1,5 @@
 #pragma once
 #include "asset_ptr.h"
-#include "object.h"
-#include <crossguid/guid.hpp>
 
 namespace engine
 {

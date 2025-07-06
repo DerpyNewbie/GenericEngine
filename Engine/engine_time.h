@@ -3,10 +3,6 @@
 //
 #pragma once
 
-#include "DxLib.h"
-
-#include <chrono>
-
 namespace engine
 {
 using Instant = std::chrono::time_point<std::chrono::steady_clock>;

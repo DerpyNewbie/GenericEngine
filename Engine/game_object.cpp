@@ -2,14 +2,11 @@
 
 #include "game_object.h"
 
-#include "engine.h"
 #include "scene.h"
 #include "scene_manager.h"
 
 #include "Components/component.h"
 #include "Components/transform.h"
-
-#include "cereal/archives/json.hpp"
 
 namespace engine
 {
@@ -204,5 +201,9 @@ void GameObject::serialize(Archive &ar)
 
 template void engine::GameObject::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &);
 template void engine::GameObject::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &);
+template void engine::GameObject::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
+template void engine::GameObject::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
+template void engine::GameObject::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &);
+template void engine::GameObject::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &);
 
 CEREAL_REGISTER_TYPE(engine::GameObject)

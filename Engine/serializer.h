@@ -1,9 +1,4 @@
 #pragma once
-#include "logger.h"
-#include "../pch.h"
-
-#include "object.h"
-#include "cereal/archives/json.hpp"
 
 namespace engine
 {

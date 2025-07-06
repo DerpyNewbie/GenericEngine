@@ -3,10 +3,8 @@
 #include "mesh_renderer.h"
 
 #include "DxLib/dxlib_helper.h"
-#include "DxLib/dxlib_converter.h"
 #include "Rendering/texture2d.h"
 #include "game_object.h"
-#include "logger.h"
 
 namespace engine
 {

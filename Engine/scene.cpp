@@ -5,8 +5,6 @@
 #include "game_object.h"
 #include "update_manager.h"
 
-#include "cereal/archives/json.hpp"
-
 namespace engine
 {
 void Scene::OnConstructed()

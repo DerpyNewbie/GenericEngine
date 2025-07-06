@@ -1,8 +1,6 @@
 #pragma once
 #include "game_object.h"
 
-#include <ranges>
-
 namespace engine
 {
 class IComponentFactory
@@ -17,31 +15,17 @@ class IComponentFactory
 public:
     virtual ~IComponentFactory() = default;
 
-    explicit IComponentFactory(const std::string &name) : m_name_(name)
-    {}
+    explicit IComponentFactory(const std::string &name);
 
-    std::string Name()
-    {
-        return m_name_;
-    }
+    std::string Name();
 
     virtual void AddComponentTo(std::shared_ptr<GameObject>) = 0;
 
-    static void Register(const std::shared_ptr<IComponentFactory> &factory)
-    {
-        m_factories_.insert_or_assign(factory->Name(), factory);
-    }
+    static void Register(const std::shared_ptr<IComponentFactory> &factory);
 
-    static std::shared_ptr<IComponentFactory> Get(const std::string &name)
-    {
-        return m_factories_.at(name);
-    }
+    static std::shared_ptr<IComponentFactory> Get(const std::string &name);
 
-    static std::vector<std::string> GetNames()
-    {
-        auto view = m_factories_ | std::views::keys;
-        return {view.begin(), view.end()};
-    }
+    static std::vector<std::string> GetNames();
 };
 
 template <typename T>

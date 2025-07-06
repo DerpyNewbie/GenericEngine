@@ -1,9 +1,6 @@
 ﻿#pragma once
 #include "component.h"
 
-#include <memory>
-#include <vector>
-
 namespace engine
 {
 class Transform : public Component

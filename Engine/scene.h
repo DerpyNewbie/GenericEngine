@@ -1,10 +1,5 @@
 ﻿#pragma once
-#include "object.h"
 #include "event_receivers.h"
-#include "Components/component.h"
-
-#include <memory>
-#include <vector>
 
 namespace engine
 {

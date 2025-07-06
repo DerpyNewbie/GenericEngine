@@ -2,8 +2,6 @@
 
 #include "update_manager.h"
 
-#include "logger.h"
-
 namespace engine
 {
 
