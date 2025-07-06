@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include <d3dcommon.h>
 
 D3D_FEATURE_LEVEL levels[] =
 {

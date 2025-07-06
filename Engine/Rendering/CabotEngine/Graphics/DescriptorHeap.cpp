@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
+
 #include "DescriptorHeap.h"
 #include "Texture2D.h"
-#include <directx/d3dx12.h>
 #include "RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
@@ -99,19 +99,19 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuf
     return pHandle; // ハンドルを返す
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer& constant_buffer)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &constant_buffer)
 {
     auto pHandle = Allocate();
 
     auto view_desc = constant_buffer.ViewDesc();
-    g_RenderEngine->Device()->CreateConstantBufferView(&view_desc,pHandle->HandleCPU);
+    g_RenderEngine->Device()->CreateConstantBufferView(&view_desc, pHandle->HandleCPU);
     return pHandle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
     auto count = m_pHandles.size() + 1;
-    
+
     DescriptorHandle handle = {};
     if (HANDLE_MAX <= m_pHandles.size())
     {
@@ -128,7 +128,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 
     pHandle->HandleCPU = handleCPU;
     pHandle->HandleGPU = handleGPU;
-    
+
     m_pHandles.push_back(pHandle);
     return pHandle;
 }

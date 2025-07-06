@@ -1,7 +1,6 @@
 ﻿#include "pch.h"
 
 #include "IndexBuffer.h"
-#include <directx/d3dx12.h>
 #include "RenderEngine.h"
 
 engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)

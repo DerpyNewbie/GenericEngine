@@ -1,10 +1,7 @@
 #pragma once
-#include "object.h"
 #include "Asset/inspectable_asset.h"
 #include "Asset/Importer/ShaderImporter.h"
 #include "CabotEngine/Graphics/ComPtr.h"
-#include <d3dcommon.h>
-#include <directx/d3dx12_core.h>
 
 namespace engine
 {
@@ -68,7 +65,7 @@ public:
 
     void OnInspectorGui() override;
     void OnConstructed() override;
-    
+
     CD3DX12_SHADER_BYTECODE GetByteCode(ShaderType type) const
     {
         switch (type)

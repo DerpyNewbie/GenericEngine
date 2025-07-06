@@ -1,10 +1,6 @@
 ﻿#pragma once
-#include "ComPtr.h"
 #include "Asset/inspectable_asset.h"
 #include "Rendering/buffers.h"
-#include <directx/d3dx12.h>
-#include <string>
-#include <memory>
 
 struct aiTexture;
 class DescriptorHeap;

@@ -1,9 +1,6 @@
 #include "pch.h"
 
 #include "skinned_mesh_renderer.h"
-#include "Rendering/texture2d.h"
-
-#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
 namespace engine
@@ -11,7 +8,7 @@ namespace engine
 void SkinnedMeshRenderer::OnInspectorGui()
 {
     MeshRenderer::OnInspectorGui();
-    
+
     ImGui::Checkbox("Draw Bones", &m_draw_bones_);
     ImGui::Separator();
     if (ImGui::CollapsingHeader("Bone Info"))

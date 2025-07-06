@@ -1,9 +1,5 @@
 ﻿#pragma once
-#include "ComPtr.h"
 #include "Rendering/material.h"
-
-#include <directx/d3dx12.h>
-#include <string>
 
 class PipelineState
 {

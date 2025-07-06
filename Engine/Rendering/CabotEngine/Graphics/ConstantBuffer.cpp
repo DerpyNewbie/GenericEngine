@@ -4,7 +4,6 @@
 
 #include "DescriptorHeapManager.h"
 #include "RenderEngine.h"
-#include "logger.h"
 
 ConstantBuffer::ConstantBuffer(size_t size)
 {
@@ -58,7 +57,7 @@ void ConstantBuffer::CreateBuffer()
 
 void ConstantBuffer::UpdateBuffer(void *data)
 {
-    memcpy(m_pMappedPtr,data,m_SizeAligned);
+    memcpy(m_pMappedPtr, data, m_SizeAligned);
 }
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()

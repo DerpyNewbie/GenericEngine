@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include <directx/d3dx12.h>
-#include "ComPtr.h"
 #include "Rendering/buffers.h"
 
 class ConstantBuffer : public IBuffer

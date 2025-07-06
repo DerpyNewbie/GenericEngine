@@ -1,18 +1,20 @@
 #include "pch.h"
 
 #include "application.h"
-#include "Engine.h"
-#include "Editor/editor.h"
-#include "Engine/scene.h"
-#include "Engine/Components/camera.h"
-#include "Engine/Components/controller.h"
-#include "Engine/Components/skinned_mesh_renderer.h"
-#include "Editor/editor.h"
-#include "Rendering/model_importer.h"
-#include <ranges>
-#include "object.h"
 
-Application* g_app;
+#include <tchar.h>
+
+#include "engine.h"
+#include "scene.h"
+#include "game_object.h"
+
+#include "Components/camera.h"
+#include "Components/controller.h"
+#include "Components/skinned_mesh_renderer.h"
+#include "Rendering/model_importer.h"
+#include "Editor/editor.h"
+
+Application *g_app;
 std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
 float Application::m_window_height_ = 1080;
 float Application::m_window_width_ = 1920;
@@ -99,16 +101,16 @@ void Application::InitWindow()
 
     //ウィンドウオブジェクトの生成
     m_h_wnd_ = CreateWindow(w.lpszClassName,
-                        _T("DX12"),
-                        WS_OVERLAPPEDWINDOW,
-                        CW_USEDEFAULT,
-                        CW_USEDEFAULT,
-                        wrc.right - wrc.left,
-                        wrc.bottom - wrc.top,
-                        nullptr,
-                        nullptr,
-                        w.hInstance,
-                        nullptr);
+                            _T("DX12"),
+                            WS_OVERLAPPEDWINDOW,
+                            CW_USEDEFAULT,
+                            CW_USEDEFAULT,
+                            wrc.right - wrc.left,
+                            wrc.bottom - wrc.top,
+                            nullptr,
+                            nullptr,
+                            w.hInstance,
+                            nullptr);
 
     //ウィンドウ表示
     ShowWindow(m_h_wnd_,SW_SHOW);

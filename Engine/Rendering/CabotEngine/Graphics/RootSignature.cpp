@@ -2,8 +2,6 @@
 
 #include "RootSignature.h"
 #include "RenderEngine.h"
-#include <directx/d3dx12.h>
-#include <array>
 
 engine::RootSignature::RootSignature()
 {
@@ -21,12 +19,12 @@ engine::RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0);//CBVはちょっと多めに確保
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0); //CBVはちょっと多めに確保
     tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
-    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6,0);
+    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
     tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0);
     tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
-    tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6,0);
+    tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
 
     rootParam[kVertexCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_VERTEX);
     rootParam[kVertexSRV].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_VERTEX);

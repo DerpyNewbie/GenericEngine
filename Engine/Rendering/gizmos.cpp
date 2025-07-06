@@ -1,13 +1,11 @@
 #include "pch.h"
 #include "gizmos.h"
 
-#include "logger.h"
 #include "update_manager.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "Components/camera.h"
-#include "Math/mathf.h"
 
 namespace engine
 {

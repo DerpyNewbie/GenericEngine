@@ -5,8 +5,6 @@
 #include "Rendering/Vertex.h"
 #include "Components/skinned_mesh_renderer.h"
 
-#include <directx/d3dx12.h>
-
 engine::VertexBuffer::VertexBuffer(const Mesh *p_init_data)
 {
     auto size = sizeof(Vertex) * p_init_data->vertices.size();

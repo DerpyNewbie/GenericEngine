@@ -6,13 +6,10 @@
 #pragma comment(lib, "assimp-vc143-mt.lib")
 #endif
 
-#include <algorithm>
-#include <array>
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include "DxLib/dxlib_converter.h"
 #include "mesh.h"
-#include "logger.h"
 #include "CabotEngine/Converter/D3D12ToAssimp.h"
 
 namespace

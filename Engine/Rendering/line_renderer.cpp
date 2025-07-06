@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "line_renderer.h"
-#include "logger.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "Components/camera.h"
 #include "Components/mesh_renderer.h"
@@ -26,12 +25,12 @@ void LineRenderer::UpdateIndexBuffer(std::vector<uint32_t> indices)
     {
         m_IndexBuffer = nullptr;
     }
-    m_IndexBuffer = std::make_shared<engine::IndexBuffer>(m_NumIndices * sizeof(uint32_t),indices.data());
+    m_IndexBuffer = std::make_shared<engine::IndexBuffer>(m_NumIndices * sizeof(uint32_t), indices.data());
     if (!m_VertexBuffer->IsValid())
     {
         m_IsValid = false;
     }
-    
+
 }
 
 void LineRenderer::UpdateViewProjectionBuffer()
@@ -70,7 +69,7 @@ void LineRenderer::Draw()
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = m_VertexBuffer->View();
     auto ibView = m_IndexBuffer->View();
-    
+
     cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
     cmd_list->SetGraphicsRootConstantBufferView(0, m_ViewProjectionBuffers[currentIndex]->GetAddress());
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);

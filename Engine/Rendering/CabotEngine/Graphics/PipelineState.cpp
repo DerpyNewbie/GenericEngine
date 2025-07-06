@@ -2,8 +2,6 @@
 
 #include "PipelineState.h"
 #include "RenderEngine.h"
-#include <directx/d3dx12.h>
-#include <d3dcompiler.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
 

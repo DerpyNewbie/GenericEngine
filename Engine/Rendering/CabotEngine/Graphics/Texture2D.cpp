@@ -2,13 +2,8 @@
 
 #include "Texture2D.h"
 #include "DescriptorHeapManager.h"
-#include <DirectXTex.h>
 #include <assimp/texture.h>
-#include <wrl.h>
-#include <directx/d3dx12.h>
-#include <wincodec.h>
 #include "RenderEngine.h"
-#include "logger.h"
 
 #pragma comment(lib, "DirectXTex.lib")
 

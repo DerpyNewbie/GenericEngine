@@ -5,6 +5,8 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
+#include <cstdio>
 #include <filesystem>
 #include <fstream>
 #include <format>
@@ -40,13 +42,21 @@
 #include <cereal/types/vector.hpp>
 /* === end cereal === */
 
-/* === begin directxtk12 === */
-#include <directxtk12/SimpleMath.h>
-/* === end directxtk12 === */
-
 /* === begin windows === */
 #include <windows.h>
+#include <wrl.h>
+#include <wincodec.h>
 /* === end windows === */
+
+/* === begin directx === */
+#include <directx/d3dx12.h>
+#include <directx/d3dcommon.h>
+#include <DirectXTex.h>
+#include <directxtk12/SimpleMath.h>
+#include <DirectXMath.h>
+#include <d3dcompiler.h>
+#include <dxgi1_4.h>
+/* === end directx === */
 
 /* === begin crossguid === */
 #include <crossguid/guid.hpp>
@@ -63,3 +73,7 @@
 #include "Math/math_serializer.h"
 #include "Rendering/rendering_serializer.h"
 /* === end engine.serialzier === */
+
+/* === begin engine.cabot_engine === */
+#include "Rendering/CabotEngine/Graphics/ComPtr.h"
+/* === end engine.cabot_engine === */

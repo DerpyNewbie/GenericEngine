@@ -2,9 +2,6 @@
 #include "event_receivers.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/VertexBuffer.h"
-#include "Math/bounds.h"
-
-#include <directxtk12/SimpleMath.h>
 
 namespace engine
 {

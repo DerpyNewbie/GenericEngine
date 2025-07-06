@@ -1,6 +1,4 @@
 ﻿#pragma once
-#include <d3d12.h>
-#include "ComPtr.h"
 #include "../../mesh.h"
 #include "Rendering/Vertex.h"
 

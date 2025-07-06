@@ -1,10 +1,7 @@
 #pragma once
-#include <vector>
 #include "Math/bounds.h"
 #include "bone_weight.h"
-#include "object.h"
 #include "sub_mesh.h"
-#include "rendering_serializer.h"
 
 struct aiMesh;
 struct aiScene;

@@ -1,7 +1,4 @@
 ﻿#pragma once
-#include "ComPtr.h"
-#include <directx/d3dx12.h>
-#include <vector>
 #include "RenderEngine.h"
 
 class ConstantBuffer;

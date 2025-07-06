@@ -16,7 +16,6 @@
 #include "Components/skinned_mesh_renderer.h"
 #include "game_object.h"
 #include "str_util.h"
-#include "logger.h"
 #include "mesh.h"
 #include "CabotEngine/Converter/D3D12ToAssimp.h"
 

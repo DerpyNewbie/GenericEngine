@@ -1,7 +1,4 @@
 #pragma once
-#include <d3d12.h>
-#include <directxtk12/SimpleMath.h>
-using namespace DirectX::SimpleMath;
 
 struct Vertex
 {

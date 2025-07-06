@@ -4,6 +4,7 @@
 
 #include "game_object.h"
 #include "transform.h"
+#include "DxLib/dxlib_converter.h"
 
 namespace engine
 {

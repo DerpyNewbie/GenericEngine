@@ -1,12 +1,6 @@
 ﻿#include "pch.h"
 
 #include "RenderEngine.h"
-#include <d3d12.h>
-#include <stdio.h>
-#include <Windows.h>
-#include <DirectXTex.h>
-#include <directx/d3dx12.h>
-
 
 RenderEngine *g_RenderEngine;
 
