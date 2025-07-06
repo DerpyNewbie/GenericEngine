@@ -18,11 +18,6 @@ struct IMaterialData
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
     virtual int SizeInBytes() = 0;
     virtual void *Data() =0;
-    template <class Archive>
-    void serialize(Archive &ar)
-    {
-        ar();
-    }
 };
 
 template <typename T>
@@ -85,11 +80,11 @@ struct MaterialData : IMaterialData
 
     size_t Count()
     {
-        if constexpr (engine_traits::is_vector<T>::value)   // T が vector のときだけ
+        if constexpr (engine_traits::is_vector<T>::value) // T が vector のときだけ
         {
             return value.size();
         }
-        else                                               // それ以外（スカラ型など）
+        else // それ以外（スカラ型など）
         {
             return 1;
         }
@@ -106,10 +101,11 @@ struct MaterialData : IMaterialData
             return value.data();
         }
     }
+
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<IMaterialData>(this), value);
+        ar(value);
         if (!buffer)
         {
             CreateBuffer();
@@ -117,52 +113,3 @@ struct MaterialData : IMaterialData
     }
 };
 }
-
-/*template <>
-struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
-{
-    //IAssetPtr value;
-    MaterialData() = default;
-
-    void Set(IAssetPtr new_value)
-    {
-        //value = new_value;
-    }
-
-    IAssetPtr Get()
-    {
-        //return value;
-    }
-
-    void CreateBuffer() override
-    {
-
-    }
-
-    void UpdateBuffer() override
-    {
-        return;
-    }
-
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override
-    {
-
-    }
-
-    int SizeInBytes() override
-    {
-        return sizeof(Texture2D);
-    }
-
-    void *Data() override
-    {
-        //return &std::dynamic_pointer_cast<Texture2D>(value.Lock())->tex_data;
-    }
-    template <class Archive>
-    void serialize(Archive &ar)
-    {
-        //ar(cereal::base_class<IMaterialData>(this), value);
-
-    }
-};
-}*/
