@@ -1,5 +1,5 @@
 #pragma once
-#include "CabotEngine/Graphics/DescriptorHeap.h"
+class DescriptorHandle;
 
 class IBuffer
 {

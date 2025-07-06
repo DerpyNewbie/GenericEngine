@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "ComPtr.h"
+#include "Asset/inspectable_asset.h"
 #include "Rendering/buffers.h"
-
 #include <directx/d3dx12.h>
 #include <string>
 #include <memory>
@@ -11,12 +11,14 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D :public std::enable_shared_from_this<Texture2D>, public IBuffer
+class Texture2D final :public engine::InspectableAsset, public IBuffer
 {
 public:
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
     UINT width;
     UINT height;
+
+    void OnInspectorGui() override;
 
     bool CanUpdate() override
     {

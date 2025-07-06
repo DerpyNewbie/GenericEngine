@@ -69,8 +69,4 @@ std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 
     return shader;
 }
-
-void ShaderImporter::Export(AssetDescriptor *asset)
-{
-}
 }

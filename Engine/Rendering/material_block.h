@@ -23,7 +23,6 @@ public:
     MaterialBlock() = default;
     void OnInspectorGui() override;
     void OnConstructed() override;
-
     
     std::shared_ptr<DescriptorHandle> GetDescriptorHandle(kShaderType shader_type, kParameterBufferType param_buffer);
     std::weak_ptr<IMaterialData> FindMaterialDataFromName(std::string name);

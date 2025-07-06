@@ -11,6 +11,5 @@ class ShaderImporter : public AssetImporter
 public:
     std::vector<std::string>SupportedExtensions() override;
     std::shared_ptr<Object> Import(AssetDescriptor *asset) override;
-    void Export(AssetDescriptor *asset) override;
 };
 }

@@ -1,5 +1,4 @@
 ﻿#include "pch.h"
-
 #include "DescriptorHeap.h"
 #include "Texture2D.h"
 #include <directx/d3dx12.h>

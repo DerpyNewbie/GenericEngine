@@ -2,6 +2,7 @@
 #include <cereal/archives/portable_binary.hpp>
 #include "buffers.h"
 #include "engine_traits.h"
+#include "Asset/asset_ptr.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
@@ -115,26 +116,27 @@ struct MaterialData : IMaterialData
         }
     }
 };
+}
 
-template <>
+/*template <>
 struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
 {
-    std::weak_ptr<Texture2D> value;
+    //IAssetPtr value;
     MaterialData() = default;
 
-    void Set(std::weak_ptr<Texture2D> new_value)
+    void Set(IAssetPtr new_value)
     {
-        value = new_value;
+        //value = new_value;
     }
 
-    std::weak_ptr<Texture2D> Get()
+    IAssetPtr Get()
     {
-        return value;
+        //return value;
     }
 
     void CreateBuffer() override
     {
-        value.lock()->CreateBuffer();
+
     }
 
     void UpdateBuffer() override
@@ -144,7 +146,7 @@ struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
 
     std::shared_ptr<DescriptorHandle> UploadBuffer() override
     {
-        return value.lock()->UploadBuffer();
+
     }
 
     int SizeInBytes() override
@@ -154,17 +156,13 @@ struct MaterialData<std::weak_ptr<Texture2D>> : IMaterialData
 
     void *Data() override
     {
-        return &value.lock()->tex_data;
+        //return &std::dynamic_pointer_cast<Texture2D>(value.Lock())->tex_data;
     }
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<IMaterialData>(this), value);
-        if (!value.lock()->IsValid())
-        {
-            CreateBuffer();
-        }
+        //ar(cereal::base_class<IMaterialData>(this), value);
+
     }
 };
-
-}
+}*/
