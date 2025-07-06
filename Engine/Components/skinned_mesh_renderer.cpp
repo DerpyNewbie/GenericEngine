@@ -1,6 +1,7 @@
 #include "pch.h"
 
 #include "skinned_mesh_renderer.h"
+#include "Rendering/texture2d.h"
 
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"

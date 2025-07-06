@@ -1,7 +1,5 @@
 #pragma once
 
-#include <directxtk12/SimpleMath.h>
-
 namespace engine
 {
 using namespace DirectX::SimpleMath;

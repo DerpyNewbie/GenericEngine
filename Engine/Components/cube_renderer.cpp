@@ -2,7 +2,6 @@
 
 #include "cube_renderer.h"
 
-#include "DxLib/dxlib_converter.h"
 #include "game_object.h"
 #include "transform.h"
 

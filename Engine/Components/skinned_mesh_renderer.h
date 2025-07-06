@@ -1,12 +1,9 @@
 #pragma once
-#include "DxLib.h"
-#include "game_object.h"
+
 #include "mesh_renderer.h"
 #include "Rendering/line_renderer.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
-
-#include <vector>
 
 namespace engine
 {

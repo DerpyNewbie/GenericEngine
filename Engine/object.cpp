@@ -1,8 +1,5 @@
 #include "pch.h"
 
-#include "object.h"
-
-#include "logger.h"
 #include "update_manager.h"
 
 namespace engine

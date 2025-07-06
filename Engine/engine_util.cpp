@@ -3,8 +3,6 @@
 #include "engine_util.h"
 
 #include "Components/component.h"
-#include "logger.h"
-
 
 namespace engine
 {

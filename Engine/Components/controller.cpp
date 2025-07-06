@@ -4,7 +4,7 @@
 
 #include "game_object.h"
 #include "transform.h"
-#include "Math/mathf.h"
+
 
 // TODO: remove DxLib dependency
 #include <DxLib.h>

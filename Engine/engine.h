@@ -5,8 +5,6 @@
 #pragma comment(lib, "assimp-vc143-mt")
 #endif
 
-#include "engine_time.h"
-
 namespace engine
 {
 class Engine

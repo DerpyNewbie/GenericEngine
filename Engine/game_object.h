@@ -1,10 +1,5 @@
 #pragma once
-#include <vector>
 
-#include <cereal/types/vector.hpp>
-
-#include "logger.h"
-#include "object.h"
 #include "engine_util.h"
 #include "Components/component.h"
 #include "Components/transform.h"
@@ -21,8 +16,6 @@ public:
     void OnConstructed() override;
 
     void OnDestroy() override;
-
-    void NotifyDestroy();
 
     std::shared_ptr<Transform> Transform() const;
 

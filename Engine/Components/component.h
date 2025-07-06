@@ -1,8 +1,5 @@
 #pragma once
 
-#include <memory>
-#include "object.h"
-
 namespace engine
 {
 class GameObject;
@@ -41,10 +38,7 @@ public:
 
     virtual void OnInspectorGui();
 
-    [[nodiscard]] std::shared_ptr<GameObject> GameObject() const
-    {
-        return m_game_object_.lock();
-    }
+    [[nodiscard]] std::shared_ptr<GameObject> GameObject() const;
 
     template <class Archive>
     void serialize(Archive &ar);

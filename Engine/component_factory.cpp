@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "component_factory.h"
 
 #include "Components/camera.h"
@@ -26,5 +27,24 @@ void IComponentFactory::Init()
     ADD_COMPONENT(SkinnedMeshRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
 #undef ADD_COMPONENT
+}
+IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
+{}
+std::string IComponentFactory::Name()
+{
+    return m_name_;
+}
+void IComponentFactory::Register(const std::shared_ptr<IComponentFactory> &factory)
+{
+    m_factories_.insert_or_assign(factory->Name(), factory);
+}
+std::shared_ptr<IComponentFactory> IComponentFactory::Get(const std::string &name)
+{
+    return m_factories_.at(name);
+}
+std::vector<std::string> IComponentFactory::GetNames()
+{
+    auto view = m_factories_ | std::views::keys;
+    return {view.begin(), view.end()};
 }
 }

@@ -1,5 +1,4 @@
 #pragma once
-#include <directxtk12/SimpleMath.h>
 #include "bounds.h"
 
 using namespace DirectX::SimpleMath;

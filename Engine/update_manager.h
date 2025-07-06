@@ -1,9 +1,6 @@
 ﻿#pragma once
 #include "event_receivers.h"
 
-#include <memory>
-#include <vector>
-
 namespace engine
 {
 class UpdateManager

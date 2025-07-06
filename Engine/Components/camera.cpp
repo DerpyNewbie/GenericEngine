@@ -2,12 +2,9 @@
 
 #include "camera.h"
 
-#include <DirectXMath.h>
 #include "DxLib/dxlib_converter.h"
 #include "application.h"
 #include "game_object.h"
-#include "Math/mathf.h"
-
 
 namespace engine
 {

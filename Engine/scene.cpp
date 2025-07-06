@@ -5,8 +5,6 @@
 #include "game_object.h"
 #include "update_manager.h"
 
-#include "cereal/archives/json.hpp"
-
 namespace engine
 {
 void Scene::OnConstructed()
@@ -16,23 +14,21 @@ void Scene::OnConstructed()
 }
 void Scene::OnUpdate()
 {
-    bool has_destroying_game_object = false;
-    for (const auto &game_object : m_root_game_objects_)
-    {
-        if (game_object->IsDestroying())
-        {
-            has_destroying_game_object = true;
-            continue;
-        }
-
-        game_object->InvokeUpdate();
-    }
-
-    if (has_destroying_game_object)
+    if (m_has_destroying_game_object_)
     {
         std::erase_if(m_root_game_objects_, [](const auto &go) {
             return go->IsDestroying();
         });
+
+        std::erase_if(m_all_game_objects_, [](const auto &go) {
+            return go->IsDestroying();
+        });
+        m_has_destroying_game_object_ = false;
+    }
+
+    for (const auto &game_object : m_root_game_objects_)
+    {
+        game_object->InvokeUpdate();
     }
 }
 void Scene::OnFixedUpdate()

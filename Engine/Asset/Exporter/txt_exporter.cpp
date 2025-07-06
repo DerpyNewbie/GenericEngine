@@ -1,6 +1,6 @@
 #include "pch.h"
+
 #include "txt_exporter.h"
-#include "logger.h"
 #include "Asset/asset_descriptor.h"
 #include "Asset/text_asset.h"
 
