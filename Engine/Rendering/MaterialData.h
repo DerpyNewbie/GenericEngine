@@ -97,7 +97,6 @@ struct MaterialData : IMaterialData
             return value.data();
         }
     }
-
     template <class Archive>
     void serialize(Archive &ar)
     {
@@ -106,6 +105,53 @@ struct MaterialData : IMaterialData
         {
             CreateBuffer();
         }
+    }
+};
+
+template <>
+struct MaterialData<IAssetPtr> : IMaterialData
+{
+    IAssetPtr value;
+    MaterialData() = default;
+
+    void Set(AssetPtr<Texture2D> new_value)
+    {
+        value = static_cast<IAssetPtr>(new_value);
+    }
+
+    std::shared_ptr<Texture2D> Get()
+    {
+        return std::dynamic_pointer_cast<Texture2D>(value.Lock());
+    }
+
+    void CreateBuffer() override
+    {
+        std::dynamic_pointer_cast<Texture2D>(value.Lock())->CreateBuffer();
+    }
+
+    void UpdateBuffer() override
+    {
+        return;
+    }
+
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override
+    {
+        return std::dynamic_pointer_cast<Texture2D>(value.Lock())->UploadBuffer();
+    }
+
+    int SizeInBytes() override
+    {
+        return sizeof(Texture2D);
+    }
+
+    void *Data() override
+    {
+        return &std::dynamic_pointer_cast<Texture2D>(value.Lock())->tex_data;
+    }
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(value);
     }
 };
 }
