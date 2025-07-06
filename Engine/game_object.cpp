@@ -20,6 +20,13 @@ void GameObject::OnConstructed()
 }
 void GameObject::OnDestroy()
 {
+    // notify the scene that there is a destroying game object
+    const auto scene = Scene();
+    if (scene != nullptr)
+    {
+        scene->m_has_destroying_game_object_ = true;
+    }
+
     for (const auto &component : m_components_)
     {
         DestroyImmediate(component);
