@@ -65,5 +65,12 @@ struct AssetPtr : IAssetPtr
 
         return std::dynamic_pointer_cast<T>(m_ptr_.lock());
     }
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<IAssetPtr>(this));
+        auto _ = Lock(); // try to import the object associated with guid
+    }
 };
 }

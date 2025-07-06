@@ -19,3 +19,13 @@
 #include <imgui_stdlib.h>
 
 #include <implot.h>
+
+#include <cereal/archives/xml.hpp>
+#include <cereal/archives/json.hpp>
+#include <cereal/archives/portable_binary.hpp>
+
+#include <cereal/types/polymorphic.hpp>
+#include <cereal/types/array.hpp>
+#include <cereal/types/vector.hpp>
+
+#include "Math/math_serializer.h"
