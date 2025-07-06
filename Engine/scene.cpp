@@ -65,6 +65,9 @@ void Scene::serialize(Archive &ar)
 
 template void engine::Scene::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &);
 template void engine::Scene::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &);
-
+template void engine::Scene::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
+template void engine::Scene::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
+template void engine::Scene::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &);
+template void engine::Scene::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &);
 
 CEREAL_REGISTER_TYPE(engine::Scene)
