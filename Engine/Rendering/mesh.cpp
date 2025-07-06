@@ -15,10 +15,45 @@
 #include "logger.h"
 #include "CabotEngine/Converter/D3D12ToAssimp.h"
 
+namespace
+{
+using namespace engine;
+std::shared_ptr<Mesh> CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_ref_polygon_list)
+{
+    auto result = Object::Instantiate<Mesh>();
+    result->vertices.resize(mv1_ref_polygon_list.VertexNum);
+    result->uvs[0].resize(mv1_ref_polygon_list.VertexNum);
+    result->uvs[1].resize(mv1_ref_polygon_list.VertexNum);
+    result->colors.resize(mv1_ref_polygon_list.VertexNum);
+    result->normals.resize(mv1_ref_polygon_list.VertexNum);
+
+    for (int i = 0; i < mv1_ref_polygon_list.VertexNum; i++)
+    {
+        const auto vertex = mv1_ref_polygon_list.Vertexs[i];
+        result->vertices[i] = DxLibConverter::To(vertex.Position);
+        result->uvs[0][i] = DxLibConverter::To(vertex.TexCoord[0]);
+        result->uvs[1][i] = DxLibConverter::To(vertex.TexCoord[1]);
+        result->colors[i] = DxLibConverter::To(vertex.DiffuseColor);
+        result->normals[i] = DxLibConverter::To(vertex.Normal);
+    }
+
+    result->indices.resize(3ULL * mv1_ref_polygon_list.PolygonNum);
+    for (size_t i = 0; std::cmp_less(i, mv1_ref_polygon_list.PolygonNum); i++)
+    {
+        const auto polygon = mv1_ref_polygon_list.Polygons[i];
+        result->indices[i * 3] = polygon.VIndex[0];
+        result->indices[i * 3 + 1] = polygon.VIndex[1];
+        result->indices[i * 3 + 2] = polygon.VIndex[2];
+    }
+
+    return result;
+}
+}
+
 namespace engine
 {
 
-aiMatrix4x4 GetGlobalTransform(const aiNode* node)
+aiMatrix4x4 GetGlobalTransform(const aiNode *node)
 {
     aiMatrix4x4 transform = node->mTransformation;
     while (node->mParent)
@@ -37,13 +72,13 @@ aiMatrix4x4 GetBindPose(const aiBone *bone)
                                  std::string(bone->mName.C_Str()));
     }
 
-    aiMatrix4x4 global  = GetGlobalTransform(bone->mNode);
+    aiMatrix4x4 global = GetGlobalTransform(bone->mNode);
     aiMatrix4x4 skinMat = global * bone->mOffsetMatrix;
 
     return skinMat;
 }
 
-std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh,aiMatrix4x4 global_transform)
+std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
 {
     const auto result = Instantiate<Mesh>(mesh->mName.C_Str());
     Logger::Log<Mesh>("Creating mesh `%s` from aiMesh", result->Name().c_str());
@@ -195,37 +230,6 @@ std::vector<std::shared_ptr<Mesh>> Mesh::CreateFromMV1(const int model_handle, c
         result.emplace_back(std::move(mesh));
         MV1TerminateReferenceMesh(model_handle, frame_index, false, false, mesh_index);
     }
-    return result;
-}
-
-std::shared_ptr<Mesh> Mesh::CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_ref_polygon_list)
-{
-    auto result = Instantiate<Mesh>();
-    result->vertices.resize(mv1_ref_polygon_list.VertexNum);
-    result->uvs[0].resize(mv1_ref_polygon_list.VertexNum);
-    result->uvs[1].resize(mv1_ref_polygon_list.VertexNum);
-    result->colors.resize(mv1_ref_polygon_list.VertexNum);
-    result->normals.resize(mv1_ref_polygon_list.VertexNum);
-
-    for (int i = 0; i < mv1_ref_polygon_list.VertexNum; i++)
-    {
-        const auto vertex = mv1_ref_polygon_list.Vertexs[i];
-        result->vertices[i] = DxLibConverter::To(vertex.Position);
-        result->uvs[0][i] = DxLibConverter::To(vertex.TexCoord[0]);
-        result->uvs[1][i] = DxLibConverter::To(vertex.TexCoord[1]);
-        result->colors[i] = DxLibConverter::To(vertex.DiffuseColor);
-        result->normals[i] = DxLibConverter::To(vertex.Normal);
-    }
-
-    result->indices.resize(3ULL * mv1_ref_polygon_list.PolygonNum);
-    for (size_t i = 0; std::cmp_less(i, mv1_ref_polygon_list.PolygonNum); i++)
-    {
-        const auto polygon = mv1_ref_polygon_list.Polygons[i];
-        result->indices[i * 3] = polygon.VIndex[0];
-        result->indices[i * 3 + 1] = polygon.VIndex[1];
-        result->indices[i * 3 + 2] = polygon.VIndex[2];
-    }
-
     return result;
 }
 

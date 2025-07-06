@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <assimp/matrix4x4.h>
 #include "Math/bounds.h"
 #include "bone_weight.h"
 #include "object.h"
@@ -28,9 +27,10 @@ public:
     std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
 
-    static std::shared_ptr<Mesh> CreateFromAiMesh(const aiScene *scene, const aiMesh *mesh,aiMatrix4x4 global_transform);
+    static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
+
+    // TODO: remove DxLib dependency
     static std::vector<std::shared_ptr<Mesh>> CreateFromMV1(int model_handle, int frame_index);
-    static std::shared_ptr<Mesh> CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_ref_polygon_list);
 
     void Append(Mesh other);
     std::vector<Vector2> *GetUV(int index);

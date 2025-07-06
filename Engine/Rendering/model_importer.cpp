@@ -14,12 +14,14 @@
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
-#include "DxLib/dxlib_converter.h"
 #include "game_object.h"
 #include "str_util.h"
 #include "logger.h"
 #include "mesh.h"
 #include "CabotEngine/Converter/D3D12ToAssimp.h"
+
+// TODO: remove DxLib dependency
+#include "DxLib/dxlib_converter.h"
 
 namespace engine
 {
@@ -89,11 +91,10 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     materials.reserve(node->mNumMeshes);
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
-        meshes.emplace_back(Mesh::CreateFromAiMesh(scene, scene->mMeshes[node->mMeshes[i]], GetGlobalTransform(node)));
+        meshes.emplace_back(Mesh::CreateFromAiMesh(scene->mMeshes[node->mMeshes[i]]));
         materials.emplace_back(Object::Instantiate<Material>());
     }
 
-    
     if (!meshes.empty())
     {
         const auto result_mesh = meshes[0];
