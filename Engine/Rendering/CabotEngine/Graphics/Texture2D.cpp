@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
+
 #include "Texture2D.h"
 #include "DescriptorHeapManager.h"
-#include <cassert>
 #include <DirectXTex.h>
 #include <assimp/texture.h>
 #include <wrl.h>
@@ -45,13 +45,17 @@ Texture2D::Texture2D(std::wstring path)
     m_IsValid = Load(path);
 }
 
+void Texture2D::OnInspectorGui()
+{
+    // TODO: implement inspector
+}
 void Texture2D::CreateBuffer()
 {
     auto desc = CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R8G8B8A8_UNORM,
-                                            width,
-                                            height,
-                                            1,
-                                            1);
+                                             width,
+                                             height,
+                                             1,
+                                             1);
 
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
@@ -122,7 +126,7 @@ Texture2D::Texture2D(aiTexture *src)
         0.0f,
         WICBitmapPaletteTypeCustom
         );
-    
+
     frame->GetSize(&width, &height);
 
     std::vector<uint8_t> imageRGBA(width * height * 4);

@@ -5,18 +5,17 @@
 #include <directx/d3dx12.h>
 #include <string>
 #include <memory>
-#include <directxtk12/SimpleMath.h>
 
 struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D final :public engine::InspectableAsset, public IBuffer
+class Texture2D final : public engine::InspectableAsset, public IBuffer
 {
 public:
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
-    UINT width;
-    UINT height;
+    UINT width = 0;
+    UINT height = 0;
 
     void OnInspectorGui() override;
 
@@ -27,13 +26,13 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    
+
     explicit Texture2D(aiTexture *src);
     static std::shared_ptr<Texture2D> Get(std::string path);
     static std::shared_ptr<Texture2D> Get(std::wstring path);
     static std::shared_ptr<Texture2D> GetWhite();
     static Texture2D *CreateGrayGradationTexture();
-    bool IsValid();
+    bool IsValid() override;
 
     ID3D12Resource *Resource();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();

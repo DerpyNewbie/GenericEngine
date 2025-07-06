@@ -9,8 +9,9 @@ public:
     virtual void UpdateBuffer(void *data) = 0;
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
     virtual bool CanUpdate() = 0;
-    
-    bool IsValid()
+
+    // TODO: consider moving this to all inheritors for proper interface implementation
+    virtual bool IsValid()
     {
         return m_IsValid;
     }
