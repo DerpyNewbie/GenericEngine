@@ -250,14 +250,30 @@ IAssetPtr AssetDescriptor::ToAssetPtr()
 
 void AssetDescriptor::Save()
 {
+    if (IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot save internal asset '%s'", guid.str().c_str());
+        return;
+    }
+
     std::string json;
     Write(GetMetaFilePath(path_hint));
 }
 
 void AssetDescriptor::Reload()
 {
+    if (IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", guid.str().c_str());
+        return;
+    }
+
     std::string json;
     GetMetaJson(path_hint, json);
     Reload(shared_from_base<AssetDescriptor>(), json);
+}
+bool AssetDescriptor::IsInternalAsset() const
+{
+    return path_hint.string() == kInternalAssetPath;
 }
 }

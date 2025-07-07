@@ -98,6 +98,12 @@ void AssetDatabase::Import(const path &path)
     Logger::Warn<AssetDatabase>("Path '%s' is not a file or directory. ignoring", path.string().c_str());
 }
 
+void AssetDatabase::ImportInternal(const std::shared_ptr<AssetDescriptor> &descriptor)
+{
+    descriptor->path_hint = AssetDescriptor::kInternalAssetPath;
+    m_assets_by_guid_map_[descriptor->guid] = descriptor;
+}
+
 void AssetDatabase::ImportAll()
 {
     Import(m_project_directory_);
@@ -192,6 +198,12 @@ std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 
 void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
 {
+    if (asset_descriptor->IsInternalAsset())
+    {
+        Logger::Warn<AssetDatabase>("Cannot write internal asset '%s'", asset_descriptor->guid.str().c_str());
+        return;
+    }
+
     const auto exporter = AssetExporter::Get(asset_descriptor->type_hint);
     if (exporter == nullptr)
     {
