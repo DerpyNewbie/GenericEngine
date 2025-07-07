@@ -24,7 +24,7 @@ public:
     /// Write Object to the file that AssetDescriptor points to.
     /// </summary>
     /// <param name="descriptor">A valid AssetDescriptor</param>
-    virtual void Export(const AssetDescriptor *descriptor) = 0;
+    virtual void Export(AssetDescriptor *descriptor) = 0;
 
     /// <summary>
     /// Add AssetExporter implementations to make impl retrievable with supported file extension.

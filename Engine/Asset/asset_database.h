@@ -26,6 +26,8 @@ public:
 
     static std::shared_ptr<AssetHierarchy> GetRootAssetHierarchy();
 
+    static void ReloadAsset(const xg::Guid &guid);
+
     static std::shared_ptr<AssetDescriptor> GetAssetDescriptor(const xg::Guid &guid);
 
     static IAssetPtr GetAsset(const path &path);
@@ -33,7 +35,7 @@ public:
 
     static std::vector<IAssetPtr> GetAssetsByType(const std::string &type);
 
-    static void WriteAsset(const AssetDescriptor *asset_descriptor);
+    static void WriteAsset(AssetDescriptor *asset_descriptor);
     static void WriteAsset(const xg::Guid &guid);
     static void WriteAsset(const IAssetPtr &ptr);
 
