@@ -24,6 +24,8 @@ void engine::MaterialBlock::OnConstructed()
 std::shared_ptr<DescriptorHandle> engine::MaterialBlock::GetDescriptorHandle(
     kShaderType shader_type, kParameterBufferType param_buffer)
 {
+    if (parameters[shader_type][param_buffer].empty())
+        return nullptr;
     return parameters[shader_type][param_buffer].begin()->second->UploadBuffer();
 }
 std::weak_ptr<engine::IMaterialData> engine::MaterialBlock::FindMaterialDataFromName(std::string name)
@@ -33,6 +35,7 @@ std::weak_ptr<engine::IMaterialData> engine::MaterialBlock::FindMaterialDataFrom
             for (auto [key,value] : parameters[shader_type][params_type])
                 if (name == key.name)
                     return value;
+    return std::weak_ptr<engine::IMaterialData>();
 }
 void engine::MaterialBlock::CreateParamsFromShaderParams(std::vector<ShaderParameter> shader_params)
 {

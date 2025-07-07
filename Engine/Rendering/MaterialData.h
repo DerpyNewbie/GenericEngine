@@ -1,8 +1,10 @@
 #pragma once
 #include "buffers.h"
 #include "engine_traits.h"
+#include "Asset/asset_ptr.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
+#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {

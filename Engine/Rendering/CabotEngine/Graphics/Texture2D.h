@@ -12,36 +12,25 @@ public:
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
     UINT width = 0;
     UINT height = 0;
-
+    UINT16 mip_levels;
+    DXGI_FORMAT format;
     void OnInspectorGui() override;
 
-    bool CanUpdate() override
-    {
-        return false;
-    }
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-
-    explicit Texture2D(aiTexture *src);
-    static std::shared_ptr<Texture2D> Get(std::string path);
-    static std::shared_ptr<Texture2D> Get(std::wstring path);
-    static std::shared_ptr<Texture2D> GetWhite();
-    static Texture2D *CreateGrayGradationTexture();
+    bool CanUpdate() override;
     bool IsValid() override;
 
     ID3D12Resource *Resource();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
 
-    explicit Texture2D(ID3D12Resource *buffer);
-    explicit Texture2D(std::wstring path);
-
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Object>(this), tex_data, width, height, format, mip_levels);
+    }
 private:
-    explicit Texture2D(std::string path);
-    bool m_IsValid;
     ComPtr<ID3D12Resource> m_pResource;
-    bool Load(std::string &path);
-    bool Load(std::wstring &path);
-
-    static ID3D12Resource *GetDefaultResource(size_t width, size_t height);
+    bool m_IsValid = false;
 };

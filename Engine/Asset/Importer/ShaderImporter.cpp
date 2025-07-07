@@ -65,8 +65,12 @@ std::vector<std::string> ShaderImporter::SupportedExtensions()
 std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 {
     auto shader = Object::Instantiate<Shader>();
-    CompileShader(shader,asset->path);
-
-    return shader;
+    if (asset->guid == xg::Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
+    {
+        shader = Shader::GetDefault();
+        return shader;
+    }
+        CompileShader(shader,asset->path);
+        return shader;
 }
 }

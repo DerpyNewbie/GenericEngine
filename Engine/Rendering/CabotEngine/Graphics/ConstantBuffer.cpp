@@ -1,7 +1,5 @@
 ﻿#include "pch.h"
-
 #include "ConstantBuffer.h"
-
 #include "DescriptorHeapManager.h"
 #include "RenderEngine.h"
 
@@ -64,4 +62,19 @@ std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 {
     auto pHandle = g_DescriptorHeapManager->Get().Register(*this);
     return pHandle;
+}
+
+bool ConstantBuffer::IsValid()
+{
+    return m_IsValid;
+}
+
+bool ConstantBuffer::CanUpdate()
+{
+    return true;
+}
+
+void * ConstantBuffer::GetPtr() const
+{
+    return m_pMappedPtr;
 }

@@ -32,31 +32,7 @@ void SkinnedMeshRenderer::OnInspectorGui()
 
 void SkinnedMeshRenderer::OnDraw()
 {
-    UpdateBuffers();
-
-    auto cmd_list = g_RenderEngine->CommandList();
-    auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
-    auto vbView = vertex_buffer->View();
-    auto ibView = index_buffers[0]->View();
-
-    cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
-
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, &vbView);
-    cmd_list->IASetIndexBuffer(&ibView);
-
-    cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
-                                       ? shared_mesh->sub_meshes[0].base_index
-                                       : shared_mesh->indices.size(), 1, 0, 0, 0);
-
-    for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
-    {
-        auto ib = index_buffers[i + 1];
-        auto sub_mesh = shared_mesh->sub_meshes[i];
-        ibView = ib->View();
-        cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
-    }
+    MeshRenderer::OnDraw();
 }
 
 void SkinnedMeshRenderer::ReconstructBuffers()
@@ -68,9 +44,25 @@ void SkinnedMeshRenderer::ReconstructBuffers()
         transforms.emplace_back(shared_mesh->bind_poses[i]);
 }
 
+void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
+{
+    MeshRenderer::ReconstructMaterialBuffers(material_idx);
+    auto find_material_data = shared_materials[material_idx]->p_shared_material_block.CastedLock()->
+                                                              FindMaterialDataFromName("BoneMatrices").lock();
+    if (find_material_data)
+    {
+        auto bone_matrices_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
+        material_bone_matrices_buffers[material_idx] = bone_matrices_data;
+    }
+}
+
 void SkinnedMeshRenderer::UpdateBuffers()
 {
     MeshRenderer::UpdateBuffers();
+    for (auto bone_matrices_buffer: material_bone_matrices_buffers)
+    {
+        bone_matrices_buffer.lock()->Set(transforms);
+    }
 }
 }
 

@@ -50,6 +50,7 @@ class Shader : public InspectableAsset
     friend ShaderImporter;
     ComPtr<ID3DBlob> m_pVSBlob;
     ComPtr<ID3DBlob> m_pPSBlob;
+    static std::shared_ptr<Shader> m_pDefaultShader;
 
 public:
     enum class ShaderType
@@ -58,13 +59,12 @@ public:
         Pixel
     };
 
-    static std::shared_ptr<Shader> default_shader;
     std::vector<ShaderParameter> parameters;
 
-    static std::shared_ptr<Shader> GetDefault();
 
     void OnInspectorGui() override;
     void OnConstructed() override;
+    static std::shared_ptr<Shader> GetDefault();
 
     CD3DX12_SHADER_BYTECODE GetByteCode(ShaderType type) const
     {

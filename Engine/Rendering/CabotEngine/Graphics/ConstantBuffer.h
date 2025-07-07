@@ -11,16 +11,11 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    bool IsValid() override;
 
-    bool CanUpdate() override
-    {
-        return true;
-    }
+    bool CanUpdate() override;
 
-    void *GetPtr() const
-    {
-        return m_pMappedPtr;
-    } // 定数バッファにマッピングされたポインタを返す
+    void *GetPtr() const;
 
     template <typename T>
     T *GetPtr()
@@ -36,4 +31,5 @@ private:
 
     ConstantBuffer(const ConstantBuffer &) = delete;
     void operator =(const ConstantBuffer &) = delete;
+    bool m_IsValid = false;
 };

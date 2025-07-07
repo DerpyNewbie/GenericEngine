@@ -11,13 +11,14 @@ class SkinnedMeshRenderer : public MeshRenderer
 
 public:
     constexpr static int kLimitBonesPerVertex = 4;
-    std::vector<DirectX::XMMATRIX> transforms;
+    std::vector<Matrix> transforms;
+    std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> material_bone_matrices_buffers;
 
     void OnInspectorGui() override;
-
     void OnDraw() override;
 
     void ReconstructBuffers() override;
+    void ReconstructMaterialBuffers(int material_idx) override;
     void UpdateBuffers() override;
 
     template <class Archive>

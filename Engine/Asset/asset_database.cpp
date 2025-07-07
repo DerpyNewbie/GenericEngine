@@ -8,6 +8,8 @@
 #include "Exporter/asset_exporter.h"
 #include "Exporter/txt_exporter.h"
 #include "Importer/ShaderImporter.h"
+#include "Importer/material_importer.h"
+#include "Importer/texture_2d_importer.h"
 
 namespace engine
 {
@@ -32,6 +34,8 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<TxtImporter>());
     AssetExporter::Register(std::make_shared<TxtExporter>());
     AssetImporter::Register(std::make_shared<ShaderImporter>());
+    AssetImporter::Register(std::make_shared<MaterialImporter>());
+    AssetImporter::Register(std::make_shared<Texture2DImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 

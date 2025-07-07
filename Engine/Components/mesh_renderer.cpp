@@ -29,6 +29,20 @@ void MeshRenderer::OnInspectorGui()
         ImGui::Text("Bone Weights: %llu", shared_mesh->bone_weights.size());
         ImGui::Text("Bind Poses  : %llu", shared_mesh->bind_poses.size());
         ImGui::Text("Sub Meshes  : %llu", shared_mesh->sub_meshes.size());
+        if (ImGui::CollapsingHeader("Materials"))
+        {
+            ImGui::Indent();
+            for (auto i = 0; i < shared_materials.size(); ++i)
+            {
+                if (ImGui::CollapsingHeader(("Material " + std::to_string(i)).c_str()))
+                {
+                    ImGui::Indent();
+                    shared_materials[i]->OnInspectorGui();
+                    ImGui::Unindent();
+                }
+            }
+            ImGui::Unindent();
+        }
         if (ImGui::CollapsingHeader("Sub Meshes"))
         {
             ImGui::Indent();
@@ -65,7 +79,7 @@ void MeshRenderer::OnDraw()
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
     SetDescriptorTable(cmd_list, 0);
-    
+
     //cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
     //? shared_mesh->sub_meshes[0].base_index
     //: shared_mesh->indices.size(),1, 0, 0, 0);
@@ -82,6 +96,26 @@ void MeshRenderer::OnDraw()
 }
 
 void MeshRenderer::ReconstructBuffers()
+{
+    if (!vertex_buffer || index_buffers.empty())
+    {
+        if (buffer_creation_failed)
+        {
+            return;
+        }
+        ReconstructMeshesBuffer();
+    }
+    material_handles.resize(shared_materials.size());
+    for (size_t i = 0; i < shared_materials.size(); ++i)
+    {
+        if (shared_materials[i]->IsValid())
+        {
+            ReconstructMaterialBuffers(i);
+        }
+    }
+}
+
+void MeshRenderer::ReconstructMeshesBuffer()
 {
     // clean up old buffers
     if (vertex_buffer)
@@ -143,50 +177,52 @@ void MeshRenderer::ReconstructBuffers()
 
         index_buffers.emplace_back(sub_ib);
     }
-    
-    for (size_t i = 0; i < shared_materials.size(); ++i)
+}
+
+void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
+{
+    //get wvp_buffer for update buffer
+    auto find_material_data = shared_materials[material_idx]->p_shared_material_block.CastedLock()->
+                                                              FindMaterialDataFromName("WVP").lock();
+    if (find_material_data)
     {
-        auto find_material_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(shared_materials[i]->shared_material_block->FindMaterialDataFromName("WVP").lock());
-        for (auto &wvp_buffer : material_wvp_buffers[i])
+        auto wvp_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
+        for (auto &wvp_buffer : material_wvp_buffers)
         {
-            wvp_buffer = find_material_data;
+            wvp_buffer.emplace_back(wvp_data);
         }
     }
 
-    material_handles.resize(shared_materials.size());
-    for (size_t i = 0; i < material_handles.size(); ++i)
-        for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-            for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-                material_handles[i][shader_type][params_type] = shared_materials[i]->shared_material_block->
-                    GetDescriptorHandle(static_cast<kShaderType>(shader_type),
-                                        static_cast<kParameterBufferType>(params_type));
+    //create material handle
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
+            material_handles[material_idx][shader_type][params_type] = shared_materials[material_idx]->
+                                                                       p_shared_material_block.
+                                                                       CastedLock()->GetDescriptorHandle(
+                                                                           static_cast<kShaderType>(shader_type),
+                                                                           static_cast<kParameterBufferType>(
+                                                                               params_type));
 }
 
 void MeshRenderer::UpdateBuffers()
 {
-    if (!vertex_buffer || index_buffers.empty())
-    {
-        if (buffer_creation_failed)
-        {
-            return;
-        }
-
-        ReconstructBuffers();
-    }
-
+    ReconstructBuffers();
     std::vector<Matrix> wvp;
     const auto camera = Camera::Main();
-    
-    wvp.emplace_back(GameObject()->Transform()->WorldMatrix());
-    wvp.emplace_back(camera.lock()->GetViewMatrix());
-    wvp.emplace_back(camera.lock()->GetProjectionMatrix());
-    
-    for (size_t i = 0; i < shared_materials.size(); ++i)
+
+    if (!material_wvp_buffers[0].empty())
     {
-        for (auto &wvp_buffer : material_wvp_buffers[i])
+        wvp.emplace_back(GameObject()->Transform()->WorldMatrix());
+        wvp.emplace_back(camera.lock()->GetViewMatrix());
+        wvp.emplace_back(camera.lock()->GetProjectionMatrix());
+
+        for (size_t i = 0; i < shared_materials.size(); ++i)
         {
-            wvp_buffer.lock()->Set(wvp);
-            wvp_buffer.lock()->UpdateBuffer();
+            for (auto &wvp_buffer : material_wvp_buffers[i])
+            {
+                wvp_buffer.lock()->Set(wvp);
+                wvp_buffer.lock()->UpdateBuffer();
+            }
         }
     }
 }
@@ -195,9 +231,11 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
 {
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV]->HandleGPU);
+            if (material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV])
+                cmd_list->SetGraphicsRootDescriptorTable(
+                    kVertexCBV,
+                    material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV]->HandleGPU);
 }
-
 }
 
 CEREAL_REGISTER_TYPE(engine::MeshRenderer)
