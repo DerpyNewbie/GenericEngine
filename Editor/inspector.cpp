@@ -165,7 +165,7 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
 {
     if (asset_hierarchy->IsFile())
     {
-        ImGui::Text("File: %s", asset_hierarchy->asset->path.string().c_str());
+        ImGui::Text("File: %s", asset_hierarchy->asset->path_hint.string().c_str());
         ImGui::Text("Guid: %s", asset_hierarchy->asset->guid.str().c_str());
         ImGui::Separator();
         if (asset_hierarchy->asset->managed_object != nullptr)
@@ -183,6 +183,6 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
         return;
     }
 
-    ImGui::Text("Folder: %s", asset_hierarchy->asset->path.string().c_str());
+    ImGui::Text("Folder: %s", asset_hierarchy->asset->path_hint.string().c_str());
 }
 }

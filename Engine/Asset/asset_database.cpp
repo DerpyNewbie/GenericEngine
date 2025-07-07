@@ -120,6 +120,17 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetRootAssetHierarchy()
 {
     return m_asset_hierarchy_;
 }
+void AssetDatabase::ReloadAsset(const xg::Guid &guid)
+{
+    const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
+    if (asset_desc_it == m_assets_by_guid_map_.end())
+    {
+        Logger::Error<AssetDatabase>("Asset with guid '%s' not found", guid.str().c_str());
+        return;
+    }
+
+    asset_desc_it->second->Reload();
+}
 std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const xg::Guid &guid)
 {
     if (!m_assets_by_guid_map_.contains(guid))
@@ -179,18 +190,18 @@ std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
     return assets;
 }
 
-void AssetDatabase::WriteAsset(const AssetDescriptor *asset_descriptor)
+void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
 {
     const auto exporter = AssetExporter::Get(asset_descriptor->type_hint);
     if (exporter == nullptr)
     {
         Logger::Warn<AssetDatabase>("Asset exporter for type '%s' not found! Will ignore file '%s'",
-                                    asset_descriptor->type_hint.c_str(), asset_descriptor->path.c_str());
+                                    asset_descriptor->type_hint.c_str(), asset_descriptor->path_hint.c_str());
         return;
     }
 
     exporter->Export(asset_descriptor);
-    asset_descriptor->Write(asset_descriptor->path);
+    asset_descriptor->Save();
 }
 
 void AssetDatabase::WriteAsset(const xg::Guid &guid)

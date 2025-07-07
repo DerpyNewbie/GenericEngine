@@ -13,10 +13,16 @@ std::vector<std::string> TxtImporter::SupportedExtensions()
 }
 std::shared_ptr<Object> TxtImporter::Import(AssetDescriptor *asset)
 {
-    auto text = Object::Instantiate<TextAsset>(asset->path.string());
+    auto text = Object::Instantiate<TextAsset>(asset->path_hint.string());
     std::stringstream ss;
-    ss << std::ifstream(asset->path).rdbuf();
+    ss << std::ifstream(asset->path_hint).rdbuf();
     text->content = ss.str();
+
+    for (const auto &key : asset->GetKeys())
+    {
+        text->key_value_pairs[key] = asset->GetString(key);
+    }
+
     asset->managed_object = text;
     return text;
 }

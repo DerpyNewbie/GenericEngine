@@ -16,10 +16,10 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
     ImGui::PushID(asset_hierarchy.get());
     if (asset_hierarchy->IsFile())
     {
-        if (ImGui::Selectable(asset_hierarchy->asset->path.filename().string().c_str()))
+        if (ImGui::Selectable(asset_hierarchy->asset->path_hint.filename().string().c_str()))
         {
             if (asset_hierarchy->asset->managed_object == nullptr)
-                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path);
+                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path_hint);
             Editor::Instance()->SetSelectedObject(asset_hierarchy);
         }
 
@@ -27,7 +27,7 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
         {
             ImGui::SetDragDropPayload(Gui::DragDropTarget::kAsset, &asset_hierarchy,
                                       sizeof(std::shared_ptr<engine::AssetHierarchy>));
-            ImGui::Text("Dragging %s", asset_hierarchy->asset->path.string().c_str());
+            ImGui::Text("Dragging %s", asset_hierarchy->asset->path_hint.string().c_str());
             ImGui::EndDragDropSource();
         }
 
@@ -35,8 +35,15 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
         {
             if (ImGui::MenuItem("Save"))
             {
-                engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->path.string().c_str());
+                engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->path_hint.string().c_str());
                 engine::AssetDatabase::WriteAsset(asset_hierarchy->asset->guid);
+            }
+
+            if (ImGui::MenuItem("Reload"))
+            {
+                engine::Logger::Log<AssetBrowser>("Reloading %s", asset_hierarchy->asset->path_hint.string().c_str());
+                const auto descriptor = engine::AssetDatabase::GetAssetDescriptor(asset_hierarchy->asset->guid);
+                descriptor->Reload();
             }
 
             ImGui::EndPopup();

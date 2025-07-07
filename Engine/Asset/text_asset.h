@@ -7,6 +7,7 @@ class TextAsset final : public InspectableAsset
 {
 public:
     std::string content;
+    std::unordered_map<std::string, std::string> key_value_pairs;
 
     void OnInspectorGui() override;
 
