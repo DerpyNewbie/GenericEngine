@@ -19,6 +19,7 @@ class AssetDatabase
 
 public:
     static void Import(const path &path);
+    static void ImportInternal(const std::shared_ptr<AssetDescriptor> &descriptor);
     static void ImportAll();
 
     static void SetProjectDirectory(const path &path);

@@ -8,6 +8,8 @@ struct AssetDescriptor : Object
 private:
     friend class AssetDatabase;
 
+    static constexpr auto kMetaFileExtension = ".meta";
+    static constexpr auto kInternalAssetPath = "__internally_generated__";
     static constexpr auto kGuidKey = "guid";
     static constexpr auto kTypeKey = "type";
     static constexpr auto kDataKey = "data";
@@ -44,7 +46,10 @@ public:
     bool GetBool(const std::string &key);
 
     IAssetPtr ToAssetPtr();
+
     void Save();
     void Reload();
+
+    [[nodiscard]] bool IsInternalAsset() const;
 };
 }

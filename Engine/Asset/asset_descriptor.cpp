@@ -19,7 +19,7 @@ path AssetDescriptor::GetAbsoluteAssetFilePath(const path &asset_path)
     auto absolute_path_str = absolute_path.string();
     do
     {
-        if (absolute_path_str.ends_with(".meta"))
+        if (absolute_path_str.ends_with(kMetaFileExtension))
         {
             absolute_path_str = absolute_path_str.substr(0, absolute_path_str.size() - 5);
         }
@@ -29,7 +29,7 @@ path AssetDescriptor::GetAbsoluteAssetFilePath(const path &asset_path)
         {
             absolute_path_str = absolute_path_str.substr(0, absolute_path_str.size() - 1);
         }
-    } while (absolute_path_str.ends_with(".meta") ||
+    } while (absolute_path_str.ends_with(kMetaFileExtension) ||
              absolute_path_str.back() == '/' || absolute_path_str.back() == '\\');
 
     return absolute_path_str;
@@ -38,7 +38,7 @@ path AssetDescriptor::GetAbsoluteAssetFilePath(const path &asset_path)
 path AssetDescriptor::GetMetaFilePath(const path &asset_path)
 {
     const auto absolute_asset_path = GetAbsoluteAssetFilePath(asset_path);
-    return absolute_asset_path.string() + ".meta";
+    return absolute_asset_path.string() + kMetaFileExtension;
 }
 
 bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
@@ -254,14 +254,30 @@ IAssetPtr AssetDescriptor::ToAssetPtr()
 
 void AssetDescriptor::Save()
 {
+    if (IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot save internal asset '%s'", guid.str().c_str());
+        return;
+    }
+
     std::string json;
     Write(GetMetaFilePath(path_hint));
 }
 
 void AssetDescriptor::Reload()
 {
+    if (IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", guid.str().c_str());
+        return;
+    }
+
     std::string json;
     GetMetaJson(path_hint, json);
     Reload(shared_from_base<AssetDescriptor>(), json);
+}
+bool AssetDescriptor::IsInternalAsset() const
+{
+    return path_hint.string() == kInternalAssetPath;
 }
 }
