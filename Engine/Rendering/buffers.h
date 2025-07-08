@@ -1,6 +1,16 @@
 #pragma once
 class DescriptorHandle;
+namespace engine
+{
+enum kParameterBufferType
+{
+    kParameterBufferType_CBV,
+    kParameterBufferType_SRV,
+    kParameterBufferType_UAV,
 
+    kParameterBufferType_Count
+};
+}
 class IBuffer
 {
 public:

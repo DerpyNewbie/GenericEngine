@@ -50,7 +50,7 @@ void engine::MaterialBlock::CreateParamsFromShaderParams(std::vector<ShaderParam
     {
         auto material_data = CreateMaterialData(shader_param.type_hint);
         material_data->CreateBuffer();
-        parameters[shader_param.shader_type][shader_param.buffer_type].emplace_back(
+        parameters[shader_param.shader_type][material_data->BufferType()].emplace_back(
             shader_param, material_data);
     }
 }

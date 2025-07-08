@@ -18,7 +18,7 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(AssetDescripto
 {
     auto texture_2d = Object::Instantiate<Texture2D>();
     
-    const auto path = asset->path;
+    const auto path = asset->path_hint;
     TexMetadata meta = {};
     ScratchImage scratch = {};
     auto ext = FileExtension(path);

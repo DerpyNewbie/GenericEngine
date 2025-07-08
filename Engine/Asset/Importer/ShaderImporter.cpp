@@ -70,7 +70,8 @@ std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
         shader = Shader::GetDefault();
         return shader;
     }
-        CompileShader(shader,asset->path);
+        CompileShader(shader,asset->path_hint);
+    
         return shader;
 }
 }

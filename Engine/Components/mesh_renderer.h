@@ -9,6 +9,7 @@
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
+#include "Rendering/buffers.h"
 
 typedef std::array<std::shared_ptr<DescriptorHandle>, engine::kParameterBufferType_Count> DescriptorHandlePerBuffer;
 typedef std::array<DescriptorHandlePerBuffer, engine::kShaderType_Count> DescriptorHandlePerShader;

@@ -213,6 +213,8 @@
     <ItemGroup>
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
+        <Content Include="Resources\aaa.txt.meta" />
+        <Content Include="Resources\BasicShader.hlsl.meta" />
         <Content Include="vcpkg.json"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">

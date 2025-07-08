@@ -160,7 +160,6 @@ std::vector<std::string> AssetDescriptor::GetKeys()
 
     return keys;
 }
-
 void AssetDescriptor::ClearKeys()
 {
     auto &data = GetDataValue();

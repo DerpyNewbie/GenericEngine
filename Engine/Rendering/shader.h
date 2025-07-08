@@ -6,15 +6,6 @@
 namespace engine
 {
 
-enum kParameterBufferType
-{
-    kParameterBufferType_CBV,
-    kParameterBufferType_SRV,
-    kParameterBufferType_UAV,
-
-    kParameterBufferType_Count
-};
-
 enum kShaderType
 {
     kShaderType_Vertex,
@@ -29,13 +20,12 @@ struct ShaderParameter
     std::string name;
     int index;
     kShaderType shader_type;
-    kParameterBufferType buffer_type;
     std::string type_hint;
 
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(name, index, shader_type, buffer_type, type_hint);
+        ar(name, index, shader_type, type_hint);
     }
 };
 

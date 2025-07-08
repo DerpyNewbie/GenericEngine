@@ -14,6 +14,7 @@ struct IMaterialData
     virtual void CreateBuffer() = 0;
     virtual void UpdateBuffer() = 0;
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
+    virtual kParameterBufferType BufferType() = 0;
     virtual int SizeInBytes() = 0;
     virtual void *Data() =0;
 };
@@ -23,6 +24,7 @@ struct MaterialData : IMaterialData
 {
     T value;
     std::unique_ptr<IBuffer> buffer;
+    kParameterBufferType buffer_type;
 
     MaterialData() = default;
 
@@ -42,10 +44,12 @@ struct MaterialData : IMaterialData
         {
             using ElementType = typename engine_traits::vector_element_type<T>::type;
             buffer = std::make_unique<StructuredBuffer>(sizeof(ElementType), Count());
+            buffer_type = kParameterBufferType_SRV;
         }
         else
         {
             buffer = std::make_unique<ConstantBuffer>(SizeInBytes());
+            buffer_type = kParameterBufferType_CBV;
         }
         buffer->CreateBuffer();
     }
@@ -61,6 +65,10 @@ struct MaterialData : IMaterialData
     std::shared_ptr<DescriptorHandle> UploadBuffer()
     {
         return buffer->UploadBuffer();
+    }
+    kParameterBufferType BufferType() override
+    {
+        return buffer_type;
     }
 
     int SizeInBytes() override
@@ -133,12 +141,16 @@ struct MaterialData<IAssetPtr> : IMaterialData
 
     void UpdateBuffer() override
     {
-        return;
     }
 
     std::shared_ptr<DescriptorHandle> UploadBuffer() override
     {
         return std::dynamic_pointer_cast<Texture2D>(value.Lock())->UploadBuffer();
+    }
+
+    kParameterBufferType BufferType() override
+    {
+        return kParameterBufferType_SRV;
     }
 
     int SizeInBytes() override
