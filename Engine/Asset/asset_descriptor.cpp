@@ -121,6 +121,11 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
         descriptor->m_meta_json_.AddMember(StringRef(kTypeKey), type_hint_value, a);
         descriptor->m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
         descriptor->Write(meta_file_path);
+        if (!GetMetaJson(path, meta_json))
+        {
+            Logger::Error<AssetDescriptor>("Failed to generate meta file for asset `%s`", path.string().c_str());
+            return nullptr;
+        }
     }
 
     auto result = Instantiate<AssetDescriptor>(meta_file_path);

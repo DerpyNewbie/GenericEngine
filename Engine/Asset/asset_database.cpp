@@ -6,6 +6,7 @@
 #include "Asset/Importer/txt_importer.h"
 #include "logger.h"
 #include "Exporter/asset_exporter.h"
+#include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
 #include "Importer/ShaderImporter.h"
 #include "Importer/material_importer.h"
@@ -34,6 +35,7 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<TxtImporter>());
     AssetExporter::Register(std::make_shared<TxtExporter>());
     AssetImporter::Register(std::make_shared<ShaderImporter>());
+    AssetExporter::Register(std::make_shared<ShaderExporter>());
     AssetImporter::Register(std::make_shared<MaterialImporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
     SetProjectDirectory(current_path() / "Resources");

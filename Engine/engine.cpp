@@ -43,7 +43,7 @@ bool Engine::Init()
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
-    Gizmos::Init();
+    // Gizmos::Init();
     Time::Get()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();

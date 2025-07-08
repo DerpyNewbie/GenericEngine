@@ -25,7 +25,71 @@ std::shared_ptr<engine::Shader> engine::Shader::GetDefault()
 }
 
 void engine::Shader::OnInspectorGui()
-{}
+{
+    auto vertex_params = std::views::filter(parameters, [](auto &p) {
+        return p.shader_type == kShaderType_Vertex;
+    });
+    auto pixel_params = std::views::filter(parameters, [](auto &p) {
+        return p.shader_type == kShaderType_Pixel;
+    });
+
+    auto draw_params = [](auto &params, auto &sources) {
+        int index = 0;
+        for (auto &param : params)
+        {
+            ImGui::PushID(&param);
+            const auto should_show = ImGui::CollapsingHeader(("Parameter " + std::to_string(index++)).c_str());
+            if (ImGui::BeginPopupContextItem())
+            {
+                if (ImGui::MenuItem("Remove"))
+                {
+                    sources.erase(std::find_if(sources.begin(), sources.end(), [&](auto &p) {
+                        return p.name == param.name && p.index == param.index && p.shader_type == param.shader_type;
+                    }));
+                    break;
+                }
+            }
+
+            if (should_show)
+            {
+                ImGui::Indent();
+                ImGui::InputText("Name", &param.name);
+                ImGui::InputText("Display Name", &param.display_name);
+                ImGui::InputText("Type", &param.type_hint);
+                ImGui::Unindent();
+            }
+            ImGui::PopID();
+        }
+    };
+
+    ImGui::PushID("Vertex Shader Parameters");
+    if (ImGui::CollapsingHeader("Vertex Shader Parameters"))
+    {
+        ImGui::Indent();
+        draw_params(vertex_params, parameters);
+        if (ImGui::Button("Add VS Parameter"))
+        {
+            auto &p = parameters.emplace_back();
+            p.shader_type = kShaderType_Vertex;
+        }
+        ImGui::Unindent();
+    }
+    ImGui::PopID();
+
+    ImGui::PushID("Pixel Shader Parameters");
+    if (ImGui::CollapsingHeader("Pixel Shader Parameters"))
+    {
+        ImGui::Indent();
+        draw_params(pixel_params, parameters);
+        if (ImGui::Button("Add PS Parameter"))
+        {
+            auto &p = parameters.emplace_back();
+            p.shader_type = kShaderType_Pixel;
+        }
+        ImGui::Unindent();
+    }
+    ImGui::PopID();
+}
 
 void engine::Shader::OnConstructed()
 {

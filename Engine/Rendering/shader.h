@@ -17,9 +17,10 @@ enum kShaderType
 
 struct ShaderParameter
 {
-    std::string name;
     int index;
     kShaderType shader_type;
+    std::string name;
+    std::string display_name;
     std::string type_hint;
 
     template <class Archive>
