@@ -69,7 +69,7 @@ void engine::Engine::MainLoop() const
         Profiler::End("Draw Call");
 
         Profiler::Begin("Cleanup Objects");
-        Object::DestroyObjects();
+        Object::GarbageCollect();
         Profiler::End("Cleanup Objects");
     }
 }

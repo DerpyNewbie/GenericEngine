@@ -6,38 +6,53 @@ namespace engine
 struct AssetDescriptor;
 class Object;
 
+enum class AssetPtrType
+{
+    kNull,
+    kStoredReference,
+    kExternalReference
+};
+
 struct IAssetPtr
 {
 protected:
-    std::weak_ptr<Object> m_ptr_;
+    std::weak_ptr<Object> m_external_reference_;
+    std::shared_ptr<Object> m_stored_reference_;
     xg::Guid m_guid_;
+    AssetPtrType m_type_ = AssetPtrType::kNull;
 
-    IAssetPtr(const std::shared_ptr<Object> &ptr, const xg::Guid guid) : m_ptr_(ptr), m_guid_(guid)
+    IAssetPtr(const std::weak_ptr<Object> &weak_ptr,
+              const std::shared_ptr<Object> &shared_ptr,
+              const xg::Guid guid,
+              const AssetPtrType type) :
+        m_external_reference_(weak_ptr),
+        m_stored_reference_(shared_ptr),
+        m_guid_(guid),
+        m_type_(type)
     {}
 
 public:
     static const xg::Guid kNullGuid;
-    static const xg::Guid kSceneRefGuid;
 
     virtual ~IAssetPtr() = default;
 
     IAssetPtr();
 
-    static IAssetPtr FromScene(std::shared_ptr<Object> ptr);
+    static IAssetPtr FromManaged(const std::weak_ptr<Object> &ptr);
+
+    static IAssetPtr FromInstance(const std::shared_ptr<Object> &ptr);
 
     static IAssetPtr FromAssetDescriptor(const std::shared_ptr<AssetDescriptor> &asset);
 
     [[nodiscard]] xg::Guid Guid() const;
 
-    [[nodiscard]] virtual std::shared_ptr<Object> Lock();
-
-    [[nodiscard]] bool IsFileReference() const;
-
-    [[nodiscard]] bool IsSceneReference() const;
-
-    [[nodiscard]] bool IsLoaded() const;
+    [[nodiscard]] std::string Name() const;
 
     [[nodiscard]] bool IsNull() const;
+
+    [[nodiscard]] bool IsLoaded();
+
+    [[nodiscard]] virtual std::shared_ptr<Object> Lock();
 
     bool operator==(const IAssetPtr &other) const
     {
@@ -47,7 +62,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(m_guid_);
+        ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_type_), CEREAL_NVP(m_stored_reference_));
         auto _ = Lock(); // try to import the object associated with guid
     }
 };
@@ -57,10 +72,10 @@ struct AssetPtr : IAssetPtr
 {
     std::shared_ptr<T> CastedLock()
     {
-        if (m_ptr_.expired())
+        if (m_external_reference_.expired())
             return nullptr;
 
-        return std::dynamic_pointer_cast<T>(m_ptr_.lock());
+        return std::dynamic_pointer_cast<T>(m_external_reference_.lock());
     }
 
     template <class Archive>

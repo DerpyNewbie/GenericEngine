@@ -8,6 +8,8 @@
 #include "game_object.h"
 #include "gui.h"
 #include "scene.h"
+#include "Asset/asset_database.h"
+
 #include <shobjidl.h>
 
 void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
@@ -59,7 +61,7 @@ void editor::DefaultEditorMenu::DrawDefaultMenu()
 }
 void editor::DefaultEditorMenu::DrawFilesMenu()
 {
-    static std::vector<FilterSpec> scene_filter =
+    static std::vector<engine::FilterSpec> scene_filter =
     {
         {L"Scene Files (*.scene)", L"*.scene"},
         {L"All Files (*.*)", L"*.*"}
@@ -69,7 +71,7 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
     {
         std::string file_path;
 
-        if (!Gui::OpenFileDialog(file_path, scene_filter))
+        if (!engine::Gui::OpenFileDialog(file_path, scene_filter))
         {
             engine::Logger::Error<DefaultEditorMenu>("Failed to open file dialog");
             return;
@@ -86,7 +88,7 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
 
         auto target_scene = engine::SceneManager::GetActiveScene();
         auto default_file_name = target_scene->Name() + ".scene";
-        if (!Gui::SaveFileDialog(file_path, default_file_name, scene_filter))
+        if (!engine::Gui::SaveFileDialog(file_path, default_file_name, scene_filter))
         {
             engine::Logger::Error<DefaultEditorMenu>("Failed to open save file dialog");
             return;

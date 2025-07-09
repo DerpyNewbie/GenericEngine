@@ -3,6 +3,7 @@
 #include "hierarchy.h"
 
 #include "editor_prefs.h"
+#include "gui.h"
 #include "DxLib/dxlib_helper.h"
 #include "DxLib/dxlib_converter.h"
 #include "scene.h"
@@ -74,11 +75,11 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
     const bool draw_tree = DrawObject(game_object);
     if (ImGui::BeginDragDropTarget())
     {
-        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload("ENGINE_OBJECT",
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
                                                                        ImGuiDragDropFlags_AcceptBeforeDelivery))
         {
-            const auto payload_object = static_cast<std::shared_ptr<engine::Object> *>(payload->Data);
-            const auto payload_go = std::dynamic_pointer_cast<engine::GameObject>(*payload_object);
+            const auto payload_object = engine::Gui::GetObjectDragDropTarget(payload);
+            const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
             if (payload_go != nullptr)
             {
                 const bool can_be_child = !game_object->Transform()->IsChildOf(payload_go->Transform());
@@ -100,7 +101,7 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
             else
             {
                 ImGui::SetTooltip("Cannot drag and drop object %s as this is not GameObject",
-                                  payload_object->get()->Name().c_str());
+                                  payload_object->Name().c_str());
             }
         }
 
@@ -148,10 +149,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
     {
-        ImGui::SetDragDropPayload(
-            "ENGINE_OBJECT", &game_object,
-            sizeof(std::shared_ptr<engine::GameObject> *));
-
+        engine::Gui::SetObjectDragDropTarget(game_object);
         ImGui::Text("Dragging %s", game_object->Path().c_str());
         ImGui::EndDragDropSource();
     }

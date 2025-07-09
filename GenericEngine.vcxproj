@@ -25,7 +25,6 @@
         <ClCompile Include="Editor\editor_prefs.cpp"/>
         <ClCompile Include="Editor\editor_window.cpp"/>
         <ClCompile Include="Editor\editor.cpp"/>
-        <ClCompile Include="Editor\gui.cpp"/>
         <ClCompile Include="Editor\hierarchy.cpp"/>
         <ClCompile Include="Editor\imgui_demo_window.cpp"/>
         <ClCompile Include="Editor\inspector.cpp"/>
@@ -56,6 +55,7 @@
         <ClCompile Include="Engine\engine_profiler.cpp"/>
         <ClCompile Include="Engine\engine_util.cpp"/>
         <ClCompile Include="Engine\game_object.cpp"/>
+        <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\Math\bounds.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
@@ -82,7 +82,6 @@
         <ClInclude Include="Editor\editor_prefs.h"/>
         <ClInclude Include="Editor\editor_window.h"/>
         <ClInclude Include="Editor\editor.h"/>
-        <ClInclude Include="Editor\gui.h"/>
         <ClInclude Include="Editor\hierarchy.h"/>
         <ClInclude Include="Editor\imgui_demo_window.h"/>
         <ClInclude Include="Editor\inspector.h"/>
@@ -119,6 +118,7 @@
         <ClInclude Include="Engine\engine_util.h"/>
         <ClInclude Include="Engine\event_receivers.h"/>
         <ClInclude Include="Engine\game_object.h"/>
+        <ClInclude Include="Engine\gui.h"/>
         <ClInclude Include="Engine\guid_serializer.h"/>
         <ClInclude Include="Engine\inspectable.h"/>
         <ClInclude Include="Engine\logger.h"/>

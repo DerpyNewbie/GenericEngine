@@ -4,7 +4,7 @@ namespace DxLibConverter
 {
 using namespace DirectX::SimpleMath;
 
-inline VECTOR From(const Vector3 vector)
+inline VECTOR From(const Vector3 &vector)
 {
     return {vector.x, vector.y, vector.z};
 }
