@@ -89,10 +89,9 @@ void Engine::MainLoop() const
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");
 
-            Profiler::Begin("Cleanup Objects");
-            Object::DestroyObjects();
-            Profiler::End("Cleanup Objects");
-        }
+        Profiler::Begin("Cleanup Objects");
+        Object::GarbageCollect();
+        Profiler::End("Cleanup Objects");
     }
 }
 }

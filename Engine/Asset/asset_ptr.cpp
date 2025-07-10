@@ -3,24 +3,47 @@
 
 #include "asset_database.h"
 #include "asset_descriptor.h"
-#include "Importer/asset_importer.h"
+#include "Components/component.h"
+#include "game_object.h"
 
 namespace engine
 {
 const xg::Guid IAssetPtr::kNullGuid = xg::Guid();
-const xg::Guid IAssetPtr::kSceneRefGuid = xg::Guid("ffffffff-ffff-ffff-ffff-ffffffffffff");
 
 IAssetPtr::IAssetPtr()
 {
     m_guid_ = kNullGuid;
 }
-IAssetPtr IAssetPtr::FromScene(std::shared_ptr<Object> ptr)
+
+IAssetPtr IAssetPtr::FromManaged(const std::weak_ptr<Object> &ptr)
 {
-    return {ptr, kSceneRefGuid};
+    auto lock = ptr.lock();
+    return {
+        ptr,
+        {},
+        lock != nullptr ? lock->Guid() : kNullGuid,
+        lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
+    };
 }
+
+IAssetPtr IAssetPtr::FromInstance(const std::shared_ptr<Object> &ptr)
+{
+    return {
+        {},
+        ptr,
+        ptr != nullptr ? ptr->Guid() : kNullGuid,
+        ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
+    };
+}
+
 IAssetPtr IAssetPtr::FromAssetDescriptor(const std::shared_ptr<AssetDescriptor> &asset)
 {
-    return {asset->managed_object, asset->guid};
+    return {
+        asset->managed_object,
+        {},
+        asset->guid,
+        AssetPtrType::kExternalReference
+    };
 }
 xg::Guid IAssetPtr::Guid() const
 {
@@ -28,45 +51,68 @@ xg::Guid IAssetPtr::Guid() const
 }
 std::shared_ptr<Object> IAssetPtr::Lock()
 {
-    if (m_ptr_.expired())
+    switch (m_type_)
     {
-        const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(m_guid_);
-        if (asset_descriptor == nullptr)
+    default:
+    case AssetPtrType::kNull:
+        return nullptr;
+    case AssetPtrType::kStoredReference:
+        return m_stored_reference_;
+    case AssetPtrType::kExternalReference: {
+        const auto lock = m_external_reference_.lock();
+        if (lock == nullptr)
         {
-            throw std::runtime_error("Asset not found");
+            auto obj = Object::Find(m_guid_);
+            if (obj != nullptr)
+            {
+                m_external_reference_ = obj;
+                return obj;
+            }
+
+            const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(m_guid_);
+            if (asset_descriptor != nullptr)
+            {
+                asset_descriptor->Reload();
+                m_external_reference_ = asset_descriptor->managed_object;
+                return asset_descriptor->managed_object;
+            }
+
+            // missing reference
+            return nullptr;
         }
 
-        if (asset_descriptor->managed_object != nullptr)
-        {
-            m_ptr_ = asset_descriptor->managed_object;
-            return m_ptr_.lock();
-        }
-
-        const auto importer = AssetImporter::Get(asset_descriptor->type_hint);
-        if (importer == nullptr)
-        {
-            throw std::runtime_error("Asset importer not found");
-        }
-
-        m_ptr_ = importer->Import(asset_descriptor.get());
+        return lock;
     }
-    return m_ptr_.lock();
+    }
 }
-bool IAssetPtr::IsFileReference() const
+
+std::string IAssetPtr::Name() const
 {
-    return m_guid_ != kNullGuid && m_guid_ != kSceneRefGuid;
-}
-bool IAssetPtr::IsSceneReference() const
-{
-    return m_guid_ == kSceneRefGuid;
-}
-bool IAssetPtr::IsLoaded() const
-{
-    return !m_ptr_.expired();
+    const auto locked = m_external_reference_.lock();
+    if (locked != nullptr)
+    {
+        const auto component = std::dynamic_pointer_cast<Component>(locked);
+        if (component != nullptr && component->GameObject() != nullptr)
+        {
+            return component->GameObject()->Name() + " (" + component->Name() + ")";
+        }
+        return locked->Name();
+    }
+
+    if (IsNull())
+    {
+        return "(None)";
+    }
+
+    return "(Missing)";
 }
 bool IAssetPtr::IsNull() const
 {
     return m_guid_ == kNullGuid;
+}
+bool IAssetPtr::IsLoaded()
+{
+    return Lock() != nullptr;
 }
 }
 

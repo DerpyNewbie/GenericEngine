@@ -3,7 +3,7 @@
 
 namespace engine
 {
-struct AssetDescriptor : Object
+struct AssetDescriptor : enable_shared_from_base<AssetDescriptor>
 {
 private:
     friend class AssetDatabase;

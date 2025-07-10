@@ -1,14 +1,27 @@
 #include "pch.h"
 #include "text_asset_ref_test_component.h"
 
-#include "Editor/gui.h"
-void engine::TextAssetRefTestComponent::OnInspectorGui()
+#include "gui.h"
+
+namespace engine
 {
-    editor::Gui::PropertyField<TextAsset>("Text Asset", m_text_asset_, ".txt");
-    if (m_text_asset_.IsLoaded())
-        std::dynamic_pointer_cast<TextAsset>(m_text_asset_.Lock())->OnInspectorGui();
-    else
-        ImGui::Text("Not loaded");
+void TextAssetRefTestComponent::OnInspectorGui()
+{
+    // PropertyField can query any Object
+    Gui::PropertyField<Object>("Any", m_any_);
+
+    // PropertyField can filter any Object by type
+    Gui::PropertyField<class GameObject>("Any GameObject", m_any_);
+
+    // PropertyField can take GameObject's component by drag and drop
+    Gui::PropertyField<Transform>("Any Transform", m_any_);
+
+    // ExpandablePropertyField can show the inspector of an assigned object
+    Gui::ExpandablePropertyField("Text Asset", m_text_asset_);
+
+    // ExpandablePropertyField can recursively show the inspector of an assigned object
+    Gui::ExpandablePropertyField<TextAssetRefTestComponent>("Other Text Asset Ref", m_other_text_asset_ref_);
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::TextAssetRefTestComponent)

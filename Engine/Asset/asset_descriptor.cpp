@@ -100,7 +100,7 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
     if (!GetMetaJson(path, meta_json))
     {
         Logger::Log<AssetDescriptor>("No meta file `%s` found. Generating!", path.string().c_str());
-        const auto descriptor = Instantiate<AssetDescriptor>(path.string().c_str());
+        const auto descriptor = std::make_shared<AssetDescriptor>();
         descriptor->path_hint = asset_file_path;
         descriptor->guid = xg::newGuid();
         descriptor->type_hint = path.extension().string();
@@ -128,7 +128,7 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
         }
     }
 
-    auto result = Instantiate<AssetDescriptor>(meta_file_path);
+    auto result = std::make_shared<AssetDescriptor>();
     result->path_hint = asset_file_path;
 
     Reload(result, meta_json);
@@ -149,7 +149,18 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
         return;
     }
 
-    instance->managed_object = asset_importer->Import(instance.get());
+    const auto object = asset_importer->Import(instance.get());
+    if (object->Guid() != instance->guid)
+    {
+        Logger::Error<AssetDescriptor>("Asset guid mismatch from importer for '%s'! Expected '%s', got '%s'",
+                                       instance->type_hint.c_str(),
+                                       instance->guid.str().c_str(),
+                                       object->Guid().str().c_str());
+        throw std::runtime_error("Asset guid mismatch from AssetImporter!");
+    }
+
+    object->SetName(instance->path_hint.filename().string());
+    instance->managed_object = object;
 }
 
 #pragma pop_macro("GetObject")

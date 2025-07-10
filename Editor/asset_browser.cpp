@@ -25,8 +25,8 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
 
         if (ImGui::BeginDragDropSource())
         {
-            ImGui::SetDragDropPayload(Gui::DragDropTarget::kAsset, &asset_hierarchy,
-                                      sizeof(std::shared_ptr<engine::AssetHierarchy>));
+            const auto guid_str = asset_hierarchy->asset->guid.str();
+            ImGui::SetDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
             ImGui::Text("Dragging %s", asset_hierarchy->asset->path_hint.string().c_str());
             ImGui::EndDragDropSource();
         }

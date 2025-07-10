@@ -7,7 +7,9 @@ namespace engine
 {
 class TextAssetRefTestComponent : public Component
 {
+    IAssetPtr m_any_;
     AssetPtr<TextAsset> m_text_asset_;
+    IAssetPtr m_other_text_asset_ref_;
 
 public:
     void OnInspectorGui() override;

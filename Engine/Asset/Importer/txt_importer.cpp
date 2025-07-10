@@ -13,7 +13,7 @@ std::vector<std::string> TxtImporter::SupportedExtensions()
 }
 std::shared_ptr<Object> TxtImporter::Import(AssetDescriptor *asset)
 {
-    auto text = Object::Instantiate<TextAsset>(asset->path_hint.string());
+    auto text = Object::Instantiate<TextAsset>(asset->guid);
     std::stringstream ss;
     ss << std::ifstream(asset->path_hint).rdbuf();
     text->content = ss.str();

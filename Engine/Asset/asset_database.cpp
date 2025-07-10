@@ -144,6 +144,7 @@ void AssetDatabase::ReloadAsset(const xg::Guid &guid)
 
     asset_desc_it->second->Reload();
 }
+
 std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const xg::Guid &guid)
 {
     if (!m_assets_by_guid_map_.contains(guid))

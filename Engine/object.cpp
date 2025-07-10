@@ -4,14 +4,18 @@
 
 namespace engine
 {
+
+unsigned int Object::m_last_instantiated_name_count_ = 0;
 unsigned int Object::m_last_immediately_destroyed_objects_ = 0;
+std::unordered_map<xg::Guid, std::shared_ptr<Object>> Object::m_objects_;
 std::vector<std::shared_ptr<Object>> Object::m_destroying_objects_;
 
-void Object::DestroyObjects()
+void Object::GarbageCollect()
 {
     for (const auto &obj : m_destroying_objects_)
     {
         obj->OnDestroy();
+        m_objects_.erase(obj->m_guid_);
     }
 
     if (m_last_immediately_destroyed_objects_ != 0)
@@ -25,6 +29,28 @@ void Object::DestroyObjects()
         Logger::Log<Object>("Destroyed %d objects.", m_destroying_objects_.size());
         m_destroying_objects_.clear();
     }
+}
+
+std::string Object::GenerateName()
+{
+    m_last_instantiated_name_count_++;
+    return "Instantiated Object " + std::to_string(m_last_instantiated_name_count_);
+}
+
+xg::Guid Object::GenerateGuid()
+{
+    xg::Guid guid;
+    do
+    {
+        guid = xg::newGuid();
+    } while (m_objects_.contains(guid));
+
+    return guid;
+}
+
+xg::Guid Object::Guid() const
+{
+    return m_guid_;
 }
 
 std::string Object::Name() const
@@ -68,8 +94,17 @@ void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
         Logger::Warn<Object>("Object is already destroying.");
         return;
     }
+
     obj->m_is_destroying_ = true;
     obj->OnDestroy();
+    m_objects_.erase(obj->m_guid_);
     ++m_last_immediately_destroyed_objects_;
+}
+
+std::shared_ptr<Object> Object::Find(const xg::Guid &guid)
+{
+    if (m_objects_.contains(guid))
+        return m_objects_.at(guid);
+    return nullptr;
 }
 }
