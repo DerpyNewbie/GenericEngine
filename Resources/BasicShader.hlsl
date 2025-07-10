@@ -51,7 +51,7 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-    for (int i = 0; i < input.bones_per_vertex; ++i)
+    /*for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)
@@ -63,7 +63,7 @@ VSOutput vrt(VSInput input)
         }
         localPos = bonePos;
         localNormal = boneNormal;
-    }
+    }*/
     
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
@@ -80,7 +80,7 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t1);
+Texture2D _MainTex : register(t0);
 
 float4 pix(VSOutput input) : SV_TARGET
 {

@@ -55,7 +55,7 @@ void ConstantBuffer::CreateBuffer()
 
 void ConstantBuffer::UpdateBuffer(void *data)
 {
-    memcpy(m_pMappedPtr, data, m_SizeAligned);
+    memcpy(m_pMappedPtr, data, 192);
 }
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
@@ -74,7 +74,7 @@ bool ConstantBuffer::CanUpdate()
     return true;
 }
 
-void * ConstantBuffer::GetPtr() const
+void *ConstantBuffer::GetPtr() const
 {
     return m_pMappedPtr;
 }

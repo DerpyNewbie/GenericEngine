@@ -2,6 +2,7 @@
 #include "ShaderImporter.h"
 #include "logger.h"
 #include "Rendering/shader.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
 #include <d3dcompiler.h>
 
@@ -56,6 +57,7 @@ bool ShaderImporter::CompileShader(std::shared_ptr<Shader> shader, std::wstring 
     // TODO: impl
     return false;
 }
+
 void ShaderImporter::LoadParameters(std::shared_ptr<Shader> shader, AssetDescriptor *descriptor)
 {
     const auto json = descriptor->GetString("shader_meta");
@@ -154,7 +156,7 @@ std::vector<std::string> ShaderImporter::SupportedExtensions()
 
 std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 {
-    auto shader = Object::Instantiate<Shader>();
+    auto shader = Object::Instantiate<Shader>(asset->path_hint.stem().string());
     if (asset->guid == xg::Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
     {
         shader = Shader::GetDefault();
@@ -163,7 +165,7 @@ std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 
     CompileShader(shader, asset->path_hint);
     LoadParameters(shader, asset);
-
+    g_PSOManager.Register(shader);
     return shader;
 }
 }

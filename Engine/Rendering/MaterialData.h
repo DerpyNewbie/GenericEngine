@@ -2,6 +2,7 @@
 #include "buffers.h"
 #include "engine_traits.h"
 #include "Asset/asset_ptr.h"
+#include "Asset/Importer/texture_2d_importer.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
@@ -24,7 +25,6 @@ struct MaterialData : IMaterialData
 {
     T value;
     std::unique_ptr<IBuffer> buffer;
-    kParameterBufferType buffer_type;
 
     MaterialData() = default;
 
@@ -40,16 +40,14 @@ struct MaterialData : IMaterialData
 
     void CreateBuffer() override
     {
-        if constexpr (!engine_traits::is_vector<T>::value)
+        if constexpr (engine_traits::is_vector<T>::value)
         {
             using ElementType = typename engine_traits::vector_element_type<T>::type;
             buffer = std::make_unique<StructuredBuffer>(sizeof(ElementType), Count());
-            buffer_type = kParameterBufferType_SRV;
         }
         else
         {
             buffer = std::make_unique<ConstantBuffer>(SizeInBytes());
-            buffer_type = kParameterBufferType_CBV;
         }
         buffer->CreateBuffer();
     }
@@ -66,21 +64,26 @@ struct MaterialData : IMaterialData
     {
         return buffer->UploadBuffer();
     }
+
     kParameterBufferType BufferType() override
     {
-        return buffer_type;
+        if constexpr (engine_traits::is_vector<T>::value)
+        {
+            return kParameterBufferType_SRV;
+        }
+        return kParameterBufferType_CBV;
     }
 
     int SizeInBytes() override
     {
-        if constexpr (!engine_traits::is_vector<T>::value)
-        {
-            return sizeof(T);
-        }
-        else
+        if constexpr (engine_traits::is_vector<T>::value)
         {
             using ElementType = typename engine_traits::vector_element_type<T>::type;
             return static_cast<int>(value.size() * sizeof(ElementType));
+        }
+        else
+        {
+            return sizeof(T);
         }
     }
 
@@ -107,6 +110,7 @@ struct MaterialData : IMaterialData
             return value.data();
         }
     }
+
     template <class Archive>
     void serialize(Archive &ar)
     {
@@ -119,14 +123,14 @@ struct MaterialData : IMaterialData
 };
 
 template <>
-struct MaterialData<IAssetPtr> : IMaterialData
+struct MaterialData<AssetPtr<Texture2D>> : IMaterialData
 {
     IAssetPtr value;
     MaterialData() = default;
 
-    void Set(AssetPtr<Texture2D> new_value)
+    void Set(IAssetPtr new_value)
     {
-        value = static_cast<IAssetPtr>(new_value);
+        value = new_value;
     }
 
     std::shared_ptr<Texture2D> Get()
@@ -136,6 +140,7 @@ struct MaterialData<IAssetPtr> : IMaterialData
 
     void CreateBuffer() override
     {
+        Set(Texture2DImporter::GetColorTexture(DirectX::PackedVector::XMCOLOR(1, 1, 1, 1)));
         std::dynamic_pointer_cast<Texture2D>(value.Lock())->CreateBuffer();
     }
 
@@ -162,6 +167,7 @@ struct MaterialData<IAssetPtr> : IMaterialData
     {
         return &std::dynamic_pointer_cast<Texture2D>(value.Lock())->tex_data;
     }
+
     template <class Archive>
     void serialize(Archive &ar)
     {

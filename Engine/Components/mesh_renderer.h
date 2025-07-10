@@ -10,6 +10,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "Rendering/buffers.h"
+#include "Rendering/world_view_projection.h"
 
 typedef std::array<std::shared_ptr<DescriptorHandle>, engine::kParameterBufferType_Count> DescriptorHandlePerBuffer;
 typedef std::array<DescriptorHandlePerBuffer, engine::kShaderType_Count> DescriptorHandlePerShader;
@@ -24,16 +25,17 @@ public:
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-    std::array<std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>>, RenderEngine::FRAME_BUFFER_COUNT> material_wvp_buffers;
+    std::array<std::vector<std::weak_ptr<MaterialData<WorldViewProjection>>>, RenderEngine::FRAME_BUFFER_COUNT>
+    material_wvp_buffers;
     std::vector<DescriptorHandlePerShader> material_handles;
 
     bool buffer_creation_failed = false;
     bool is_material_error = false;
 
     void OnInspectorGui() override;
-    
+
     void OnDraw() override;
-    
+
     virtual void UpdateBuffers();
 
     template <class Archive>
@@ -41,14 +43,15 @@ public:
     {
         ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(shared_materials));
     }
+
 protected:
     virtual void ReconstructBuffers();
-    
+
     void ReconstructMeshesBuffer();
     virtual void ReconstructMaterialBuffers(int material_idx);
 
 private:
-    void SetDescriptorTable(ID3D12GraphicsCommandList* cmd_list, int material_idx);
-    
+    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
+
 };
 }

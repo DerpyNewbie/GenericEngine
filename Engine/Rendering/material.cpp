@@ -1,22 +1,31 @@
 #include "pch.h"
 #include "material.h"
+
+#include "MaterialData.h"
 #include "Editor/gui.h"
+
+#include <memory>
 
 void engine::Material::OnInspectorGui()
 {
-    editor::Gui::PropertyField<Shader>("Shader Asset", p_shared_shader, ".hlsl");
-    if (p_shared_shader.IsLoaded())
+    if (editor::Gui::PropertyField<Shader>("Shader Asset", p_shared_shader, ".hlsl"))
     {
-        std::dynamic_pointer_cast<Shader>(p_shared_shader.Lock())->OnInspectorGui();
         CreateMaterialBlock();
         m_IsValid = true;
     }
-    else
-        ImGui::Text("Not loaded");
-    //Undefined extension
-    editor::Gui::PropertyField<MaterialBlock>("MaterialBlock Asset", p_shared_shader, ".matblock");
     if (p_shared_shader.IsLoaded())
-        std::dynamic_pointer_cast<MaterialBlock>(p_shared_shader.Lock())->OnInspectorGui();
+    {
+        auto shader = p_shared_shader.CastedLock();
+        if (!shader)
+        {
+            Logger::Error<Material>("Invalid reference in material for shader");
+        }
+        shader->OnInspectorGui();
+    }
+    if (p_shared_material_block)
+    {
+        p_shared_material_block->OnInspectorGui();
+    }
     else
         ImGui::Text("Not loaded");
 }
@@ -24,8 +33,9 @@ void engine::Material::OnInspectorGui()
 void engine::Material::CreateMaterialBlock()
 {
     auto shared_shader = p_shared_shader.CastedLock();
-    auto shared_material_block = p_shared_material_block.CastedLock();
-    shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
+    p_shared_material_block = std::make_shared<MaterialBlock>();
+    p_shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
+
 }
 
 bool engine::Material::IsValid()

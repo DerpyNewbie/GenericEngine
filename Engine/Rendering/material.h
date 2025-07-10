@@ -15,14 +15,16 @@ namespace engine
 class Material : public InspectableAsset
 {
     bool m_IsValid = false;
+
 public:
     AssetPtr<Shader> p_shared_shader;
-    AssetPtr<MaterialBlock> p_shared_material_block;
+    std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
     void CreateMaterialBlock();
 
     bool IsValid();
+
     template <class Archive>
     void serialize(Archive &ar)
     {

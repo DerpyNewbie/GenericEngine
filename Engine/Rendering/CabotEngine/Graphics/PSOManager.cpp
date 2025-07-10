@@ -39,7 +39,43 @@ bool PSOManager::Register(PSOSetting setting)
         return false;
     }
 
-    psoCache.emplace(setting.PSOName, pso);
+    m_PSOCache_.emplace(setting.PSOName, pso);
 
     return true;
+}
+
+bool PSOManager::Register(std::shared_ptr<engine::Shader> shader)
+{
+    auto pso = new PipelineState;
+    pso->SetInputLayout(Vertex::InputLayout);
+    pso->SetRootSignature(g_RootSignatureManager.Get("Basic"));
+    pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+    pso->SetShader(shader);
+    pso->Create();
+
+    if (!pso->IsValid())
+    {
+        return false;
+    }
+
+    m_PSOCache_.emplace(shader->Name(), pso);
+    return true;
+}
+
+bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader)
+{
+    //PSO name is the same as the shader name.
+    std::string pso_name = shader->Name();
+    auto it = m_PSOCache_.find(pso_name);
+    if (it != m_PSOCache_.end())
+    {
+        //TODO:レンダリング周りのリファクタリングができたらこれを始動してほしい
+        /*if (m_CurrentPSO_ != pso_name)*/
+        {
+            m_CurrentPSO_ = pso_name;
+            cmd_list->SetPipelineState(Get(shader->Name()));
+        }
+        return true;
+    }
+    return false;
 }

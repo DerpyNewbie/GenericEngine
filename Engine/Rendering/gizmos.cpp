@@ -5,6 +5,7 @@
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
+#include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/camera.h"
 
 namespace engine
@@ -19,8 +20,12 @@ void Gizmos::Init()
 
     m_instance_ = std::make_shared<Gizmos>();
     m_instance_->m_constant_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 2);
+    m_instance_->m_constant_buffer_->CreateBuffer();
+    m_instance_->m_desc_hadnle_ = m_instance_->m_constant_buffer_->UploadBuffer();
+
     UpdateManager::SubscribeDrawCall(m_instance_);
 }
+
 void Gizmos::OnDraw()
 {
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
@@ -37,6 +42,7 @@ void Gizmos::OnDraw()
     }
 
     const auto constant_buffer = m_instance_->m_constant_buffer_;
+
     if (!constant_buffer->IsValid())
     {
         Logger::Error<Gizmos>("ConstantBuffer is invalid!");
@@ -44,9 +50,10 @@ void Gizmos::OnDraw()
         return;
     }
 
-    const auto mat_ptr = constant_buffer->GetPtr<Matrix>();
-    mat_ptr[0] = camera->GetViewMatrix();
-    mat_ptr[1] = camera->GetProjectionMatrix();
+    Matrix mat[2];
+    mat[0] = camera->GetViewMatrix();
+    mat[1] = camera->GetProjectionMatrix();
+    constant_buffer->UpdateBuffer(mat);
 
     const auto vertex_buffer = std::make_shared<VertexBuffer>(m_vertices_.size(), m_vertices_.data());
     const auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
@@ -63,13 +70,14 @@ void Gizmos::OnDraw()
     const auto cmd_list = g_RenderEngine->CommandList();
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
-    cmd_list->SetGraphicsRootConstantBufferView(0, constant_buffer->GetAddress());
+    cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_hadnle_->HandleGPU);
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
     cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);
 
     m_vertices_.clear();
 }
+
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)
 {
     Vertex vert_start{start, color};
@@ -78,6 +86,7 @@ void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &col
     m_vertices_.emplace_back(vert_start);
     m_vertices_.emplace_back(vert_end);
 }
+
 void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
 {
     for (size_t i = 0; i < line.size() - 1; i++)
@@ -85,6 +94,7 @@ void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
         DrawLine(line[i], line[i + 1], color);
     }
 }
+
 void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &color,
                         const Quaternion &rotation, const int segments)
 {
@@ -103,6 +113,7 @@ void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &
     circle.emplace_back(circle[0]);
     DrawLines(circle, color);
 }
+
 void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &color, const int segments)
 {
     for (int i = 0; i < segments; i++)

@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "mesh_renderer.h"
-
 #include "DxLib/dxlib_helper.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
@@ -9,7 +8,7 @@
 #include "game_object.h"
 #include "camera.h"
 #include "Rendering/MaterialData.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
+#include "Rendering/world_view_projection.h"
 
 namespace engine
 {
@@ -68,30 +67,41 @@ void MeshRenderer::OnDraw()
 {
     UpdateBuffers();
 
+    auto material = shared_materials[0];
+    auto shader = material->p_shared_shader.CastedLock();
     auto cmd_list = g_RenderEngine->CommandList();
-    auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = vertex_buffer->View();
     auto ibView = index_buffers[0]->View();
+    if (material->IsValid())
+    {
+        if (shader)
+            g_PSOManager.SetPipelineState(cmd_list, shader);
 
-    cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
+        cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        cmd_list->IASetVertexBuffers(0, 1, &vbView);
+        cmd_list->IASetIndexBuffer(&ibView);
+        SetDescriptorTable(cmd_list, 0);
 
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, &vbView);
-    cmd_list->IASetIndexBuffer(&ibView);
-    SetDescriptorTable(cmd_list, 0);
-
-    //cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
-    //? shared_mesh->sub_meshes[0].base_index
-    //: shared_mesh->indices.size(),1, 0, 0, 0);
+        cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
+                                           ? shared_mesh->sub_meshes[0].base_index
+                                           : shared_mesh->indices.size(), 1, 0, 0, 0);
+    }
     // sub-meshes
     for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
-        auto ib = index_buffers[i + 1];
-        auto sub_mesh = shared_mesh->sub_meshes[i];
-        ibView = ib->View();
-        cmd_list->IASetIndexBuffer(&ibView);
-        SetDescriptorTable(cmd_list, i + 1);
-        //cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, sub_mesh.base_vertex, 0);
+        material = shared_materials[i + 1];
+        if (material->IsValid())
+        {
+            shader = material->p_shared_shader.CastedLock();
+            if (shader)
+                g_PSOManager.SetPipelineState(cmd_list, shader);
+            auto ib = index_buffers[i + 1];
+            auto sub_mesh = shared_mesh->sub_meshes[i];
+            ibView = ib->View();
+            cmd_list->IASetIndexBuffer(&ibView);
+            SetDescriptorTable(cmd_list, i + 1);
+            cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+        }
     }
 }
 
@@ -106,9 +116,9 @@ void MeshRenderer::ReconstructBuffers()
         ReconstructMeshesBuffer();
     }
     material_handles.resize(shared_materials.size());
-    for (size_t i = 0; i < shared_materials.size(); ++i)
+    for (int i = 0; i < shared_materials.size(); ++i)
     {
-        if (shared_materials[i]->IsValid())
+        if (shared_materials[i]->IsValid() && !shared_materials[i]->p_shared_material_block->IsCreateBuffer())
         {
             ReconstructMaterialBuffers(i);
         }
@@ -181,12 +191,14 @@ void MeshRenderer::ReconstructMeshesBuffer()
 
 void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
 {
+
+    shared_materials[material_idx]->p_shared_material_block->CreateBuffer();
     //get wvp_buffer for update buffer
-    auto find_material_data = shared_materials[material_idx]->p_shared_material_block.CastedLock()->
-                                                              FindMaterialDataFromName("WVP").lock();
+    auto find_material_data = shared_materials[material_idx]->p_shared_material_block->
+                                                              FindMaterialDataFromName("__WVP__").lock();
     if (find_material_data)
     {
-        auto wvp_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
+        auto wvp_data = std::dynamic_pointer_cast<MaterialData<WorldViewProjection>>(find_material_data);
         for (auto &wvp_buffer : material_wvp_buffers)
         {
             wvp_buffer.emplace_back(wvp_data);
@@ -197,8 +209,7 @@ void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
             material_handles[material_idx][shader_type][params_type] = shared_materials[material_idx]->
-                                                                       p_shared_material_block.
-                                                                       CastedLock()->GetDescriptorHandle(
+                                                                       p_shared_material_block->GetDescriptorHandle(
                                                                            static_cast<kShaderType>(shader_type),
                                                                            static_cast<kParameterBufferType>(
                                                                                params_type));
@@ -207,21 +218,25 @@ void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
 void MeshRenderer::UpdateBuffers()
 {
     ReconstructBuffers();
-    std::vector<Matrix> wvp;
     const auto camera = Camera::Main();
 
     if (!material_wvp_buffers[0].empty())
     {
-        wvp.emplace_back(GameObject()->Transform()->WorldMatrix());
-        wvp.emplace_back(camera.lock()->GetViewMatrix());
-        wvp.emplace_back(camera.lock()->GetProjectionMatrix());
+        WorldViewProjection wvp;
+        wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
+        wvp.WVP[1] = camera.lock()->GetViewMatrix();
+        wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
 
-        for (size_t i = 0; i < shared_materials.size(); ++i)
+        for (auto &wvp_buffers : material_wvp_buffers)
         {
-            for (auto &wvp_buffer : material_wvp_buffers[i])
+            for (size_t i = 0; i < wvp_buffers.size(); ++i)
             {
-                wvp_buffer.lock()->Set(wvp);
-                wvp_buffer.lock()->UpdateBuffer();
+                auto wvp_buffer = wvp_buffers[i].lock();
+                if (wvp_buffer)
+                {
+                    wvp_buffer->Set(wvp);
+                    wvp_buffer->UpdateBuffer();
+                }
             }
         }
     }
@@ -231,10 +246,10 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
 {
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            if (material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV])
+            if (material_handles[material_idx][shader_type][params_type])
                 cmd_list->SetGraphicsRootDescriptorTable(
-                    kVertexCBV,
-                    material_handles[material_idx][kShaderType_Vertex][kParameterBufferType_CBV]->HandleGPU);
+                    shader_type * 3 + params_type,
+                    material_handles[material_idx][shader_type][params_type]->HandleGPU);
 }
 }
 

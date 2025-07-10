@@ -79,10 +79,10 @@ void PipelineState::SetGS(std::wstring filePath)
     desc.GS = CD3DX12_SHADER_BYTECODE(m_pGsBlob.Get());
 }
 
-void PipelineState::SetMaterial(std::shared_ptr<engine::Material> material)
+void PipelineState::SetShader(std::shared_ptr<engine::Shader> shader)
 {
-    desc.VS = material->p_shared_shader.CastedLock()->GetByteCode(engine::Shader::ShaderType::Vertex);
-    desc.PS = material->p_shared_shader.CastedLock()->GetByteCode(engine::Shader::ShaderType::Pixel);
+    desc.VS = shader->GetByteCode(engine::Shader::ShaderType::Vertex);
+    desc.PS = shader->GetByteCode(engine::Shader::ShaderType::Pixel);
 }
 
 void PipelineState::Create()

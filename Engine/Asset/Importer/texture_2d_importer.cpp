@@ -1,12 +1,36 @@
 #include "pch.h"
 #include "texture_2d_importer.h"
+
+#include "Asset/asset_database.h"
 #include "Rendering/CabotEngine/Graphics/Texture2D.h"
+
+#include <memory>
 using namespace DirectX;
 
 std::wstring FileExtension(const std::wstring &path)
 {
     auto idx = path.rfind(L'.');
     return path.substr(idx + 1, path.length() - idx - 1);
+}
+
+engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
+{
+    auto texture_2d = Object::Instantiate<Texture2D>();
+
+    texture_2d->width = 4;
+    texture_2d->height = 4;
+    texture_2d->format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texture_2d->mip_levels = 1;
+
+    size_t pixelCount = 4 * 4;
+    texture_2d->tex_data.reserve(pixelCount);
+    for (UINT i = 0; i < pixelCount; ++i)
+    {
+        texture_2d->tex_data.emplace_back(color);
+    }
+    auto asset_ptr = IAssetPtr::FromScene(texture_2d);
+
+    return asset_ptr;
 }
 
 std::vector<std::string> engine::Texture2DImporter::SupportedExtensions()
@@ -17,7 +41,7 @@ std::vector<std::string> engine::Texture2DImporter::SupportedExtensions()
 std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(AssetDescriptor *asset)
 {
     auto texture_2d = Object::Instantiate<Texture2D>();
-    
+
     const auto path = asset->path_hint;
     TexMetadata meta = {};
     ScratchImage scratch = {};
@@ -45,7 +69,7 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(AssetDescripto
     texture_2d->mip_levels = meta.mipLevels;
 
     auto img = scratch.GetImage(0, 0, 0);
-    const uint8_t* src = img->pixels;
+    const uint8_t *src = img->pixels;
     size_t pixelCount = img->width * img->height;
     texture_2d->tex_data.reserve(pixelCount);
     for (UINT i = 0; i < pixelCount; ++i)

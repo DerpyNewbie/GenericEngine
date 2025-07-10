@@ -53,6 +53,9 @@ bool Gui::PropertyField(const char *label, engine::IAssetPtr &value, std::string
                 {
                     value = asset;
                     ImGui::CloseCurrentPopup();
+                    ImGui::EndPopup();
+                    ImGui::PopID();
+                    return true;
                 }
 
                 if (ImGui::BeginItemTooltip())

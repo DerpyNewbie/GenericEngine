@@ -13,7 +13,7 @@ public:
     void SetVS(std::wstring filePath);
     void SetPS(std::wstring filePath);
     void SetGS(std::wstring filePath);
-    void SetMaterial(std::shared_ptr<engine::Material> material); //これ呼び出したらVS,PSのセットはしなくていい
+    void SetShader(std::shared_ptr<engine::Shader> shader); //これ呼び出したらVS,PSのセットはしなくていい
     void Create();
 
     ID3D12PipelineState *Get();

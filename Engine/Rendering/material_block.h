@@ -16,6 +16,8 @@ struct ShaderParameter;
 /// </remarks>
 class MaterialBlock : public InspectableAsset
 {
+    bool m_IsCreate_Buffer_ = false;
+
 public:
     MaterialBlock() = default;
     void OnInspectorGui() override;
@@ -24,6 +26,8 @@ public:
     std::shared_ptr<DescriptorHandle> GetDescriptorHandle(kShaderType shader_type, kParameterBufferType param_buffer);
     std::weak_ptr<IMaterialData> FindMaterialDataFromName(std::string name);
     void CreateParamsFromShaderParams(std::vector<ShaderParameter> shader_params);
+    void CreateBuffer();
+    bool IsCreateBuffer();
 
     std::array<std::array<std::vector<std::pair<ShaderParameter, std::shared_ptr<IMaterialData>>>,
                           kParameterBufferType_Count>, kShaderType_Count> parameters;

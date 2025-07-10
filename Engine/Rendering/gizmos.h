@@ -22,6 +22,7 @@ class Gizmos : public IDrawCallReceiver
 
     std::shared_ptr<VertexBuffer> m_vertex_buffers_[2];
     std::shared_ptr<ConstantBuffer> m_constant_buffer_;
+    std::shared_ptr<DescriptorHandle> m_desc_hadnle_;
 
     static void Init();
 

@@ -109,6 +109,7 @@
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\Vertex.cpp"/>
+        <ClCompile Include="Engine\Rendering\world_view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
         <ClCompile Include="Engine\scene_manager.cpp"/>
         <ClCompile Include="Engine\serializer.cpp"/>
@@ -204,6 +205,7 @@
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\Vertex.h"/>
+        <ClInclude Include="Engine\Rendering\world_view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>
         <ClInclude Include="Engine\scene_manager.h"/>
         <ClInclude Include="Engine\serializer.h"/>

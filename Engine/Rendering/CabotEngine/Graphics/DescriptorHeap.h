@@ -25,7 +25,7 @@ public:
     ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
 
-    std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer structured_buffer);
+    std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer &structured_buffer);
     std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
     std::shared_ptr<DescriptorHandle> Allocate();
 

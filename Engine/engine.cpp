@@ -43,7 +43,7 @@ bool Engine::Init()
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
-    // Gizmos::Init();
+    Gizmos::Init();
     Time::Get()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
@@ -51,6 +51,7 @@ bool Engine::Init()
 
     return true;
 }
+
 void Engine::MainLoop() const
 {
     MSG msg = {};
@@ -83,7 +84,6 @@ void Engine::MainLoop() const
             g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
             auto &descriptor_heap_wrapped = g_DescriptorHeapManager->Get();
             auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
-            descriptor_heap_wrapped.Release();
             g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
