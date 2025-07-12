@@ -25,12 +25,12 @@ public:
 
     std::shared_ptr<DescriptorHandle> GetDescriptorHandle(kShaderType shader_type, kParameterBufferType param_buffer);
     std::weak_ptr<IMaterialData> FindMaterialDataFromName(std::string name);
-    void CreateParamsFromShaderParams(std::vector<ShaderParameter> shader_params);
+    void CreateParamsFromShaderParams(std::vector<std::shared_ptr<ShaderParameter>> shader_params);
     void CreateBuffer();
     bool IsCreateBuffer();
 
-    std::array<std::array<std::vector<std::pair<ShaderParameter, std::shared_ptr<IMaterialData>>>,
-                          kParameterBufferType_Count>, kShaderType_Count> parameters;
+    std::array<std::array<std::vector<std::shared_ptr<IMaterialData>>, kParameterBufferType_Count>, kShaderType_Count>
+    material_datasets;
 
     template <class Archive>
     void serialize(Archive &ar)

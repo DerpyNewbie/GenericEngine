@@ -5,14 +5,18 @@
 
 namespace engine
 {
+class Transform;
+
 class SkinnedMeshRenderer : public MeshRenderer
 {
     bool m_draw_bones_ = false;
 
+    void ApplyBoneTransforms();
+
 public:
     constexpr static int kLimitBonesPerVertex = 4;
     std::vector<Matrix> transforms;
-    std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> material_bone_matrices_buffers;
+    std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> bone_transform_buffers;
 
     void OnInspectorGui() override;
     void OnDraw() override;

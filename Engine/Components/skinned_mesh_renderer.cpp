@@ -1,10 +1,14 @@
 #include "pch.h"
-
 #include "skinned_mesh_renderer.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
+#include "Components/transform.h"
 
 namespace engine
 {
+void SkinnedMeshRenderer::ApplyBoneTransforms()
+{
+}
+
 void SkinnedMeshRenderer::OnInspectorGui()
 {
     MeshRenderer::OnInspectorGui();
@@ -43,18 +47,18 @@ void SkinnedMeshRenderer::ReconstructBuffers()
 void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
 {
     //set bone matrices
-    material_bone_matrices_buffers.resize(shared_materials.size());
+    bone_transform_buffers.resize(shared_materials.size());
     auto find_material_data = shared_materials[material_idx]->p_shared_material_block->
                                                               FindMaterialDataFromName("__BoneMatrices__").lock();
     if (find_material_data)
     {
-        transforms.reserve(shared_mesh->bind_poses.size());
+        transforms.resize(shared_mesh->bind_poses.size());
         for (size_t i = 0; i < shared_mesh->bind_poses.size(); i++)
-            transforms.emplace_back(shared_mesh->bind_poses[i]);
+            transforms[i] = (DirectX::XMMatrixTranspose(shared_mesh->bind_poses[i]));
 
         auto bone_matrices_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
-        material_bone_matrices_buffers[material_idx] = bone_matrices_data;
-        material_bone_matrices_buffers[material_idx].lock()->Set(transforms);
+        bone_transform_buffers[material_idx] = bone_matrices_data;
+        bone_transform_buffers[material_idx].lock()->Set(transforms);
     }
     MeshRenderer::ReconstructMaterialBuffers(material_idx);
 }
@@ -62,12 +66,20 @@ void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
 void SkinnedMeshRenderer::UpdateBuffers()
 {
     MeshRenderer::UpdateBuffers();
-    for (size_t i = 0; i < material_bone_matrices_buffers.size(); ++i)
+    for (size_t i = 0; i < bone_transform_buffers.size(); ++i)
     {
-        if (material_bone_matrices_buffers[i].lock() && shared_materials[i]->p_shared_material_block->IsCreateBuffer())
+        auto bone_matrices_buffer = bone_transform_buffers[i].lock();
+        if (bone_matrices_buffer && shared_materials[i]->p_shared_material_block->IsCreateBuffer())
         {
-            material_bone_matrices_buffers[i].lock()->Set(transforms);
-            material_bone_matrices_buffers[i].lock()->UpdateBuffer();
+            if (bone_matrices_buffer->buffer->IsValid())
+            {
+                bone_matrices_buffer->Set(transforms);
+                bone_matrices_buffer->UpdateBuffer();
+            }
+        }
+        else
+        {
+            bone_transform_buffers.erase(bone_transform_buffers.begin() + i);
         }
     }
 }

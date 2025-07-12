@@ -10,26 +10,27 @@ std::vector<std::string> ShaderExporter::SupportedExtensions()
 {
     return {".hlsl"};
 }
+
 void ShaderExporter::Export(AssetDescriptor *asset)
 {
     const auto shader = std::dynamic_pointer_cast<Shader>(asset->managed_object);
 
     using namespace rapidjson;
-    auto create_shader_param_obj = [](const ShaderParameter &param, auto &alloc) {
+    auto create_shader_param_obj = [](const std::shared_ptr<ShaderParameter> &param, auto &alloc) {
         auto result = Value(kObjectType);
 
         auto name_value = Value{};
-        name_value.SetString(param.name.c_str(), param.name.size());
+        name_value.SetString(param->name.c_str(), param->name.size());
         result.AddMember("name", name_value, alloc);
 
         auto type_value = Value{};
-        type_value.SetString(param.type_hint.c_str(), param.type_hint.size());
+        type_value.SetString(param->type_hint.c_str(), param->type_hint.size());
         result.AddMember("type", type_value, alloc);
 
-        if (!param.display_name.empty())
+        if (!param->display_name.empty())
         {
             auto display_name_value = Value{};
-            display_name_value.SetString(param.display_name.c_str(), param.display_name.size());
+            display_name_value.SetString(param->display_name.c_str(), param->display_name.size());
             result.AddMember("displayName", display_name_value, alloc);
         }
         return result;
@@ -46,10 +47,10 @@ void ShaderExporter::Export(AssetDescriptor *asset)
 
     auto create_shader_params_value = [&](auto &alloc) {
         auto vertex_params = std::views::filter(shader->parameters, [](auto &p) {
-            return p.shader_type == kShaderType_Vertex;
+            return p->shader_type == kShaderType_Vertex;
         });
         auto pixel_params = std::views::filter(shader->parameters, [](auto &p) {
-            return p.shader_type == kShaderType_Pixel;
+            return p->shader_type == kShaderType_Pixel;
         });
 
         auto vertex_params_obj = create_shader_params_list(vertex_params, alloc);

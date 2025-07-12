@@ -16,10 +16,18 @@ class DescriptorHandle
 public:
     D3D12_CPU_DESCRIPTOR_HANDLE HandleCPU;
     D3D12_GPU_DESCRIPTOR_HANDLE HandleGPU;
+    UINT index;
 };
 
 class DescriptorHeap
 {
+    static constexpr UINT kHandleMax = 512;
+    bool m_IsValid_ = false;
+    UINT m_IncrementSize_ = 0;
+    std::vector<UINT> m_FreeIndices_;
+    std::vector<std::shared_ptr<DescriptorHandle>> m_pHandles_;
+    ComPtr<ID3D12DescriptorHeap> m_pHeap_ = nullptr;
+
 public:
     DescriptorHeap(); // コンストラクタで生成する
     ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
@@ -28,12 +36,8 @@ public:
     std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer &structured_buffer);
     std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
     std::shared_ptr<DescriptorHandle> Allocate();
+    void Free(std::shared_ptr<DescriptorHandle> handle);
 
     void Release();
 
-private:
-    bool m_IsValid = false;
-    UINT m_IncrementSize = 0;
-    ComPtr<ID3D12DescriptorHeap> m_pHeap = nullptr;
-    std::vector<std::shared_ptr<DescriptorHandle>> m_pHandles;
 };

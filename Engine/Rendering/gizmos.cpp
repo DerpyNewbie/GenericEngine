@@ -21,7 +21,7 @@ void Gizmos::Init()
     m_instance_ = std::make_shared<Gizmos>();
     m_instance_->m_constant_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 2);
     m_instance_->m_constant_buffer_->CreateBuffer();
-    m_instance_->m_desc_hadnle_ = m_instance_->m_constant_buffer_->UploadBuffer();
+    m_instance_->m_desc_handle_ = m_instance_->m_constant_buffer_->UploadBuffer();
 
     UpdateManager::SubscribeDrawCall(m_instance_);
 }
@@ -55,10 +55,10 @@ void Gizmos::OnDraw()
     mat[1] = camera->GetProjectionMatrix();
     constant_buffer->UpdateBuffer(mat);
 
-    const auto vertex_buffer = std::make_shared<VertexBuffer>(m_vertices_.size(), m_vertices_.data());
     const auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
-    m_instance_->m_vertex_buffers_[buffer_index] = vertex_buffer;
-
+    m_instance_->m_vertex_buffers_[buffer_index] = std::make_shared<VertexBuffer>(
+        m_vertices_.size(), m_vertices_.data());
+    const auto &vertex_buffer = m_instance_->m_vertex_buffers_[buffer_index];
     if (!vertex_buffer->IsValid())
     {
         Logger::Error<Gizmos>("Failed to create VertexBuffer!");
@@ -70,7 +70,7 @@ void Gizmos::OnDraw()
     const auto cmd_list = g_RenderEngine->CommandList();
 
     cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
-    cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_hadnle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_handle_->HandleGPU);
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
     cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);

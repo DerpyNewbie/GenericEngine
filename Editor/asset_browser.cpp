@@ -4,6 +4,7 @@
 #include "gui.h"
 #include "Asset/asset_database.h"
 #include "logger.h"
+#include "Engine/gui.h"
 
 namespace editor
 {
@@ -11,6 +12,7 @@ std::string AssetBrowser::Name()
 {
     return "Asset Browser";
 }
+
 static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
 {
     ImGui::PushID(asset_hierarchy.get());
@@ -65,6 +67,7 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
 
     ImGui::PopID();
 }
+
 void AssetBrowser::OnEditorGui()
 {
     if (ImGui::BeginPopupContextWindow())

@@ -38,8 +38,8 @@
         <ClCompile Include="Engine\Asset\Exporter\asset_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
-        <ClCompile Include="Engine\Asset\Importer\material_importer.cpp" />
-        <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp" />
+      <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
+      <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp"/>
@@ -138,8 +138,8 @@
         <ClInclude Include="Engine\Asset\Exporter\asset_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
-        <ClInclude Include="Engine\Asset\Importer\material_importer.h" />
-        <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h" />
+      <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
+      <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
@@ -217,9 +217,10 @@
     <ItemGroup>
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
-        <Content Include="Resources\aaa.txt.meta" />
-        <Content Include="Resources\BasicShader.hlsl.meta" />
         <Content Include="vcpkg.json"/>
+    </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

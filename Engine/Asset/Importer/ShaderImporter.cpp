@@ -86,9 +86,9 @@ void ShaderImporter::LoadParameters(std::shared_ptr<Shader> shader, AssetDescrip
     {
         auto &params_value = parameters_member->value;
         auto construct_shader_parameter = [](const int index, const kShaderType shader_type, auto &object) {
-            ShaderParameter param{};
-            param.index = index;
-            param.shader_type = shader_type;
+            auto param = std::make_shared<ShaderParameter>();
+            param->index = index;
+            param->shader_type = shader_type;
 
             auto name_member = object->FindMember("name");
             if (name_member == object->MemberEnd())
@@ -97,7 +97,7 @@ void ShaderImporter::LoadParameters(std::shared_ptr<Shader> shader, AssetDescrip
             }
             else
             {
-                param.name = name_member->value.GetString();
+                param->name = name_member->value.GetString();
             }
 
             auto type_member = object->FindMember("type");
@@ -107,23 +107,23 @@ void ShaderImporter::LoadParameters(std::shared_ptr<Shader> shader, AssetDescrip
             }
             else
             {
-                param.type_hint = type_member->value.GetString();
+                param->type_hint = type_member->value.GetString();
             }
 
             auto display_name_member = object->FindMember("displayName");
             if (display_name_member == object->MemberEnd())
             {
-                param.display_name = std::string();
+                param->display_name = std::string();
             }
             else
             {
-                param.display_name = display_name_member->value.GetString();
+                param->display_name = display_name_member->value.GetString();
             }
 
             return param;
         };
         auto read_shader_params = [&](const kShaderType shader_type, const char *name) {
-            std::vector<ShaderParameter> params;
+            std::vector<std::shared_ptr<ShaderParameter>> params;
             const auto it = params_value.FindMember(name);
             if (it == params_value.MemberEnd())
             {
@@ -156,7 +156,7 @@ std::vector<std::string> ShaderImporter::SupportedExtensions()
 
 std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 {
-    auto shader = Object::Instantiate<Shader>(asset->path_hint.stem().string());
+    auto shader = Object::Instantiate<Shader>(asset->guid);
     if (asset->guid == xg::Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
     {
         shader = Shader::GetDefault();
@@ -165,7 +165,7 @@ std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
 
     CompileShader(shader, asset->path_hint);
     LoadParameters(shader, asset);
-    g_PSOManager.Register(shader);
+    g_PSOManager.Register(shader, asset->path_hint.filename().string());
     return shader;
 }
 }

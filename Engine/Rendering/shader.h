@@ -50,7 +50,7 @@ public:
         Pixel
     };
 
-    std::vector<ShaderParameter> parameters;
+    std::vector<std::shared_ptr<ShaderParameter>> parameters;
 
 
     void OnInspectorGui() override;

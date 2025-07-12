@@ -2,16 +2,22 @@
 #include "material.h"
 
 #include "MaterialData.h"
+#include "gui.h"
 #include "Editor/gui.h"
 
 #include <memory>
 
 void engine::Material::OnInspectorGui()
 {
-    if (editor::Gui::PropertyField<Shader>("Shader Asset", p_shared_shader, ".hlsl"))
+    if (Gui::PropertyField<Shader>("Shader Asset", p_shared_shader))
     {
-        CreateMaterialBlock();
-        m_IsValid = true;
+        if (!p_shared_shader.IsNull())
+        {
+            CreateMaterialBlock();
+            m_IsValid = true;
+            return;
+        }
+        m_IsValid = false;
     }
     if (p_shared_shader.IsLoaded())
     {
@@ -32,10 +38,14 @@ void engine::Material::OnInspectorGui()
 
 void engine::Material::CreateMaterialBlock()
 {
-    auto shared_shader = p_shared_shader.CastedLock();
-    p_shared_material_block = std::make_shared<MaterialBlock>();
-    p_shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
+    if (p_shared_material_block)
+    {
+        p_shared_material_block->DestroyThis();
+    }
 
+    auto shared_shader = p_shared_shader.CastedLock();
+    p_shared_material_block = Instantiate<MaterialBlock>();
+    p_shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
 }
 
 bool engine::Material::IsValid()

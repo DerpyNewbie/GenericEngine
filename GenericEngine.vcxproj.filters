@@ -5,6 +5,7 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
+    <FxCompile Include="Resources\BasicShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -70,6 +71,21 @@
     <ClCompile Include="Engine\Asset\text_asset.cpp" />
     <ClCompile Include="Engine\Components\line_renderer.cpp" />
     <ClCompile Include="Engine\Rendering\gizmos.cpp" />
+    <ClCompile Include="Editor\imgui_demo_window.cpp" />
+    <ClCompile Include="Engine\Asset\asset_descriptor.cpp" />
+    <ClCompile Include="Engine\Asset\asset_ptr.cpp" />
+    <ClCompile Include="Engine\Asset\Exporter\asset_exporter.cpp" />
+    <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp" />
+    <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\material_importer.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp" />
+    <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp" />
+    <ClCompile Include="Engine\component_factory.cpp" />
+    <ClCompile Include="Engine\gui.cpp" />
+    <ClCompile Include="Engine\object.cpp" />
+    <ClCompile Include="Engine\Rendering\buffers.cpp" />
+    <ClCompile Include="Engine\Rendering\MaterialData.cpp" />
+    <ClCompile Include="Engine\Rendering\world_view_projection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -149,8 +165,21 @@
     <ClInclude Include="Engine\Components\line_renderer.h" />
     <ClInclude Include="Engine\inspectable.h" />
     <ClInclude Include="Engine\Rendering\gizmos.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\BasicShader.hlsl" />
+    <ClInclude Include="Editor\imgui_demo_window.h" />
+    <ClInclude Include="Engine\Asset\asset_ptr.h" />
+    <ClInclude Include="Engine\Asset\Exporter\asset_exporter.h" />
+    <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h" />
+    <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h" />
+    <ClInclude Include="Engine\Asset\Importer\material_importer.h" />
+    <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h" />
+    <ClInclude Include="Engine\Components\text_asset_ref_test_component.h" />
+    <ClInclude Include="Engine\component_factory.h" />
+    <ClInclude Include="Engine\engine_traits.h" />
+    <ClInclude Include="Engine\gui.h" />
+    <ClInclude Include="Engine\guid_serializer.h" />
+    <ClInclude Include="Engine\Rendering\buffers.h" />
+    <ClInclude Include="Engine\Rendering\MaterialData.h" />
+    <ClInclude Include="Engine\Rendering\world_view_projection.h" />
+    <ClInclude Include="pch.h" />
   </ItemGroup>
 </Project>

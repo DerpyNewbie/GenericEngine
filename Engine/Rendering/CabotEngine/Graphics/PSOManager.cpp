@@ -44,7 +44,7 @@ bool PSOManager::Register(PSOSetting setting)
     return true;
 }
 
-bool PSOManager::Register(std::shared_ptr<engine::Shader> shader)
+bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string pso_name)
 {
     auto pso = new PipelineState;
     pso->SetInputLayout(Vertex::InputLayout);
@@ -58,7 +58,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader)
         return false;
     }
 
-    m_PSOCache_.emplace(shader->Name(), pso);
+    m_PSOCache_.emplace(pso_name, pso);
     return true;
 }
 

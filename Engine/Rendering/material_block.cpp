@@ -1,26 +1,42 @@
 #include "pch.h"
 #include "material_block.h"
 #include "MaterialData.h"
+#include "gui.h"
 #include "world_view_projection.h"
+using MaterialFactory =
+std::function<std::shared_ptr<engine::IMaterialData>(std::weak_ptr<engine::ShaderParameter> &)>;
 
-std::shared_ptr<engine::IMaterialData> CreateMaterialData(std::string type_hint)
+std::unordered_map<std::string, MaterialFactory> material_data_map = {
+    {"int", [](std::weak_ptr<engine::ShaderParameter> &param) {
+        return std::make_shared<engine::MaterialData<int>>(param);
+    }},
+    {"float", [](std::weak_ptr<engine::ShaderParameter> &param) {
+        return std::make_shared<engine::MaterialData<float>>(param);
+    }},
+    {"__WVP__", [](std::weak_ptr<engine::ShaderParameter> &param) {
+        return std::make_shared<engine::MaterialData<WorldViewProjection>>(param);
+    }},
+    {"vector<Matrix>", [](std::weak_ptr<engine::ShaderParameter> &param) {
+        return std::make_shared<engine::MaterialData<std::vector<Matrix>>>(param);
+    }},
+    {"Texture2D", [](std::weak_ptr<engine::ShaderParameter> &param) {
+        return std::make_shared<engine::MaterialData<engine::AssetPtr<Texture2D>>>(param);
+    }}
+};
+
+std::shared_ptr<engine::IMaterialData> CreateMaterialData(std::weak_ptr<engine::ShaderParameter> shader_param)
 {
-    if (type_hint == "int")
-        return std::make_shared<engine::MaterialData<int>>();
-    if (type_hint == "float")
-        return std::make_shared<engine::MaterialData<float>>();
-    if (type_hint == "Texture2D")
-        return std::make_shared<engine::MaterialData<engine::AssetPtr<Texture2D>>>();
-    if (type_hint == "vector<Matrix>")
-        return std::make_shared<engine::MaterialData<std::vector<Matrix>>>();
-    //engine
-    if (type_hint == "__WVP__")
-        return std::make_shared<engine::MaterialData<WorldViewProjection>>();
+    auto func = material_data_map[shader_param.lock()->type_hint];
+    auto material_data = func(shader_param);
+    return material_data;
 }
 
 void engine::MaterialBlock::OnInspectorGui()
 {
-
+    for (int i = 0; i < kShaderType_Count; ++i)
+        for (int j = 0; j < kParameterBufferType_Count; ++j)
+            for (auto param : material_datasets[i][j])
+                param->OnInspectorGui();
 }
 
 void engine::MaterialBlock::OnConstructed()
@@ -31,13 +47,13 @@ void engine::MaterialBlock::OnConstructed()
 std::shared_ptr<DescriptorHandle> engine::MaterialBlock::GetDescriptorHandle(
     kShaderType shader_type, kParameterBufferType param_buffer)
 {
-    auto params = parameters[shader_type][param_buffer];
+    auto params = material_datasets[shader_type][param_buffer];
     if (params.empty())
         return nullptr;
 
-    std::shared_ptr<DescriptorHandle> result = params[0].second->UploadBuffer();
+    std::shared_ptr<DescriptorHandle> result = params[0]->UploadBuffer();
     for (int i = 1; i < params.size(); ++i)
-        params[i].second->UploadBuffer();
+        params[i]->UploadBuffer();
 
     return result;
 }
@@ -46,27 +62,18 @@ std::weak_ptr<engine::IMaterialData> engine::MaterialBlock::FindMaterialDataFrom
 {
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            for (auto [key,value] : parameters[shader_type][params_type])
-                if (name == key.name)
-                    return value;
-    return std::weak_ptr<engine::IMaterialData>();
+            for (auto material_data : material_datasets[shader_type][params_type])
+                if (name == material_data->GetShaderParam().name)
+                    return material_data;
+    return {};
 }
 
-void engine::MaterialBlock::CreateParamsFromShaderParams(std::vector<ShaderParameter> shader_params)
+void engine::MaterialBlock::CreateParamsFromShaderParams(std::vector<std::shared_ptr<ShaderParameter>> shader_params)
 {
-    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            std::sort(parameters[shader_type][params_type].begin(), parameters[shader_type][params_type].end(),
-                      [](std::pair<ShaderParameter, std::shared_ptr<IMaterialData>> a,
-                         std::pair<ShaderParameter, std::shared_ptr<IMaterialData>> b) {
-                          return a.first.index < b.first.index;
-                      });
     for (auto shader_param : shader_params)
     {
-        auto material_data = CreateMaterialData(shader_param.type_hint);
-        parameters[shader_param.shader_type][material_data->BufferType()].emplace_back(
-            shader_param, material_data);
-
+        auto material_data = CreateMaterialData(shader_param);
+        material_datasets[shader_param->shader_type][material_data->BufferType()].emplace_back(material_data);
     }
 }
 
@@ -74,7 +81,7 @@ void engine::MaterialBlock::CreateBuffer()
 {
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            for (auto mat_data : parameters[shader_type][params_type] | std::views::values)
+            for (auto mat_data : material_datasets[shader_type][params_type])
                 mat_data->CreateBuffer();
     m_IsCreate_Buffer_ = true;
 }

@@ -27,10 +27,10 @@ std::shared_ptr<engine::Shader> engine::Shader::GetDefault()
 void engine::Shader::OnInspectorGui()
 {
     auto vertex_params = std::views::filter(parameters, [](auto &p) {
-        return p.shader_type == kShaderType_Vertex;
+        return p->shader_type == kShaderType_Vertex;
     });
     auto pixel_params = std::views::filter(parameters, [](auto &p) {
-        return p.shader_type == kShaderType_Pixel;
+        return p->shader_type == kShaderType_Pixel;
     });
 
     auto draw_params = [](auto &params, auto &sources) {
@@ -44,7 +44,8 @@ void engine::Shader::OnInspectorGui()
                 if (ImGui::MenuItem("Remove"))
                 {
                     sources.erase(std::find_if(sources.begin(), sources.end(), [&](auto &p) {
-                        return p.name == param.name && p.index == param.index && p.shader_type == param.shader_type;
+                        return p->name == param->name && p->index == param->index && p->shader_type == param->
+                               shader_type;
                     }));
                     break;
                 }
@@ -53,9 +54,9 @@ void engine::Shader::OnInspectorGui()
             if (should_show)
             {
                 ImGui::Indent();
-                ImGui::InputText("Name", &param.name);
-                ImGui::InputText("Display Name", &param.display_name);
-                ImGui::InputText("Type", &param.type_hint);
+                ImGui::InputText("Name", &param->name);
+                ImGui::InputText("Display Name", &param->display_name);
+                ImGui::InputText("Type", &param->type_hint);
                 ImGui::Unindent();
             }
             ImGui::PopID();
@@ -70,7 +71,8 @@ void engine::Shader::OnInspectorGui()
         if (ImGui::Button("Add VS Parameter"))
         {
             auto &p = parameters.emplace_back();
-            p.shader_type = kShaderType_Vertex;
+            p = std::make_shared<ShaderParameter>();
+            p->shader_type = kShaderType_Vertex;
         }
         ImGui::Unindent();
     }
@@ -84,7 +86,8 @@ void engine::Shader::OnInspectorGui()
         if (ImGui::Button("Add PS Parameter"))
         {
             auto &p = parameters.emplace_back();
-            p.shader_type = kShaderType_Pixel;
+            p = std::make_shared<ShaderParameter>();
+            p->shader_type = kShaderType_Pixel;
         }
         ImGui::Unindent();
     }

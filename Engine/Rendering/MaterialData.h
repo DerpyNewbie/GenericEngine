@@ -1,6 +1,7 @@
 #pragma once
 #include "buffers.h"
 #include "engine_traits.h"
+#include "shader.h"
 #include "Asset/asset_ptr.h"
 #include "Asset/Importer/texture_2d_importer.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
@@ -9,7 +10,7 @@
 
 namespace engine
 {
-struct IMaterialData
+struct IMaterialData : Inspectable
 {
     virtual ~IMaterialData() = default;
     virtual void CreateBuffer() = 0;
@@ -18,6 +19,7 @@ struct IMaterialData
     virtual kParameterBufferType BufferType() = 0;
     virtual int SizeInBytes() = 0;
     virtual void *Data() =0;
+    virtual ShaderParameter &GetShaderParam() = 0;
 };
 
 template <typename T>
@@ -25,8 +27,25 @@ struct MaterialData : IMaterialData
 {
     T value;
     std::unique_ptr<IBuffer> buffer;
+    std::weak_ptr<ShaderParameter> shader_param;
 
-    MaterialData() = default;
+    MaterialData(const std::weak_ptr<ShaderParameter> &param)
+    {
+        shader_param = param;
+    }
+
+
+    void OnInspectorGui() override
+    {
+        if constexpr (std::is_same_v<T, int>)
+        {
+            if (ImGui::InputInt("Value", &value))
+                UpdateBuffer();
+            return;
+        }
+
+        ImGui::Text("Inspector not implemented for %s", typeid(T).name());
+    }
 
     void Set(T new_value)
     {
@@ -111,6 +130,11 @@ struct MaterialData : IMaterialData
         }
     }
 
+    ShaderParameter &GetShaderParam() override
+    {
+        return *shader_param.lock();
+    }
+
     template <class Archive>
     void serialize(Archive &ar)
     {
@@ -126,7 +150,17 @@ template <>
 struct MaterialData<AssetPtr<Texture2D>> : IMaterialData
 {
     IAssetPtr value;
-    MaterialData() = default;
+    std::weak_ptr<ShaderParameter> shader_param;
+
+    MaterialData(const std::weak_ptr<ShaderParameter> &param)
+    {
+        shader_param = param;
+    }
+
+    void OnInspectorGui() override
+    {
+        ImGui::Text("Inspector not implemented for Texture");
+    }
 
     void Set(IAssetPtr new_value)
     {
@@ -140,7 +174,7 @@ struct MaterialData<AssetPtr<Texture2D>> : IMaterialData
 
     void CreateBuffer() override
     {
-        Set(Texture2DImporter::GetColorTexture(DirectX::PackedVector::XMCOLOR(1, 1, 1, 1)));
+        Set(Texture2DImporter::GetColorTexture(DirectX::PackedVector::XMCOLOR(1, 1, 0, 1)));
         std::dynamic_pointer_cast<Texture2D>(value.Lock())->CreateBuffer();
     }
 
@@ -166,6 +200,11 @@ struct MaterialData<AssetPtr<Texture2D>> : IMaterialData
     void *Data() override
     {
         return &std::dynamic_pointer_cast<Texture2D>(value.Lock())->tex_data;
+    }
+
+    ShaderParameter &GetShaderParam() override
+    {
+        return *shader_param.lock();
     }
 
     template <class Archive>

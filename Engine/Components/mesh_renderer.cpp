@@ -36,7 +36,9 @@ void MeshRenderer::OnInspectorGui()
                 if (ImGui::CollapsingHeader(("Material " + std::to_string(i)).c_str()))
                 {
                     ImGui::Indent();
+                    ImGui::PushID(i);
                     shared_materials[i]->OnInspectorGui();
+                    ImGui::PopID();
                     ImGui::Unindent();
                 }
             }
@@ -191,7 +193,6 @@ void MeshRenderer::ReconstructMeshesBuffer()
 
 void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
 {
-
     shared_materials[material_idx]->p_shared_material_block->CreateBuffer();
     //get wvp_buffer for update buffer
     auto find_material_data = shared_materials[material_idx]->p_shared_material_block->
@@ -206,6 +207,7 @@ void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
     }
 
     //create material handle
+    ReleaseDescriptorHandles();
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
             material_handles[material_idx][shader_type][params_type] = shared_materials[material_idx]->
@@ -218,28 +220,7 @@ void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
 void MeshRenderer::UpdateBuffers()
 {
     ReconstructBuffers();
-    const auto camera = Camera::Main();
-
-    if (!material_wvp_buffers[0].empty())
-    {
-        WorldViewProjection wvp;
-        wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
-        wvp.WVP[1] = camera.lock()->GetViewMatrix();
-        wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
-
-        for (auto &wvp_buffers : material_wvp_buffers)
-        {
-            for (size_t i = 0; i < wvp_buffers.size(); ++i)
-            {
-                auto wvp_buffer = wvp_buffers[i].lock();
-                if (wvp_buffer)
-                {
-                    wvp_buffer->Set(wvp);
-                    wvp_buffer->UpdateBuffer();
-                }
-            }
-        }
-    }
+    UpdateWVPBuffer();
 }
 
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx)
@@ -250,6 +231,43 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
                 cmd_list->SetGraphicsRootDescriptorTable(
                     shader_type * 3 + params_type,
                     material_handles[material_idx][shader_type][params_type]->HandleGPU);
+}
+
+void MeshRenderer::ReleaseDescriptorHandles()
+{
+    for (auto material_handle : material_handles)
+        for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+            for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
+                g_DescriptorHeapManager->Get().Free(material_handle[shader_type][param_type]);
+}
+
+void MeshRenderer::UpdateWVPBuffer()
+{
+    if (!material_wvp_buffers[0].empty())
+    {
+        WorldViewProjection wvp;
+        const auto camera = Camera::Main();
+
+        wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
+        wvp.WVP[1] = camera.lock()->GetViewMatrix();
+        wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
+
+        for (auto &wvp_buffers : material_wvp_buffers)
+        {
+            for (size_t i = 0; i < wvp_buffers.size(); ++i)
+            {
+                if (auto wvp_buffer = wvp_buffers[i].lock())
+                {
+                    wvp_buffer->Set(wvp);
+                    wvp_buffer->UpdateBuffer();
+                }
+                else
+                {
+                    wvp_buffers.erase(wvp_buffers.begin() + i);
+                }
+            }
+        }
+    }
 }
 }
 

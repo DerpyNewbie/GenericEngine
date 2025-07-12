@@ -6,17 +6,19 @@
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
-const UINT HANDLE_MAX = 512;
-
 DescriptorHeap::DescriptorHeap()
 {
-    m_pHandles.clear();
-    m_pHandles.reserve(HANDLE_MAX);
+    m_FreeIndices_.reserve(kHandleMax);
+    for (UINT i = 0; i < kHandleMax; ++i)
+        m_FreeIndices_.emplace_back(i);
+
+    m_pHandles_.clear();
+    m_pHandles_.reserve(kHandleMax);
 
     D3D12_DESCRIPTOR_HEAP_DESC desc{};
     desc.NodeMask = 1;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-    desc.NumDescriptors = HANDLE_MAX;
+    desc.NumDescriptors = kHandleMax;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
     auto device = g_RenderEngine->Device();
@@ -25,20 +27,20 @@ DescriptorHeap::DescriptorHeap()
     auto hr = device->CreateDescriptorHeap(
         &desc,
 
-        IID_PPV_ARGS(m_pHeap.ReleaseAndGetAddressOf()));
+        IID_PPV_ARGS(m_pHeap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
-        m_IsValid = false;
+        m_IsValid_ = false;
         return;
     }
 
-    m_IncrementSize = device->GetDescriptorHandleIncrementSize(desc.Type); // ディスクリプタヒープ1個のメモリサイズを返す
-    m_IsValid = true;
+    m_IncrementSize_ = device->GetDescriptorHandleIncrementSize(desc.Type); // ディスクリプタヒープ1個のメモリサイズを返す
+    m_IsValid_ = true;
 }
 
 ID3D12DescriptorHeap *DescriptorHeap::GetHeap()
 {
-    return m_pHeap.Get();
+    return m_pHeap_.Get();
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Texture2D> texture)
@@ -77,29 +79,57 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
-    auto count = m_pHandles.size();
+    UINT index;
 
-    if (HANDLE_MAX <= m_pHandles.size())
+    if (!m_FreeIndices_.empty())
     {
-        return nullptr;
+        // 再利用できるスロットがある
+        index = m_FreeIndices_.back();
+        m_FreeIndices_.pop_back();
+    }
+    else
+    {
+        if (m_pHandles_.size() >= kHandleMax)
+            return nullptr;
+
+        index = static_cast<UINT>(m_pHandles_.size());
     }
 
     std::shared_ptr<DescriptorHandle> pHandle = std::make_shared<DescriptorHandle>();
+    pHandle->index = index;
 
-    auto handleCPU = m_pHeap->GetCPUDescriptorHandleForHeapStart(); // ディスクリプタヒープの最初のアドレス
-    handleCPU.ptr += m_IncrementSize * count; // 最初のアドレスからcount番目が今回追加されたリソースのハンドル
+    auto handleCPU = m_pHeap_->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr += m_IncrementSize_ * index;
 
-    auto handleGPU = m_pHeap->GetGPUDescriptorHandleForHeapStart(); // ディスクリプタヒープの最初のアドレス
-    handleGPU.ptr += m_IncrementSize * count; // 最初のアドレスからcount番目が今回追加されたリソースのハンドル
+    auto handleGPU = m_pHeap_->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr += m_IncrementSize_ * index;
 
     pHandle->HandleCPU = handleCPU;
     pHandle->HandleGPU = handleGPU;
 
-    m_pHandles.push_back(pHandle);
+    if (index < m_pHandles_.size())
+    {
+        m_pHandles_[index] = pHandle;
+    }
+    else
+    {
+        m_pHandles_.push_back(pHandle);
+    }
+
     return pHandle;
+}
+
+void DescriptorHeap::Free(std::shared_ptr<DescriptorHandle> handle)
+{
+    if (!handle || handle->index >= m_pHandles_.size())
+        return;
+
+    m_pHandles_[handle->index] = nullptr; // スロットを無効化
+    m_FreeIndices_.push_back(handle->index); // 空きとして登録
 }
 
 void DescriptorHeap::Release()
 {
-    m_pHandles.clear();
+    m_pHandles_.clear();
+    m_FreeIndices_.clear();
 }

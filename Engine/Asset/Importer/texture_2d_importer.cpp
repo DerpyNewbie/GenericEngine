@@ -28,7 +28,7 @@ engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOL
     {
         texture_2d->tex_data.emplace_back(color);
     }
-    auto asset_ptr = IAssetPtr::FromScene(texture_2d);
+    auto asset_ptr = IAssetPtr::FromManaged(texture_2d);
 
     return asset_ptr;
 }

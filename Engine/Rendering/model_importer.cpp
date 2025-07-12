@@ -27,40 +27,6 @@ namespace engine
 namespace
 {
 
-aiMatrix4x4 GetGlobalTransform(const aiNode *node)
-{
-    aiMatrix4x4 transform = node->mTransformation;
-    while (node->mParent)
-    {
-        node = node->mParent;
-        transform = node->mTransformation * transform;
-    }
-    return transform;
-}
-
-Matrix ConvertAi(const aiMatrix4x4 &m)
-{
-    // TODO: conversion may not be accurate as rotation is invalid
-    Matrix result;
-    result.m[0][0] = m.a1;
-    result.m[0][1] = m.a2;
-    result.m[0][2] = m.a3;
-    result.m[0][3] = m.a4;
-    result.m[1][0] = m.b1;
-    result.m[1][1] = m.b2;
-    result.m[1][2] = m.b3;
-    result.m[1][3] = m.b4;
-    result.m[2][0] = m.c1;
-    result.m[2][1] = m.c2;
-    result.m[2][2] = m.c3;
-    result.m[2][3] = m.c4;
-    result.m[3][0] = m.d1;
-    result.m[3][1] = m.d2;
-    result.m[3][2] = m.d3;
-    result.m[3][3] = m.d4;
-    return result;
-}
-
 std::string RetrieveNameFromPath(const char *file_path)
 {
     const std::filesystem::path path = file_path;
@@ -86,6 +52,7 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     // apply meshes
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<std::shared_ptr<Material>> materials;
+    std::vector<Transform> bone_transforms;
     meshes.reserve(node->mNumMeshes);
     materials.reserve(node->mNumMeshes);
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)

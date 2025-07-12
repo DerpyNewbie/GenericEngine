@@ -5,6 +5,11 @@ cbuffer Transform : register(b0)
     float4x4 Proj; // 投影行列
 }
 
+cbuffer temp : register(b1)
+{
+	int aho;
+}
+
 StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
 struct VSInput
@@ -13,7 +18,7 @@ struct VSInput
     float4 color : COLOR; // 頂点色
     float3 normal : NORMAL; // 法線
     float4 tangent : TANGENT; // 接空間
-    float2 uv1 : TEXCOOD0; // UV
+    float2 uv : TEXCOOD0; // UV
     float2 uv2 : TEXCOOD1;
     float2 uv3 : TEXCOOD2;
     float2 uv4 : TEXCOOD3;
@@ -43,7 +48,6 @@ float3x3 ExtractRotation(float4x4 m)
         );
 }
 
-
 VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
@@ -51,7 +55,7 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-    /*for (int i = 0; i < input.bones_per_vertex; ++i)
+    for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)
@@ -59,11 +63,12 @@ VSOutput vrt(VSInput input)
             float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
             float3x3 boneRot = ExtractRotation(boneMatrix);
             bonePos += mul(boneMatrix, localPos) * weight;
-            boneNormal += mul(boneRot, localNormal) * weight;
+            //boneNormal += mul(boneRot, localNormal) * weight;
         }
-        localPos = bonePos;
-        localNormal = boneNormal;
-    }*/
+    }
+    
+	localPos = bonePos;
+    //localNormal = boneNormal;
     
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
@@ -75,7 +80,7 @@ VSOutput vrt(VSInput input)
     output.svpos = projPos; // 投影変換された座標をピクセルシェーダーに渡す
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
-    output.uv = input.uv1;
+    output.uv = input.uv;
     return output;
 }
 
@@ -85,8 +90,8 @@ Texture2D _MainTex : register(t0);
 float4 pix(VSOutput input) : SV_TARGET
 {
     float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = dot(-light,input.normal);
+    float brightness = (dot(-light,input.normal) + 1) / 2;
     float4 mainColor = _MainTex.Sample(smp, input.uv);
 
-    return float4(1,1,1,1) * brightness;
+    return mainColor * brightness;
 }

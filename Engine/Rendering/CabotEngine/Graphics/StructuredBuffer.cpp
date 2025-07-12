@@ -22,7 +22,7 @@ void engine::StructuredBuffer::CreateBuffer()
         );
 
     // アップロード用バッファ
-    g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
         &heap_prop,
         D3D12_HEAP_FLAG_NONE,
         &bufferDesc,
@@ -30,6 +30,12 @@ void engine::StructuredBuffer::CreateBuffer()
         nullptr,
         IID_PPV_ARGS(&m_pUploadBuffer)
         );
+
+    if (FAILED(hr))
+    {
+        return;
+    }
+    m_IsValid = true;
 }
 
 void engine::StructuredBuffer::UpdateBuffer(void *data)
@@ -68,7 +74,7 @@ D3D12_SHADER_RESOURCE_VIEW_DESC engine::StructuredBuffer::ViewDesc()
     return srvDesc;
 }
 
-ID3D12Resource * engine::StructuredBuffer::Resource()
+ID3D12Resource *engine::StructuredBuffer::Resource()
 {
     return m_pUploadBuffer.Get();
 }

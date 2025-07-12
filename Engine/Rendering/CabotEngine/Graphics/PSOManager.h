@@ -20,7 +20,7 @@ class PSOManager
 public:
     void Initialize();
     bool Register(PSOSetting setting);
-    bool Register(std::shared_ptr<engine::Shader> shader);
+    bool Register(std::shared_ptr<engine::Shader> shader, std::string pso_name);
 
     ID3D12PipelineState *Get(const std::string &id)
     {

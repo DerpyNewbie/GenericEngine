@@ -19,6 +19,16 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
+    void ReleaseDescriptorHandles();
+    void UpdateWVPBuffer();
+    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
+
+protected:
+    virtual void ReconstructBuffers();
+    virtual void ReconstructMaterialBuffers(int material_idx);
+
+    void ReconstructMeshesBuffer();
+
 public:
     std::shared_ptr<Mesh> shared_mesh;
     std::vector<std::shared_ptr<Material>> shared_materials;
@@ -43,15 +53,6 @@ public:
     {
         ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(shared_materials));
     }
-
-protected:
-    virtual void ReconstructBuffers();
-
-    void ReconstructMeshesBuffer();
-    virtual void ReconstructMaterialBuffers(int material_idx);
-
-private:
-    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
 
 };
 }

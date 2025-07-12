@@ -9,6 +9,7 @@
 #include "scene.h"
 #include "scene_manager.h"
 #include "str_util.h"
+#include "Engine/gui.h"
 
 namespace editor
 {
@@ -16,10 +17,12 @@ Hierarchy::Hierarchy()
 {
     window_flags = ImGuiWindowFlags_MenuBar;
 }
+
 std::string Hierarchy::Name()
 {
     return "Hierarchy";
 }
+
 void Hierarchy::OnEditorGui()
 {
     Editor::Instance()->DrawEditorMenuBar();
@@ -39,6 +42,7 @@ void Hierarchy::OnEditorGui()
                                     DxLibConverter::From(locked->Transform()->WorldToLocal()));
     }
 }
+
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 {
     auto draw = ImGui::CollapsingHeader(scene->Name().c_str());
@@ -63,6 +67,7 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
         }
     }
 }
+
 void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
 {
     ImGui::PushID(game_object.get());
@@ -127,6 +132,7 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
 
     ImGui::PopID();
 }
+
 bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
     bool is_tree_expanded = false;
