@@ -52,13 +52,17 @@ void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
                                                               FindMaterialDataFromName("__BoneMatrices__").lock();
     if (find_material_data)
     {
-        transforms.resize(shared_mesh->bind_poses.size());
-        for (size_t i = 0; i < shared_mesh->bind_poses.size(); i++)
-            transforms[i] = (DirectX::XMMatrixTranspose(shared_mesh->bind_poses[i]));
+        std::vector<Matrix> matrices(transforms.size());
+        for (int i = 0; i < transforms.size(); ++i)
+        {
+            auto world = transforms[i].lock()->WorldMatrix();
+            auto bind_poses = shared_mesh->bind_poses[i];
+            matrices[i] = bind_poses * world;
+        }
 
         auto bone_matrices_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
         bone_transform_buffers[material_idx] = bone_matrices_data;
-        bone_transform_buffers[material_idx].lock()->Set(transforms);
+        bone_transform_buffers[material_idx].lock()->Set(matrices);
     }
     MeshRenderer::ReconstructMaterialBuffers(material_idx);
 }
@@ -73,7 +77,14 @@ void SkinnedMeshRenderer::UpdateBuffers()
         {
             if (bone_matrices_buffer->buffer->IsValid())
             {
-                bone_matrices_buffer->Set(transforms);
+                std::vector<Matrix> matrices(transforms.size());
+                for (int i = 0; i < transforms.size(); ++i)
+                {
+                    auto world = transforms[i].lock()->WorldMatrix();
+                    auto bind_poses = shared_mesh->bind_poses[i];
+                    matrices[i] = bind_poses * world;
+                }
+                bone_matrices_buffer->Set(matrices);
                 bone_matrices_buffer->UpdateBuffer();
             }
         }

@@ -34,10 +34,14 @@ std::string RetrieveNameFromPath(const char *file_path)
 }
 
 std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *node,
-                                           const std::shared_ptr<GameObject> &parent_node)
+                                           const std::shared_ptr<GameObject> &parent_node,
+                                           std::map<UINT64, std::shared_ptr<GameObject>> &node_map)
 {
     // create GameObject
     const auto node_go = GameObject::Instantiate<GameObject>(node->mName.C_Str());
+
+    //set node_map
+    node_map.emplace(reinterpret_cast<UINT64>(node), node_go);
 
     // apply transforms
     const auto node_transform = node_go->Transform();
@@ -49,16 +53,42 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
     // TODO: local matrix is incorrect
     node_transform->SetLocalMatrix(aiMatrixToXMMatrix(node->mTransformation));
 
+    // create children
+    for (unsigned int i = 0; i < node->mNumChildren; ++i)
+        CreateFromNode(scene, node->mChildren[i], node_go, node_map);
+
+    return node_go;
+}
+
+void AttachMeshObject(const aiScene *scene, const aiNode *node,
+                      const std::shared_ptr<GameObject> &parent_node,
+                      std::map<UINT64, std::shared_ptr<GameObject>> &node_map)
+{
+    auto node_go = node_map[reinterpret_cast<UINT64>(node)];
     // apply meshes
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::vector<std::shared_ptr<Material>> materials;
-    std::vector<Transform> bone_transforms;
+    std::vector<std::weak_ptr<Transform>> bone_transforms;
+    std::unordered_set<const aiNode *> visited;
     meshes.reserve(node->mNumMeshes);
     materials.reserve(node->mNumMeshes);
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
-        meshes.emplace_back(Mesh::CreateFromAiMesh(scene->mMeshes[node->mMeshes[i]]));
+        auto current_mesh = scene->mMeshes[node->mMeshes[i]];
+        meshes.emplace_back(Mesh::CreateFromAiMesh(current_mesh));
         materials.emplace_back(Object::Instantiate<Material>());
+
+        for (unsigned int j = 0; j < current_mesh->mNumBones; ++j)
+        {
+            const aiNode *boneNode = current_mesh->mBones[j]->mNode;
+
+            if (visited.insert(boneNode).second)
+            {
+                std::weak_ptr t = node_map[reinterpret_cast<std::uintptr_t>(boneNode)]->GetComponent<Transform>();
+
+                bone_transforms.emplace_back(t);
+            }
+        }
     }
 
     if (!meshes.empty())
@@ -72,7 +102,9 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         if (result_mesh->HasBoneWeights())
         {
             node_go->AddComponent<SkinnedMeshRenderer>()->shared_mesh = result_mesh;
-            node_go->GetComponent<SkinnedMeshRenderer>()->shared_materials = materials;
+            auto skinned_mesh_renderer = node_go->GetComponent<SkinnedMeshRenderer>();
+            skinned_mesh_renderer->shared_materials = materials;
+            skinned_mesh_renderer->transforms = bone_transforms;
         }
         else
         {
@@ -80,12 +112,8 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
             node_go->GetComponent<MeshRenderer>()->shared_materials = materials;
         }
     }
-
-    // create children
     for (unsigned int i = 0; i < node->mNumChildren; ++i)
-        CreateFromNode(scene, node->mChildren[i], node_go);
-
-    return node_go;
+        AttachMeshObject(scene, node->mChildren[i], node_go, node_map);
 }
 }
 
@@ -108,8 +136,9 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
         Logger::Error<ModelImporter>("Failed to load model from FBX!");
         return nullptr;
     }
-
-    auto parent_node_obj = CreateFromNode(scene, scene->mRootNode, nullptr);
+    std::map<UINT64, std::shared_ptr<GameObject>> node_map;
+    auto parent_node_obj = CreateFromNode(scene, scene->mRootNode, nullptr, node_map);
+    AttachMeshObject(scene, scene->mRootNode, nullptr, node_map);
     parent_node_obj->SetName(RetrieveNameFromPath(file_path));
     return parent_node_obj;
 }

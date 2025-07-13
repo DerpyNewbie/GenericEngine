@@ -15,6 +15,7 @@
 namespace
 {
 using namespace engine;
+
 std::shared_ptr<Mesh> CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_ref_polygon_list)
 {
     auto result = Object::Instantiate<Mesh>();
@@ -50,8 +51,9 @@ std::shared_ptr<Mesh> CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_
 namespace engine
 {
 
-aiMatrix4x4 GetGlobalTransform(const aiNode *node)
+aiMatrix4x4 GetBindPose(const aiBone *bone)
 {
+    auto node = bone->mNode;
     aiMatrix4x4 transform = node->mTransformation;
     while (node->mParent)
     {
@@ -59,20 +61,6 @@ aiMatrix4x4 GetGlobalTransform(const aiNode *node)
         transform = node->mTransformation * transform;
     }
     return transform;
-}
-
-aiMatrix4x4 GetBindPose(const aiBone *bone)
-{
-    if (!bone->mNode)
-    {
-        throw std::runtime_error("bone->mNode == nullptr: " +
-                                 std::string(bone->mName.C_Str()));
-    }
-
-    aiMatrix4x4 global = GetGlobalTransform(bone->mNode);
-    aiMatrix4x4 skinMat = global * bone->mOffsetMatrix;
-
-    return skinMat;
 }
 
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
@@ -169,7 +157,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
         for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         {
             auto bone = mesh->mBones[i];
-            result->bind_poses.emplace_back(aiMatrixToXMMatrix(GetBindPose(bone)));
+            result->bind_poses.emplace_back(aiMatrixToXMMatrix(bone->mOffsetMatrix));
             for (unsigned int j = 0; j < bone->mNumWeights; ++j)
             {
                 auto weight = mesh->mBones[i]->mWeights[j];

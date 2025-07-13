@@ -15,7 +15,7 @@ class SkinnedMeshRenderer : public MeshRenderer
 
 public:
     constexpr static int kLimitBonesPerVertex = 4;
-    std::vector<Matrix> transforms;
+    std::vector<std::weak_ptr<Transform>> transforms;
     std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> bone_transform_buffers;
 
     void OnInspectorGui() override;

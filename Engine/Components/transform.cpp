@@ -11,24 +11,29 @@ void Transform::OnInspectorGui()
     RenderLocalTransformGui();
     RenderGlobalTransformGui();
 }
+
 Matrix Transform::LocalMatrix() const
 {
     return m_matrix_;
 }
+
 Matrix Transform::WorldMatrix() const
 {
     return m_parent_.expired()
                ? m_matrix_
-               : m_parent_.lock()->WorldMatrix() * m_matrix_;
+               : m_matrix_ * m_parent_.lock()->WorldMatrix();
 }
+
 Matrix Transform::WorldToLocal() const
 {
     return WorldMatrix().Invert();
 }
+
 Matrix Transform::LocalToWorld() const
 {
     return WorldMatrix();
 }
+
 Vector3 Transform::Position() const
 {
     Vector3 pos, sca;
@@ -36,6 +41,7 @@ Vector3 Transform::Position() const
     LocalToWorld().Decompose(sca, rot, pos);
     return pos;
 }
+
 Quaternion Transform::Rotation() const
 {
     Vector3 pos, sca;
@@ -43,6 +49,7 @@ Quaternion Transform::Rotation() const
     LocalToWorld().Decompose(sca, rot, pos);
     return rot;
 }
+
 Vector3 Transform::Scale() const
 {
     Vector3 pos, sca;
@@ -50,6 +57,7 @@ Vector3 Transform::Scale() const
     LocalToWorld().Decompose(sca, rot, pos);
     return sca;
 }
+
 Vector3 Transform::LocalPosition() const
 {
     Vector3 pos, sca;
@@ -57,6 +65,7 @@ Vector3 Transform::LocalPosition() const
     LocalMatrix().Decompose(sca, rot, pos);
     return pos;
 }
+
 Quaternion Transform::LocalRotation() const
 {
     Vector3 pos, sca;
@@ -64,6 +73,7 @@ Quaternion Transform::LocalRotation() const
     LocalMatrix().Decompose(sca, rot, pos);
     return rot;
 }
+
 Vector3 Transform::LocalScale() const
 {
     Vector3 pos, sca;
@@ -71,14 +81,17 @@ Vector3 Transform::LocalScale() const
     LocalMatrix().Decompose(sca, rot, pos);
     return sca;
 }
+
 std::shared_ptr<Transform> Transform::Parent() const
 {
     return m_parent_.lock();
 }
+
 std::shared_ptr<Transform> Transform::GetChild(const int i) const
 {
     return m_children_.at(i);
 }
+
 bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const bool deep) const
 {
     auto parent = m_parent_.lock();
@@ -93,10 +106,12 @@ bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const boo
     }
     return false;
 }
+
 int Transform::ChildCount() const
 {
     return static_cast<int>(m_children_.size());
 }
+
 void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
 {
     const auto current_parent = m_parent_.lock();
@@ -124,6 +139,7 @@ void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
 
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
+
 void Transform::SetPosition(const Vector3 &position)
 {
     if (m_parent_.expired())
@@ -136,6 +152,7 @@ void Transform::SetPosition(const Vector3 &position)
     position.Transform(local_position, m_parent_.lock()->WorldToLocal());
     SetLocalPosition(local_position);
 }
+
 void Transform::SetRotation(const Quaternion &rotation)
 {
     if (m_parent_.expired())
@@ -183,19 +200,23 @@ void Transform::SetLocalPositionAndRotation(const Vector3 &local_position, const
 {
     SetTRS(LocalScale(), local_rotation, local_position);
 }
+
 void Transform::SetLocalScale(const Vector3 &local_scale)
 {
     SetTRS(local_scale, LocalRotation(), LocalPosition());
 }
+
 void Transform::SetLocalMatrix(const Matrix &matrix)
 {
     m_matrix_ = matrix;
 }
+
 void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
 {
     m_matrix_ = Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) *
                 Matrix::CreateTranslation(position);
 }
+
 void Transform::RenderLocalTransformGui()
 {
     if (!ImGui::CollapsingHeader("Local", ImGuiTreeNodeFlags_DefaultOpen))
@@ -232,6 +253,7 @@ void Transform::RenderLocalTransformGui()
 
     ImGui::PopID();
 }
+
 void Transform::RenderGlobalTransformGui()
 {
     if (!ImGui::CollapsingHeader("Global"))
