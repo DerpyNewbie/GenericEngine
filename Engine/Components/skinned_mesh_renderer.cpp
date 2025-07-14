@@ -5,6 +5,9 @@
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Components/transform.h"
 #include "game_object.h"
+#include "Rendering/gizmos.h"
+
+#include <DxLib.h>
 
 namespace engine
 {
@@ -27,6 +30,21 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
         }
         bone_matrices_buffer->value = matrices;
         bone_matrices_buffer->UpdateBuffer();
+    }
+}
+
+void SkinnedMeshRenderer::DrawBones()
+{
+    Vector3 start_pos, end_pos, sca;
+    Quaternion rot;
+    for (int i = 0; i < transforms.size(); ++i)
+    {
+        if (transforms[i].lock()->Parent())
+        {
+            transforms[i].lock()->WorldMatrix().Decompose(sca, rot, start_pos);
+            transforms[i].lock()->Parent()->WorldMatrix().Decompose(sca, rot, end_pos);
+            Gizmos::DrawLine(start_pos, end_pos);
+        }
     }
 }
 
@@ -78,6 +96,13 @@ void SkinnedMeshRenderer::OnInspectorGui()
         ImGui::Text("Colors: %d", shared_mesh->colors.size());
         ImGui::Text("Normals: %d", shared_mesh->normals.size());
     }
+}
+
+void SkinnedMeshRenderer::OnDraw()
+{
+    MeshRenderer::OnDraw();
+    if (m_draw_bones_)
+        DrawBones();
 }
 
 void SkinnedMeshRenderer::ReconstructBuffers()

@@ -12,6 +12,7 @@ class SkinnedMeshRenderer : public MeshRenderer
     bool m_draw_bones_ = false;
 
     void UpdateBoneTransformsBuffer();
+    void DrawBones();
 
 protected:
     void UpdateWVPBuffer() override;
@@ -23,6 +24,7 @@ public:
 
     void OnInspectorGui() override;
 
+    void OnDraw() override;
     void ReconstructBuffers() override;
     void ReconstructMaterialBuffers(int material_idx) override;
     void UpdateBuffers() override;
