@@ -5,9 +5,14 @@ cbuffer Transform : register(b0)
     float4x4 Proj; // 投影行列
 }
 
-cbuffer temp : register(b1)
+cbuffer DebugType : register(b1)
 {
-	int aho;
+    int debug_type;
+}
+
+cbuffer WeightIndex : register(b2)
+{
+    int weight_idx;
 }
 
 StructuredBuffer<float4x4> BoneMatrices : register(t0);
@@ -63,20 +68,36 @@ VSOutput vrt(VSInput input)
             float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
             float3x3 boneRot = ExtractRotation(boneMatrix);
             bonePos += mul(boneMatrix, localPos) * weight;
-            //boneNormal += mul(boneRot, localNormal) * weight;
+            boneNormal += mul(boneRot, localNormal) * weight;
         }
     }
-    
-	localPos = bonePos;
-    //localNormal = boneNormal;
-    
+
+    localPos = bonePos;
+    localNormal = boneNormal;
+
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
     float4 projPos = mul(Proj, viewPos); // 投影変換
-    
+
     float3x3 worldRot = ExtractRotation(World);
     float3 worldNormal = mul(worldRot, localNormal); // ワールド座標に変換
-    
+
+    switch (debug_type)
+    {
+    case 1:
+        input.color = float4(input.uv, 0.0f, 1.0f);
+        break;
+    case 0:
+        input.color = float4(input.normal, 1.0f);
+        break;
+    case 2:
+        input.color = float4(input.bone_weight[weight_idx], 0.0f, 0.0f, 1.0f);
+        break;
+	default:
+		input.color = float4(1,0,1,1);
+		break;
+    }
+
     output.svpos = projPos; // 投影変換された座標をピクセルシェーダーに渡す
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
@@ -85,14 +106,11 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t0);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
     float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = clamp(dot(-light,input.normal),0,1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
-    float4 mainColor = _MainTex.Sample(smp, flippedUV);
+    float brightness = (dot(-light, input.normal) + 1) / 2;
 
-    return mainColor * brightness;
+    return input.color;
 }

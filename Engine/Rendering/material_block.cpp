@@ -31,31 +31,48 @@ std::shared_ptr<engine::IMaterialData> CreateMaterialData(std::weak_ptr<engine::
     return material_data;
 }
 
+void engine::MaterialBlock::CreateDescHandles()
+{
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
+            for (int i = 0; i < material_datasets[shader_type][param_type].size(); ++i)
+            {
+                auto desc_handle = material_datasets[shader_type][param_type][i]->UploadBuffer();
+                desc_handles[shader_type][param_type].emplace_back(desc_handle);
+            }
+}
+
+void engine::MaterialBlock::ReleaseDescHandles()
+{
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
+        {
+            for (auto desc_handle : desc_handles[shader_type][param_type])
+                g_DescriptorHeapManager->Get().Free(desc_handle);
+            desc_handles[shader_type][param_type].clear();
+        }
+}
+
+engine::MaterialBlock::~MaterialBlock()
+{
+    ReleaseDescHandles();
+}
+
 void engine::MaterialBlock::OnInspectorGui()
 {
-    for (int i = 0; i < kShaderType_Count; ++i)
-        for (int j = 0; j < kParameterBufferType_Count; ++j)
-            for (auto param : material_datasets[i][j])
-                param->OnInspectorGui();
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
+            for (int i = 0; i < material_datasets[shader_type][param_type].size(); ++i)
+            {
+                ImGui::PushID(i);
+                material_datasets[shader_type][param_type][i]->OnInspectorGui();
+                ImGui::PopID();
+            }
 }
 
 void engine::MaterialBlock::OnConstructed()
 {
     Object::OnConstructed();
-}
-
-std::shared_ptr<DescriptorHandle> engine::MaterialBlock::GetDescriptorHandle(
-    kShaderType shader_type, kParameterBufferType param_buffer)
-{
-    auto params = material_datasets[shader_type][param_buffer];
-    if (params.empty())
-        return nullptr;
-
-    std::shared_ptr<DescriptorHandle> result = params[0]->UploadBuffer();
-    for (int i = 1; i < params.size(); ++i)
-        params[i]->UploadBuffer();
-
-    return result;
 }
 
 std::weak_ptr<engine::IMaterialData> engine::MaterialBlock::FindMaterialDataFromName(std::string name)
@@ -83,12 +100,30 @@ void engine::MaterialBlock::CreateBuffer()
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
             for (auto mat_data : material_datasets[shader_type][params_type])
                 mat_data->CreateBuffer();
+    CreateDescHandles();
     m_IsCreate_Buffer_ = true;
 }
 
 bool engine::MaterialBlock::IsCreateBuffer()
 {
     return m_IsCreate_Buffer_;
+}
+
+DescriptorHandlePerShader engine::MaterialBlock::GetHandles()
+{
+    bool is_swap = false;
+    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
+        for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
+            for (int i = 0; i < material_datasets[shader_type][param_type].size(); ++i)
+                if (material_datasets[shader_type][param_type][i]->HasBufferSwapped())
+                    is_swap = true;
+
+    if (!is_swap)
+        return desc_handles;
+
+    ReleaseDescHandles();
+    CreateDescHandles();
+    return desc_handles;
 }
 
 CEREAL_REGISTER_TYPE(engine::MaterialBlock)

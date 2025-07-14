@@ -50,7 +50,6 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         node_transform->SetParent(parent_node->Transform());
     }
 
-    // TODO: local matrix is incorrect
     node_transform->SetLocalMatrix(aiMatrixToXMMatrix(node->mTransformation));
 
     // create children

@@ -105,7 +105,7 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
     for (unsigned int i = 0; i < mesh->GetNumUVChannels(); ++i)
     {
         result->GetUV(i)->resize(mesh->mNumVertices);
-        for (unsigned int j = 0; j < mesh->mNumUVComponents[i]; ++j)
+        for (unsigned int j = 0; j < mesh->mNumVertices; ++j)
         {
             result->GetUV(i)->at(j) = Vector2(mesh->mTextureCoords[i][j].x, mesh->mTextureCoords[i][j].y);
         }

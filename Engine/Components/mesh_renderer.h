@@ -5,26 +5,20 @@
 #include "Rendering/MaterialData.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
-#include "Rendering/buffers.h"
 #include "Rendering/world_view_projection.h"
-
-typedef std::array<std::shared_ptr<DescriptorHandle>, engine::kParameterBufferType_Count> DescriptorHandlePerBuffer;
-typedef std::array<DescriptorHandlePerBuffer, engine::kShaderType_Count> DescriptorHandlePerShader;
 
 namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    void ReleaseDescriptorHandles();
-    void UpdateWVPBuffer();
     void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
 
 protected:
     virtual void ReconstructBuffers();
+    virtual void UpdateWVPBuffer();
     virtual void ReconstructMaterialBuffers(int material_idx);
 
     void ReconstructMeshesBuffer();
@@ -37,7 +31,6 @@ public:
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
     std::array<std::vector<std::weak_ptr<MaterialData<WorldViewProjection>>>, RenderEngine::FRAME_BUFFER_COUNT>
     material_wvp_buffers;
-    std::vector<DescriptorHandlePerShader> material_handles;
 
     bool buffer_creation_failed = false;
     bool is_material_error = false;

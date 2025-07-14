@@ -35,12 +35,12 @@ engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOL
 
 std::vector<std::string> engine::Texture2DImporter::SupportedExtensions()
 {
-    return {};
+    return {".png", ".tga"};
 }
 
 std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(AssetDescriptor *asset)
 {
-    auto texture_2d = Object::Instantiate<Texture2D>();
+    auto texture_2d = Object::Instantiate<Texture2D>(asset->guid);
 
     const auto path = asset->path_hint;
     TexMetadata meta = {};
@@ -80,11 +80,13 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(AssetDescripto
         uint8_t a = src[i * 4 + 3];
 
         PackedVector::XMCOLOR color;
-        color.b = b;
+        color.b = r;
         color.g = g;
-        color.r = r;
+        color.r = b;
         color.a = a;
 
         texture_2d->tex_data.emplace_back(color);
     }
+
+    return texture_2d;
 }

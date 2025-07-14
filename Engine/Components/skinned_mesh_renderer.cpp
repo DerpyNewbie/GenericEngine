@@ -1,7 +1,10 @@
 #include "pch.h"
 #include "skinned_mesh_renderer.h"
+
+#include "camera.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Components/transform.h"
+#include "game_object.h"
 
 namespace engine
 {
@@ -22,8 +25,33 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
             auto invert_bind_poses = shared_mesh->bind_poses[i].Invert();
             matrices[i] = invert_bind_poses * world;
         }
-        bone_matrices_buffer->Set(matrices);
+        bone_matrices_buffer->value = matrices;
         bone_matrices_buffer->UpdateBuffer();
+    }
+}
+
+void SkinnedMeshRenderer::UpdateWVPBuffer()
+{
+    WorldViewProjection wvp;
+    const auto camera = Camera::Main();
+
+    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix() * GameObject()->Transform()->LocalMatrix().Invert();
+    wvp.WVP[1] = camera.lock()->GetViewMatrix();
+    wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
+
+    for (auto &wvp_buffers : material_wvp_buffers)
+    {
+        for (size_t i = 0; i < wvp_buffers.size(); ++i)
+        {
+            auto wvp_buffer = wvp_buffers[i].lock();
+            if (!wvp_buffer)
+            {
+                wvp_buffers.erase(wvp_buffers.begin() + i);
+                break;
+            }
+            wvp_buffer->value = wvp;
+            wvp_buffer->UpdateBuffer();
+        }
     }
 }
 
@@ -75,7 +103,7 @@ void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
             auto invert_bind_poses = shared_mesh->bind_poses[i].Invert();
             matrices[i] = invert_bind_poses * world;
         }
-        bone_transform_buffers[material_idx].lock()->Set(matrices);
+        bone_transform_buffers[material_idx].lock()->value = matrices;
     }
     MeshRenderer::ReconstructMaterialBuffers(material_idx);
 }

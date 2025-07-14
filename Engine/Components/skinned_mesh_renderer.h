@@ -13,6 +13,9 @@ class SkinnedMeshRenderer : public MeshRenderer
 
     void UpdateBoneTransformsBuffer();
 
+protected:
+    void UpdateWVPBuffer() override;
+
 public:
     constexpr static int kLimitBonesPerVertex = 4;
     std::vector<std::weak_ptr<Transform>> transforms;

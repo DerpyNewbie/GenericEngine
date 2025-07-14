@@ -138,8 +138,8 @@
         <ClInclude Include="Engine\Asset\Exporter\asset_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
-      <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
-      <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
@@ -219,8 +219,8 @@
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
     </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\"/>
+    <ItemGroup>
+        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

@@ -84,8 +84,8 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
     if (!m_FreeIndices_.empty())
     {
         // 再利用できるスロットがある
-        index = m_FreeIndices_.back();
-        m_FreeIndices_.pop_back();
+        index = m_FreeIndices_.front();
+        m_FreeIndices_.erase(m_FreeIndices_.begin());
     }
     else
     {

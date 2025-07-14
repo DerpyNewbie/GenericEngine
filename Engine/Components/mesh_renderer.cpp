@@ -17,7 +17,7 @@ void MeshRenderer::UpdateWVPBuffer()
     WorldViewProjection wvp;
     const auto camera = Camera::Main();
 
-    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix() * GameObject()->Transform()->LocalMatrix().Invert();
+    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
     wvp.WVP[1] = camera.lock()->GetViewMatrix();
     wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
 
@@ -31,7 +31,7 @@ void MeshRenderer::UpdateWVPBuffer()
                 wvp_buffers.erase(wvp_buffers.begin() + i);
                 break;
             }
-            wvp_buffer->Set(wvp);
+            wvp_buffer->value = wvp;
             wvp_buffer->UpdateBuffer();
         }
     }
@@ -143,7 +143,6 @@ void MeshRenderer::ReconstructBuffers()
         }
         ReconstructMeshesBuffer();
     }
-    material_handles.resize(shared_materials.size());
     for (int i = 0; i < shared_materials.size(); ++i)
     {
         if (shared_materials[i]->IsValid() && !shared_materials[i]->p_shared_material_block->IsCreateBuffer())
@@ -231,16 +230,6 @@ void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
             wvp_buffer.emplace_back(wvp_data);
         }
     }
-
-    //create material handle
-    ReleaseDescriptorHandles();
-    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            material_handles[material_idx][shader_type][params_type] = shared_materials[material_idx]->
-                                                                       p_shared_material_block->GetDescriptorHandle(
-                                                                           static_cast<kShaderType>(shader_type),
-                                                                           static_cast<kParameterBufferType>(
-                                                                               params_type));
 }
 
 void MeshRenderer::UpdateBuffers()
@@ -251,20 +240,13 @@ void MeshRenderer::UpdateBuffers()
 
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx)
 {
+    auto material_handles = shared_materials[material_idx]->p_shared_material_block->GetHandles();
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            if (material_handles[material_idx][shader_type][params_type])
+            if (!material_handles[shader_type][params_type].empty())
                 cmd_list->SetGraphicsRootDescriptorTable(
                     shader_type * 3 + params_type,
-                    material_handles[material_idx][shader_type][params_type]->HandleGPU);
-}
-
-void MeshRenderer::ReleaseDescriptorHandles()
-{
-    for (auto material_handle : material_handles)
-        for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-            for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
-                g_DescriptorHeapManager->Get().Free(material_handle[shader_type][param_type]);
+                    material_handles[shader_type][params_type][0]->HandleGPU);
 }
 }
 
