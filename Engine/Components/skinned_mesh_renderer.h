@@ -11,7 +11,7 @@ class SkinnedMeshRenderer : public MeshRenderer
 {
     bool m_draw_bones_ = false;
 
-    void ApplyBoneTransforms();
+    void UpdateBoneTransformsBuffer();
 
 public:
     constexpr static int kLimitBonesPerVertex = 4;
@@ -19,7 +19,6 @@ public:
     std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> bone_transform_buffers;
 
     void OnInspectorGui() override;
-    void OnDraw() override;
 
     void ReconstructBuffers() override;
     void ReconstructMaterialBuffers(int material_idx) override;

@@ -50,16 +50,29 @@ std::shared_ptr<Mesh> CreateFromMV1ReferenceMesh(const MV1_REF_POLYGONLIST &mv1_
 
 namespace engine
 {
-
-aiMatrix4x4 GetBindPose(const aiBone *bone)
+aiMatrix4x4 GetBindPose(std::list<std::string> bone_names, aiNode *node)
 {
-    auto node = bone->mNode;
     aiMatrix4x4 transform = node->mTransformation;
-    while (node->mParent)
+    const aiNode *parent = node->mParent;
+
+    while (parent)
     {
-        node = node->mParent;
-        transform = node->mTransformation * transform;
+        // Check if the parent node is one of the bones in our list
+        bool find = false;
+        for (auto bone_name : bone_names)
+        {
+            if (std::string(parent->mName.C_Str()) == bone_name.c_str())
+            {
+                find = true;
+                break;
+            }
+        }
+        if (find == false)
+            return transform;
+        transform = parent->mTransformation * transform;
+        parent = parent->mParent;
     }
+
     return transform;
 }
 
@@ -151,13 +164,12 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
     // copy bones
     if (mesh->HasBones())
     {
-        // vector of vertex id { pair of bone index and vertex weight}
         result->bone_weights.resize(mesh->mNumVertices);
-
+        std::list<std::string> bone_names;
         for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         {
             auto bone = mesh->mBones[i];
-            result->bind_poses.emplace_back(aiMatrixToXMMatrix(bone->mOffsetMatrix));
+            bone_names.emplace_back() = std::string(mesh->mBones[i]->mName.C_Str());
             for (unsigned int j = 0; j < bone->mNumWeights; ++j)
             {
                 auto weight = mesh->mBones[i]->mWeights[j];
@@ -171,6 +183,11 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
                     result->max_bones_in_vertex = result->bone_weights[vert_itr].size();
                 }
             }
+        }
+        for (unsigned int i = 0; i < mesh->mNumBones; ++i)
+        {
+            auto bind_pose = aiMatrixToXMMatrix(GetBindPose(bone_names, mesh->mBones[i]->mNode));
+            result->bind_poses.emplace_back(bind_pose);
         }
         // copy bone weights
 
