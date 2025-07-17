@@ -5,7 +5,6 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
-    <FxCompile Include="Resources\BasicShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />

@@ -17,7 +17,7 @@ void MeshRenderer::UpdateWVPBuffer()
     WorldViewProjection wvp;
     const auto camera = Camera::Main();
 
-    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
+    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix() * GameObject()->Transform()->LocalMatrix().Invert();
     wvp.WVP[1] = camera.lock()->GetViewMatrix();
     wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mesh_renderer.h"
-#include "Rendering/line_renderer.h"
+#include "Asset/asset_ptr.h"
 
 namespace engine
 {
@@ -21,6 +21,7 @@ public:
     constexpr static int kLimitBonesPerVertex = 4;
     std::vector<std::weak_ptr<Transform>> transforms;
     std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> bone_transform_buffers;
+    AssetPtr<Transform> root_bone;
 
     void OnInspectorGui() override;
 

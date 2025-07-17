@@ -53,7 +53,7 @@ void SkinnedMeshRenderer::UpdateWVPBuffer()
     WorldViewProjection wvp;
     const auto camera = Camera::Main();
 
-    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix() * GameObject()->Transform()->LocalMatrix().Invert();
+    wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
     wvp.WVP[1] = camera.lock()->GetViewMatrix();
     wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
 
@@ -79,6 +79,7 @@ void SkinnedMeshRenderer::OnInspectorGui()
 
     ImGui::Checkbox("Draw Bones", &m_draw_bones_);
     ImGui::Separator();
+    Gui::PropertyField("Root Bone", root_bone);
     if (ImGui::CollapsingHeader("Bone Info"))
     {
         for (int i = 0; i < transforms.size(); i++)
@@ -100,6 +101,16 @@ void SkinnedMeshRenderer::OnInspectorGui()
 
 void SkinnedMeshRenderer::OnDraw()
 {
+    Matrix root_bone_matrix = GameObject()->Transform()->WorldMatrix();
+    if (const auto root_bone_transform = root_bone.CastedLock())
+    {
+        if (const auto parent_transform = root_bone_transform->Parent())
+        {
+            root_bone_matrix = parent_transform->WorldMatrix();
+        }
+    }
+
+    Gizmos::DrawBounds(shared_mesh->bounds, Gizmos::kDefaultColor, root_bone_matrix);
     MeshRenderer::OnDraw();
     if (m_draw_bones_)
         DrawBones();
@@ -135,7 +146,8 @@ void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
 
 void SkinnedMeshRenderer::UpdateBuffers()
 {
-    MeshRenderer::UpdateBuffers();
+    ReconstructBuffers();
+    UpdateWVPBuffer();
     UpdateBoneTransformsBuffer();
 }
 }

@@ -126,4 +126,29 @@ void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &
         DrawCircle(center, radius, color, Quaternion::CreateFromYawPitchRoll(0, theta, 0), segments);
     }
 }
+
+void Gizmos::DrawBounds(const Bounds &bounds, const Color &color, const Matrix &mat)
+{
+    Vector3 local[8] = {
+        bounds.center + Vector3(-bounds.extents.x, -bounds.extents.y, -bounds.extents.z),
+        bounds.center + Vector3(bounds.extents.x, -bounds.extents.y, -bounds.extents.z),
+        bounds.center + Vector3(bounds.extents.x, -bounds.extents.y, bounds.extents.z),
+        bounds.center + Vector3(-bounds.extents.x, -bounds.extents.y, bounds.extents.z),
+        bounds.center + Vector3(-bounds.extents.x, bounds.extents.y, -bounds.extents.z),
+        bounds.center + Vector3(bounds.extents.x, bounds.extents.y, -bounds.extents.z),
+        bounds.center + Vector3(bounds.extents.x, bounds.extents.y, bounds.extents.z),
+        bounds.center + Vector3(-bounds.extents.x, bounds.extents.y, bounds.extents.z)
+    };
+
+    for (auto &v : local)
+        v = Vector3::Transform(v, mat);
+
+    const int e[12][2] = {
+        {0, 1}, {1, 2}, {2, 3}, {3, 0},
+        {4, 5}, {5, 6}, {6, 7}, {7, 4},
+        {0, 4}, {1, 5}, {2, 6}, {3, 7}
+    };
+    for (auto &p : e)
+        DrawLine(local[p[0]], local[p[1]], color);
+}
 }

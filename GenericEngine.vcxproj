@@ -38,12 +38,13 @@
         <ClCompile Include="Engine\Asset\Exporter\asset_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
-      <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
-      <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
+        <ClCompile Include="Engine\assimp_util.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -66,7 +67,6 @@
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\buffers.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl">
             <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicPS</EntryPointName>
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
@@ -146,6 +146,7 @@
         <ClInclude Include="Engine\Asset\Importer\ShaderImporter.h"/>
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
+        <ClInclude Include="Engine\assimp_util.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -180,7 +181,6 @@
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\buffers.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>
@@ -257,6 +257,7 @@
             <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -278,6 +279,7 @@
             <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -299,8 +301,10 @@
             <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <PrecompiledHeader>Create</PrecompiledHeader>
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
             <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
+            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>
@@ -322,6 +326,7 @@
             <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>

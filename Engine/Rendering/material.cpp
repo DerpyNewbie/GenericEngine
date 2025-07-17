@@ -3,6 +3,7 @@
 
 #include "MaterialData.h"
 #include "gui.h"
+#include "Asset/asset_database.h"
 #include "Editor/gui.h"
 
 #include <memory>
@@ -14,7 +15,6 @@ void engine::Material::OnInspectorGui()
         if (!p_shared_shader.IsNull())
         {
             CreateMaterialBlock();
-            m_IsValid = true;
             return;
         }
         m_IsValid = false;
@@ -36,6 +36,15 @@ void engine::Material::OnInspectorGui()
         ImGui::Text("Not loaded");
 }
 
+void engine::Material::OnConstructed()
+{
+    InspectableAsset::OnConstructed();
+    auto default_shader = AssetDatabase::GetAsset(xg::Guid("00214c87-b0e4-40ce-bef6-f7bfb3425888"));
+    p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(default_shader);
+
+    CreateMaterialBlock();
+}
+
 void engine::Material::CreateMaterialBlock()
 {
     if (p_shared_material_block)
@@ -46,6 +55,7 @@ void engine::Material::CreateMaterialBlock()
     auto shared_shader = p_shared_shader.CastedLock();
     p_shared_material_block = Instantiate<MaterialBlock>();
     p_shared_material_block->CreateParamsFromShaderParams(shared_shader->parameters);
+    m_IsValid = true;
 }
 
 bool engine::Material::IsValid()

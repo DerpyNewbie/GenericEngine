@@ -17,15 +17,16 @@
 #include "game_object.h"
 #include "str_util.h"
 #include "mesh.h"
-#include "CabotEngine/Converter/D3D12ToAssimp.h"
 
 // TODO: remove DxLib dependency
+#include "assimp_util.h"
 #include "DxLib/dxlib_converter.h"
 
 namespace engine
 {
 namespace
 {
+
 
 std::string RetrieveNameFromPath(const char *file_path)
 {
@@ -69,24 +70,44 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
     std::vector<std::shared_ptr<Material>> materials;
     std::vector<std::weak_ptr<Transform>> bone_transforms;
     std::unordered_set<const aiNode *> visited;
+    std::weak_ptr<Transform> root_bone;
+
     meshes.reserve(node->mNumMeshes);
     materials.reserve(node->mNumMeshes);
+    {
+        unsigned int bone_count = 0;
+        for (unsigned int i = 0; i < node->mNumMeshes; ++i)
+        {
+            bone_count += scene->mMeshes[i]->mNumBones;
+        }
+
+        bone_transforms.reserve(bone_count);
+    }
+
     for (unsigned int i = 0; i < node->mNumMeshes; ++i)
     {
         auto current_mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.emplace_back(Mesh::CreateFromAiMesh(current_mesh));
         materials.emplace_back(Object::Instantiate<Material>());
 
+        //create bone info
+        auto bone_names = CreateBoneNamesList(current_mesh);
+        meshes[i]->bind_poses = GetBindPoses(bone_names, current_mesh);
+
         for (unsigned int j = 0; j < current_mesh->mNumBones; ++j)
         {
-            const aiNode *boneNode = current_mesh->mBones[j]->mNode;
-
-            if (visited.insert(boneNode).second)
+            const aiNode *bone_node = current_mesh->mBones[j]->mNode;
+            if (visited.insert(bone_node).second)
             {
-                std::weak_ptr t = node_map[reinterpret_cast<std::uintptr_t>(boneNode)]->GetComponent<Transform>();
-
+                std::weak_ptr t = node_map[reinterpret_cast<std::uintptr_t>(bone_node)]->GetComponent<Transform>();
                 bone_transforms.emplace_back(t);
             }
+        }
+        if (current_mesh->mNumBones)
+        {
+            //適当なボーンからルートボーンをたどっていく
+            auto root_node = GetRootBone(bone_names, current_mesh->mBones[0]);
+            root_bone = node_map[reinterpret_cast<std::uintptr_t>(root_node)]->Transform();
         }
     }
 
@@ -100,15 +121,17 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
 
         if (result_mesh->HasBoneWeights())
         {
-            node_go->AddComponent<SkinnedMeshRenderer>()->shared_mesh = result_mesh;
-            auto skinned_mesh_renderer = node_go->GetComponent<SkinnedMeshRenderer>();
+            auto skinned_mesh_renderer = node_go->AddComponent<SkinnedMeshRenderer>();
+            skinned_mesh_renderer->shared_mesh = result_mesh;
             skinned_mesh_renderer->shared_materials = materials;
             skinned_mesh_renderer->transforms = bone_transforms;
+            skinned_mesh_renderer->root_bone = AssetPtr<Transform>::FromManaged(root_bone);
         }
         else
         {
-            node_go->AddComponent<MeshRenderer>()->shared_mesh = result_mesh;
-            node_go->GetComponent<MeshRenderer>()->shared_materials = materials;
+            auto mesh_renderer = node_go->AddComponent<MeshRenderer>();
+            mesh_renderer->shared_mesh = result_mesh;
+            mesh_renderer->shared_materials = materials;
         }
     }
     for (unsigned int i = 0; i < node->mNumChildren; ++i)

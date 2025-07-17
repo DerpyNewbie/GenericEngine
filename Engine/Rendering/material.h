@@ -21,6 +21,7 @@ public:
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
+    void OnConstructed() override;
     void CreateMaterialBlock();
 
     bool IsValid();
