@@ -20,6 +20,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
 #include "Rendering/material.h"
+#include "Physics/physics.h"
 
 #include <ranges>
 
@@ -163,6 +164,8 @@ void Editor::OnDraw()
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
         DxLibHelper::DrawYPlaneGrid();
+    if (EditorPrefs::show_physics_debug)
+        Physics::DebugDraw();
 
     for (const auto &window : m_editor_windows_ | std::views::values)
     {

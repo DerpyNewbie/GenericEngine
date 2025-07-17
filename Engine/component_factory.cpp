@@ -9,6 +9,11 @@
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Components/text_asset_ref_test_component.h"
+#include "Physics/box_collider.h"
+#include "Physics/capsule_collider.h"
+#include "Physics/plane_collider.h"
+#include "Physics/rigidbody_component.h"
+#include "Physics/sphere_collider.h"
 
 namespace engine
 {
@@ -24,6 +29,11 @@ void IComponentFactory::Init()
     ADD_COMPONENT(SkinnedMeshRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(TextRenderer);
+    ADD_COMPONENT(RigidbodyComponent);
+    ADD_COMPONENT(SphereCollider);
+    ADD_COMPONENT(PlaneCollider);
+    ADD_COMPONENT(BoxCollider);
+    ADD_COMPONENT(CapsuleCollider);
 #undef ADD_COMPONENT
 }
 

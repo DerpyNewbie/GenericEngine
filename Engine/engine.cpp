@@ -19,6 +19,7 @@
 #include "Rendering/gizmos.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "input.h"
+#include "Physics/physics.h"
 
 namespace engine
 {
@@ -34,8 +35,8 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-
-    Gizmos::Init();
+    
+    Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
     AssetDatabase::Init();

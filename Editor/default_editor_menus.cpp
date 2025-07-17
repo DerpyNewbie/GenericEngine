@@ -113,6 +113,7 @@ void editor::DefaultEditorMenu::DrawEditMenu()
     if (ImGui::BeginMenu("Prefs"))
     {
         ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
+        ImGui::MenuItem("Show Physics Debug", nullptr, &EditorPrefs::show_physics_debug);
         ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
 
         ImGui::EndMenu();
