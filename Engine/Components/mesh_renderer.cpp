@@ -92,7 +92,7 @@ void MeshRenderer::OnInspectorGui()
             {
                 ImGui::Indent();
                 ImGui::PushID(i);
-                shared_materials[i]->OnInspectorGui();
+                shared_materials[i].CastedLock()->OnInspectorGui();
                 ImGui::PopID();
                 ImGui::Unindent();
             }
@@ -112,7 +112,7 @@ void MeshRenderer::OnDraw()
 {
     UpdateBuffers();
 
-    auto material = shared_materials[0];
+    auto material = shared_materials[0].CastedLock();
     auto shader = material->p_shared_shader.CastedLock();
     auto cmd_list = g_RenderEngine->CommandList();
     auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
@@ -136,7 +136,7 @@ void MeshRenderer::OnDraw()
     // sub-meshes
     for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
-        material = shared_materials[i + 1];
+        material = shared_materials[i + 1].CastedLock();
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();
@@ -179,9 +179,10 @@ void MeshRenderer::Reconstruct()
     }
     for (int i = 0; i < shared_materials.size(); ++i)
     {
-        if (shared_materials[i]->IsValid() && !shared_materials[i]->p_shared_material_block->IsCreateBuffer())
+        auto material = shared_materials[i].CastedLock();
+        if (material->IsValid() && !material->p_shared_material_block->IsCreateBuffer())
         {
-            shared_materials[i]->p_shared_material_block->CreateBuffer();
+            material->p_shared_material_block->CreateBuffer();
         }
     }
     for (auto &wvp_buffer : wvp_buffers)
@@ -264,7 +265,7 @@ void MeshRenderer::UpdateBuffers()
 
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx)
 {
-    auto material_handles = shared_materials[material_idx]->p_shared_material_block->GetHandles();
+    auto material_handles = shared_materials[material_idx].CastedLock()->p_shared_material_block->GetHandles();
     for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
             if (!material_handles[shader_type][params_type].empty())

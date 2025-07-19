@@ -67,7 +67,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
     auto node_go = node_map[reinterpret_cast<UINT64>(node)];
     // apply meshes
     std::vector<std::shared_ptr<Mesh>> meshes;
-    std::vector<std::shared_ptr<Material>> materials;
+    std::vector<AssetPtr<Material>> materials;
     std::vector<std::weak_ptr<Transform>> bone_transforms;
     std::unordered_set<const aiNode *> visited;
     std::weak_ptr<Transform> root_bone;
@@ -88,7 +88,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
     {
         auto current_mesh = scene->mMeshes[node->mMeshes[i]];
         meshes.emplace_back(Mesh::CreateFromAiMesh(current_mesh));
-        materials.emplace_back(Object::Instantiate<Material>());
+        materials.emplace_back(AssetPtr<Material>::FromManaged(Object::Instantiate<Material>()));
 
         //create bone info
         auto bone_names = CreateBoneNamesList(current_mesh);

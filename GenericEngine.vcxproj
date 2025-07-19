@@ -36,6 +36,7 @@
         <ClCompile Include="Engine\Asset\asset_database.cpp"/>
         <ClCompile Include="Engine\Asset\asset_ptr.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\asset_exporter.cpp"/>
+        <ClCompile Include="Engine\Asset\Exporter\material_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
@@ -134,6 +135,7 @@
         <ClInclude Include="Engine\Asset\asset_descriptor.h"/>
         <ClInclude Include="Engine\Asset\asset_ptr.h"/>
         <ClInclude Include="Engine\Asset\Exporter\asset_exporter.h"/>
+        <ClInclude Include="Engine\Asset\Exporter\material_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>

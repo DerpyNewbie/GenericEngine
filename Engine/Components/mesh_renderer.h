@@ -30,7 +30,7 @@ protected:
 
 public:
     std::shared_ptr<Mesh> shared_mesh;
-    std::vector<std::shared_ptr<Material>> shared_materials;
+    std::vector<AssetPtr<Material>> shared_materials;
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
