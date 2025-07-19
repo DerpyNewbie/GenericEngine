@@ -48,11 +48,9 @@
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
-        <ClCompile Include="Engine\Components\cube_renderer.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
-        <ClCompile Include="Engine\Components\mv1_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
@@ -150,11 +148,9 @@
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
-        <ClInclude Include="Engine\Components\cube_renderer.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
-        <ClInclude Include="Engine\Components\mv1_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>

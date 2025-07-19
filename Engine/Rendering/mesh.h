@@ -13,7 +13,6 @@ class Mesh : public Object
 public:
     unsigned int max_bones_in_vertex = 0;
 
-    Bounds bounds;
     std::vector<Vector3> vertices;
     std::vector<Color> colors; // per-vertex
     std::array<std::vector<Vector2>, 8> uvs; // per-vertex
@@ -46,7 +45,6 @@ public:
             cereal::base_class<Object>(this),
             CEREAL_NVP(vertices),
             CEREAL_NVP(colors),
-            CEREAL_NVP(bounds),
             CEREAL_NVP(uvs),
             CEREAL_NVP(indices),
             CEREAL_NVP(normals), CEREAL_NVP(tangents),

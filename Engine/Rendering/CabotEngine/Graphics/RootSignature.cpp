@@ -11,6 +11,10 @@ engine::RootSignature::RootSignature()
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS; // ジオメトリシェーダーのルートシグネチャへんアクセスを拒否する
 
     std::vector<CD3DX12_ROOT_PARAMETER> rootParam(kRootParameterIndexCount);
+
+    rootParam[kWVPCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kBoneSRV].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+
     //DescriptorHeapの作成
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
@@ -19,11 +23,11 @@ engine::RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0); //CBVはちょっと多めに確保
-    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 1); //CBVはちょっと多めに確保
+    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 1);
     tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
-    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 0);
-    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 0);
+    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 1);
+    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 1);
     tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
 
     rootParam[kVertexCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_VERTEX);

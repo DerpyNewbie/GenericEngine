@@ -1,12 +1,11 @@
 #pragma once
 #include "component.h"
+#include "renderer.h"
 
 namespace engine
 {
-class Camera : public Component
+class Camera : public Component, public IDrawCallReceiver
 {
-
-
     enum class kViewMode : unsigned char
     {
         kPerspective,
@@ -16,13 +15,15 @@ class Camera : public Component
     static std::weak_ptr<Camera> m_main_camera_;
 
     kViewMode m_view_mode_ = kViewMode::kPerspective;
-    float m_field_of_view_ = 70;
+    float m_field_of_view_ = DirectX::XMConvertToRadians(70);
     float m_near_plane_ = 0.1f;
     float m_far_plane_ = 1000.0f;
     float m_ortho_size_ = 50;
     Color m_background_color_ = Color(0x1A1A1AFF);
+    UINT m_drawcall_count_ = 0;
 
     void ApplyCameraSettingToDxLib() const;
+    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
     static constexpr float min_field_of_view = 1.0f;
@@ -33,6 +34,9 @@ public:
     void OnAwake() override;
     void OnUpdate() override;
     void OnInspectorGui() override;
+    void OnDraw() override;
+    void OnEnabled() override;
+    void OnDisabled() override;
 
     static std::weak_ptr<Camera> Main();
 

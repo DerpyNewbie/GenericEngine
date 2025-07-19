@@ -41,7 +41,7 @@ public:
     static void DrawCircle(const Vector3 &center, float radius, const Color &color = kDefaultColor,
                            const Quaternion &rotation = Quaternion::Identity, int segments = 16);
     static void DrawSphere(const Vector3 &center, float radius, const Color &color = kDefaultColor, int segments = 16);
-    static void DrawBounds(const Bounds &bounds, const Color &color = kDefaultColor,
+    static void DrawBounds(const DirectX::BoundingBox &bounds, const Color &color = kDefaultColor,
                            const Matrix &mat = DirectX::XMMatrixIdentity());
 };
 }

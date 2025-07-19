@@ -9,6 +9,7 @@
 #include "camera.h"
 #include "Rendering/MaterialData.h"
 #include "Rendering/world_view_projection.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -17,24 +18,34 @@ void MeshRenderer::UpdateWVPBuffer()
     WorldViewProjection wvp;
     const auto camera = Camera::Main();
 
-    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix() * GameObject()->Transform()->LocalMatrix().Invert();
+    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
     wvp.WVP[1] = camera.lock()->GetViewMatrix();
     wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
 
-    for (auto &wvp_buffers : material_wvp_buffers)
+    for (auto &wvp_buffer : wvp_buffers)
     {
-        for (size_t i = 0; i < wvp_buffers.size(); ++i)
-        {
-            auto wvp_buffer = wvp_buffers[i].lock();
-            if (!wvp_buffer)
-            {
-                wvp_buffers.erase(wvp_buffers.begin() + i);
-                break;
-            }
-            wvp_buffer->value = wvp;
-            wvp_buffer->UpdateBuffer();
-        }
+        auto ptr = wvp_buffer->GetPtr<WorldViewProjection>();
+        *ptr = wvp;
     }
+}
+
+void MeshRenderer::CalcBoundingBox()
+{
+    auto min_pos = Vector3(0, 0, 0);
+    auto max_pos = Vector3(0, 0, 0);
+    for (int i = 0; i < shared_mesh->vertices.size(); ++i)
+    {
+        auto vertex = shared_mesh->vertices[i];
+        min_pos.x = std::min(min_pos.x, vertex.x);
+        min_pos.y = std::min(min_pos.y, vertex.y);
+        min_pos.z = std::min(min_pos.z, vertex.z);
+
+        max_pos.x = max(max_pos.x, vertex.x);
+        max_pos.y = max(max_pos.y, vertex.y);
+        max_pos.z = max(max_pos.z, vertex.z);
+    }
+    DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);
+    m_already_calc_bounds_ = true;
 }
 
 void MeshRenderer::OnInspectorGui()
@@ -90,6 +101,12 @@ void MeshRenderer::OnInspectorGui()
     }
 }
 
+void MeshRenderer::OnUpdate()
+{
+    if (!m_already_calc_bounds_)
+        CalcBoundingBox();
+}
+
 void MeshRenderer::OnDraw()
 {
     UpdateBuffers();
@@ -97,6 +114,7 @@ void MeshRenderer::OnDraw()
     auto material = shared_materials[0];
     auto shader = material->p_shared_shader.CastedLock();
     auto cmd_list = g_RenderEngine->CommandList();
+    auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = vertex_buffer->View();
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
@@ -107,6 +125,7 @@ void MeshRenderer::OnDraw()
             g_PSOManager.SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
+        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
         cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
@@ -120,6 +139,7 @@ void MeshRenderer::OnDraw()
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();
+            cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
             if (shader)
                 g_PSOManager.SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];
@@ -133,7 +153,12 @@ void MeshRenderer::OnDraw()
     }
 }
 
-void MeshRenderer::ReconstructBuffers()
+std::weak_ptr<Transform> MeshRenderer::GetTransform()
+{
+    return GameObject()->Transform();
+}
+
+void MeshRenderer::Reconstruct()
 {
     if (!vertex_buffer || index_buffers.empty())
     {
@@ -147,9 +172,15 @@ void MeshRenderer::ReconstructBuffers()
     {
         if (shared_materials[i]->IsValid() && !shared_materials[i]->p_shared_material_block->IsCreateBuffer())
         {
-            ReconstructMaterialBuffers(i);
+            shared_materials[i]->p_shared_material_block->CreateBuffer();
         }
     }
+    for (auto &wvp_buffer : wvp_buffers)
+        if (!wvp_buffer)
+        {
+            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(WorldViewProjection));
+            wvp_buffer->CreateBuffer();
+        }
 }
 
 void MeshRenderer::ReconstructMeshesBuffer()
@@ -216,25 +247,9 @@ void MeshRenderer::ReconstructMeshesBuffer()
     }
 }
 
-void MeshRenderer::ReconstructMaterialBuffers(int material_idx)
-{
-    shared_materials[material_idx]->p_shared_material_block->CreateBuffer();
-    //get wvp_buffer for update buffer
-    auto find_material_data = shared_materials[material_idx]->p_shared_material_block->
-                                                              FindMaterialDataFromName("__WVP__").lock();
-    if (find_material_data)
-    {
-        auto wvp_data = std::dynamic_pointer_cast<MaterialData<WorldViewProjection>>(find_material_data);
-        for (auto &wvp_buffer : material_wvp_buffers)
-        {
-            wvp_buffer.emplace_back(wvp_data);
-        }
-    }
-}
-
 void MeshRenderer::UpdateBuffers()
 {
-    ReconstructBuffers();
+    Reconstruct();
     UpdateWVPBuffer();
 }
 
@@ -245,9 +260,10 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
         for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
             if (!material_handles[shader_type][params_type].empty())
                 cmd_list->SetGraphicsRootDescriptorTable(
-                    shader_type * 3 + params_type,
+                    shader_type * 3 + params_type + 2,
                     material_handles[shader_type][params_type][0]->HandleGPU);
 }
+
 }
 
 CEREAL_REGISTER_TYPE(engine::MeshRenderer)

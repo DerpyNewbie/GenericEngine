@@ -100,6 +100,12 @@ void RenderEngine::EndRender()
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                         D3D12_RESOURCE_STATE_PRESENT);
     m_pCommandList->ResourceBarrier(1, &barrier);
+    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_COMMON
+        );
+    m_pCommandList->ResourceBarrier(1, &dsBarrier);
 
     // コマンドの記録を終了
     m_pCommandList->Close();

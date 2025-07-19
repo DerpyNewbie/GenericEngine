@@ -127,17 +127,17 @@ void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &
     }
 }
 
-void Gizmos::DrawBounds(const Bounds &bounds, const Color &color, const Matrix &mat)
+void Gizmos::DrawBounds(const DirectX::BoundingBox &bounds, const Color &color, const Matrix &mat)
 {
     Vector3 local[8] = {
-        bounds.center + Vector3(-bounds.extents.x, -bounds.extents.y, -bounds.extents.z),
-        bounds.center + Vector3(bounds.extents.x, -bounds.extents.y, -bounds.extents.z),
-        bounds.center + Vector3(bounds.extents.x, -bounds.extents.y, bounds.extents.z),
-        bounds.center + Vector3(-bounds.extents.x, -bounds.extents.y, bounds.extents.z),
-        bounds.center + Vector3(-bounds.extents.x, bounds.extents.y, -bounds.extents.z),
-        bounds.center + Vector3(bounds.extents.x, bounds.extents.y, -bounds.extents.z),
-        bounds.center + Vector3(bounds.extents.x, bounds.extents.y, bounds.extents.z),
-        bounds.center + Vector3(-bounds.extents.x, bounds.extents.y, bounds.extents.z)
+        bounds.Center + Vector3(-bounds.Extents.x, -bounds.Extents.y, -bounds.Extents.z),
+        bounds.Center + Vector3(bounds.Extents.x, -bounds.Extents.y, -bounds.Extents.z),
+        bounds.Center + Vector3(bounds.Extents.x, -bounds.Extents.y, bounds.Extents.z),
+        bounds.Center + Vector3(-bounds.Extents.x, -bounds.Extents.y, bounds.Extents.z),
+        bounds.Center + Vector3(-bounds.Extents.x, bounds.Extents.y, -bounds.Extents.z),
+        bounds.Center + Vector3(bounds.Extents.x, bounds.Extents.y, -bounds.Extents.z),
+        bounds.Center + Vector3(bounds.Extents.x, bounds.Extents.y, bounds.Extents.z),
+        bounds.Center + Vector3(-bounds.Extents.x, bounds.Extents.y, bounds.Extents.z)
     };
 
     for (auto &v : local)

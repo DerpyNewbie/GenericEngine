@@ -6,6 +6,8 @@
 #include "Components/transform.h"
 #include "game_object.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/world_view_projection.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 #include <DxLib.h>
 
@@ -13,14 +15,8 @@ namespace engine
 {
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 {
-    for (size_t i = 0; i < bone_transform_buffers.size(); ++i)
+    for (auto bone_matrices_buffer : bone_matrices_buffers)
     {
-        auto bone_matrices_buffer = bone_transform_buffers[i].lock();
-        if (!bone_matrices_buffer)
-        {
-            bone_transform_buffers.erase(bone_transform_buffers.begin() + i);
-            break;
-        }
         std::vector<Matrix> matrices(transforms.size());
         for (int i = 0; i < transforms.size(); ++i)
         {
@@ -28,8 +24,23 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
             auto invert_bind_poses = shared_mesh->bind_poses[i].Invert();
             matrices[i] = invert_bind_poses * world;
         }
-        bone_matrices_buffer->value = matrices;
-        bone_matrices_buffer->UpdateBuffer();
+        bone_matrices_buffer->UpdateBuffer(matrices.data());
+    }
+}
+
+void SkinnedMeshRenderer::UpdateWVPBuffer()
+{
+    WorldViewProjection wvp;
+    const auto camera = Camera::Main();
+
+    wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
+    wvp.WVP[1] = camera.lock()->GetViewMatrix();
+    wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
+
+    for (auto &wvp_buffer : wvp_buffers)
+    {
+        auto ptr = wvp_buffer->GetPtr<WorldViewProjection>();
+        *ptr = wvp;
     }
 }
 
@@ -48,29 +59,9 @@ void SkinnedMeshRenderer::DrawBones()
     }
 }
 
-void SkinnedMeshRenderer::UpdateWVPBuffer()
+std::weak_ptr<Transform> SkinnedMeshRenderer::GetTransform()
 {
-    WorldViewProjection wvp;
-    const auto camera = Camera::Main();
-
-    wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
-    wvp.WVP[1] = camera.lock()->GetViewMatrix();
-    wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
-
-    for (auto &wvp_buffers : material_wvp_buffers)
-    {
-        for (size_t i = 0; i < wvp_buffers.size(); ++i)
-        {
-            auto wvp_buffer = wvp_buffers[i].lock();
-            if (!wvp_buffer)
-            {
-                wvp_buffers.erase(wvp_buffers.begin() + i);
-                break;
-            }
-            wvp_buffer->value = wvp;
-            wvp_buffer->UpdateBuffer();
-        }
-    }
+    return root_bone.CastedLock()->Parent();
 }
 
 void SkinnedMeshRenderer::OnInspectorGui()
@@ -110,43 +101,69 @@ void SkinnedMeshRenderer::OnDraw()
         }
     }
 
-    Gizmos::DrawBounds(shared_mesh->bounds, Gizmos::kDefaultColor, root_bone_matrix);
-    MeshRenderer::OnDraw();
+    Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, root_bone_matrix);
+    UpdateBuffers();
+
+    auto material = shared_materials[0];
+    auto shader = material->p_shared_shader.CastedLock();
+    auto cmd_list = g_RenderEngine->CommandList();
+    auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
+    auto vbView = vertex_buffer->View();
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmd_list->IASetVertexBuffers(0, 1, &vbView);
+
+    if (material->IsValid())
+    {
+        if (shader)
+            g_PSOManager.SetPipelineState(cmd_list, shader);
+        auto ibView = index_buffers[0]->View();
+        cmd_list->IASetIndexBuffer(&ibView);
+        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrices_buffers[current_buffer]->GetAddress());
+        SetDescriptorTable(cmd_list, 0);
+
+        cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
+                                           ? shared_mesh->sub_meshes[0].base_index
+                                           : shared_mesh->indices.size(), 1, 0, 0, 0);
+    }
+    // sub-meshes
+    for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
+    {
+        material = shared_materials[i + 1];
+        if (material->IsValid())
+        {
+            shader = material->p_shared_shader.CastedLock();
+            cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+            if (shader)
+                g_PSOManager.SetPipelineState(cmd_list, shader);
+            auto ib = index_buffers[i + 1];
+            auto sub_mesh = shared_mesh->sub_meshes[i];
+            auto ibView = ib->View();
+            cmd_list->IASetIndexBuffer(&ibView);
+            SetDescriptorTable(cmd_list, i + 1);
+
+            cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+        }
+    }
     if (m_draw_bones_)
         DrawBones();
 }
 
-void SkinnedMeshRenderer::ReconstructBuffers()
+void SkinnedMeshRenderer::Reconstruct()
 {
-    MeshRenderer::ReconstructBuffers();
-}
+    MeshRenderer::Reconstruct();
 
-void SkinnedMeshRenderer::ReconstructMaterialBuffers(int material_idx)
-{
-    //set bone matrices
-    bone_transform_buffers.resize(shared_materials.size());
-    auto find_material_data = shared_materials[material_idx]->p_shared_material_block->
-                                                              FindMaterialDataFromName("__BoneMatrices__").lock();
-    if (find_material_data)
-    {
-        auto bone_matrices_data = std::dynamic_pointer_cast<MaterialData<std::vector<Matrix>>>(find_material_data);
-        bone_transform_buffers[material_idx] = bone_matrices_data;
-        std::vector<Matrix> matrices(transforms.size());
-        //ここで一回セットしておかないとCreateBufferでうまくいかない
-        for (int i = 0; i < transforms.size(); ++i)
+    for (auto &bone_matrices_buffer : bone_matrices_buffers)
+        if (!bone_matrices_buffer)
         {
-            auto world = transforms[i].lock()->WorldMatrix();
-            auto invert_bind_poses = shared_mesh->bind_poses[i].Invert();
-            matrices[i] = invert_bind_poses * world;
+            bone_matrices_buffer = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
+            bone_matrices_buffer->CreateBuffer();
         }
-        bone_transform_buffers[material_idx].lock()->value = matrices;
-    }
-    MeshRenderer::ReconstructMaterialBuffers(material_idx);
 }
 
 void SkinnedMeshRenderer::UpdateBuffers()
 {
-    ReconstructBuffers();
+    Reconstruct();
     UpdateWVPBuffer();
     UpdateBoneTransformsBuffer();
 }

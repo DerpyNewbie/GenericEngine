@@ -76,7 +76,6 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
 
         result->vertices[i] = Vector3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
     }
-    result->bounds = Bounds::FromMinMax(min_pos, max_pos);
 
     // copy colors
     if (mesh->GetNumColorChannels() > 0 && mesh->HasVertexColors(0))

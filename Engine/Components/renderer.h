@@ -1,23 +1,31 @@
 #pragma once
 #include "component.h"
 #include "event_receivers.h"
+#include "transform.h"
 
 namespace engine
 {
-class Renderer : public Component, public IDrawCallReceiver
+class Renderer : public Component
 {
-    static std::vector<std::weak_ptr<IDrawCallReceiver>> m_draw_call_receivers_;
+    friend class Camera;
+
+    static std::vector<std::weak_ptr<Renderer>> renderers;
+
+    static void Render();
 
 protected:
     bool m_is_visible_ = false;
 
+    virtual void OnDraw() = 0;
     void SetVisible(bool visible);
 
 public:
+    DirectX::BoundingBox bounds;
+
     void OnEnabled() override;
     void OnDisabled() override;
     void OnDestroy() override;
 
-    friend class Camera;
+    virtual std::weak_ptr<Transform> GetTransform() = 0;
 };
 }

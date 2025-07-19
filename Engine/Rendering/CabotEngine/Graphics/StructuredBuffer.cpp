@@ -35,11 +35,21 @@ void engine::StructuredBuffer::CreateBuffer()
     {
         return;
     }
+
+    m_GpuAddress = m_pUploadBuffer->GetGPUVirtualAddress();
+
     m_IsValid = true;
 }
 
 void engine::StructuredBuffer::UpdateBuffer(void *data)
 {
+    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDefaultBuffer.Get(),
+        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_COPY_DEST
+        );
+    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+
     void *mapped = nullptr;
     m_pUploadBuffer->Map(0, nullptr, &mapped);
     memcpy(mapped, data, m_stride * m_elementCount);
@@ -47,10 +57,10 @@ void engine::StructuredBuffer::UpdateBuffer(void *data)
 
     g_RenderEngine->CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
                                                     m_elementCount);
-    CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+    barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDefaultBuffer.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
-        D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE
+        D3D12_RESOURCE_STATE_GENERIC_READ
         );
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -72,6 +82,11 @@ D3D12_SHADER_RESOURCE_VIEW_DESC engine::StructuredBuffer::ViewDesc()
     srvDesc.Buffer.StructureByteStride = m_stride;
     srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
     return srvDesc;
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS engine::StructuredBuffer::GetAddress() const
+{
+    return m_GpuAddress;
 }
 
 ID3D12Resource *engine::StructuredBuffer::Resource()

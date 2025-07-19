@@ -14,20 +14,21 @@ class SkinnedMeshRenderer : public MeshRenderer
     void UpdateBoneTransformsBuffer();
     void DrawBones();
 
+    std::weak_ptr<Transform> GetTransform() override;
+
 protected:
     void UpdateWVPBuffer() override;
 
 public:
     constexpr static int kLimitBonesPerVertex = 4;
     std::vector<std::weak_ptr<Transform>> transforms;
-    std::vector<std::weak_ptr<MaterialData<std::vector<Matrix>>>> bone_transform_buffers;
+    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::FRAME_BUFFER_COUNT> bone_matrices_buffers;
     AssetPtr<Transform> root_bone;
 
     void OnInspectorGui() override;
 
     void OnDraw() override;
-    void ReconstructBuffers() override;
-    void ReconstructMaterialBuffers(int material_idx) override;
+    void Reconstruct() override;
     void UpdateBuffers() override;
 
     template <class Archive>

@@ -8,20 +8,22 @@
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
-#include "Rendering/world_view_projection.h"
 
 namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
+    bool m_already_calc_bounds_ = false;
+
+    std::weak_ptr<Transform> GetTransform() override;
 
 protected:
-    virtual void ReconstructBuffers();
+    virtual void Reconstruct();
     virtual void UpdateWVPBuffer();
-    virtual void ReconstructMaterialBuffers(int material_idx);
 
+    void CalcBoundingBox();
     void ReconstructMeshesBuffer();
+    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
 
 public:
     std::shared_ptr<Mesh> shared_mesh;
@@ -29,14 +31,13 @@ public:
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-    std::array<std::vector<std::weak_ptr<MaterialData<WorldViewProjection>>>, RenderEngine::FRAME_BUFFER_COUNT>
-    material_wvp_buffers;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> wvp_buffers;
 
     bool buffer_creation_failed = false;
     bool is_material_error = false;
 
     void OnInspectorGui() override;
-
+    void OnUpdate() override;
     void OnDraw() override;
 
     virtual void UpdateBuffers();

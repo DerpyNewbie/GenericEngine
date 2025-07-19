@@ -4,6 +4,8 @@ namespace engine
 {
 enum kRootParameterIndex
 {
+    kWVPCBV,
+    kBoneSRV,
     kVertexCBV,
     kVertexSRV,
     kVertexUAV,

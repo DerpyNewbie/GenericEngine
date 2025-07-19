@@ -1,4 +1,4 @@
-cbuffer Transform : register(b0)
+cbuffer Transform : register(b1)
 {
     float4x4 View;
     float4x4 Proj;
@@ -41,7 +41,7 @@ VSOutput main(VSInput input)
     output.svpos = projPos;
     output.normal = input.pos;
     output.color = input.color;
-    output.uv = float2(1,1);
-    
-	return output;
+    output.uv = float2(1, 1);
+
+    return output;
 }
