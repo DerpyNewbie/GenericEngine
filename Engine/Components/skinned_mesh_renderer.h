@@ -11,9 +11,8 @@ class SkinnedMeshRenderer : public MeshRenderer
 {
     bool m_draw_bones_ = false;
 
-    void UpdateBoneTransformsBuffer();
     void DrawBones();
-
+    void UpdateBoneTransformsBuffer();
     std::weak_ptr<Transform> GetTransform() override;
 
 protected:

@@ -64,22 +64,6 @@ void MeshRenderer::OnInspectorGui()
         ImGui::Text("Bone Weights: %llu", shared_mesh->bone_weights.size());
         ImGui::Text("Bind Poses  : %llu", shared_mesh->bind_poses.size());
         ImGui::Text("Sub Meshes  : %llu", shared_mesh->sub_meshes.size());
-        if (ImGui::CollapsingHeader("Materials"))
-        {
-            ImGui::Indent();
-            for (auto i = 0; i < shared_materials.size(); ++i)
-            {
-                if (ImGui::CollapsingHeader(("Material " + std::to_string(i)).c_str()))
-                {
-                    ImGui::Indent();
-                    ImGui::PushID(i);
-                    shared_materials[i]->OnInspectorGui();
-                    ImGui::PopID();
-                    ImGui::Unindent();
-                }
-            }
-            ImGui::Unindent();
-        }
         if (ImGui::CollapsingHeader("Sub Meshes"))
         {
             ImGui::Indent();
@@ -99,6 +83,23 @@ void MeshRenderer::OnInspectorGui()
         }
         ImGui::Unindent();
     }
+    if (ImGui::CollapsingHeader("Materials"))
+    {
+        ImGui::Indent();
+        for (auto i = 0; i < shared_materials.size(); ++i)
+        {
+            if (ImGui::CollapsingHeader(("Material " + std::to_string(i)).c_str()))
+            {
+                ImGui::Indent();
+                ImGui::PushID(i);
+                shared_materials[i]->OnInspectorGui();
+                ImGui::PopID();
+                ImGui::Unindent();
+            }
+        }
+        ImGui::Unindent();
+    }
+    ImGui::Checkbox("Draw Bounds", &m_draw_bounds_);
 }
 
 void MeshRenderer::OnUpdate()
@@ -151,6 +152,14 @@ void MeshRenderer::OnDraw()
             cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
         }
     }
+    if (m_draw_bounds_)
+        DrawBounds();
+}
+
+void MeshRenderer::DrawBounds()
+{
+    auto matrix = GetTransform().lock()->WorldMatrix();
+    Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, matrix);
 }
 
 std::weak_ptr<Transform> MeshRenderer::GetTransform()

@@ -92,18 +92,9 @@ void SkinnedMeshRenderer::OnInspectorGui()
 
 void SkinnedMeshRenderer::OnDraw()
 {
-    Matrix root_bone_matrix = GameObject()->Transform()->WorldMatrix();
-    if (const auto root_bone_transform = root_bone.CastedLock())
-    {
-        if (const auto parent_transform = root_bone_transform->Parent())
-        {
-            root_bone_matrix = parent_transform->WorldMatrix();
-        }
-    }
-
-    Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, root_bone_matrix);
     UpdateBuffers();
 
+    //draw meshes
     auto material = shared_materials[0];
     auto shader = material->p_shared_shader.CastedLock();
     auto cmd_list = g_RenderEngine->CommandList();
@@ -145,6 +136,8 @@ void SkinnedMeshRenderer::OnDraw()
             cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
         }
     }
+    if (m_draw_bounds_)
+        DrawBounds();
     if (m_draw_bones_)
         DrawBones();
 }

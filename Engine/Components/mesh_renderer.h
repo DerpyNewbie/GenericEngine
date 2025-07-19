@@ -18,9 +18,12 @@ class MeshRenderer : public Renderer
     std::weak_ptr<Transform> GetTransform() override;
 
 protected:
+    bool m_draw_bounds_ = false;
+
     virtual void Reconstruct();
     virtual void UpdateWVPBuffer();
 
+    void DrawBounds();
     void CalcBoundingBox();
     void ReconstructMeshesBuffer();
     void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
