@@ -5,11 +5,6 @@ cbuffer Transform : register(b0)
     float4x4 Proj; // 投影行列
 }
 
-cbuffer temp : register(b1)
-{
-	int aho;
-}
-
 StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
 struct VSInput
@@ -48,6 +43,13 @@ float3x3 ExtractRotation(float4x4 m)
         );
 }
 
+static const float4x4 identityMatrix = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+};
+
 VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
@@ -55,7 +57,7 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-    for (int i = 0; i < input.bones_per_vertex; ++i)
+   for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)
@@ -63,7 +65,7 @@ VSOutput vrt(VSInput input)
             float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
             float3x3 boneRot = ExtractRotation(boneMatrix);
             bonePos += mul(boneMatrix, localPos) * weight;
-            //boneNormal += mul(boneRot, localNormal) * weight;
+            boneNormal += mul(boneRot, localNormal) * weight;
         }
     }
     
@@ -85,7 +87,7 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t0);
+Texture2D _MainTex : register(t1);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
