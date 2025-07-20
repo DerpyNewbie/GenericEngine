@@ -146,7 +146,7 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
     if (asset_importer == nullptr)
     {
         Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
-                                      instance->type_hint.c_str(), instance->path_hint.c_str());
+                                      instance->type_hint.c_str(), instance->path_hint.string().c_str());
         return;
     }
 
