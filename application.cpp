@@ -13,6 +13,7 @@
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 #include "Editor/editor.h"
+#include "Rendering/bill_board.h"
 
 Application *g_app;
 std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
@@ -55,34 +56,41 @@ void Application::StartApp()
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
         engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+        engine::Object::Instantiate<BillBoard>();
     }
 
     engine->MainLoop();
 
     editor->Finalize();
 }
+
 int Application::WindowWidth()
 {
     return m_window_width_;
 }
+
 int Application::WindowHeight()
 {
     return m_window_height_;
 }
+
 HWND Application::GetWindowHandle()
 {
     return m_h_wnd_;
 }
+
 int Application::AddWindowCallback(std::function<LRESULT(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)> callback)
 {
     int handle = reinterpret_cast<int>(&callback);
     m_callbacks_.emplace(handle, callback);
     return handle;
 }
+
 void Application::RemoveWindowCallback(int window_callback_handle)
 {
     m_callbacks_.erase(window_callback_handle);
 }
+
 void Application::InitWindow()
 {
     WNDCLASSEX w = {};
