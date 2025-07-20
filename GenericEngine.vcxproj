@@ -212,6 +212,7 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\Rendering\bill_board.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
