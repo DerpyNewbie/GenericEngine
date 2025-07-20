@@ -12,17 +12,12 @@
 
 namespace editor
 {
-Hierarchy::Hierarchy()
-{
-    window_flags = ImGuiWindowFlags_MenuBar;
-}
 std::string Hierarchy::Name()
 {
     return "Hierarchy";
 }
 void Hierarchy::OnEditorGui()
 {
-    Editor::Instance()->DrawEditorMenuBar();
     for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
          const auto &scene : current_scenes)
     {

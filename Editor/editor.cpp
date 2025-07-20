@@ -123,6 +123,12 @@ void Editor::OnDraw()
         ImGui::NewFrame();
     }
 
+    if (ImGui::BeginMainMenuBar())
+    {
+        DrawEditorMenuBar();
+        ImGui::EndMainMenuBar();
+    }
+
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
@@ -198,11 +204,9 @@ void Editor::RemoveEditorMenu(const std::string &name)
         return m.name == name;
     }));
 }
+
 void Editor::DrawEditorMenuBar() const
 {
-    if (!ImGui::BeginMenuBar())
-        return;
-
     for (const auto &menu : m_editor_menus_)
     {
         if (ImGui::BeginMenu(menu.name.c_str()))
@@ -211,9 +215,8 @@ void Editor::DrawEditorMenuBar() const
             ImGui::EndMenu();
         }
     }
-
-    ImGui::EndMenuBar();
 }
+
 void Editor::DrawEditorMenu(const std::string &name)
 {
     GetEditorMenu(name)->OnEditorMenuGui(name);
