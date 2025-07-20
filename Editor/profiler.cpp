@@ -52,6 +52,21 @@ std::string Profiler::Name()
 }
 void Profiler::OnEditorGui()
 {
+    if (ImGui::CollapsingHeader("Stats", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        const auto time = engine::Time::Get();
+        ImGui::Indent();
+        ImGui::Text("FPS        : %d", time->Fps());
+        ImGui::Text("FPS Target : %d", time->FpsTarget());
+        ImGui::Text("Frames     : %d", time->Frames());
+        ImGui::Text("Time Since Start Up: %f", time->TimeSinceStartUp());
+        ImGui::Text("Delta Time         : %f", time->DeltaTime());
+        ImGui::Text("Unscaled Delta Time: %f", time->UnscaledDeltaTime());
+        ImGui::Text("Time Scale         : %f", time->TimeScale());
+        ImGui::Text("Last Fixed Frame Count: %d", time->LastFixedFrameCount());
+        ImGui::Unindent();
+    }
+
     if (ImPlot::BeginPlot("##Profiler"))
     {
         const float t = engine::Time::Get()->TimeSinceStartUp();
