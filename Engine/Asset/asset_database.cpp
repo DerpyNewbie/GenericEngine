@@ -126,6 +126,7 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetRootAssetHierarchy()
 {
     return m_asset_hierarchy_;
 }
+
 void AssetDatabase::ReloadAsset(const xg::Guid &guid)
 {
     const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
@@ -178,6 +179,7 @@ IAssetPtr AssetDatabase::GetAsset(const xg::Guid &guid)
     const auto asset_desc = asset_desc_it->second;
     return IAssetPtr::FromAssetDescriptor(asset_desc);
 }
+
 std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 {
     auto assets = std::vector<IAssetPtr>();
@@ -235,4 +237,31 @@ void AssetDatabase::WriteAsset(const IAssetPtr &ptr)
     WriteAsset(ptr.Guid());
 }
 
+std::shared_ptr<AssetDescriptor> AssetDatabase::CreateAsset(const std::shared_ptr<Object> &object, const path &path)
+{
+    auto descriptor = GetAssetDescriptor(object->Guid());
+    if (descriptor != nullptr)
+    {
+        if (!descriptor->IsInternalAsset())
+        {
+            Logger::Error("Asset with guid %s already exists. Cannot create asset!", object->Guid().str().c_str());
+            return nullptr;
+        }
+
+        descriptor->managed_object = object;
+        descriptor->path_hint = path;
+    }
+    else
+    {
+        descriptor = std::make_shared<AssetDescriptor>();
+        descriptor->guid = object->Guid();
+        descriptor->path_hint = path;
+        descriptor->managed_object = object;
+        descriptor->type_hint = AssetExporter::Get(object)->SupportedExtensions().front();
+    }
+
+    WriteAsset(descriptor.get());
+    Import(path);
+    return descriptor;
+}
 }

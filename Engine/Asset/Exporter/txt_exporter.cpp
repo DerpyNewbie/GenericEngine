@@ -31,4 +31,9 @@ void TxtExporter::Export(AssetDescriptor *asset)
         asset->SetString(key, value);
     }
 }
+
+bool TxtExporter::CanExport(const std::shared_ptr<Object> &object)
+{
+    return std::dynamic_pointer_cast<TextAsset>(object) != nullptr;
+}
 }

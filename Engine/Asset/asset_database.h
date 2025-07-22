@@ -40,6 +40,8 @@ public:
     static void WriteAsset(const xg::Guid &guid);
     static void WriteAsset(const IAssetPtr &ptr);
 
+    static std::shared_ptr<AssetDescriptor> CreateAsset(const std::shared_ptr<Object> &object, const path &path);
+
     template <typename T>
     static AssetPtr<T> GetAsset(const path &path)
     {
@@ -51,7 +53,5 @@ public:
     {
         return reinterpret_cast<AssetPtr<T>>(GetAsset(guid));
     }
-
-
 };
 }

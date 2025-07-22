@@ -5,7 +5,8 @@ namespace engine
 {
 class AssetImporter
 {
-    static std::unordered_map<std::string, std::shared_ptr<AssetImporter>> m_asset_importers_;
+    static std::set<std::shared_ptr<AssetImporter>> m_importers_;
+    static std::unordered_map<std::string, std::shared_ptr<AssetImporter>> m_importer_extension_map_;
 
 public:
     virtual ~AssetImporter() = default;
@@ -42,5 +43,11 @@ public:
     /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
     /// <returns>AssetImporter instance if a supported instance were found. `nullptr` otherwise.</returns>
     static std::shared_ptr<AssetImporter> Get(const std::string &file_extension);
+
+    /// <summary>
+    /// Retrieve all registered AssetImporter instances.
+    /// </summary>
+    /// <returns>Set of registered AssetImporter instances.</returns>
+    static std::set<std::shared_ptr<AssetImporter>> Get();
 };
 }
