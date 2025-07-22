@@ -23,7 +23,6 @@ std::shared_ptr<Object> TxtImporter::Import(AssetDescriptor *asset)
         text->key_value_pairs[key] = asset->GetString(key);
     }
 
-    asset->managed_object = text;
     return text;
 }
 }

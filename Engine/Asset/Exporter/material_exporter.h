@@ -2,9 +2,13 @@
 #include "pch.h"
 #include "asset_exporter.h"
 
-class MaterialExporter : public engine::AssetExporter
+namespace engine
+{
+class MaterialExporter : public AssetExporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;
-    void Export(engine::AssetDescriptor *descriptor) override;
+    void Export(AssetDescriptor *descriptor) override;
+    bool CanExport(const std::shared_ptr<Object> &object) override;
 };
+}

@@ -1,17 +1,30 @@
 #include "material_exporter.h"
 #include "serializer.h"
 #include "Asset/asset_descriptor.h"
+#include "Rendering/material.h"
 
+namespace engine
+{
 std::vector<std::string> MaterialExporter::SupportedExtensions()
 {
     return {".material"};
 }
 
-void MaterialExporter::Export(engine::AssetDescriptor *descriptor)
+void MaterialExporter::Export(AssetDescriptor *descriptor)
 {
-    std::string file_path = descriptor->managed_object->Name() + ".material";
-    std::ofstream ofs(file_path);
-    engine::Serializer serializer;
+    const auto material = std::dynamic_pointer_cast<Material>(descriptor->managed_object);
+    if (material == nullptr)
+    {
+        assert(false && "This object cannot be exported with MaterialExporter");
+    }
 
-    serializer.Save(ofs, descriptor->managed_object);
+    std::ofstream ofs(descriptor->path_hint);
+    Serializer serializer;
+    serializer.Save(ofs, material);
+}
+
+bool MaterialExporter::CanExport(const std::shared_ptr<Object> &object)
+{
+    return std::dynamic_pointer_cast<Material>(object) != nullptr;
+}
 }

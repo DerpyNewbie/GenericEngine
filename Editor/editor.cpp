@@ -21,6 +21,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/asset_database.h"
 #include "Asset/text_asset.h"
+#include "Rendering/material.h"
 
 #include <ranges>
 
@@ -133,6 +134,10 @@ void Editor::Init()
     {
         AddCreateMenu("Text Asset", ".txt", [] {
             return Object::Instantiate<TextAsset>("New Text Asset");
+        });
+
+        AddCreateMenu("Material", ".material", [] {
+            return Object::Instantiate<Material>("New Material");
         });
     }
 }

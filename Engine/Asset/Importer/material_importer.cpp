@@ -1,13 +1,20 @@
 #include "pch.h"
 #include "material_importer.h"
 
+#include "serializer.h"
+#include "Rendering/material.h"
+
+namespace engine
+{
 std::vector<std::string> MaterialImporter::SupportedExtensions()
 {
     return {".material"};
 }
 
-std::shared_ptr<engine::Object> MaterialImporter::Import(engine::AssetDescriptor *asset)
+std::shared_ptr<Object> MaterialImporter::Import(AssetDescriptor *asset)
 {
-    //TODO:Add Code
-    return nullptr;
+    Serializer serializer;
+    std::ifstream ifs(asset->path_hint);
+    return serializer.Load<Material>(ifs);
+}
 }
