@@ -26,12 +26,22 @@ class Editor final : public enable_shared_from_base<Editor>, public IDrawCallRec
         }
     };
 
+    struct PrioritizedCreateMenu
+    {
+        std::string name;
+        std::string extension;
+        std::function<std::shared_ptr<engine::Object>()> factory;
+        int priority;
+    };
+
+
     static Editor *m_instance_;
 
     int m_last_editor_style_ = -1;
     std::weak_ptr<engine::Object> m_selected_object_;
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
     std::vector<PrioritizedEditorMenu> m_editor_menus_;
+    std::vector<PrioritizedCreateMenu> m_create_menus_;
 
     void SetEditorStyle(int i);
 
@@ -62,6 +72,11 @@ public:
     std::vector<PrioritizedEditorMenu> GetEditorMenus();
     std::shared_ptr<EditorMenu> GetEditorMenu(const std::string &name);
     void RemoveEditorMenu(const std::string &name);
+
+    void AddCreateMenu(const std::string &name, const std::string &extension,
+                       std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
+    std::vector<PrioritizedCreateMenu> GetCreateMenus();
+    void RemoveCreateMenu(const std::string &name);
 
     void DrawEditorMenuBar() const;
     void DrawEditorMenu(const std::string &name);

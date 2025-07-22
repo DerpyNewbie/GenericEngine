@@ -239,6 +239,12 @@ void AssetDatabase::WriteAsset(const IAssetPtr &ptr)
 
 std::shared_ptr<AssetDescriptor> AssetDatabase::CreateAsset(const std::shared_ptr<Object> &object, const path &path)
 {
+    if (path.empty() || exists(path))
+    {
+        Logger::Error("Path '%s' is empty or already exists. Cannot create asset!", path.string().c_str());
+        return nullptr;
+    }
+
     auto descriptor = GetAssetDescriptor(object->Guid());
     if (descriptor != nullptr)
     {

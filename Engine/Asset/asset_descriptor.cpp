@@ -56,6 +56,8 @@ bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
 
 void AssetDescriptor::Write(const path &path)
 {
+    PopulateMetaJson();
+
     StringBuffer string_buffer;
     PrettyWriter writer(string_buffer);
     writer.StartObject();
@@ -83,9 +85,39 @@ void AssetDescriptor::Write(const path &path)
     output_stream << string_buffer.GetString();
     output_stream.close();
 }
+
 GenericValue<UTF8<>> &AssetDescriptor::GetDataValue()
 {
+    PopulateMetaJson();
     return m_meta_json_.FindMember(kDataKey)->value;
+}
+
+void AssetDescriptor::PopulateMetaJson()
+{
+    if (m_meta_json_.Null())
+    {
+        m_meta_json_.SetObject();
+    }
+
+    auto &a = m_meta_json_.GetAllocator();
+
+    if (!m_meta_json_.HasMember(kGuidKey))
+    {
+        const auto guid_str = guid.str();
+        auto guid_value = Value();
+        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
+        m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
+    }
+
+    if (!m_meta_json_.HasMember(kTypeKey))
+    {
+        m_meta_json_.AddMember(StringRef(kTypeKey), Value(type_hint.c_str(), type_hint.size(), a), a);
+    }
+
+    if (!m_meta_json_.HasMember(kDataKey))
+    {
+        m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
+    }
 }
 
 #pragma push_macro("GetObject")

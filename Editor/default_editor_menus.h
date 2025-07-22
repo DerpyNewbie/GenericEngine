@@ -15,5 +15,6 @@ public:
     static void DrawObjectMenu();
     static void DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go);
     static void DrawWindowMenu();
+    static void DrawAssetMenu(std::filesystem::path path);
 };
 }

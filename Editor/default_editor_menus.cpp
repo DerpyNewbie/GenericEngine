@@ -50,6 +50,12 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
         return;
     }
 
+    if (name == "Asset")
+    {
+        DrawAssetMenu(engine::AssetDatabase::GetProjectDirectory());
+        return;
+    }
+
     throw std::runtime_error("Unknown editor menu: " + name);
 }
 void editor::DefaultEditorMenu::DrawDefaultMenu()
@@ -142,5 +148,27 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
     for (auto &name : names)
     {
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
+    }
+}
+void editor::DefaultEditorMenu::DrawAssetMenu(std::filesystem::path path)
+{
+    const auto editor = Editor::Instance();
+    const auto menus = editor->GetCreateMenus();
+    const auto enabled = !path.empty();
+    for (const auto &menu : menus)
+    {
+        if (ImGui::MenuItem(menu.name.c_str(), nullptr, false, enabled))
+        {
+            auto object = menu.factory();
+            auto file_name = object->Name() + menu.extension;
+
+            int i = 0;
+            while (exists(path / file_name))
+            {
+                file_name = object->Name() + " " + std::to_string(++i) + menu.extension;
+            }
+
+            engine::AssetDatabase::CreateAsset(object, path / file_name);
+        }
     }
 }

@@ -15,6 +15,7 @@
 #include <imgui_impl_dx11.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+#include "Asset/text_asset.h"
 
 #include <ranges>
 
@@ -31,6 +32,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+using namespace engine;
+
 Editor *Editor::m_instance_ = nullptr;
 
 void Editor::SetEditorStyle(const int i)
@@ -104,15 +107,22 @@ void Editor::Init()
         const auto default_menu = std::make_shared<DefaultEditorMenu>();
         AddEditorMenu("File", default_menu, -1000);
         AddEditorMenu("Edit", default_menu, -990);
-        AddEditorMenu("GameObject", default_menu, -980);
-        AddEditorMenu("Component", default_menu, -970);
-        AddEditorMenu("Window", default_menu, -960);
+        AddEditorMenu("Asset", default_menu, -980);
+        AddEditorMenu("GameObject", default_menu, -970);
+        AddEditorMenu("Component", default_menu, -960);
+        AddEditorMenu("Window", default_menu, -950);
+    }
+
+    {
+        AddCreateMenu("Text Asset", ".txt", [] {
+            return Object::Instantiate<TextAsset>("New Text Asset");
+        });
     }
 }
 
 void Editor::Attach()
 {
-    engine::UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
 }
 
 void Editor::OnDraw()
@@ -160,12 +170,12 @@ void Editor::Finalize()
     ImGui::DestroyContext();
 }
 
-void Editor::SetSelectedObject(const std::shared_ptr<engine::Object> &object)
+void Editor::SetSelectedObject(const std::shared_ptr<Object> &object)
 {
     m_selected_object_ = object;
 }
 
-std::shared_ptr<engine::Object> Editor::SelectedObject() const
+std::shared_ptr<Object> Editor::SelectedObject() const
 {
     return m_selected_object_.lock();
 }
@@ -211,6 +221,25 @@ std::shared_ptr<EditorMenu> Editor::GetEditorMenu(const std::string &name)
 void Editor::RemoveEditorMenu(const std::string &name)
 {
     m_editor_menus_.erase(std::ranges::find_if(m_editor_menus_, [&](const auto &m) {
+        return m.name == name;
+    }));
+}
+
+void Editor::AddCreateMenu(const std::string &name, const std::string &extension,
+                           std::function<std::shared_ptr<Object>()> factory, int priority)
+{
+    m_create_menus_.emplace_back(name, extension, factory, priority);
+    std::ranges::sort(m_create_menus_, std::ranges::less(), &PrioritizedCreateMenu::priority);
+}
+
+std::vector<Editor::PrioritizedCreateMenu> Editor::GetCreateMenus()
+{
+    return m_create_menus_;
+}
+
+void Editor::RemoveCreateMenu(const std::string &name)
+{
+    m_create_menus_.erase(std::ranges::find_if(m_create_menus_, [&](const auto &m) {
         return m.name == name;
     }));
 }
