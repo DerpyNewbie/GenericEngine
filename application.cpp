@@ -1,11 +1,8 @@
 #include "pch.h"
 
 #include "application.h"
-
 #include <tchar.h>
-
 #include "engine.h"
-#include "scene.h"
 #include "game_object.h"
 #include "input.h"
 
@@ -67,7 +64,6 @@ void Application::StartApp()
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
         engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
-        engine::Object::Instantiate<BillBoard>();
     }
 
     engine->MainLoop();

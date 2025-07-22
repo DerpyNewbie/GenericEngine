@@ -57,28 +57,31 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-   for (int i = 0; i < input.bones_per_vertex; ++i)
+    if (input.bone_id[0] < 65535)
     {
-        float weight = input.bone_weight[i];
-        if (weight > 0)
+        for (int i = 0; i < input.bones_per_vertex; ++i)
         {
-            float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
-            float3x3 boneRot = ExtractRotation(boneMatrix);
-            bonePos += mul(boneMatrix, localPos) * weight;
-            boneNormal += mul(boneRot, localNormal) * weight;
+            float weight = input.bone_weight[i];
+            if (weight > 0)
+            {
+                float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
+                float3x3 boneRot = ExtractRotation(boneMatrix);
+                bonePos += mul(boneMatrix, localPos) * weight;
+                boneNormal += mul(boneRot, localNormal) * weight;
+            }
         }
+
+        localPos = bonePos;
+        //localNormal = boneNormal;
     }
-    
-	localPos = bonePos;
-    //localNormal = boneNormal;
-    
+
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
     float4 projPos = mul(Proj, viewPos); // 投影変換
-    
+
     float3x3 worldRot = ExtractRotation(World);
     float3 worldNormal = mul(worldRot, localNormal); // ワールド座標に変換
-    
+
     output.svpos = projPos; // 投影変換された座標をピクセルシェーダーに渡す
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
@@ -92,8 +95,8 @@ Texture2D _MainTex : register(t1);
 float4 pix(VSOutput input) : SV_TARGET
 {
     float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = clamp(dot(-light,input.normal),0,1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
+    float brightness = clamp(dot(-light, input.normal), 0, 1);
+    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
     return mainColor * brightness;

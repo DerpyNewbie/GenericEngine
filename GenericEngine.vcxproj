@@ -49,6 +49,7 @@
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
+        <ClCompile Include="Engine\Components\billboard_renderer.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -105,6 +106,7 @@
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
             <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
         </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\billboard.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
@@ -127,6 +129,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\font_data.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
+        <ClCompile Include="Engine\Rendering\line_renderer.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
@@ -178,6 +181,7 @@
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
+        <ClInclude Include="Engine\Components\billboard_renderer.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -208,10 +212,10 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
-        <ClInclude Include="Engine\Rendering\bill_board.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\billboard.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>
@@ -226,6 +230,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\font_data.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
+        <ClInclude Include="Engine\Rendering\line_renderer.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
         <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
