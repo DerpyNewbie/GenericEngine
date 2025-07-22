@@ -11,7 +11,7 @@ std::vector<std::string> ShaderExporter::SupportedExtensions()
     return {".hlsl"};
 }
 
-void ShaderExporter::Export(AssetDescriptor *asset)
+void ShaderExporter::Export(std::ostream &output_stream, AssetDescriptor *asset)
 {
     const auto shader = std::dynamic_pointer_cast<Shader>(asset->managed_object);
 

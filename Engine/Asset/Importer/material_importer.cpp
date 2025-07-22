@@ -11,10 +11,9 @@ std::vector<std::string> MaterialImporter::SupportedExtensions()
     return {".material"};
 }
 
-std::shared_ptr<Object> MaterialImporter::Import(AssetDescriptor *asset)
+std::shared_ptr<Object> MaterialImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
 {
     Serializer serializer;
-    std::ifstream ifs(asset->path_hint);
-    return serializer.Load<Material>(ifs);
+    return serializer.Load<Material>(input_stream);
 }
 }

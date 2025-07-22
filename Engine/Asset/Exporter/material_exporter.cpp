@@ -10,7 +10,7 @@ std::vector<std::string> MaterialExporter::SupportedExtensions()
     return {".material"};
 }
 
-void MaterialExporter::Export(AssetDescriptor *descriptor)
+void MaterialExporter::Export(std::ostream &output_stream, AssetDescriptor *descriptor)
 {
     const auto material = std::dynamic_pointer_cast<Material>(descriptor->managed_object);
     if (material == nullptr)
@@ -18,9 +18,8 @@ void MaterialExporter::Export(AssetDescriptor *descriptor)
         assert(false && "This object cannot be exported with MaterialExporter");
     }
 
-    std::ofstream ofs(descriptor->path_hint);
     Serializer serializer;
-    serializer.Save(ofs, material);
+    serializer.Save(output_stream, material);
 }
 
 bool MaterialExporter::CanExport(const std::shared_ptr<Object> &object)
