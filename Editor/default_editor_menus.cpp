@@ -141,14 +141,6 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
     const auto names = editor->GetEditorWindowNames();
     for (auto &name : names)
     {
-        // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
-        if (name == "Hierarchy")
-        {
-            ImGui::BeginDisabled();
-            ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
-            ImGui::EndDisabled();
-            continue;
-        }
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
 }
