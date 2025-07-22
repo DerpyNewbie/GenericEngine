@@ -94,9 +94,10 @@ GenericValue<UTF8<>> &AssetDescriptor::GetDataValue()
 
 void AssetDescriptor::PopulateMetaJson()
 {
-    if (m_meta_json_.Null())
+    if (!m_meta_json_.IsObject())
     {
         m_meta_json_.SetObject();
+        Logger::Warn<AssetDescriptor>("Meta json is not an object! Resetting!");
     }
 
     auto &a = m_meta_json_.GetAllocator();
