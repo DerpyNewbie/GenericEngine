@@ -42,7 +42,7 @@ float3x3 ExtractRotation(float4x4 m)
 }
 
 
-VSOutput BasicVS(VSInput input)
+VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
     float4 localPos = float4(input.pos, 1.0f); // 頂点座標
@@ -67,10 +67,8 @@ Texture2D _MainTex : register(t1);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = clamp(dot(-light, input.normal), 0, 1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
+    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    return mainColor * brightness;
+    return mainColor;
 }
