@@ -64,7 +64,19 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
 
     if (asset_hierarchy->IsDirectory())
     {
-        if (ImGui::CollapsingHeader(asset_hierarchy->Name().c_str()))
+        const bool is_open = ImGui::CollapsingHeader(asset_hierarchy->Name().c_str());
+        if (ImGui::IsItemClicked())
+        {
+            Editor::Instance()->SetSelectedObject(asset_hierarchy);
+
+            auto path = engine::AssetDatabase::GetProjectDirectory();
+            if (asset_hierarchy->asset != nullptr)
+                path = asset_hierarchy->asset->path_hint;
+
+            Editor::Instance()->SetSelectedDirectory(path);
+        }
+
+        if (is_open)
         {
             ImGui::Indent();
             for (auto &child : asset_hierarchy->children)

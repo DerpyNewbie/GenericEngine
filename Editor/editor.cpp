@@ -15,6 +15,7 @@
 #include <imgui_impl_dx11.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+#include "Asset/asset_database.h"
 #include "Asset/text_asset.h"
 
 #include <ranges>
@@ -180,6 +181,16 @@ std::shared_ptr<Object> Editor::SelectedObject() const
     return m_selected_object_.lock();
 }
 
+void Editor::SetSelectedDirectory(const path &path)
+{
+    m_selected_directory_ = path;
+}
+
+path Editor::SelectedDirectory() const
+{
+    return m_selected_directory_;
+}
+
 void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
 {
     m_editor_windows_.emplace(name, window);
@@ -203,6 +214,7 @@ void Editor::RemoveEditorWindow(const std::string &name)
 
 void Editor::AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, const int priority)
 {
+    menu->editor = this;
     m_editor_menus_.emplace_back(name, menu, priority);
     std::ranges::sort(m_editor_menus_, std::ranges::less(), &PrioritizedEditorMenu::priority);
 }
