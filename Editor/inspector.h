@@ -5,11 +5,8 @@
 
 namespace engine
 {
+class Component;
 class AssetHierarchy;
-}
-
-namespace engine
-{
 class GameObject;
 }
 

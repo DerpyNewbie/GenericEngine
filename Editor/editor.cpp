@@ -53,10 +53,12 @@ void Editor::SetEditorStyle(const int i)
 
     m_last_editor_style_ = i;
 }
+
 Editor *Editor::Instance()
 {
     return m_instance_;
 }
+
 void Editor::Init()
 {
     m_instance_ = this;
@@ -107,8 +109,6 @@ void Editor::Init()
         AddEditorMenu("Window", default_menu, -960);
     }
 }
-void Editor::Update()
-{}
 
 void Editor::Attach()
 {
@@ -151,6 +151,7 @@ void Editor::OnDraw()
 
     RefreshDxLibDirect3DSetting();
 }
+
 void Editor::Finalize()
 {
     ImGui_ImplWin32_Shutdown();
@@ -158,31 +159,38 @@ void Editor::Finalize()
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
+
 void Editor::SetSelectedObject(const std::shared_ptr<engine::Object> &object)
 {
     m_selected_object_ = object;
 }
+
 std::shared_ptr<engine::Object> Editor::SelectedObject() const
 {
     return m_selected_object_.lock();
 }
+
 void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
 {
     m_editor_windows_.emplace(name, window);
 }
+
 std::vector<std::string> Editor::GetEditorWindowNames()
 {
     auto keys = std::views::keys(m_editor_windows_);
     return {keys.begin(), keys.end()};
 }
+
 std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
 {
     return m_editor_windows_.at(name);
 }
+
 void Editor::RemoveEditorWindow(const std::string &name)
 {
     m_editor_windows_.erase(name);
 }
+
 void Editor::AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, const int priority)
 {
     m_editor_menus_.emplace_back(name, menu, priority);
@@ -193,11 +201,13 @@ std::vector<Editor::PrioritizedEditorMenu> Editor::GetEditorMenus()
 {
     return m_editor_menus_;
 }
+
 std::shared_ptr<EditorMenu> Editor::GetEditorMenu(const std::string &name)
 {
     const auto item = std::ranges::find(m_editor_menus_, name, &PrioritizedEditorMenu::name);
     return item->menu;
 }
+
 void Editor::RemoveEditorMenu(const std::string &name)
 {
     m_editor_menus_.erase(std::ranges::find_if(m_editor_menus_, [&](const auto &m) {

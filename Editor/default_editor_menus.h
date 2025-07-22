@@ -1,5 +1,6 @@
 #pragma once
 #include "editor_menu.h"
+#include "game_object.h"
 
 namespace editor
 {

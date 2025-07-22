@@ -3,7 +3,6 @@
 
 #include "enable_shared_from_base.h"
 #include "event_receivers.h"
-#include "Components/component.h"
 
 namespace editor
 {
@@ -48,7 +47,6 @@ public:
     void OnDraw() override;
 
     void Init();
-    void Update();
     void Attach();
     void Finalize();
 
