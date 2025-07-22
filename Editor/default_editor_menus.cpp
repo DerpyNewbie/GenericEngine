@@ -69,7 +69,7 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
 
     if (ImGui::MenuItem("Load Scene"))
     {
-        std::string file_path;
+        std::string file_path = engine::AssetDatabase::GetProjectDirectory().string() + "\\";
 
         if (!engine::Gui::OpenFileDialog(file_path, scene_filter))
         {
