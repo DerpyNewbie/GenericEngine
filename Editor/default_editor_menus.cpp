@@ -150,7 +150,7 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
 }
-void editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
+bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
 {
     const auto editor = Editor::Instance();
     const auto menus = editor->GetCreateMenus();
@@ -159,7 +159,7 @@ void editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
     {
         if (ImGui::MenuItem(menu.name.c_str(), nullptr, false, enabled))
         {
-            auto object = menu.factory();
+            const auto object = menu.factory();
             auto file_name = object->Name() + menu.extension;
 
             int i = 0;
@@ -169,6 +169,7 @@ void editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
             }
 
             engine::AssetDatabase::CreateAsset(object, path / file_name);
+            return true;
         }
 
         if (!enabled)
@@ -176,4 +177,6 @@ void editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
             ImGui::SetItemTooltip("You must select directory in AssetBrowser in order to create asset");
         }
     }
+
+    return false;
 }
