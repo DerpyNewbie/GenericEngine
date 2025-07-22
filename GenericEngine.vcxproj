@@ -299,8 +299,6 @@
             <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
-            <PrecompiledHeader>NotUsing</PrecompiledHeader>
-            <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
         </ClCompile>

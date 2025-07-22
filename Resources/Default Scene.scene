@@ -1,0 +1,464 @@
+{
+    "value0": {
+        "polymorphic_id": 1073741824,
+        "ptr_wrapper": {
+            "id": 2147483649,
+            "data": {
+                "value0": {
+                    "m_guid_": "a9fe19c1-39f6-4e13-bde0-a3e5a69c476a",
+                    "m_name_": "Default Scene"
+                },
+                "m_root_game_objects_": [
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 2147483650,
+                            "data": {
+                                "value0": {
+                                    "m_guid_": "18a43459-4d19-4fe2-81d8-d5c8b4aa70a1",
+                                    "m_name_": "Camera"
+                                },
+                                "m_scene_": {
+                                    "locked_ptr": {
+                                        "polymorphic_id": 1073741824,
+                                        "ptr_wrapper": {
+                                            "id": 1
+                                        }
+                                    }
+                                },
+                                "m_is_active_self_": true,
+                                "m_components_": [
+                                    {
+                                        "polymorphic_id": 2147483649,
+                                        "polymorphic_name": "engine::Transform",
+                                        "ptr_wrapper": {
+                                            "id": 2147483651,
+                                            "data": {
+                                                "value0": {
+                                                    "value0": {
+                                                        "m_guid_": "3c18d53c-f511-4c5e-9f81-053dc3ccc581",
+                                                        "m_name_": "Transform"
+                                                    },
+                                                    "value1": {
+                                                        "locked_ptr": {
+                                                            "polymorphic_id": 1073741824,
+                                                            "ptr_wrapper": {
+                                                                "id": 2
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "m_matrix_": {
+                                                    "v.m[0][0]": 1.0,
+                                                    "v.m[0][1]": 0.0,
+                                                    "v.m[0][2]": 0.0,
+                                                    "v.m[0][3]": 0.0,
+                                                    "v.m[1][0]": 0.0,
+                                                    "v.m[1][1]": 1.0,
+                                                    "v.m[1][2]": 0.0,
+                                                    "v.m[1][3]": 0.0,
+                                                    "v.m[2][0]": 0.0,
+                                                    "v.m[2][1]": 0.0,
+                                                    "v.m[2][2]": 1.0,
+                                                    "v.m[2][3]": 0.0,
+                                                    "v.m[3][0]": 45.43859100341797,
+                                                    "v.m[3][1]": 53.573577880859378,
+                                                    "v.m[3][2]": 348.2426452636719,
+                                                    "v.m[3][3]": 1.0
+                                                },
+                                                "m_parent_": {
+                                                    "locked_ptr": {
+                                                        "polymorphic_id": 0
+                                                    }
+                                                },
+                                                "m_children_": []
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "polymorphic_id": 2147483650,
+                                        "polymorphic_name": "engine::Camera",
+                                        "ptr_wrapper": {
+                                            "id": 2147483652,
+                                            "data": {
+                                                "value0": {
+                                                    "value0": {
+                                                        "m_guid_": "a9c41549-5fb2-4550-a751-0b5604ddfa40",
+                                                        "m_name_": "Camera"
+                                                    },
+                                                    "value1": {
+                                                        "locked_ptr": {
+                                                            "polymorphic_id": 1073741824,
+                                                            "ptr_wrapper": {
+                                                                "id": 2
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "m_view_mode_": 0,
+                                                "m_field_of_view_": 70.0,
+                                                "m_ortho_size_": 50.0,
+                                                "m_near_plane_": 0.10000000149011612,
+                                                "m_far_plane_": 1000.0,
+                                                "m_background_color_": {
+                                                    "value0": 0.10196079313755036,
+                                                    "value1": 0.10196079313755036,
+                                                    "value2": 1.0,
+                                                    "value3": 0.10196079313755036
+                                                }
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "polymorphic_id": 2147483651,
+                                        "polymorphic_name": "engine::Controller",
+                                        "ptr_wrapper": {
+                                            "id": 2147483653,
+                                            "data": {
+                                                "value0": {
+                                                    "value0": {
+                                                        "m_guid_": "ec2e66e7-076a-4c0a-80f9-a208c6b42442",
+                                                        "m_name_": "Controller"
+                                                    },
+                                                    "value1": {
+                                                        "locked_ptr": {
+                                                            "polymorphic_id": 1073741824,
+                                                            "ptr_wrapper": {
+                                                                "id": 2
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "m_rotation_": {
+                                                    "v.x": 0.0,
+                                                    "v.y": 0.0,
+                                                    "v.z": 0.0
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 2147483654,
+                            "data": {
+                                "value0": {
+                                    "m_guid_": "494400fc-795f-47b8-a971-4c8398f92f35",
+                                    "m_name_": "Parent"
+                                },
+                                "m_scene_": {
+                                    "locked_ptr": {
+                                        "polymorphic_id": 1073741824,
+                                        "ptr_wrapper": {
+                                            "id": 1
+                                        }
+                                    }
+                                },
+                                "m_is_active_self_": true,
+                                "m_components_": [
+                                    {
+                                        "polymorphic_id": 1,
+                                        "ptr_wrapper": {
+                                            "id": 2147483655,
+                                            "data": {
+                                                "value0": {
+                                                    "value0": {
+                                                        "m_guid_": "d71eb150-ca94-4beb-9d69-90d01d2f6e37",
+                                                        "m_name_": "Transform"
+                                                    },
+                                                    "value1": {
+                                                        "locked_ptr": {
+                                                            "polymorphic_id": 1073741824,
+                                                            "ptr_wrapper": {
+                                                                "id": 6
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "m_matrix_": {
+                                                    "v.m[0][0]": 1.0,
+                                                    "v.m[0][1]": 0.0,
+                                                    "v.m[0][2]": 0.0,
+                                                    "v.m[0][3]": 0.0,
+                                                    "v.m[1][0]": 0.0,
+                                                    "v.m[1][1]": 1.0,
+                                                    "v.m[1][2]": 0.0,
+                                                    "v.m[1][3]": 0.0,
+                                                    "v.m[2][0]": 0.0,
+                                                    "v.m[2][1]": 0.0,
+                                                    "v.m[2][2]": 1.0,
+                                                    "v.m[2][3]": 0.0,
+                                                    "v.m[3][0]": 0.0,
+                                                    "v.m[3][1]": 0.0,
+                                                    "v.m[3][2]": 0.0,
+                                                    "v.m[3][3]": 1.0
+                                                },
+                                                "m_parent_": {
+                                                    "locked_ptr": {
+                                                        "polymorphic_id": 0
+                                                    }
+                                                },
+                                                "m_children_": [
+                                                    {
+                                                        "polymorphic_id": 1073741824,
+                                                        "ptr_wrapper": {
+                                                            "id": 2147483656,
+                                                            "data": {
+                                                                "value0": {
+                                                                    "value0": {
+                                                                        "m_guid_": "7d04ef98-a08f-4ebe-81bd-45583da28efc",
+                                                                        "m_name_": "Transform"
+                                                                    },
+                                                                    "value1": {
+                                                                        "locked_ptr": {
+                                                                            "polymorphic_id": 1073741824,
+                                                                            "ptr_wrapper": {
+                                                                                "id": 2147483657,
+                                                                                "data": {
+                                                                                    "value0": {
+                                                                                        "m_guid_": "3379eff8-1f54-41f3-861c-667739775964",
+                                                                                        "m_name_": "Child"
+                                                                                    },
+                                                                                    "m_scene_": {
+                                                                                        "locked_ptr": {
+                                                                                            "polymorphic_id": 1073741824,
+                                                                                            "ptr_wrapper": {
+                                                                                                "id": 1
+                                                                                            }
+                                                                                        }
+                                                                                    },
+                                                                                    "m_is_active_self_": true,
+                                                                                    "m_components_": [
+                                                                                        {
+                                                                                            "polymorphic_id": 1,
+                                                                                            "ptr_wrapper": {
+                                                                                                "id": 8
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "m_matrix_": {
+                                                                    "v.m[0][0]": 1.0,
+                                                                    "v.m[0][1]": 0.0,
+                                                                    "v.m[0][2]": 0.0,
+                                                                    "v.m[0][3]": 0.0,
+                                                                    "v.m[1][0]": 0.0,
+                                                                    "v.m[1][1]": 1.0,
+                                                                    "v.m[1][2]": 0.0,
+                                                                    "v.m[1][3]": 0.0,
+                                                                    "v.m[2][0]": 0.0,
+                                                                    "v.m[2][1]": 0.0,
+                                                                    "v.m[2][2]": 1.0,
+                                                                    "v.m[2][3]": 0.0,
+                                                                    "v.m[3][0]": 0.0,
+                                                                    "v.m[3][1]": 0.0,
+                                                                    "v.m[3][2]": 0.0,
+                                                                    "v.m[3][3]": 1.0
+                                                                },
+                                                                "m_parent_": {
+                                                                    "locked_ptr": {
+                                                                        "polymorphic_id": 1073741824,
+                                                                        "ptr_wrapper": {
+                                                                            "id": 7
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "m_children_": []
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 2147483658,
+                            "data": {
+                                "value0": {
+                                    "m_guid_": "ae2f45ff-6528-47dc-adf4-9ec3a8cbf6e6",
+                                    "m_name_": "Parent2"
+                                },
+                                "m_scene_": {
+                                    "locked_ptr": {
+                                        "polymorphic_id": 1073741824,
+                                        "ptr_wrapper": {
+                                            "id": 1
+                                        }
+                                    }
+                                },
+                                "m_is_active_self_": true,
+                                "m_components_": [
+                                    {
+                                        "polymorphic_id": 1,
+                                        "ptr_wrapper": {
+                                            "id": 2147483659,
+                                            "data": {
+                                                "value0": {
+                                                    "value0": {
+                                                        "m_guid_": "d03d8dfc-c8ef-476c-88e9-909a57d888ea",
+                                                        "m_name_": "Transform"
+                                                    },
+                                                    "value1": {
+                                                        "locked_ptr": {
+                                                            "polymorphic_id": 1073741824,
+                                                            "ptr_wrapper": {
+                                                                "id": 10
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "m_matrix_": {
+                                                    "v.m[0][0]": 1.0,
+                                                    "v.m[0][1]": 0.0,
+                                                    "v.m[0][2]": 0.0,
+                                                    "v.m[0][3]": 0.0,
+                                                    "v.m[1][0]": 0.0,
+                                                    "v.m[1][1]": 1.0,
+                                                    "v.m[1][2]": 0.0,
+                                                    "v.m[1][3]": 0.0,
+                                                    "v.m[2][0]": 0.0,
+                                                    "v.m[2][1]": 0.0,
+                                                    "v.m[2][2]": 1.0,
+                                                    "v.m[2][3]": 0.0,
+                                                    "v.m[3][0]": 0.0,
+                                                    "v.m[3][1]": 0.0,
+                                                    "v.m[3][2]": 0.0,
+                                                    "v.m[3][3]": 1.0
+                                                },
+                                                "m_parent_": {
+                                                    "locked_ptr": {
+                                                        "polymorphic_id": 0
+                                                    }
+                                                },
+                                                "m_children_": [
+                                                    {
+                                                        "polymorphic_id": 1073741824,
+                                                        "ptr_wrapper": {
+                                                            "id": 2147483660,
+                                                            "data": {
+                                                                "value0": {
+                                                                    "value0": {
+                                                                        "m_guid_": "743de7cc-3182-4e3f-8bde-4ba1e7221bc2",
+                                                                        "m_name_": "Transform"
+                                                                    },
+                                                                    "value1": {
+                                                                        "locked_ptr": {
+                                                                            "polymorphic_id": 1073741824,
+                                                                            "ptr_wrapper": {
+                                                                                "id": 2147483661,
+                                                                                "data": {
+                                                                                    "value0": {
+                                                                                        "m_guid_": "c877429f-4960-4127-907e-90c54556da4e",
+                                                                                        "m_name_": "Child2"
+                                                                                    },
+                                                                                    "m_scene_": {
+                                                                                        "locked_ptr": {
+                                                                                            "polymorphic_id": 1073741824,
+                                                                                            "ptr_wrapper": {
+                                                                                                "id": 1
+                                                                                            }
+                                                                                        }
+                                                                                    },
+                                                                                    "m_is_active_self_": true,
+                                                                                    "m_components_": [
+                                                                                        {
+                                                                                            "polymorphic_id": 1,
+                                                                                            "ptr_wrapper": {
+                                                                                                "id": 12
+                                                                                            }
+                                                                                        }
+                                                                                    ]
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "m_matrix_": {
+                                                                    "v.m[0][0]": 1.0,
+                                                                    "v.m[0][1]": 0.0,
+                                                                    "v.m[0][2]": 0.0,
+                                                                    "v.m[0][3]": 0.0,
+                                                                    "v.m[1][0]": 0.0,
+                                                                    "v.m[1][1]": 1.0,
+                                                                    "v.m[1][2]": 0.0,
+                                                                    "v.m[1][3]": 0.0,
+                                                                    "v.m[2][0]": 0.0,
+                                                                    "v.m[2][1]": 0.0,
+                                                                    "v.m[2][2]": 1.0,
+                                                                    "v.m[2][3]": 0.0,
+                                                                    "v.m[3][0]": 0.0,
+                                                                    "v.m[3][1]": 0.0,
+                                                                    "v.m[3][2]": 0.0,
+                                                                    "v.m[3][3]": 1.0
+                                                                },
+                                                                "m_parent_": {
+                                                                    "locked_ptr": {
+                                                                        "polymorphic_id": 1073741824,
+                                                                        "ptr_wrapper": {
+                                                                            "id": 11
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "m_children_": []
+                                                            }
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "m_all_game_objects_": [
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 2
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 6
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 9
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 10
+                        }
+                    },
+                    {
+                        "polymorphic_id": 1073741824,
+                        "ptr_wrapper": {
+                            "id": 13
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

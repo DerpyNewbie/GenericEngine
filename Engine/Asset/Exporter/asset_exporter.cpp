@@ -4,19 +4,44 @@
 
 namespace engine
 {
-std::unordered_map<std::string, std::shared_ptr<AssetExporter>> AssetExporter::m_asset_exporters_;
+std::set<std::shared_ptr<AssetExporter>> AssetExporter::m_exporters_;
+std::unordered_map<std::string, std::shared_ptr<AssetExporter>> AssetExporter::m_exporter_extension_map_;
 
 void AssetExporter::Register(const std::shared_ptr<AssetExporter> &exporter)
 {
-    for (const auto &file_Extension : exporter->SupportedExtensions())
-        m_asset_exporters_[file_Extension] = exporter;
+    m_exporters_.insert(exporter);
+    for (const auto &file_extension : exporter->SupportedExtensions())
+    {
+        m_exporter_extension_map_[file_extension] = exporter;
+    }
 }
+
 void AssetExporter::Register(const std::string &file_extension, const std::shared_ptr<AssetExporter> &exporter)
 {
-    m_asset_exporters_[file_extension] = exporter;
+    m_exporters_.insert(exporter);
+    m_exporter_extension_map_[file_extension] = exporter;
 }
+
 std::shared_ptr<AssetExporter> AssetExporter::Get(const std::string &file_extension)
 {
-    return m_asset_exporters_[file_extension];
+    return m_exporter_extension_map_[file_extension];
+}
+
+std::shared_ptr<AssetExporter> AssetExporter::Get(const std::shared_ptr<Object> &object)
+{
+    for (auto exporter : Get())
+    {
+        if (exporter->CanExport(object))
+        {
+            return exporter;
+        }
+    }
+
+    return nullptr;
+}
+
+std::set<std::shared_ptr<AssetExporter>> AssetExporter::Get()
+{
+    return m_exporters_;
 }
 }

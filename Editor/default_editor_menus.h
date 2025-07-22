@@ -1,5 +1,6 @@
 #pragma once
 #include "editor_menu.h"
+#include "game_object.h"
 
 namespace editor
 {
@@ -14,5 +15,6 @@ public:
     static void DrawObjectMenu();
     static void DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go);
     static void DrawWindowMenu();
+    static bool DrawAssetMenu(const std::filesystem::path &path);
 };
 }

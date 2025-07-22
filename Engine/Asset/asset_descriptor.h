@@ -14,7 +14,7 @@ private:
     static constexpr auto kTypeKey = "type";
     static constexpr auto kDataKey = "data";
 
-    rapidjson::Document m_meta_json_;
+    rapidjson::Document m_meta_json_ = rapidjson::Document();
 
     static std::filesystem::path GetAbsoluteAssetFilePath(const std::filesystem::path &asset_path);
     static std::filesystem::path GetMetaFilePath(const std::filesystem::path &asset_path);
@@ -25,6 +25,7 @@ private:
 
     void Write(const std::filesystem::path &path);
     rapidjson::GenericValue<rapidjson::UTF8<>> &GetDataValue();
+    void PopulateMetaJson();
 
 public:
     xg::Guid guid = xg::Guid();
