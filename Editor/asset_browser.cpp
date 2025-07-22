@@ -46,6 +46,18 @@ static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &as
                 descriptor->Reload();
             }
 
+            if (ImGui::MenuItem("Reimport"))
+            {
+                engine::Logger::Log<AssetBrowser>("Reimporting %s", asset_hierarchy->asset->path_hint.string().c_str());
+                engine::AssetDatabase::Import(asset_hierarchy->asset->path_hint);
+            }
+
+            if (ImGui::MenuItem("Delete"))
+            {
+                engine::Logger::Log<AssetBrowser>("Deleting %s", asset_hierarchy->asset->path_hint.string().c_str());
+                engine::AssetDatabase::DeleteAsset(asset_hierarchy->asset->path_hint);
+            }
+
             ImGui::EndPopup();
         }
     }
