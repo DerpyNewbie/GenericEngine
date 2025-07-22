@@ -24,14 +24,15 @@ public:
     /// <summary>
     /// Write Object to the file that AssetDescriptor points to.
     /// </summary>
+    /// <param name="output_stream">An output stream to write Object</param>
     /// <param name="descriptor">A valid AssetDescriptor</param>
-    virtual void Export(AssetDescriptor *descriptor) = 0;
+    virtual void Export(std::ostream &output_stream, AssetDescriptor *descriptor) = 0;
 
     /// <summary>
     /// Check if Object can be exported with this exporter.
     /// </summary>
-    /// <param name="object">Object to check an ability to export</param>
-    /// <returns>true if exporter supports <paramref name="object"/>, false otherwise.</returns>
+    /// <param name="object">Object to check the ability to export</param>
+    /// <returns>true if the exporter supports an object, false otherwise.</returns>
     virtual bool CanExport(const std::shared_ptr<Object> &object) = 0;
 
     /// <summary>

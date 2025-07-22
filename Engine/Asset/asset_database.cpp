@@ -1,10 +1,8 @@
 #include "pch.h"
 #include "asset_database.h"
 
-#include <ranges>
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
-#include "logger.h"
 #include "Exporter/asset_exporter.h"
 #include "Exporter/txt_exporter.h"
 
@@ -242,7 +240,9 @@ void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
         return;
     }
 
-    exporter->Export(asset_descriptor);
+    std::ofstream output_stream(asset_descriptor->path_hint);
+    exporter->Export(output_stream, asset_descriptor);
+    output_stream.close();
     asset_descriptor->Save();
 }
 

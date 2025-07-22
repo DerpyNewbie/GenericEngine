@@ -12,7 +12,7 @@ std::vector<std::string> TxtExporter::SupportedExtensions()
     return {".txt"};
 }
 
-void TxtExporter::Export(AssetDescriptor *asset)
+void TxtExporter::Export(std::ostream &output_stream, AssetDescriptor *asset)
 {
     const auto text = std::dynamic_pointer_cast<TextAsset>(asset->managed_object);
     if (text == nullptr)
@@ -21,10 +21,8 @@ void TxtExporter::Export(AssetDescriptor *asset)
                                   asset->path_hint.string().c_str());
         return;
     }
-    std::ofstream file(asset->path_hint);
-    file << text->content;
-    file.close();
 
+    output_stream << text->content;
     asset->ClearKeys();
     for (auto [key, value] : text->key_value_pairs)
     {

@@ -20,9 +20,10 @@ public:
     /// <summary>
     /// Retrieve Object from AssetDescriptor
     /// </summary>
+    /// <param name="input_stream">An input stream containing Object in serialized form</param>
     /// <param name="asset">A valid AssetDescriptor</param>
     /// <returns>Object representation of a file that AssetDescriptor points to. `nullptr` if the file cannot be converted to Object.</returns>
-    virtual std::shared_ptr<Object> Import(AssetDescriptor *asset) = 0;
+    virtual std::shared_ptr<Object> Import(const std::istream &input_stream, AssetDescriptor *asset) = 0;
 
     /// <summary>
     /// Add AssetImporter implementations to make impl retrievable with supported file extension.
