@@ -7,7 +7,7 @@ class TxtExporter : public AssetExporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;
-    void Export(AssetDescriptor *asset) override;
+    void Export(std::ostream &output_stream, AssetDescriptor *asset) override;
     bool CanExport(const std::shared_ptr<Object> &object) override;
 };
 }

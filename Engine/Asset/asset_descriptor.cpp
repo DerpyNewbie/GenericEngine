@@ -170,6 +170,13 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
 
 void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, const std::string &json)
 {
+    if (instance->IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", instance->guid.str().c_str());
+        return;
+    }
+
+    instance->m_meta_json_ = Document();
     instance->m_meta_json_.Parse(json.c_str());
     instance->guid = xg::Guid(instance->m_meta_json_.FindMember(kGuidKey)->value.GetString());
     instance->type_hint = instance->m_meta_json_.FindMember(kTypeKey)->value.GetString();
@@ -182,7 +189,10 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
         return;
     }
 
-    const auto object = asset_importer->Import(instance.get());
+    auto input_stream = std::ifstream(instance->path_hint);
+    const auto object = asset_importer->Import(input_stream, instance.get());
+    input_stream.close();
+
     if (object->Guid() != instance->guid)
     {
         Logger::Error<AssetDescriptor>("Asset guid mismatch from importer for '%s'! Expected '%s', got '%s'",
