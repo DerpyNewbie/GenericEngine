@@ -2,6 +2,14 @@
 
 #include "RenderEngine.h"
 
+#include "PSOManager.h"
+#include "RootSignatureManager.h"
+#include "application.h"
+#include "update_manager.h"
+#include "Rendering/FontData.h"
+
+#include <DirectXColors.h>
+
 RenderEngine *g_RenderEngine;
 
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
@@ -47,6 +55,11 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         printf("デプスステンシルバッファの生成に失敗\n");
         return false;
     }
+    if (!CreatePeraResource())
+    {
+        printf("ペラリソースの生成に失敗\n");
+        return false;
+    }
 
     printf("描画エンジンの初期化に成功\n");
     return true;
@@ -65,6 +78,32 @@ void RenderEngine::BeginRender()
     m_pCommandList->RSSetViewports(1, &m_Viewport);
     m_pCommandList->RSSetScissorRects(1, &m_Scissor);
 
+    auto currentRtvHandle = m_pPeraRTVHeap->GetCPUDescriptorHandleForHeapStart();
+    auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE
+        );
+    m_pCommandList->ResourceBarrier(1, &dsBarrier);
+
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pPeraResource.Get(), D3D12_RESOURCE_STATE_PRESENT,
+                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+
+    // レンダーターゲットを設定
+    m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
+
+    // レンダーターゲットをクリア
+    constexpr float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
+    m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
+
+    // 深度ステンシルビューをクリア
+    m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+}
+
+void RenderEngine::DrawPera()
+{
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     auto currentRtvHandle = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart();
     currentRtvHandle.ptr += m_CurrentBackBufferIndex * m_RtvDescriptorSize;
@@ -76,12 +115,10 @@ void RenderEngine::BeginRender()
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_pCommandList->ResourceBarrier(1, &barrier);
-    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pDepthStencilBuffer.Get(),
-        D3D12_RESOURCE_STATE_COMMON,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE
-        );
-    m_pCommandList->ResourceBarrier(1, &dsBarrier);
+
+    // ビューポートとシザー矩形を設定
+    m_pCommandList->RSSetViewports(1, &m_Viewport);
+    m_pCommandList->RSSetScissorRects(1, &m_Scissor);
 
     // レンダーターゲットを設定
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
@@ -92,13 +129,25 @@ void RenderEngine::BeginRender()
 
     // 深度ステンシルビューをクリア
     m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    DrawPeraPolygon();
 }
 
 void RenderEngine::EndRender()
 {
+    auto sprite_batch = engine::FontData::SpriteBatch();
+    auto sprite_font = engine::FontData::SpriteFont();
+    sprite_batch->Begin(m_pCommandList.Get());
+    sprite_font->DrawString(sprite_batch.get(), "HelloWorld", DirectX::XMFLOAT2(102, 102), DirectX::Colors::Black);
+    sprite_batch->End();
+
+    DrawPera();
     // レンダーターゲットに書き込み終わるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pPeraResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                         D3D12_RESOURCE_STATE_PRESENT);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+    barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                                   D3D12_RESOURCE_STATE_PRESENT);
     m_pCommandList->ResourceBarrier(1, &barrier);
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDepthStencilBuffer.Get(),
@@ -116,6 +165,7 @@ void RenderEngine::EndRender()
 
     // スワップチェーンを切り替え
     m_pSwapChain->Present(1, 0);
+    engine::FontData::GMamory()->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
     WaitRender();
@@ -357,6 +407,106 @@ bool RenderEngine::CreateDepthStencil()
     m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), nullptr, dsvHandle);
 
     return true;
+}
+
+bool RenderEngine::CreatePeraResource()
+{
+    auto heap_desc = m_pRtvHeap->GetDesc();
+
+    auto &bbuff = m_pRenderTargets[m_CurrentBackBufferIndex];
+    auto resDesc = bbuff->GetDesc();
+
+    D3D12_HEAP_PROPERTIES heap_prop =
+        CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+    constexpr float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
+    D3D12_CLEAR_VALUE clear_value = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_R8G8B8A8_UNORM, clearColor);
+
+    auto hr = m_pDevice->CreateCommittedResource(
+        &heap_prop,
+        D3D12_HEAP_FLAG_NONE,
+        &resDesc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        &clear_value,
+        IID_PPV_ARGS(m_pPeraResource.ReleaseAndGetAddressOf()));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    //create rtv heap
+    heap_desc.NumDescriptors = 1;
+    hr = m_pDevice->CreateDescriptorHeap(
+        &heap_desc,
+        IID_PPV_ARGS(m_pPeraRTVHeap.ReleaseAndGetAddressOf()));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
+    rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    m_pDevice->CreateRenderTargetView(
+        m_pPeraResource.Get(),
+        &rtv_desc,
+        m_pPeraRTVHeap->GetCPUDescriptorHandleForHeapStart());
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Format = rtv_desc.Format;
+    srv_desc.Texture2D.MipLevels = 1;
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+
+    g_DescriptorHeapManager.Initialize();
+    m_pPeraTexHandle = g_DescriptorHeapManager.Get().Allocate();
+
+    m_pDevice->CreateShaderResourceView(
+        m_pPeraResource.Get(),
+        &srv_desc,
+        m_pPeraTexHandle->HandleCPU
+        );
+
+    return true;
+}
+
+void RenderEngine::DrawPeraPolygon()
+{
+
+    if (!m_pVertBuff)
+    {
+        std::array<Vertex, 4> vertices;
+        vertices[0].vertex = Vector3(-1, -1, 0.1f); // 左上
+        vertices[1].vertex = Vector3(-1, 1, 0.1f); // 左下
+        vertices[2].vertex = Vector3(1, -1, 0.1f); // 右上
+        vertices[3].vertex = Vector3(1, 1, 0.1f); // 右下
+
+        vertices[0].uvs[0] = Vector2(0, 1); // 左下
+        vertices[1].uvs[0] = Vector2(0, 0); // 左上
+        vertices[2].uvs[0] = Vector2(1, 1); // 右下
+        vertices[3].uvs[0] = Vector2(1, 0); // 右上
+        m_pVertBuff = std::make_shared<engine::VertexBuffer>(vertices.size(), vertices.data());
+    }
+    if (!m_pIndexBuff)
+    {
+        std::array<uint32_t, 8> indices;
+        indices = {0, 1, 2, 1, 3, 2};
+        m_pIndexBuff = std::make_shared<engine::IndexBuffer>(indices.size() * sizeof(uint32_t), indices.data());
+    }
+
+    auto cmd_list = m_pCommandList;
+
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+    auto vbView = m_pVertBuff->View();
+    auto ibview = m_pIndexBuff->View();
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmd_list->IASetVertexBuffers(0, 1, &vbView);
+    cmd_list->IASetIndexBuffer(&ibview);
+    cmd_list->SetPipelineState(g_PSOManager.Get("2DBasic"));
+    cmd_list->SetGraphicsRootDescriptorTable(engine::kPixelSRV, m_pPeraTexHandle->HandleGPU);
+
+    cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 
 void RenderEngine::WaitRender()

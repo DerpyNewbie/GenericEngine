@@ -17,9 +17,9 @@ class UpdateManager
 
     static void InvokeUpdate();
     static void InvokeFixedUpdate();
-    static void InvokeDrawCall();
 
 public:
+    static void InvokeDrawCall();
     static void SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
     static void UnsubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
     static void SubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver);

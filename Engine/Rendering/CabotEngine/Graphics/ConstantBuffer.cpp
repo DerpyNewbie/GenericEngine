@@ -60,7 +60,7 @@ void ConstantBuffer::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 {
-    auto pHandle = g_DescriptorHeapManager->Get().Register(*this);
+    auto pHandle = g_DescriptorHeapManager.Get().Register(*this);
     return pHandle;
 }
 

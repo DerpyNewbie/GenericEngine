@@ -74,7 +74,7 @@ void Texture2D::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
 {
-    return g_DescriptorHeapManager->Get().Register(std::static_pointer_cast<Texture2D>(shared_from_this()));
+    return g_DescriptorHeapManager.Get().Register(std::static_pointer_cast<Texture2D>(shared_from_this()));
 }
 
 ID3D12Resource *Texture2D::Resource()

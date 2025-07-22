@@ -9,6 +9,7 @@
 #include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
 #include "Importer/ShaderImporter.h"
+#include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
 #include "Importer/texture_2d_importer.h"
 
@@ -38,6 +39,7 @@ void AssetDatabase::Init()
     AssetExporter::Register(std::make_shared<ShaderExporter>());
     AssetImporter::Register(std::make_shared<MaterialImporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
+    AssetImporter::Register(std::make_shared<FontImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 
@@ -133,6 +135,7 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetRootAssetHierarchy()
 {
     return m_asset_hierarchy_;
 }
+
 void AssetDatabase::ReloadAsset(const xg::Guid &guid)
 {
     const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
@@ -185,6 +188,7 @@ IAssetPtr AssetDatabase::GetAsset(const xg::Guid &guid)
     const auto asset_desc = asset_desc_it->second;
     return IAssetPtr::FromAssetDescriptor(asset_desc);
 }
+
 std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 {
     auto assets = std::vector<IAssetPtr>();

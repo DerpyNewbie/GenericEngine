@@ -67,7 +67,7 @@ void engine::StructuredBuffer::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> engine::StructuredBuffer::UploadBuffer()
 {
-    auto pHandle = g_DescriptorHeapManager->Get().Register(*this);
+    auto pHandle = g_DescriptorHeapManager.Get().Register(*this);
     return pHandle;
 }
 

@@ -48,7 +48,7 @@ void engine::MaterialBlock::ReleaseDescHandles()
         for (int param_type = 0; param_type < kParameterBufferType_Count; ++param_type)
         {
             for (auto desc_handle : desc_handles[shader_type][param_type])
-                g_DescriptorHeapManager->Get().Free(desc_handle);
+                g_DescriptorHeapManager.Get().Free(desc_handle);
             desc_handles[shader_type][param_type].clear();
         }
 }

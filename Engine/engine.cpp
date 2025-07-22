@@ -21,6 +21,7 @@
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
+#include "Engine/Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 #include <DxLib.h>
 
@@ -33,13 +34,11 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-
     g_RenderEngine = new RenderEngine();
     if (!g_RenderEngine->Init(Application::GetWindowHandle(), Application::WindowWidth(), Application::WindowHeight()))
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-    g_DescriptorHeapManager = new DescriptorHeapManager();
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
@@ -82,7 +81,7 @@ void Engine::MainLoop() const
             Profiler::Begin("Draw Call");
             g_RenderEngine->BeginRender();
             g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
-            auto &descriptor_heap_wrapped = g_DescriptorHeapManager->Get();
+            auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
             auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
             g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
             UpdateManager::InvokeDrawCall();

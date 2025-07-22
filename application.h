@@ -2,8 +2,11 @@
 #include <Windows.h>
 #include <functional>
 
+
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
+
+class DescriptorHandle;
 
 class Application
 {
@@ -30,6 +33,7 @@ private:
 
     /// @brief ウィンドウの初期化
     void InitWindow();
+    void InitFontObjects();
 
 };
 

@@ -38,6 +38,7 @@
         <ClCompile Include="Engine\Asset\Exporter\asset_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
+      <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
@@ -65,6 +66,30 @@
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\buffers.cpp"/>
+      <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
+        <ObjectFileOutput>C:\Projects\team\x64\Debug\2DPixelShader.cso</ObjectFileOutput>
+        <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
+        <EntryPointName>pix</EntryPointName>
+        <SuppressStartupBanner>true</SuppressStartupBanner>
+        <ShaderModel>5.0</ShaderModel>
+        <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+        <DisableOptimizations>true</DisableOptimizations>
+        <EnableDebuggingInformation>true</EnableDebuggingInformation>
+        <FileType>Document</FileType>
+        <ShaderType>Pixel</ShaderType>
+      </FxCompile>
+      <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl">
+        <ObjectFileOutput>C:\Projects\team\x64\Debug\2DVertShader.cso</ObjectFileOutput>
+        <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
+        <EntryPointName>vrt</EntryPointName>
+        <SuppressStartupBanner>true</SuppressStartupBanner>
+        <ShaderModel>5.0</ShaderModel>
+        <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+        <DisableOptimizations>true</DisableOptimizations>
+        <EnableDebuggingInformation>true</EnableDebuggingInformation>
+        <FileType>Document</FileType>
+        <ShaderType>Vertex</ShaderType>
+      </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl">
             <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicPS</EntryPointName>
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
@@ -97,6 +122,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
+      <ClCompile Include="Engine\Rendering\FontData.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
         <ClCompile Include="Engine\Rendering\line_renderer.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
@@ -136,6 +162,7 @@
         <ClInclude Include="Engine\Asset\Exporter\asset_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
+      <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
@@ -176,6 +203,7 @@
         <ClInclude Include="Engine\object.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\buffers.h"/>
+      <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
@@ -190,6 +218,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
+      <ClInclude Include="Engine\Rendering\FontData.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
         <ClInclude Include="Engine\Rendering\line_renderer.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>

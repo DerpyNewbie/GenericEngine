@@ -22,6 +22,12 @@ void PSOManager::Initialize()
     BasicSetting.VSPath = L"x64/Debug/LineVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/LinePixelShader.cso";
     Register(BasicSetting);
+
+    BasicSetting.PSOName = "2DBasic";
+    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    BasicSetting.VSPath = L"x64/Debug/2DVertShader.cso";
+    BasicSetting.PSPath = L"x64/Debug/2DPixelShader.cso";
+    Register(BasicSetting);
 }
 
 bool PSOManager::Register(PSOSetting setting)
