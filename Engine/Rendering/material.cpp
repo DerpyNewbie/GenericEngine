@@ -4,8 +4,6 @@
 #include "MaterialData.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
-#include "Asset/Exporter/asset_exporter.h"
-#include "Editor/gui.h"
 
 #include <memory>
 

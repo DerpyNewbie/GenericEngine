@@ -43,7 +43,7 @@
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
-        <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
@@ -143,7 +143,7 @@
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
-        <ClInclude Include="Engine\Asset\Importer\ShaderImporter.h"/>
+        <ClInclude Include="Engine\Asset\Importer\shader_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>

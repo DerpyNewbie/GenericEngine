@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "asset_database.h"
 
-#include <ranges>
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
 #include "logger.h"
@@ -9,7 +8,7 @@
 #include "Exporter/material_exporter.h"
 #include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
-#include "Importer/ShaderImporter.h"
+#include "Importer/shader_importer.h"
 #include "Importer/material_importer.h"
 #include "Importer/texture_2d_importer.h"
 
