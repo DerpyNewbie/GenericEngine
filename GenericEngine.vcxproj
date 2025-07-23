@@ -101,7 +101,7 @@
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
         <ClCompile Include="Engine\Rendering\line_renderer.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
-        <ClCompile Include="Engine\Rendering\MaterialData.cpp"/>
+        <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
@@ -195,7 +195,7 @@
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
         <ClInclude Include="Engine\Rendering\line_renderer.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
-        <ClInclude Include="Engine\Rendering\MaterialData.h"/>
+        <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>

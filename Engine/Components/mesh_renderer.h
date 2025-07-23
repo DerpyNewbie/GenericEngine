@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "component.h"
 #include "renderer.h"
-#include "Rendering/MaterialData.h"
+#include "Rendering/material_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"

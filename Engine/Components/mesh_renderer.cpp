@@ -7,7 +7,7 @@
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
 #include "camera.h"
-#include "Rendering/MaterialData.h"
+#include "Rendering/material_data.h"
 #include "Rendering/world_view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -177,20 +177,15 @@ void MeshRenderer::Reconstruct()
         }
         ReconstructMeshesBuffer();
     }
-    for (int i = 0; i < shared_materials.size(); ++i)
-    {
-        auto material = shared_materials[i].CastedLock();
-        if (material->IsValid() && !material->p_shared_material_block->IsCreateBuffer())
-        {
-            material->p_shared_material_block->CreateBuffer();
-        }
-    }
+
     for (auto &wvp_buffer : wvp_buffers)
+    {
         if (!wvp_buffer)
         {
             wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(WorldViewProjection));
             wvp_buffer->CreateBuffer();
         }
+    }
 }
 
 void MeshRenderer::ReconstructMeshesBuffer()
@@ -265,13 +260,29 @@ void MeshRenderer::UpdateBuffers()
 
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx)
 {
-    auto material_handles = shared_materials[material_idx].CastedLock()->p_shared_material_block->GetHandles();
-    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            if (!material_handles[shader_type][params_type].empty())
-                cmd_list->SetGraphicsRootDescriptorTable(
-                    shader_type * 3 + params_type + 2,
-                    material_handles[shader_type][params_type][0]->HandleGPU);
+    const auto material = shared_materials[material_idx].CastedLock();
+    const auto material_block = material->p_shared_material_block;
+
+    material->UpdateBuffer();
+
+    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
+    {
+        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
+        {
+            const auto shader_type = static_cast<kShaderType>(shader_i);
+            const auto param_type = static_cast<kParameterBufferType>(param_i);
+
+            if (material_block->Empty(shader_type, param_type))
+            {
+                continue;
+            }
+
+            const int root_param_idx = shader_i * kShaderType_Count + param_i + kParameterBufferType_Count;
+            const auto itr = material_block->Begin(shader_type, param_type);
+            const auto desc_handle = itr->handle->HandleGPU;
+            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+        }
+    }
 }
 
 }

@@ -14,8 +14,6 @@ namespace engine
 /// </remarks>
 class Material : public InspectableAsset
 {
-    bool m_IsValid = false;
-
 public:
     AssetPtr<Shader> p_shared_shader;
     std::shared_ptr<MaterialBlock> p_shared_material_block;
@@ -24,12 +22,14 @@ public:
     void OnConstructed() override;
     void CreateMaterialBlock();
 
-    bool IsValid();
+    void UpdateBuffer();
+    bool IsDirty() const;
+    bool IsValid() const;
 
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Object>(this), p_shared_shader, p_shared_material_block);
+        ar(cereal::base_class<Object>(this), CEREAL_NVP(p_shared_shader), CEREAL_NVP(p_shared_material_block));
     }
 };
 }
