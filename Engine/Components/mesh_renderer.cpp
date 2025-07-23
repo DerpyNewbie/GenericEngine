@@ -277,7 +277,8 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
                 continue;
             }
 
-            const int root_param_idx = shader_i * kShaderType_Count + param_i + kParameterBufferType_Count;
+            // +2 for engine pre-defined shader variables
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 2;
             const auto itr = material_block->Begin(shader_type, param_type);
             const auto desc_handle = itr->handle->HandleGPU;
             cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);

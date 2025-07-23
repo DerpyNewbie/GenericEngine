@@ -160,6 +160,8 @@ int MaterialBlock::GetOffset(const kShaderType type) const
 
 void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
 {
+    Logger::Log<MaterialBlock>("Inserting data %s", data->parameter.name.c_str());
+
     const auto shader_type = data->parameter.shader_type;
     const auto buffer_type = data->BufferType();
     data->CreateBuffer();
@@ -212,11 +214,13 @@ void MaterialBlock::UpdateBuffer()
             {
                 data->UpdateBuffer();
             }
-
-            if (handle != nullptr)
+            else
             {
-                g_DescriptorHeapManager->Get().Free(handle);
-                handle = nullptr;
+                if (handle != nullptr)
+                {
+                    g_DescriptorHeapManager->Get().Free(handle);
+                    handle = nullptr;
+                }
             }
 
             data->is_dirty = false;

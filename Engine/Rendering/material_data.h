@@ -37,7 +37,8 @@ struct IMaterialData : Inspectable
 };
 
 inline IMaterialData::IMaterialData(ShaderParameter param): parameter(std::move(param))
-{}
+{
+}
 
 template <typename T>
 struct MaterialData : IMaterialData
@@ -77,12 +78,14 @@ struct MaterialData : IMaterialData
 
 template <typename T>
 MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) : MaterialData({}, new_parameter)
-{}
+{
+}
 
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
-{}
+{
+}
 
 template <typename T>
 void MaterialData<T>::OnInspectorGui()
@@ -93,7 +96,7 @@ void MaterialData<T>::OnInspectorGui()
     {
         if (ImGui::InputInt(name, &value))
         {
-            is_dirty = false;
+            is_dirty = true;
         }
         ImGui::SetItemTooltip("Is Dirty?: %s", is_dirty ? "true" : "false");
     }
@@ -108,6 +111,7 @@ void MaterialData<T>::OnInspectorGui()
     {
         if (Gui::PropertyField(name, value))
         {
+            buffer = CreateBuffer();
             is_dirty = true;
         }
     }
