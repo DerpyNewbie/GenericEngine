@@ -157,7 +157,7 @@ void RenderEngine::EndRender()
 
     // スワップチェーンを切り替え
     m_pSwapChain->Present(1, 0);
-    engine::FontData::GMamory()->Commit(m_pQueue.Get());
+    engine::FontData::GMamory().lock()->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
     WaitRender();

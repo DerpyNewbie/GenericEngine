@@ -2,6 +2,6 @@
     "guid": "7322408b-f1f4-4bb7-a310-5dd0cb5e71d1",
     "type": ".hlsl",
     "data": {
-        "shader_meta": "{\"parameters\":{\"vertex\":[{\"name\":\"__WVP__\",\"type\":\"__WVP__\"},{\"name\":\"__BoneMatrices__\",\"type\":\"vector<Matrix>\"},{\"name\":\"DebugType\",\"type\":\"int\"},{\"name\":\"WeightIndex\",\"type\":\"int\"}],\"pixel\":[{\"name\":\"Albedo\",\"type\":\"Texture2D\"}]}}"
+        "shader_meta": "{\"parameters\":{\"vertex\":[{\"name\":\"DebugType\",\"type\":\"int\"},{\"name\":\"WeightIndex\",\"type\":\"int\"}],\"pixel\":[]}}"
     }
 }

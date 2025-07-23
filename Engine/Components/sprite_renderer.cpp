@@ -45,9 +45,9 @@ void engine::SpriteRenderer::OnDraw()
     }
     auto sprite_batch = FontData::SpriteBatch();
     auto sprite_font = font_data.CastedLock()->SpriteFont();
-    sprite_batch->Begin(g_RenderEngine->CommandList());
-    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
-    sprite_batch->End();
+    sprite_batch.lock()->Begin(g_RenderEngine->CommandList());
+    sprite_font->DrawString(sprite_batch.lock().get(), string.c_str(), position, color);
+    sprite_batch.lock()->End();
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
 }
 
