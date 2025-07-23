@@ -22,6 +22,7 @@ void TxtExporter::Export(std::ostream &output_stream, AssetDescriptor *asset)
         return;
     }
 
+    output_stream.clear();
     output_stream << text->content;
     asset->ClearKeys();
     for (auto [key, value] : text->key_value_pairs)

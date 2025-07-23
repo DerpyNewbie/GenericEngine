@@ -249,7 +249,14 @@ void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
         return;
     }
 
+    std::stringstream ss;
+    std::ifstream input_stream(asset_descriptor->path_hint);
+    ss << input_stream.rdbuf();
+    input_stream.close();
+
     std::ofstream output_stream(asset_descriptor->path_hint);
+    output_stream << ss.str();
+
     exporter->Export(output_stream, asset_descriptor);
     output_stream.close();
     asset_descriptor->Save();
