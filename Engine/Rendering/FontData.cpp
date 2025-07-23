@@ -4,8 +4,6 @@
 
 std::shared_ptr<DirectX::GraphicsMemory> engine::FontData::graphics_memory;
 std::shared_ptr<DirectX::SpriteBatch> engine::FontData::sprite_batch;
-std::shared_ptr<DirectX::SpriteFont> engine::FontData::m_Spritefont_;
-std::shared_ptr<DescriptorHandle> engine::FontData::m_SpritefontHandle_;
 
 void engine::FontData::Initialize()
 {

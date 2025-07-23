@@ -33,7 +33,6 @@ private:
 
     /// @brief ウィンドウの初期化
     void InitWindow();
-    void InitFontObjects();
 
 };
 

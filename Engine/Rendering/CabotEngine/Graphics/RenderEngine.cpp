@@ -78,18 +78,21 @@ void RenderEngine::BeginRender()
     m_pCommandList->RSSetViewports(1, &m_Viewport);
     m_pCommandList->RSSetScissorRects(1, &m_Scissor);
 
-    auto currentRtvHandle = m_pPeraRTVHeap->GetCPUDescriptorHandleForHeapStart();
+    auto currentRtvHandle = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart();
+    currentRtvHandle.ptr += m_CurrentBackBufferIndex * m_RtvDescriptorSize;
     auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+
+    // レンダーターゲットが使用可能になるまで待つ
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
+                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDepthStencilBuffer.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_DEPTH_WRITE
         );
     m_pCommandList->ResourceBarrier(1, &dsBarrier);
-
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pPeraResource.Get(), D3D12_RESOURCE_STATE_PRESENT,
-                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
-    m_pCommandList->ResourceBarrier(1, &barrier);
 
     // レンダーターゲットを設定
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
@@ -135,19 +138,8 @@ void RenderEngine::DrawPera()
 
 void RenderEngine::EndRender()
 {
-    auto sprite_batch = engine::FontData::SpriteBatch();
-    auto sprite_font = engine::FontData::SpriteFont();
-    sprite_batch->Begin(m_pCommandList.Get());
-    sprite_font->DrawString(sprite_batch.get(), "HelloWorld", DirectX::XMFLOAT2(102, 102), DirectX::Colors::Black);
-    sprite_batch->End();
-
-    DrawPera();
-    // レンダーターゲットに書き込み終わるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_pPeraResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                         D3D12_RESOURCE_STATE_PRESENT);
-    m_pCommandList->ResourceBarrier(1, &barrier);
-    barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                   D3D12_RESOURCE_STATE_PRESENT);
     m_pCommandList->ResourceBarrier(1, &barrier);
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDepthStencilBuffer.Get(),

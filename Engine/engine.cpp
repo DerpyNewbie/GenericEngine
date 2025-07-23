@@ -22,6 +22,7 @@
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
 #include "Engine/Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CabotEngine/Engine/InputManager.h"
 
 #include <DxLib.h>
 
@@ -39,6 +40,7 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
+    g_Input.Initialize();
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
@@ -67,6 +69,7 @@ void Engine::MainLoop() const
             Time::Get()->IncrementFrame();
 
             Profiler::Begin("Update");
+            g_Input.Update();
             UpdateManager::InvokeUpdate();
             Profiler::End("Update");
 

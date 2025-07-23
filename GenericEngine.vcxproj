@@ -54,6 +54,7 @@
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\sprite_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\component_factory.cpp"/>
@@ -100,6 +101,7 @@
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
             <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
         </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Engine\InputManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp"/>
@@ -180,6 +182,7 @@
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\sprite_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
@@ -205,6 +208,7 @@
         <ClInclude Include="Engine\Rendering\buffers.h"/>
       <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Engine\InputManager.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>

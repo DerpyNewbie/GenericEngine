@@ -15,16 +15,25 @@ std::string EngineUtil::GetTypeName(Component *component)
 {
     return GetTypeName(typeid(*component).name());
 }
+
 std::string EngineUtil::GetTypeName(const std::shared_ptr<Component> &component)
 {
     return GetTypeName(typeid(component.get()).name());
 }
+
+void EngineUtil::ToFloat2(float buff[2], Vector2 vec)
+{
+    buff[0] = vec.x;
+    buff[1] = vec.y;
+}
+
 void EngineUtil::ToFloat3(float buff[3], const Vector3 vec)
 {
     buff[0] = vec.x;
     buff[1] = vec.y;
     buff[2] = vec.z;
 }
+
 void EngineUtil::ToFloat4(float buff[4], const Color vec)
 {
     buff[0] = vec.x;

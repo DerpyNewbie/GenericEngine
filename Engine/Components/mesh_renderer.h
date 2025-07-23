@@ -50,6 +50,5 @@ public:
     {
         ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(shared_materials));
     }
-
 };
 }

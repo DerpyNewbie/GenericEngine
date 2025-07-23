@@ -7,7 +7,10 @@
 
 
 // TODO: remove DxLib dependency
+#include "Rendering/CabotEngine/Engine/InputManager.h"
+
 #include <DxLib.h>
+using namespace DirectX;
 
 namespace engine
 {
@@ -22,17 +25,17 @@ void Controller::OnUpdate()
     Vector3 dir = {0, 0, 0};
     float up_down = 0.0f;
 
-    if (CheckHitKey(KEY_INPUT_W))
+    if (g_Input.IsKeyDown(Keyboard::W))
         dir.z -= 1.0f;
-    if (CheckHitKey(KEY_INPUT_S))
+    if (g_Input.IsKeyDown(Keyboard::S))
         dir.z += 1.0f;
-    if (CheckHitKey(KEY_INPUT_D))
+    if (g_Input.IsKeyDown(Keyboard::D))
         dir.x += 1.0f;
-    if (CheckHitKey(KEY_INPUT_A))
+    if (g_Input.IsKeyDown(Keyboard::A))
         dir.x -= 1.0f;
-    if (CheckHitKey(KEY_INPUT_SPACE))
+    if (g_Input.IsKeyDown(Keyboard::Space))
         up_down += 1.0f;
-    if (CheckHitKey(KEY_INPUT_LCONTROL))
+    if (g_Input.IsKeyDown(Keyboard::LeftControl))
         up_down -= 1.0f;
 
     // Normalize movement vector if not zero
@@ -74,6 +77,7 @@ void Controller::OnUpdate()
         transform->SetPosition(new_pos);
     }
 }
+
 void Controller::OnInspectorGui()
 {
     ImGui::Text("Last Movement Input: {%.2f, %.2f, %.2f}",

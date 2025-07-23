@@ -17,6 +17,7 @@
 #include <imgui_impl_dx12.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
+#include "Rendering/CabotEngine/Engine/InputManager.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
@@ -27,6 +28,10 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     SetUseHookWinProcReturnValue(true);
+    if (g_Input.m_Keyboard)
+    {
+        g_Input.m_Keyboard->ProcessMessage(msg, wParam, lParam);
+    }
 
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;

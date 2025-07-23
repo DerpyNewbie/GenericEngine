@@ -2,6 +2,7 @@
 
 #include "component_factory.h"
 
+#include "Components/sprite_renderer.h"
 #include "Components/camera.h"
 #include "Components/controller.h"
 #include "Components/frame_meta_data.h"
@@ -22,6 +23,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(MeshRenderer);
     ADD_COMPONENT(SkinnedMeshRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
+    ADD_COMPONENT(SpriteRenderer);
 #undef ADD_COMPONENT
 }
 
