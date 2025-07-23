@@ -194,6 +194,12 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
     const auto object = asset_importer->Import(input_stream, instance.get());
     input_stream.close();
 
+    if (object == nullptr)
+    {
+        Logger::Error<AssetDescriptor>("Failed to import asset '%s'!", instance->path_hint.string().c_str());
+        return;
+    }
+
     if (object->Guid() != instance->guid)
     {
         Logger::Error<AssetDescriptor>("Asset guid mismatch from importer for '%s'! Expected '%s', got '%s'",
