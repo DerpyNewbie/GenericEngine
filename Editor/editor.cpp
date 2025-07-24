@@ -20,6 +20,9 @@
 #include "Rendering/CabotEngine/Engine/InputManager.h"
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Asset/asset_database.h"
+#include "Asset/text_asset.h"
+#include "Rendering/material.h"
 
 #include <ranges>
 
@@ -40,6 +43,8 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 namespace editor
 {
+using namespace engine;
+
 Editor *Editor::m_instance_ = nullptr;
 
 void Editor::SetEditorStyle(const int i)
@@ -125,19 +130,26 @@ void Editor::Init()
         const auto default_menu = std::make_shared<DefaultEditorMenu>();
         AddEditorMenu("File", default_menu, -1000);
         AddEditorMenu("Edit", default_menu, -990);
-        AddEditorMenu("GameObject", default_menu, -980);
-        AddEditorMenu("Component", default_menu, -970);
-        AddEditorMenu("Window", default_menu, -960);
+        AddEditorMenu("Asset", default_menu, -980);
+        AddEditorMenu("GameObject", default_menu, -970);
+        AddEditorMenu("Component", default_menu, -960);
+        AddEditorMenu("Window", default_menu, -950);
     }
-}
 
-void Editor::Update()
-{
+    {
+        AddCreateMenu("Text Asset", ".txt", [] {
+            return Object::Instantiate<TextAsset>("New Text Asset");
+        });
+
+        AddCreateMenu("Material", ".material", [] {
+            return Object::Instantiate<Material>("New Material");
+        });
+    }
 }
 
 void Editor::Attach()
 {
-    engine::UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
 }
 
 void Editor::OnDraw()
@@ -146,6 +158,12 @@ void Editor::OnDraw()
         ImGui_ImplWin32_NewFrame();
         ImGui_ImplDX12_NewFrame();
         ImGui::NewFrame();
+    }
+
+    if (ImGui::BeginMainMenuBar())
+    {
+        DrawEditorMenuBar();
+        ImGui::EndMainMenuBar();
     }
 
     if (EditorPrefs::theme != m_last_editor_style_)
@@ -181,14 +199,24 @@ void Editor::Finalize()
     ImGui::DestroyContext();
 }
 
-void Editor::SetSelectedObject(const std::shared_ptr<engine::Object> &object)
+void Editor::SetSelectedObject(const std::shared_ptr<Object> &object)
 {
     m_selected_object_ = object;
 }
 
-std::shared_ptr<engine::Object> Editor::SelectedObject() const
+std::shared_ptr<Object> Editor::SelectedObject() const
 {
     return m_selected_object_.lock();
+}
+
+void Editor::SetSelectedDirectory(const path &path)
+{
+    m_selected_directory_ = path;
+}
+
+path Editor::SelectedDirectory() const
+{
+    return m_selected_directory_;
 }
 
 void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window)
@@ -214,6 +242,7 @@ void Editor::RemoveEditorWindow(const std::string &name)
 
 void Editor::AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, const int priority)
 {
+    menu->editor = this;
     m_editor_menus_.emplace_back(name, menu, priority);
     std::ranges::sort(m_editor_menus_, std::ranges::less(), &PrioritizedEditorMenu::priority);
 }
@@ -236,11 +265,27 @@ void Editor::RemoveEditorMenu(const std::string &name)
     }));
 }
 
+void Editor::AddCreateMenu(const std::string &name, const std::string &extension,
+                           std::function<std::shared_ptr<Object>()> factory, int priority)
+{
+    m_create_menus_.emplace_back(name, extension, factory, priority);
+    std::ranges::sort(m_create_menus_, std::ranges::less(), &PrioritizedCreateMenu::priority);
+}
+
+std::vector<Editor::PrioritizedCreateMenu> Editor::GetCreateMenus()
+{
+    return m_create_menus_;
+}
+
+void Editor::RemoveCreateMenu(const std::string &name)
+{
+    m_create_menus_.erase(std::ranges::find_if(m_create_menus_, [&](const auto &m) {
+        return m.name == name;
+    }));
+}
+
 void Editor::DrawEditorMenuBar() const
 {
-    if (!ImGui::BeginMenuBar())
-        return;
-
     for (const auto &menu : m_editor_menus_)
     {
         if (ImGui::BeginMenu(menu.name.c_str()))
@@ -249,8 +294,6 @@ void Editor::DrawEditorMenuBar() const
             ImGui::EndMenu();
         }
     }
-
-    ImGui::EndMenuBar();
 }
 
 void Editor::DrawEditorMenu(const std::string &name)

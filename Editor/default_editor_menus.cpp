@@ -51,6 +51,12 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
         return;
     }
 
+    if (name == "Asset")
+    {
+        DrawAssetMenu(editor->SelectedDirectory());
+        return;
+    }
+
     throw std::runtime_error("Unknown editor menu: " + name);
 }
 
@@ -72,7 +78,7 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
 
     if (ImGui::MenuItem("Load Scene"))
     {
-        std::string file_path;
+        std::string file_path = engine::AssetDatabase::GetProjectDirectory().string() + "\\";
 
         if (!engine::Gui::OpenFileDialog(file_path, scene_filter))
         {
@@ -148,14 +154,36 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
     const auto names = editor->GetEditorWindowNames();
     for (auto &name : names)
     {
-        // don't allow users to disable the hierarchy window as it'll soft-lock from the editor
-        if (name == "Hierarchy")
-        {
-            ImGui::BeginDisabled();
-            ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
-            ImGui::EndDisabled();
-            continue;
-        }
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
+}
+bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
+{
+    const auto editor = Editor::Instance();
+    const auto menus = editor->GetCreateMenus();
+    const auto enabled = !path.empty();
+    for (const auto &menu : menus)
+    {
+        if (ImGui::MenuItem(menu.name.c_str(), nullptr, false, enabled))
+        {
+            const auto object = menu.factory();
+            auto file_name = object->Name() + menu.extension;
+
+            int i = 0;
+            while (exists(path / file_name))
+            {
+                file_name = object->Name() + " " + std::to_string(++i) + menu.extension;
+            }
+
+            engine::AssetDatabase::CreateAsset(object, path / file_name);
+            return true;
+        }
+
+        if (!enabled)
+        {
+            ImGui::SetItemTooltip("You must select directory in AssetBrowser in order to create asset");
+        }
+    }
+
+    return false;
 }

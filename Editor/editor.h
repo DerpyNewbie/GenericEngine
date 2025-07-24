@@ -3,8 +3,6 @@
 
 #include "enable_shared_from_base.h"
 #include "event_receivers.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
-#include "Components/component.h"
 
 namespace editor
 {
@@ -28,12 +26,23 @@ class Editor final : public enable_shared_from_base<Editor>, public IDrawCallRec
         }
     };
 
+    struct PrioritizedCreateMenu
+    {
+        std::string name;
+        std::string extension;
+        std::function<std::shared_ptr<engine::Object>()> factory;
+        int priority;
+    };
+
+
     static Editor *m_instance_;
 
     int m_last_editor_style_ = -1;
     std::weak_ptr<engine::Object> m_selected_object_;
+    std::filesystem::path m_selected_directory_ = "";
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
     std::vector<PrioritizedEditorMenu> m_editor_menus_;
+    std::vector<PrioritizedCreateMenu> m_create_menus_;
 
     void SetEditorStyle(int i);
 
@@ -49,12 +58,14 @@ public:
     void OnDraw() override;
 
     void Init();
-    void Update();
     void Attach();
     void Finalize();
 
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
     std::shared_ptr<engine::Object> SelectedObject() const;
+
+    void SetSelectedDirectory(const std::filesystem::path &path);
+    std::filesystem::path SelectedDirectory() const;
 
     void AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window);
     std::vector<std::string> GetEditorWindowNames();
@@ -65,6 +76,11 @@ public:
     std::vector<PrioritizedEditorMenu> GetEditorMenus();
     std::shared_ptr<EditorMenu> GetEditorMenu(const std::string &name);
     void RemoveEditorMenu(const std::string &name);
+
+    void AddCreateMenu(const std::string &name, const std::string &extension,
+                       std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
+    std::vector<PrioritizedCreateMenu> GetCreateMenus();
+    void RemoveCreateMenu(const std::string &name);
 
     void DrawEditorMenuBar() const;
     void DrawEditorMenu(const std::string &name);

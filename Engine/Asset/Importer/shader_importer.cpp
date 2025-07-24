@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "ShaderImporter.h"
+#include "shader_importer.h"
 #include "logger.h"
 #include "Rendering/shader.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
@@ -154,7 +154,7 @@ std::vector<std::string> ShaderImporter::SupportedExtensions()
     return {".hlsl"};
 }
 
-std::shared_ptr<Object> ShaderImporter::Import(AssetDescriptor *asset)
+std::shared_ptr<Object> ShaderImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
 {
     auto shader = Object::Instantiate<Shader>(asset->guid);
     if (asset->guid == xg::Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))

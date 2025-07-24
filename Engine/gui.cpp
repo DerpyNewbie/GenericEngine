@@ -28,10 +28,24 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
         }
     }
 
+    IShellItem *p_default_folder = nullptr;
+    hr = SHCreateItemFromParsingName(StringUtil::ConvertToWString(file_path).c_str(), nullptr,
+                                     IID_PPV_ARGS(&p_default_folder));
+    if (SUCCEEDED(hr))
+    {
+        hr = p_file_open->SetDefaultFolder(p_default_folder);
+        p_default_folder->Release();
+        p_default_folder = nullptr;
+    }
+    else
+    {
+        Logger::Error<Gui>("Failed to set default name");
+    }
+
     hr = p_file_open->Show(nullptr);
     if (FAILED(hr))
     {
-        Logger::Error<Gui>("Failed to show file open dialog");
+        Logger::Error<Gui>("File open cancelled");
         return false;
     }
 

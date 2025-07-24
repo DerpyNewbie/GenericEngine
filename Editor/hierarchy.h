@@ -10,7 +10,6 @@ class Hierarchy final : public EditorWindow
 public:
     std::weak_ptr<engine::GameObject> selected_game_object;
 
-    Hierarchy();
     std::string Name() override;
     void OnEditorGui() override;
 

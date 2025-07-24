@@ -95,7 +95,7 @@ void SkinnedMeshRenderer::OnDraw()
     UpdateBuffers();
 
     //draw meshes
-    auto material = shared_materials[0];
+    auto material = shared_materials[0].CastedLock();
     auto shader = material->p_shared_shader.CastedLock();
     auto cmd_list = g_RenderEngine->CommandList();
     auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
@@ -120,7 +120,7 @@ void SkinnedMeshRenderer::OnDraw()
     // sub-meshes
     for (int i = 0; i < shared_mesh->sub_meshes.size(); ++i)
     {
-        material = shared_materials[i + 1];
+        material = shared_materials[i + 1].CastedLock();
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();

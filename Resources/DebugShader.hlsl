@@ -60,6 +60,7 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
+    
     for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
@@ -84,10 +85,10 @@ VSOutput vrt(VSInput input)
 
     switch (debug_type)
     {
-    case 1:
+    case 0:
         input.color = float4(input.uv, 0.0f, 1.0f);
         break;
-    case 0:
+    case 1:
         input.color = float4(input.normal, 1.0f);
         break;
     case 2:

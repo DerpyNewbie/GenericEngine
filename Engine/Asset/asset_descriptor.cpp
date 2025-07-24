@@ -56,6 +56,8 @@ bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
 
 void AssetDescriptor::Write(const path &path)
 {
+    PopulateMetaJson();
+
     StringBuffer string_buffer;
     PrettyWriter writer(string_buffer);
     writer.StartObject();
@@ -83,9 +85,40 @@ void AssetDescriptor::Write(const path &path)
     output_stream << string_buffer.GetString();
     output_stream.close();
 }
+
 GenericValue<UTF8<>> &AssetDescriptor::GetDataValue()
 {
+    PopulateMetaJson();
     return m_meta_json_.FindMember(kDataKey)->value;
+}
+
+void AssetDescriptor::PopulateMetaJson()
+{
+    if (!m_meta_json_.IsObject())
+    {
+        m_meta_json_.SetObject();
+        Logger::Warn<AssetDescriptor>("Meta json is not an object! Resetting!");
+    }
+
+    auto &a = m_meta_json_.GetAllocator();
+
+    if (!m_meta_json_.HasMember(kGuidKey))
+    {
+        const auto guid_str = guid.str();
+        auto guid_value = Value();
+        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
+        m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
+    }
+
+    if (!m_meta_json_.HasMember(kTypeKey))
+    {
+        m_meta_json_.AddMember(StringRef(kTypeKey), Value(type_hint.c_str(), type_hint.size(), a), a);
+    }
+
+    if (!m_meta_json_.HasMember(kDataKey))
+    {
+        m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
+    }
 }
 
 #pragma push_macro("GetObject")
@@ -121,9 +154,10 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
         descriptor->m_meta_json_.AddMember(StringRef(kTypeKey), type_hint_value, a);
         descriptor->m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
         descriptor->Write(meta_file_path);
+
         if (!GetMetaJson(path, meta_json))
         {
-            Logger::Error<AssetDescriptor>("Failed to generate meta file for asset `%s`", path.string().c_str());
+            Logger::Error<AssetDescriptor>("Failed to generate meta file for asset '%s'!", path.string().c_str());
             return nullptr;
         }
     }
@@ -137,6 +171,13 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
 
 void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, const std::string &json)
 {
+    if (instance->IsInternalAsset())
+    {
+        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", instance->guid.str().c_str());
+        return;
+    }
+
+    instance->m_meta_json_ = Document();
     instance->m_meta_json_.Parse(json.c_str());
     instance->guid = xg::Guid(instance->m_meta_json_.FindMember(kGuidKey)->value.GetString());
     instance->type_hint = instance->m_meta_json_.FindMember(kTypeKey)->value.GetString();
@@ -145,11 +186,20 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
     if (asset_importer == nullptr)
     {
         Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
-                                      instance->type_hint.c_str(), instance->path_hint.c_str());
+                                      instance->type_hint.c_str(), instance->path_hint.string().c_str());
         return;
     }
 
-    const auto object = asset_importer->Import(instance.get());
+    auto input_stream = std::ifstream(instance->path_hint);
+    const auto object = asset_importer->Import(input_stream, instance.get());
+    input_stream.close();
+
+    if (object == nullptr)
+    {
+        Logger::Error<AssetDescriptor>("Failed to import asset '%s'!", instance->path_hint.string().c_str());
+        return;
+    }
+
     if (object->Guid() != instance->guid)
     {
         Logger::Error<AssetDescriptor>("Asset guid mismatch from importer for '%s'! Expected '%s', got '%s'",
@@ -176,6 +226,7 @@ std::vector<std::string> AssetDescriptor::GetKeys()
 
     return keys;
 }
+
 void AssetDescriptor::ClearKeys()
 {
     auto &data = GetDataValue();

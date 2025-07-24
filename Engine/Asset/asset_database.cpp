@@ -1,14 +1,13 @@
 #include "pch.h"
 #include "asset_database.h"
 
-#include <ranges>
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
-#include "logger.h"
 #include "Exporter/asset_exporter.h"
+#include "Exporter/material_exporter.h"
 #include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
-#include "Importer/ShaderImporter.h"
+#include "Importer/shader_importer.h"
 #include "Importer/audio_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
@@ -39,6 +38,7 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<ShaderImporter>());
     AssetExporter::Register(std::make_shared<ShaderExporter>());
     AssetImporter::Register(std::make_shared<MaterialImporter>());
+    AssetExporter::Register(std::make_shared<MaterialExporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
     AssetImporter::Register(std::make_shared<FontImporter>());
     AssetImporter::Register(std::make_shared<AudioImporter>());
@@ -133,9 +133,36 @@ path AssetDatabase::GetProjectDirectory()
     return m_project_directory_;
 }
 
+bool AssetDatabase::IsInProjectDirectory(const path &path)
+{
+    const auto path_a = weakly_canonical(path).string();
+    const auto path_b = weakly_canonical(m_project_directory_).string();
+    return path_a.starts_with(path_b);
+}
+
 std::shared_ptr<AssetHierarchy> AssetDatabase::GetRootAssetHierarchy()
 {
     return m_asset_hierarchy_;
+}
+
+std::shared_ptr<AssetHierarchy> AssetDatabase::GetAssetHierarchy(const path &path)
+{
+    const auto relative_path = relative(weakly_canonical(path), m_project_directory_);
+    const auto split_relative_path = GetSplitPath(relative_path);
+    auto current_node = m_asset_hierarchy_;
+    for (const auto &node : split_relative_path)
+    {
+        auto found_node = std::ranges::find(current_node->children, node, &AssetHierarchy::Name);
+        if (found_node == current_node->children.end())
+        {
+            Logger::Error<AssetDatabase>("Asset '%s' not found", path.string().c_str());
+            return nullptr;
+        }
+
+        current_node = *found_node;
+    }
+
+    return current_node;
 }
 
 void AssetDatabase::ReloadAsset(const xg::Guid &guid)
@@ -226,7 +253,16 @@ void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
         return;
     }
 
-    exporter->Export(asset_descriptor);
+    std::stringstream ss;
+    std::ifstream input_stream(asset_descriptor->path_hint);
+    ss << input_stream.rdbuf();
+    input_stream.close();
+
+    std::ofstream output_stream(asset_descriptor->path_hint);
+    output_stream << ss.str();
+
+    exporter->Export(output_stream, asset_descriptor);
+    output_stream.close();
     asset_descriptor->Save();
 }
 
@@ -248,4 +284,63 @@ void AssetDatabase::WriteAsset(const IAssetPtr &ptr)
     WriteAsset(ptr.Guid());
 }
 
+std::shared_ptr<AssetDescriptor> AssetDatabase::CreateAsset(const std::shared_ptr<Object> &object, const path &path)
+{
+    if (path.empty() || exists(path))
+    {
+        Logger::Error("Path '%s' is empty or already exists. Cannot create asset!", path.string().c_str());
+        return nullptr;
+    }
+
+    if (!IsInProjectDirectory(path))
+    {
+        Logger::Error("Path '%s' is outside of project path. Cannot create asset!", path.string().c_str());
+        assert(false && "Invalid path specified for CreateAsset");
+    }
+
+    auto descriptor = GetAssetDescriptor(object->Guid());
+    if (descriptor != nullptr)
+    {
+        if (!descriptor->IsInternalAsset())
+        {
+            Logger::Error("Asset with guid %s already exists. Cannot create asset!", object->Guid().str().c_str());
+            return nullptr;
+        }
+
+        descriptor->managed_object = object;
+        descriptor->path_hint = path;
+    }
+    else
+    {
+        descriptor = std::make_shared<AssetDescriptor>();
+        descriptor->guid = object->Guid();
+        descriptor->path_hint = path;
+        descriptor->managed_object = object;
+        descriptor->type_hint = AssetExporter::Get(object)->SupportedExtensions().front();
+    }
+
+    WriteAsset(descriptor.get());
+    Import(path);
+    return descriptor;
+}
+
+void AssetDatabase::DeleteAsset(const path &path)
+{
+    auto absolute_path = absolute(path);
+    if (!exists(absolute_path))
+    {
+        Logger::Error("Path '%s' does not exist. Cannot delete asset!", absolute_path.string().c_str());
+        return;
+    }
+
+    if (!IsInProjectDirectory(absolute_path))
+    {
+        Logger::Error("Path '%s' is outside of project path. Cannot delete asset!", absolute_path.string().c_str());
+        assert(false && "Invalid path specified for DeleteAsset");
+    }
+
+    std::filesystem::remove(absolute_path);
+    std::filesystem::remove(AssetDescriptor::GetMetaFilePath(absolute_path));
+    Object::Destroy(GetAssetHierarchy(absolute_path));
+}
 }

@@ -47,8 +47,12 @@ void engine::Shader::OnInspectorGui()
                         return p->name == param->name && p->index == param->index && p->shader_type == param->
                                shader_type;
                     }));
+                    ImGui::EndPopup();
+                    ImGui::PopID();
                     break;
                 }
+
+                ImGui::EndPopup();
             }
 
             if (should_show)

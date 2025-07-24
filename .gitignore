@@ -435,3 +435,6 @@ imgui.ini
 
 # Vcpkg
 vcpkg_installed/
+
+# Generic-Engine Specific
+!Resources/*

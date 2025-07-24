@@ -1,9 +1,12 @@
 #pragma once
 #include "asset_importer.h"
 
-class MaterialImporter: public engine::AssetImporter
+namespace engine
+{
+class MaterialImporter : public AssetImporter
 {
 public:
-    std::vector<std::string>SupportedExtensions() override;
-    std::shared_ptr<engine::Object> Import(engine::AssetDescriptor *asset) override;
+    std::vector<std::string> SupportedExtensions() override;
+    std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) override;
 };
+}

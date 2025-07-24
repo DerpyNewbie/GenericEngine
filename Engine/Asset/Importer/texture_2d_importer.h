@@ -11,6 +11,6 @@ public:
     static IAssetPtr GetColorTexture(DirectX::PackedVector::XMCOLOR color);
 
     std::vector<std::string> SupportedExtensions() override;
-    std::shared_ptr<Object> Import(AssetDescriptor *asset) override;
+    std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) override;
 };
 }

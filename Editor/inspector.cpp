@@ -163,11 +163,29 @@ void Inspector::DrawInspectable(const std::shared_ptr<engine::Inspectable> &insp
 }
 void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
 {
+    ImGui::PushID(asset_hierarchy.get());
+    auto asset = asset_hierarchy->asset;
+    if (asset == nullptr)
+    {
+        ImGui::Text("Asset is null!");
+        ImGui::PopID();
+        return;
+    }
+
+    ImGui::Separator();
+    ImGui::Text("Name: %s", asset->path_hint.filename().string().c_str());
+    ImGui::Text("Path: %s", asset->path_hint.string().c_str());
+    ImGui::Text("Guid: %s", asset->guid.str().c_str());
+    if (asset_hierarchy->IsFile())
+        ImGui::Text("File");
+    if (asset_hierarchy->IsDirectory())
+        ImGui::Text("Directory");
+    if (!asset_hierarchy->children.empty())
+        ImGui::Text("Children: %d", asset_hierarchy->children.size());
+    ImGui::Separator();
+
     if (asset_hierarchy->IsFile())
     {
-        ImGui::Text("File: %s", asset_hierarchy->asset->path_hint.string().c_str());
-        ImGui::Text("Guid: %s", asset_hierarchy->asset->guid.str().c_str());
-        ImGui::Separator();
         if (asset_hierarchy->asset->managed_object != nullptr)
         {
             DrawObject(asset_hierarchy->asset->managed_object);
@@ -180,9 +198,21 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
                 engine::AssetDatabase::GetAsset(asset_hierarchy->asset->guid);
             }
         }
+
+        ImGui::PopID();
         return;
     }
 
-    ImGui::Text("Folder: %s", asset_hierarchy->asset->path_hint.string().c_str());
+    if (asset_hierarchy->IsDirectory())
+    {
+        for (const auto &child : asset_hierarchy->children)
+        {
+            ImGui::Indent();
+            DrawAssetHierarchy(child);
+            ImGui::Unindent();
+        }
+    }
+
+    ImGui::PopID();
 }
 }

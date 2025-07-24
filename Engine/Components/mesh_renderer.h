@@ -2,7 +2,7 @@
 #include "pch.h"
 #include "component.h"
 #include "renderer.h"
-#include "Rendering/MaterialData.h"
+#include "Rendering/material_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
@@ -30,7 +30,7 @@ protected:
 
 public:
     std::shared_ptr<Mesh> shared_mesh;
-    std::vector<std::shared_ptr<Material>> shared_materials;
+    std::vector<AssetPtr<Material>> shared_materials;
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;

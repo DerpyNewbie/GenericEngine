@@ -9,15 +9,9 @@
 #include "scene.h"
 #include "scene_manager.h"
 #include "str_util.h"
-#include "Engine/gui.h"
 
 namespace editor
 {
-Hierarchy::Hierarchy()
-{
-    window_flags = ImGuiWindowFlags_MenuBar;
-}
-
 std::string Hierarchy::Name()
 {
     return "Hierarchy";
@@ -25,7 +19,6 @@ std::string Hierarchy::Name()
 
 void Hierarchy::OnEditorGui()
 {
-    Editor::Instance()->DrawEditorMenuBar();
     for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
          const auto &scene : current_scenes)
     {
