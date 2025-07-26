@@ -4,7 +4,10 @@
     "cereal",
     "directx-headers",
     "directxtex",
-    "directxtk12",
+    {
+      "name": "directxtk12",
+      "version>=": "2024-09-04"
+    },
     {
       "name": "imgui",
       "features": [
@@ -16,5 +19,11 @@
     },
     "implot",
     "crossguid"
+  ],
+  "overrides": [
+    {
+      "name": "directxtk12",
+      "version": "2024-09-04"
+    }
   ]
 }
