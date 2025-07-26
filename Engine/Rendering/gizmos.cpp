@@ -23,10 +23,14 @@ void Gizmos::Init()
     m_instance_->m_constant_buffer_->CreateBuffer();
     m_instance_->m_desc_handle_ = m_instance_->m_constant_buffer_->UploadBuffer();
 
-    UpdateManager::SubscribeDrawCall(m_instance_);
 }
 
-void Gizmos::OnDraw()
+void Gizmos::ClearVertices()
+{
+    m_vertices_.clear();
+}
+
+void Gizmos::Draw()
 {
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
 
@@ -69,13 +73,11 @@ void Gizmos::OnDraw()
     const auto vertex_buffer_view = vertex_buffer->View();
     const auto cmd_list = g_RenderEngine->CommandList();
 
-    /*cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
+    cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
     cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_handle_->HandleGPU);
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
-    cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);*/
-
-    m_vertices_.clear();
+    cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

@@ -155,6 +155,7 @@ void Camera::OnDraw()
             m_drawcall_count_++;
             object->OnDraw();
         }
+        Gizmos::Draw();
         EndRender();
     }
 }

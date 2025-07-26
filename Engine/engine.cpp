@@ -86,6 +86,7 @@ void Engine::MainLoop() const
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");
+            Gizmos::ClearVertices();
 
             Profiler::Begin("Cleanup Objects");
             Object::GarbageCollect();
