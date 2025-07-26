@@ -10,6 +10,7 @@ class UpdateManager
     static std::vector<std::weak_ptr<IUpdateReceiver>> m_update_receivers_;
     static std::vector<std::weak_ptr<IFixedUpdateReceiver>> m_fixed_update_receivers_;
     static std::vector<std::weak_ptr<IDrawCallReceiver>> m_draw_call_receivers_;
+    static std::queue<std::function<void()>> m_in_cycle_buffer_;
 
     static bool m_in_update_cycle_;
     static bool m_in_fixed_update_cycle_;
@@ -17,9 +18,10 @@ class UpdateManager
 
     static void InvokeUpdate();
     static void InvokeFixedUpdate();
+    static void InvokeDrawCall();
+    static void PostFix();
 
 public:
-    static void InvokeDrawCall();
     static void SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
     static void UnsubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver);
     static void SubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver);
