@@ -5,6 +5,10 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyBoxVertShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyBoxPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -18,10 +22,8 @@
     <ClCompile Include="Engine\Components\camera.cpp" />
     <ClCompile Include="Engine\Components\component.cpp" />
     <ClCompile Include="Engine\Components\controller.cpp" />
-    <ClCompile Include="Engine\Components\cube_renderer.cpp" />
     <ClCompile Include="Engine\Components\frame_meta_data.cpp" />
     <ClCompile Include="Engine\Components\mesh_renderer.cpp" />
-    <ClCompile Include="Engine\Components\mv1_renderer.cpp" />
     <ClCompile Include="Engine\Components\renderer.cpp" />
     <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp" />
     <ClCompile Include="Engine\Components\transform.cpp" />
@@ -31,7 +33,6 @@
     <ClCompile Include="Engine\game_object.cpp" />
     <ClCompile Include="Engine\Math\bounds.cpp" />
     <ClCompile Include="Engine\Rendering\bone_weight.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp" />
@@ -65,7 +66,6 @@
     <ClCompile Include="Engine\Asset\asset_database.cpp" />
     <ClCompile Include="Engine\Asset\asset_hierarchy.cpp" />
     <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp" />
-    <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp" />
     <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp" />
     <ClCompile Include="Engine\Asset\text_asset.cpp" />
     <ClCompile Include="Engine\Components\line_renderer.cpp" />
@@ -83,8 +83,21 @@
     <ClCompile Include="Engine\gui.cpp" />
     <ClCompile Include="Engine\object.cpp" />
     <ClCompile Include="Engine\Rendering\buffers.cpp" />
-    <ClCompile Include="Engine\Rendering\MaterialData.cpp" />
     <ClCompile Include="Engine\Rendering\world_view_projection.cpp" />
+    <ClCompile Include="Engine\Asset\Exporter\material_exporter.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\audio_importer.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\font_importer.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp" />
+    <ClCompile Include="Engine\assimp_util.cpp" />
+    <ClCompile Include="Engine\audio_asset.cpp" />
+    <ClCompile Include="Engine\Components\audio_emitter.cpp" />
+    <ClCompile Include="Engine\Components\sky_box.cpp" />
+    <ClCompile Include="Engine\Components\sprite_renderer.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Engine\audio.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Engine\InputManager.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp" />
+    <ClCompile Include="Engine\Rendering\FontData.cpp" />
+    <ClCompile Include="Engine\Rendering\material_data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -98,10 +111,8 @@
     <ClInclude Include="Engine\Components\camera.h" />
     <ClInclude Include="Engine\Components\component.h" />
     <ClInclude Include="Engine\Components\controller.h" />
-    <ClInclude Include="Engine\Components\cube_renderer.h" />
     <ClInclude Include="Engine\Components\frame_meta_data.h" />
     <ClInclude Include="Engine\Components\mesh_renderer.h" />
-    <ClInclude Include="Engine\Components\mv1_renderer.h" />
     <ClInclude Include="Engine\Components\renderer.h" />
     <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
     <ClInclude Include="Engine\Components\transform.h" />
@@ -121,7 +132,6 @@
     <ClInclude Include="Engine\object.h" />
     <ClInclude Include="Engine\Rendering\bone_weight.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
@@ -157,7 +167,6 @@
     <ClInclude Include="Engine\Asset\asset_descriptor.h" />
     <ClInclude Include="Engine\Asset\asset_hierarchy.h" />
     <ClInclude Include="Engine\Asset\Importer\asset_importer.h" />
-    <ClInclude Include="Engine\Asset\Importer\ShaderImporter.h" />
     <ClInclude Include="Engine\Asset\Importer\txt_importer.h" />
     <ClInclude Include="Engine\Asset\inspectable_asset.h" />
     <ClInclude Include="Engine\Asset\text_asset.h" />
@@ -177,8 +186,22 @@
     <ClInclude Include="Engine\gui.h" />
     <ClInclude Include="Engine\guid_serializer.h" />
     <ClInclude Include="Engine\Rendering\buffers.h" />
-    <ClInclude Include="Engine\Rendering\MaterialData.h" />
     <ClInclude Include="Engine\Rendering\world_view_projection.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Engine\Asset\Exporter\material_exporter.h" />
+    <ClInclude Include="Engine\Asset\Importer\audio_importer.h" />
+    <ClInclude Include="Engine\Asset\Importer\font_importer.h" />
+    <ClInclude Include="Engine\Asset\Importer\shader_importer.h" />
+    <ClInclude Include="Engine\assimp_util.h" />
+    <ClInclude Include="Engine\audio_asset.h" />
+    <ClInclude Include="Engine\Components\audio_emitter.h" />
+    <ClInclude Include="Engine\Components\sky_box.h" />
+    <ClInclude Include="Engine\Components\sprite_renderer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Engine\audio.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Engine\InputManager.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h" />
+    <ClInclude Include="Engine\Rendering\FontData.h" />
+    <ClInclude Include="Engine\Rendering\material_data.h" />
   </ItemGroup>
 </Project>

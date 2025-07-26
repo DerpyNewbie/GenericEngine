@@ -1,5 +1,6 @@
 #include <DirectXColors.h>
 #include "sprite_renderer.h"
+#include "camera.h"
 #include "gui.h"
 #include "Rendering/CabotEngine/Engine/InputManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
@@ -53,5 +54,5 @@ void engine::SpriteRenderer::OnDraw()
 
 std::weak_ptr<engine::Transform> engine::SpriteRenderer::GetTransform()
 {
-    return GameObject()->Transform();
+    return Camera::Main().lock()->GameObject()->Transform();
 }

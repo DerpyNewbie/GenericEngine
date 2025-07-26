@@ -10,6 +10,8 @@ struct PSOSetting
     ID3D12RootSignature *RootSignature;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
+    D3D12_RASTERIZER_DESC RasterizerDesc;
+    D3D12_DEPTH_STENCIL_DESC DepthStencilDesc;
 };
 
 class PSOManager

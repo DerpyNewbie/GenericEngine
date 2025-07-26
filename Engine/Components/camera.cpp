@@ -5,12 +5,52 @@
 #include "DxLib/dxlib_converter.h"
 #include "application.h"
 #include "game_object.h"
+#include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+
+#include <Rendering/CabotEngine/Graphics/RootSignatureManager.h>
 
 namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
+
+bool Camera::BeginRender()
+{
+    if (Main().lock() == shared_from_base<Camera>())
+    {
+        g_RenderEngine->BeginRender();
+        g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+        auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
+        auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+        g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
+
+        return true;
+    }
+    if (auto render_tex = render_texture.CastedLock())
+    {
+        g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+        auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
+        auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+        g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
+        render_tex->BeginRender();
+        return true;
+    }
+    return false;
+}
+
+void Camera::EndRender()
+{
+    if (Main().lock() == shared_from_base<Camera>())
+    {
+        return;
+    }
+    if (auto render_tex = render_texture.CastedLock())
+    {
+        render_tex->EndRender();
+    }
+}
 
 void Camera::ApplyCameraSettingToDxLib() const
 {
@@ -58,6 +98,11 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     return visible_objects;
 }
 
+int Camera::Order()
+{
+    return Main().lock() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
+}
+
 void Camera::OnAwake()
 {
     m_main_camera_ = shared_from_base<Camera>();
@@ -88,6 +133,8 @@ void Camera::OnInspectorGui()
         m_view_mode_ = static_cast<kViewMode>(current_view_mode);
     }
 
+    Gui::PropertyField("RenderTexture", render_texture);
+
     float color_buf[4];
     EngineUtil::ToFloat4(color_buf, m_background_color_);
     if (ImGui::ColorPicker4("Background Color", color_buf))
@@ -99,12 +146,16 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    m_drawcall_count_ = 0;
-    auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
-    for (auto object : objects_in_view)
+    if (BeginRender())
     {
-        m_drawcall_count_++;
-        object->OnDraw();
+        m_drawcall_count_ = 0;
+        auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
+        for (auto object : objects_in_view)
+        {
+            m_drawcall_count_++;
+            object->OnDraw();
+        }
+        EndRender();
     }
 }
 

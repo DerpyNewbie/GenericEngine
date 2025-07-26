@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 template <class Base>
 class enable_shared_from_base : public std::enable_shared_from_this<Base>

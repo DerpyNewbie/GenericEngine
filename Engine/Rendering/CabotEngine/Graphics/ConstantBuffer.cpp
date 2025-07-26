@@ -21,7 +21,6 @@ D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::ViewDesc()
 
 void ConstantBuffer::CreateBuffer()
 {
-
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD); // ヒーププロパティ
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_SizeAligned); // リソースの設定
 

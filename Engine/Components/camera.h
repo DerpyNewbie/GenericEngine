@@ -1,6 +1,8 @@
 #pragma once
 #include "component.h"
 #include "renderer.h"
+#include "Asset/asset_ptr.h"
+#include "Rendering/render_texture.h"
 
 namespace engine
 {
@@ -22,6 +24,8 @@ class Camera : public Component, public IDrawCallReceiver
     Color m_background_color_ = Color(0x1A1A1AFF);
     UINT m_drawcall_count_ = 0;
 
+    bool BeginRender();
+    void EndRender();
     void ApplyCameraSettingToDxLib() const;
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
@@ -31,6 +35,9 @@ public:
     static constexpr float min_clipping_plane = 0.01f;
     static constexpr float max_clipping_plane = 10000.0f;
 
+    AssetPtr<RenderTexture> render_texture;
+
+    int Order() override;
     void OnAwake() override;
     void OnUpdate() override;
     void OnInspectorGui() override;
@@ -52,7 +59,8 @@ public:
            CEREAL_NVP(m_ortho_size_),
            CEREAL_NVP(m_near_plane_),
            CEREAL_NVP(m_far_plane_),
-           CEREAL_NVP(m_background_color_));
+           CEREAL_NVP(m_background_color_),
+           CEREAL_NVP(render_texture));
     }
 };
 }

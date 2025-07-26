@@ -77,13 +77,31 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
     return pHandle;
 }
 
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(TextureCube &texture_cube)
+{
+    auto pHandle = Allocate();
+
+    auto resource = texture_cube.Resource();
+    auto view_desc = texture_cube.ViewDesc();
+    g_RenderEngine->Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
+    return pHandle;
+}
+
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(RenderTexture &render_texture)
+{
+    auto pHandle = Allocate();
+    auto resource = render_texture.Resouce();
+    auto view_desc = render_texture.ViewDesc();
+    g_RenderEngine->Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
+    return pHandle;
+}
+
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
     UINT index;
 
     if (!m_FreeIndices_.empty())
     {
-        // 再利用できるスロットがある
         index = m_FreeIndices_.front();
         m_FreeIndices_.erase(m_FreeIndices_.begin());
     }
