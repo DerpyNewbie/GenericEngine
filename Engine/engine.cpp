@@ -21,7 +21,6 @@
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
-#include "Engine/Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Engine/InputManager.h"
 
 #include <DxLib.h>
@@ -86,7 +85,6 @@ void Engine::MainLoop() const
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");
-            Gizmos::ClearVertices();
 
             Profiler::Begin("Cleanup Objects");
             Object::GarbageCollect();
