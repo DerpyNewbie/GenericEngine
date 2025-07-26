@@ -26,12 +26,12 @@ void Hierarchy::OnEditorGui()
         ImGui::PopID();
     }
 
-    const auto locked = selected_game_object.lock();
+    const auto locked = std::dynamic_pointer_cast<engine::GameObject>(Editor::Instance()->SelectedObject());
     if (locked != nullptr)
     {
         SetFontSize(12);
         DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(locked->Name()).c_str(),
-                                    DxLibConverter::From(locked->Transform()->WorldToLocal()));
+                                    DxLibConverter::From(locked->Transform()->WorldMatrix()));
     }
 }
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
@@ -136,8 +136,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
     ImGui::SameLine();
 
-    const auto locked = selected_game_object.lock();
-    if (ImGui::Selectable(game_object->Name().c_str(), game_object == locked))
+    if (ImGui::Selectable(game_object->Name().c_str(), game_object == Editor::Instance()->SelectedObject()))
     {
         Editor::Instance()->SetSelectedObject(game_object);
     }

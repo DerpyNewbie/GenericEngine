@@ -72,7 +72,8 @@ bool DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hie
 
     if (asset_hierarchy->IsFile())
     {
-        if (ImGui::Selectable(asset_hierarchy->asset->path_hint.filename().string().c_str()))
+        if (ImGui::Selectable(asset_hierarchy->asset->path_hint.filename().string().c_str(),
+                              Editor::Instance()->SelectedObject() == asset_hierarchy))
         {
             if (asset_hierarchy->asset->managed_object == nullptr)
                 engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path_hint);

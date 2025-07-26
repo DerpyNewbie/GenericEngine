@@ -8,8 +8,6 @@ namespace editor
 class Hierarchy final : public EditorWindow
 {
 public:
-    std::weak_ptr<engine::GameObject> selected_game_object;
-
     std::string Name() override;
     void OnEditorGui() override;
 
