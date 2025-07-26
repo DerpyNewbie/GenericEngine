@@ -51,16 +51,25 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 
     if (draw)
     {
-        for (const auto all_root_objects = scene->RootGameObjects();
-             const auto &root_object : all_root_objects)
+        if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg))
         {
-            DrawObjectRecursive(root_object);
+            for (const auto all_root_objects = scene->RootGameObjects();
+                 const auto &root_object : all_root_objects)
+            {
+                DrawObjectRecursive(root_object);
+            }
+
+            ImGui::EndTable();
         }
     }
 }
 void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
 {
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+
     ImGui::PushID(game_object.get());
+
     const bool has_style_color = !game_object->IsActiveInHierarchy();
     if (has_style_color)
     {
@@ -124,19 +133,24 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
 }
 bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
-    bool is_tree_expanded = false;
-    if (game_object->Transform()->ChildCount() > 0)
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+    flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    flags |= ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
+    flags |= ImGuiTreeNodeFlags_SpanFullWidth;
+
+    if (game_object->Transform()->ChildCount() == 0)
     {
-        is_tree_expanded = ImGui::TreeNode("##CHILD_TREE");
-    }
-    else
-    {
-        ImGui::Dummy(ImVec2{20, 2});
+        flags |= ImGuiTreeNodeFlags_Leaf;
     }
 
-    ImGui::SameLine();
+    if (game_object == Editor::Instance()->SelectedObject())
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
 
-    if (ImGui::Selectable(game_object->Name().c_str(), game_object == Editor::Instance()->SelectedObject()))
+    const bool open = ImGui::TreeNodeEx("", flags, "%s", game_object->Name().c_str());
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
     {
         Editor::Instance()->SetSelectedObject(game_object);
     }
@@ -159,7 +173,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
         ImGui::EndPopup();
     }
 
-    return is_tree_expanded;
+    return open;
 }
 
 }
