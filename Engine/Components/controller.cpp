@@ -2,7 +2,9 @@
 
 #include "controller.h"
 
+#include "engine_time.h"
 #include "game_object.h"
+#include "gui.h"
 #include "transform.h"
 
 
@@ -11,9 +13,6 @@ namespace engine
 void Controller::OnUpdate()
 {
     Component::OnUpdate();
-
-    constexpr float move_speed = 2.0f; // Adjust this value to control movement speed
-    constexpr float rotate_speed = 2.0f * Mathf::kDeg2Rad; // Adjust this value to control rotation speed
 
     // Movement input
     Vector3 dir = {0, 0, 0};
@@ -41,13 +40,13 @@ void Controller::OnUpdate()
     // Rotation input
     Vector2 delta_rot = {0, 0};
     if (CheckHitKey(KEY_INPUT_UP))
-        delta_rot.x += rotate_speed;
+        delta_rot.x += m_rotation_speed_;
     if (CheckHitKey(KEY_INPUT_DOWN))
-        delta_rot.x -= rotate_speed;
+        delta_rot.x -= m_rotation_speed_;
     if (CheckHitKey(KEY_INPUT_LEFT))
-        delta_rot.y += rotate_speed;
+        delta_rot.y += m_rotation_speed_;
     if (CheckHitKey(KEY_INPUT_RIGHT))
-        delta_rot.y -= rotate_speed;
+        delta_rot.y -= m_rotation_speed_;
 
     m_last_rotation_input_ = delta_rot;
 
@@ -57,7 +56,7 @@ void Controller::OnUpdate()
     // Apply rotation around the object's position
     if (!Mathf::Approximately(delta_rot.Length(), 0.0F))
     {
-        m_rotation_ = m_rotation_ + delta_rot;
+        m_rotation_ = m_rotation_ + delta_rot * Time::GetDeltaTime();
         transform->SetRotation(Quaternion::CreateFromYawPitchRoll(m_rotation_.y, m_rotation_.x, 0.0F));
     }
 
@@ -67,12 +66,15 @@ void Controller::OnUpdate()
         Vector3 world_dir = Vector3::Transform(dir, transform->Rotation()) + Vector3::Up * up_down;
         world_dir.Normalize();
 
-        const Vector3 new_pos = transform->Position() + (world_dir * move_speed);
+        const Vector3 new_pos = transform->Position() + (world_dir * m_movement_speed_ * Time::GetDeltaTime());
         transform->SetPosition(new_pos);
     }
 }
 void Controller::OnInspectorGui()
 {
+    Gui::FloatField("Movement Speed", m_movement_speed_);
+    Gui::FloatField("Rotation Speed", m_rotation_speed_);
+
     ImGui::Text("Last Movement Input: {%.2f, %.2f, %.2f}",
                 m_last_movement_input_.x, m_last_movement_input_.y, m_last_movement_input_.z);
     ImGui::Text("Last Rotation Input: {%.2f, %.2f}",
