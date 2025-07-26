@@ -14,6 +14,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <queue>
 #include <utility>
 /* === end C++ standard library === */
 
