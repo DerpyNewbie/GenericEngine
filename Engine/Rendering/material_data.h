@@ -16,6 +16,7 @@ struct IMaterialData : Inspectable
     ShaderParameter parameter;
     std::shared_ptr<IBuffer> buffer = nullptr; // can be null
 
+    IMaterialData();
     explicit IMaterialData(ShaderParameter param);
 
     virtual std::shared_ptr<IBuffer> CreateBuffer() = 0;
@@ -36,9 +37,11 @@ struct IMaterialData : Inspectable
     }
 };
 
+inline IMaterialData::IMaterialData() : parameter()
+{}
+
 inline IMaterialData::IMaterialData(ShaderParameter param): parameter(std::move(param))
-{
-}
+{}
 
 template <typename T>
 struct MaterialData : IMaterialData
@@ -52,6 +55,7 @@ struct MaterialData : IMaterialData
 
     T value;
 
+    MaterialData();
     explicit MaterialData(const ShaderParameter &new_parameter);
     explicit MaterialData(T new_value, const ShaderParameter &new_parameter);
     ~MaterialData() override = default;
@@ -77,15 +81,17 @@ struct MaterialData : IMaterialData
 };
 
 template <typename T>
+MaterialData<T>::MaterialData() : MaterialData({}, {})
+{}
+
+template <typename T>
 MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) : MaterialData({}, new_parameter)
-{
-}
+{}
 
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
-{
-}
+{}
 
 template <typename T>
 void MaterialData<T>::OnInspectorGui()
