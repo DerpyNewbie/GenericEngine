@@ -5,13 +5,30 @@
 
 void engine::BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
 {
-    auto material_handles = shared_material->p_shared_material_block->GetHandles();
-    for (int shader_type = 0; shader_type < kShaderType_Count; ++shader_type)
-        for (int params_type = 0; params_type < kParameterBufferType_Count; ++params_type)
-            if (!material_handles[shader_type][params_type].empty())
-                cmd_list->SetGraphicsRootDescriptorTable(
-                    shader_type * 3 + params_type + 2,
-                    material_handles[shader_type][params_type][0]->HandleGPU);
+    const auto material = shared_material;
+    const auto material_block = material->p_shared_material_block;
+
+    material->UpdateBuffer();
+
+    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
+    {
+        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
+        {
+            const auto shader_type = static_cast<kShaderType>(shader_i);
+            const auto param_type = static_cast<kParameterBufferType>(param_i);
+
+            if (material_block->Empty(shader_type, param_type))
+            {
+                continue;
+            }
+
+            // +2 for engine pre-defined shader variables
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 2;
+            const auto itr = material_block->Begin(shader_type, param_type);
+            const auto desc_handle = itr->handle->HandleGPU;
+            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+        }
+    }
 }
 
 void engine::BillboardRenderer::OnConstructed()
@@ -30,10 +47,7 @@ void engine::BillboardRenderer::OnDraw()
     m_billboard_.world_matrix = GameObject()->Transform()->WorldMatrix();
     m_billboard_.Update();
 
-    if (shared_material->IsValid() && !shared_material->p_shared_material_block->IsCreateBuffer())
-    {
-        shared_material->p_shared_material_block->CreateBuffer();
-    }
+    shared_material->p_shared_material_block->UpdateBuffer();
 
     if (shared_material->IsValid())
     {

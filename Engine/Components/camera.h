@@ -2,6 +2,8 @@
 #include "component.h"
 #include "event_receivers.h"
 #include "renderer.h"
+#include "Asset/asset_ptr.h"
+#include "Rendering/render_texture.h"
 
 namespace engine
 {
@@ -14,6 +16,7 @@ class Camera : public Component, public IDrawCallReceiver
     };
 
     static std::weak_ptr<Camera> m_main_camera_;
+    static std::weak_ptr<Camera> m_current_camera_;
 
     kViewMode m_view_mode_ = kViewMode::kPerspective;
     float m_field_of_view_ = 70;
@@ -22,6 +25,10 @@ class Camera : public Component, public IDrawCallReceiver
     float m_ortho_size_ = 50;
     Color m_background_color_ = Color(0x1A1A1AFF);
     UINT m_drawcall_count_ = 0;
+
+    bool BeginRender();
+    void EndRender();
+    void ApplyCameraSettingToDxLib() const;
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
@@ -30,13 +37,18 @@ public:
     static constexpr float min_clipping_plane = 0.01f;
     static constexpr float max_clipping_plane = 10000.0f;
 
+    AssetPtr<RenderTexture> render_texture;
+
+    int Order() override;
     void OnAwake() override;
+    void OnUpdate() override;
     void OnInspectorGui() override;
     void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
     static std::shared_ptr<Camera> Main();
+    static std::weak_ptr<Camera> Current();
 
     Matrix GetViewMatrix() const;
     Matrix GetProjectionMatrix() const;
@@ -50,7 +62,8 @@ public:
            CEREAL_NVP(m_ortho_size_),
            CEREAL_NVP(m_near_plane_),
            CEREAL_NVP(m_far_plane_),
-           CEREAL_NVP(m_background_color_));
+           CEREAL_NVP(m_background_color_),
+           CEREAL_NVP(render_texture));
     }
 };
 }

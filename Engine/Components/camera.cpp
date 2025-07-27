@@ -10,6 +10,7 @@
 namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
+std::weak_ptr<Camera> Camera::m_current_camera_;
 
 bool Camera::BeginRender()
 {
@@ -131,6 +132,7 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
+    m_current_camera_ = shared_from_base<Camera>();
     if (BeginRender())
     {
         m_drawcall_count_ = 0;
@@ -158,6 +160,11 @@ void Camera::OnDisabled()
 std::shared_ptr<Camera> Camera::Main()
 {
     return m_main_camera_.lock();
+}
+
+std::weak_ptr<Camera> Camera::Current()
+{
+    return m_current_camera_;
 }
 
 Matrix Camera::GetViewMatrix() const

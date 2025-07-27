@@ -45,7 +45,7 @@ void Billboard::Update()
         }
     }
 
-    const auto camera = engine::Camera::Main().lock();
+    const auto camera = engine::Camera::Current().lock();
     if (camera == nullptr)
     {
         engine::Logger::Error<Billboard>("Main Camera is not set!");
@@ -58,6 +58,13 @@ void Billboard::Update()
     Vector3 dir_vec3 = camera_pos - obj_pos;
     DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(XMLoadFloat3(&dir_vec3));
 
+    //スケールの保持
+    Vector3 scale;
+    DirectX::XMMATRIX world = world_matrix;
+    scale.x = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[0]));
+    scale.y = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[1]));
+    scale.z = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[2]));
+
     // 回転角度を算出（XZとYZで）
     float angle_y = std::atan2(dir_vec3.x, dir_vec3.z);
     float value = dir_vec3.y / DirectX::XMVectorGetX(DirectX::XMVector3Length(XMLoadFloat3(&dir_vec3)));
@@ -67,9 +74,10 @@ void Billboard::Update()
     // 合成（X → Y 回転順）
     auto rot_y = Matrix(DirectX::XMMatrixRotationY(angle_y));
     auto rot_x = Matrix(DirectX::XMMatrixRotationX(angle_x));
+    auto scale_mat = Matrix(DirectX::XMMatrixScaling(scale.x, scale.y, scale.z));
     auto trans = Matrix(DirectX::XMMatrixTranslation(obj_pos.x, obj_pos.y, obj_pos.z));
 
-    world_matrix = rot_x * rot_y * trans;
+    world_matrix = scale_mat * rot_x * rot_y * trans;
 
     for (auto &wvp_buffer : wvp_buffers)
     {

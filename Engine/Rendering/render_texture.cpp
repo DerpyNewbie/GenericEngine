@@ -7,16 +7,7 @@
 void RenderTexture::CreateBuffer()
 {
     auto device = g_RenderEngine->Device();
-
-    auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
-        DXGI_FORMAT_R8G8B8A8_UNORM,
-        g_app->WindowWidth(),
-        g_app->WindowHeight(),
-        1, // array size
-        1 // mip levels
-        );
-    desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
-
+    auto res_desc = g_RenderEngine->BBuffDesc();
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
     D3D12_CLEAR_VALUE clearValue = {};
@@ -26,13 +17,16 @@ void RenderTexture::CreateBuffer()
     clearValue.Color[2] = 0.5f;
     clearValue.Color[3] = 0.5f;
 
+    width = g_app->WindowWidth();
+    height = g_app->WindowHeight();
+
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,
         D3D12_HEAP_FLAG_NONE,
-        &desc,
+        &res_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &clearValue,
-        IID_PPV_ARGS(&m_pResource)
+        IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
         );
     m_pResource->SetName(L"renderTexture");
 
@@ -42,25 +36,19 @@ void RenderTexture::CreateBuffer()
     }
 
     // RTV用のディスクリプタヒープを作成する
-    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
+    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = g_RenderEngine->RTVHeapDesc();
     heap_desc.NumDescriptors = 1;
-    heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-    heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     hr = device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(m_RTVHeap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
         engine::Logger::Error<RenderTexture>("Failed To Create RTV Heap for RenderTexture");
     }
 
-    // ディスクリプタのサイズを取得。
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_RTVHeap_->GetCPUDescriptorHandleForHeapStart();
-
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, rtvHandle);
+    device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTexture::BeginRender()

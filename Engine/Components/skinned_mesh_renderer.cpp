@@ -29,7 +29,7 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 void SkinnedMeshRenderer::UpdateWVPBuffer()
 {
     WorldViewProjection wvp;
-    const auto camera = Camera::Main();
+    const auto camera = Camera::Current();
 
     wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
     wvp.WVP[1] = camera->GetViewMatrix();

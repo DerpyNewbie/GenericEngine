@@ -16,7 +16,7 @@ namespace engine
 void MeshRenderer::UpdateWVPBuffer()
 {
     WorldViewProjection wvp;
-    const auto camera = Camera::Main();
+    const auto camera = Camera::Current();
 
     wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
     wvp.WVP[1] = camera->GetViewMatrix();

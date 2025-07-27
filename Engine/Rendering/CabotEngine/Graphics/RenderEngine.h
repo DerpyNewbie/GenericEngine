@@ -49,6 +49,16 @@ public:
 
     void SetBackGroundColor(Color color);
 
+    D3D12_DESCRIPTOR_HEAP_DESC RTVHeapDesc() const
+    {
+        return m_pRtvHeap->GetDesc();
+    }
+
+    D3D12_RESOURCE_DESC BBuffDesc() const
+    {
+        return m_pRenderTargets[m_CurrentBackBufferIndex]->GetDesc();
+    }
+
 private:
     // DirectX12初期化に使う関数たち
     bool CreateDevice(); // デバイスを生成

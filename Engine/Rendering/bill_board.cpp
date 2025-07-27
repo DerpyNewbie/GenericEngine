@@ -51,7 +51,7 @@ void BillBoard::OnDraw()
         }
     }
 
-    const auto camera = engine::Camera::Main().lock();
+    const auto camera = engine::Camera::Current().lock();
     if (camera == nullptr)
     {
         engine::Logger::Error<BillBoard>("Main Camera is not set!");
