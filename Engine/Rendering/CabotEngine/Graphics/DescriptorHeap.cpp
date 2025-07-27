@@ -88,6 +88,16 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
     return pHandle;
 }
 
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(TextureCube &texture_cube)
+{
+    auto pHandle = Allocate();
+
+    auto resource = texture_cube.Resource();
+    auto view_desc = texture_cube.ViewDesc();
+    g_RenderEngine->Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
+    return pHandle;
+}
+
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
     auto instance = Instance();

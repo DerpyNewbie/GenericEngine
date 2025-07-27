@@ -11,7 +11,7 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D final : public engine::InspectableAsset, public IBuffer
+class Texture2D : public engine::InspectableAsset, public IBuffer
 {
     friend class engine::Texture2DImporter;
 

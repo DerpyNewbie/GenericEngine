@@ -3,12 +3,58 @@
 #include "camera.h"
 #include "application.h"
 #include "game_object.h"
+#include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
 
 namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
+
+bool Camera::BeginRender()
+{
+    if (Main().lock() == shared_from_base<Camera>())
+    {
+        g_RenderEngine->SetMainRenderTarget();
+        return true;
+    }
+    if (auto render_tex = render_texture.CastedLock())
+    {
+        render_tex->BeginRender();
+        return true;
+    }
+    return false;
+}
+
+void Camera::EndRender()
+{
+    if (Main().lock() == shared_from_base<Camera>())
+    {
+        return;
+    }
+    if (auto render_tex = render_texture.CastedLock())
+    {
+        render_tex->EndRender();
+    }
+}
+
+void Camera::ApplyCameraSettingToDxLib() const
+{
+    SetBackgroundColor(m_background_color_.R() * 255, m_background_color_.G() * 255, m_background_color_.B() * 255);
+    const auto t = GameObject()->Transform();
+
+    int x, y;
+    GetDrawScreenSize(&x, &y);
+    const float aspect = static_cast<float>(x) / static_cast<float>(y);
+    const auto proj = m_view_mode_ == kViewMode::kPerspective
+                          ? Matrix::CreatePerspectiveFieldOfView(m_field_of_view_ * Mathf::kDeg2Rad, aspect,
+                                                                 m_near_plane_, m_far_plane_)
+                          : Matrix::CreateOrthographic(m_ortho_size_, m_ortho_size_, m_near_plane_, m_far_plane_);
+    const auto view = Matrix::CreateLookAt(t->Position(), t->Position() + t->Forward(), t->Up());
+
+    SetupCamera_ProjectionMatrix(DxLibConverter::From(proj));
+    SetCameraViewMatrix(DxLibConverter::From(view));
+}
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     const std::vector<std::weak_ptr<Renderer>> &renderers)
@@ -36,6 +82,11 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
         }
     }
     return visible_objects;
+}
+
+int Camera::Order()
+{
+    return Main().lock() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
 }
 
 void Camera::OnAwake()
@@ -66,6 +117,8 @@ void Camera::OnInspectorGui()
         m_view_mode_ = static_cast<kViewMode>(current_view_mode);
     }
 
+    Gui::PropertyField("RenderTexture", render_texture);
+
     float color_buf[4];
     EngineUtil::ToFloat4(color_buf, m_background_color_);
     if (ImGui::ColorPicker4("Background Color", color_buf))
@@ -78,12 +131,17 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    m_drawcall_count_ = 0;
-    auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
-    for (auto object : objects_in_view)
+    if (BeginRender())
     {
-        m_drawcall_count_++;
-        object->OnDraw();
+        m_drawcall_count_ = 0;
+        auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
+        for (auto object : objects_in_view)
+        {
+            m_drawcall_count_++;
+            object->OnDraw();
+        }
+        Gizmos::Render();
+        EndRender();
     }
 }
 
