@@ -105,7 +105,7 @@ MaterialBlock::~MaterialBlock()
 {
     for (auto &desc_handle : material_data | std::views::transform(&MaterialDataPair::handle))
     {
-        g_DescriptorHeapManager.Get().Free(desc_handle);
+        g_DescriptorHeapManager->Get().Free(desc_handle);
         desc_handle = nullptr;
     }
 }
@@ -218,7 +218,7 @@ void MaterialBlock::UpdateBuffer()
             {
                 if (handle != nullptr)
                 {
-                    g_DescriptorHeapManager.Get().Free(handle);
+                    g_DescriptorHeapManager->Get().Free(handle);
                     handle = nullptr;
                 }
             }

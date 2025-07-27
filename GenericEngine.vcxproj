@@ -58,7 +58,6 @@
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
-        <ClCompile Include="Engine\Components\sky_box.cpp"/>
         <ClCompile Include="Engine\Components\sprite_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -127,15 +126,8 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyBoxPixelShader.hlsl">
-            <FileType>Document</FileType>
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\FontData.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
@@ -145,7 +137,6 @@
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
-        <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\Vertex.cpp"/>
@@ -158,11 +149,6 @@
         <ClCompile Include="main.cpp"/>
         <ClCompile Include="pch.cpp">
         </ClCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyBoxVertShader.hlsl">
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vert</EntryPointName>
-        </FxCompile>
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="application.h"/>
@@ -205,7 +191,6 @@
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
-        <ClInclude Include="Engine\Components\sky_box.h"/>
         <ClInclude Include="Engine\Components\sprite_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
@@ -246,7 +231,6 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\FontData.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
@@ -257,7 +241,6 @@
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
-        <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\Vertex.h"/>
@@ -273,7 +256,6 @@
     <ItemGroup>
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
-        <Content Include="Engine\Rendering\CabotEngine\Graphics\SkyBoxVertShader.hlsl"/>
         <Content Include="vcpkg.json"/>
     </ItemGroup>
     <ItemGroup>

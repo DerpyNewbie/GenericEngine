@@ -42,16 +42,6 @@ void PipelineState::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primi
     desc.PrimitiveTopologyType = primitive_type;
 }
 
-void PipelineState::SetRasterizerState(const D3D12_RASTERIZER_DESC &rasterizer_desc)
-{
-    desc.RasterizerState = rasterizer_desc;
-}
-
-void PipelineState::SetDepthStencilState(D3D12_DEPTH_STENCIL_DESC depth_stencil_desc)
-{
-    desc.DepthStencilState = depth_stencil_desc;
-}
-
 void PipelineState::SetVS(std::wstring filePath)
 {
     // 頂点シェーダー読み込み

@@ -146,17 +146,12 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    if (BeginRender())
+    m_drawcall_count_ = 0;
+    auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
+    for (auto object : objects_in_view)
     {
-        m_drawcall_count_ = 0;
-        auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
-        for (auto object : objects_in_view)
-        {
-            m_drawcall_count_++;
-            object->OnDraw();
-        }
-        Gizmos::Render();
-        EndRender();
+        m_drawcall_count_++;
+        object->OnDraw();
     }
 }
 

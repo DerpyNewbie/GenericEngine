@@ -42,7 +42,6 @@ bool Engine::Init()
     g_Input.Initialize();
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
-    g_DescriptorHeapManager.Initialize();
 
     Gizmos::Init();
     Time::Get()->Init();
@@ -82,6 +81,11 @@ void Engine::MainLoop() const
             Profiler::End("Fixed Update");
 
             Profiler::Begin("Draw Call");
+            g_RenderEngine->BeginRender();
+            g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+            auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
+            auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+            g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();
             Profiler::End("Draw Call");

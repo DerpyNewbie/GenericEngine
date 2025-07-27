@@ -8,7 +8,6 @@
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
-#include "Components/sky_box.h"
 #include "Components/text_asset_ref_test_component.h"
 
 namespace engine
@@ -25,7 +24,6 @@ void IComponentFactory::Init()
     ADD_COMPONENT(SkinnedMeshRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(SpriteRenderer);
-    ADD_COMPONENT(SkyBox);
 #undef ADD_COMPONENT
 }
 

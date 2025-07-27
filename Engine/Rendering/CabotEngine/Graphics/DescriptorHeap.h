@@ -1,7 +1,5 @@
 ﻿#pragma once
 #include "RenderEngine.h"
-#include "TextureCube.h"
-#include "Rendering/render_texture.h"
 
 class ConstantBuffer;
 class Texture2D;
@@ -31,13 +29,11 @@ class DescriptorHeap
     ComPtr<ID3D12DescriptorHeap> m_pHeap_ = nullptr;
 
 public:
-    DescriptorHeap();
-    ID3D12DescriptorHeap *GetHeap();
+    DescriptorHeap(); // コンストラクタで生成する
+    ID3D12DescriptorHeap *GetHeap(); // ディスクリプタヒープを返す
     std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
     std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer &structured_buffer);
     std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
-    std::shared_ptr<DescriptorHandle> Register(TextureCube &texture_cube);
-    std::shared_ptr<DescriptorHandle> Register(RenderTexture &render_texture);
 
     std::shared_ptr<DescriptorHandle> Allocate();
     void Free(std::shared_ptr<DescriptorHandle> handle);

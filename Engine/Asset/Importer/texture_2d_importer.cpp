@@ -48,11 +48,11 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(std::istream &
     auto ext = FileExtension(path);
 
     HRESULT hr = S_FALSE;
-    if (ext == L"png")
+    if (ext == L"png") // use WICFile when png
     {
         hr = LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &meta, scratch);
     }
-    else if (ext == L"tga")
+    else if (ext == L"tga") // use TGAFile when tga
     {
         hr = LoadFromTGAFile(path.c_str(), &meta, scratch);
     }

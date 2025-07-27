@@ -16,10 +16,6 @@ void Texture2D::OnInspectorGui()
 
 void Texture2D::CreateBuffer()
 {
-    if (m_pResource)
-    {
-        return;
-    }
     auto desc = CD3DX12_RESOURCE_DESC::Tex2D(format,
                                              width,
                                              height,
