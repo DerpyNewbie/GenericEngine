@@ -14,6 +14,7 @@ std::weak_ptr<Camera> Camera::m_current_camera_;
 
 bool Camera::BeginRender()
 {
+
     if (Main().lock() == shared_from_base<Camera>())
     {
         g_RenderEngine->SetMainRenderTarget();
@@ -132,9 +133,14 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    m_current_camera_ = shared_from_base<Camera>();
+    g_RenderEngine->BeginRender();
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+    auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
+    auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     if (BeginRender())
     {
+        m_current_camera_ = shared_from_base<Camera>();
         m_drawcall_count_ = 0;
         auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
         for (auto object : objects_in_view)

@@ -71,7 +71,10 @@ void RenderEngine::BeginRender()
     // コマンドを初期化してためる準備をする
     m_pAllocator[m_CurrentBackBufferIndex]->Reset();
     m_pCommandList->Reset(m_pAllocator[m_CurrentBackBufferIndex].Get(), nullptr);
+}
 
+void RenderEngine::SetMainRenderTarget()
+{
     // レンダーターゲットが使用可能になるまで待つ
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -83,10 +86,6 @@ void RenderEngine::BeginRender()
         D3D12_RESOURCE_STATE_DEPTH_WRITE
         );
     m_pCommandList->ResourceBarrier(1, &dsBarrier);
-}
-
-void RenderEngine::SetMainRenderTarget()
-{
     // ビューポートとシザー矩形を設定
     m_pCommandList->RSSetViewports(1, &m_Viewport);
     m_pCommandList->RSSetScissorRects(1, &m_Scissor);
@@ -131,6 +130,21 @@ void RenderEngine::SetRenderTarget(ID3D12Resource *render_target, ID3D12Descript
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
     auto descriptor_heap = DescriptorHeap::GetHeap();
     g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
+}
+
+void RenderEngine::ExecuteCommandList()
+{
+    // コマンドの記録を終了
+    m_pCommandList->Close();
+
+    // コマンドを実行
+    ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
+    m_pQueue->ExecuteCommandLists(1, ppCmdLists);
+    
+    engine::FontData::GMamory().lock()->Commit(m_pQueue.Get());
+
+    // 描画完了を待つ
+    WaitRender();
 }
 
 void RenderEngine::EndRender()
@@ -345,7 +359,6 @@ bool RenderEngine::CreateRenderTarget()
         m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(m_pRenderTargets[i].ReleaseAndGetAddressOf()));
         m_pDevice->CreateRenderTargetView(m_pRenderTargets[i].Get(), &rtvDesc, rtvHandle);
         rtvHandle.ptr += m_RtvDescriptorSize;
-        m_pRenderTargets[i]->SetName(L"RenderTexture Main");
     }
 
     return true;

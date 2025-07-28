@@ -22,11 +22,7 @@ void MeshRenderer::UpdateWVPBuffer()
     wvp.WVP[1] = camera->GetViewMatrix();
     wvp.WVP[2] = camera->GetProjectionMatrix();
 
-    for (auto &wvp_buffer : wvp_buffers)
-    {
-        auto ptr = wvp_buffer->GetPtr<WorldViewProjection>();
-        *ptr = wvp;
-    }
+    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<WorldViewProjection>() = wvp;
 }
 
 void MeshRenderer::RecalculateBoundingBox()

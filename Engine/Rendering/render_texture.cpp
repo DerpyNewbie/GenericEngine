@@ -70,6 +70,7 @@ void RenderTexture::EndRender()
         m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    g_RenderEngine->ExecuteCommandList();
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()
