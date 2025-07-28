@@ -37,6 +37,11 @@ void Camera::EndRender()
     if (auto render_tex = render_texture.CastedLock())
     {
         render_tex->EndRender();
+        g_RenderEngine->BeginRender();
+        g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+        auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
+        auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+        g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     }
 }
 
@@ -133,11 +138,6 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    g_RenderEngine->BeginRender();
-    g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
-    auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
-    auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
-    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     if (BeginRender())
     {
         m_current_camera_ = shared_from_base<Camera>();

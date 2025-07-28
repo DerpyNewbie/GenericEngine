@@ -71,6 +71,13 @@ void RenderEngine::BeginRender()
     // コマンドを初期化してためる準備をする
     m_pAllocator[m_CurrentBackBufferIndex]->Reset();
     m_pCommandList->Reset(m_pAllocator[m_CurrentBackBufferIndex].Get(), nullptr);
+
+    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE
+        );
+    m_pCommandList->ResourceBarrier(1, &dsBarrier);
 }
 
 void RenderEngine::SetMainRenderTarget()
@@ -80,12 +87,6 @@ void RenderEngine::SetMainRenderTarget()
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_pCommandList->ResourceBarrier(1, &barrier);
 
-    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pDepthStencilBuffer.Get(),
-        D3D12_RESOURCE_STATE_COMMON,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE
-        );
-    m_pCommandList->ResourceBarrier(1, &dsBarrier);
     // ビューポートとシザー矩形を設定
     m_pCommandList->RSSetViewports(1, &m_Viewport);
     m_pCommandList->RSSetScissorRects(1, &m_Scissor);
@@ -140,7 +141,7 @@ void RenderEngine::ExecuteCommandList()
     // コマンドを実行
     ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
     m_pQueue->ExecuteCommandLists(1, ppCmdLists);
-    
+
     engine::FontData::GMamory().lock()->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
