@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <directxtk12/Keyboard.h>
 #include <directxtk12/Mouse.h>
 

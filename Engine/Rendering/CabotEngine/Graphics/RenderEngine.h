@@ -16,7 +16,6 @@ public:
     bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight); // エンジン初期化
 
     void BeginRender(); // 描画の開始処理
-    void DrawPera();
     void EndRender(); // 描画の終了処理
     void WaitRender(); // 描画完了を待つ処理
 
@@ -76,15 +75,10 @@ private:
     // 描画に使うオブジェクトとその生成関数たち
     bool CreateRenderTarget(); // レンダーターゲットを生成
     bool CreateDepthStencil(); // 深度ステンシルバッファを生成
-    bool CreatePeraResource();
-    void DrawPeraPolygon();
 
     UINT m_RtvDescriptorSize = 0; // レンダーターゲットビューのディスクリプタサイズ
     ComPtr<ID3D12DescriptorHeap> m_pRtvHeap = nullptr; // レンダーターゲットのディスクリプタヒープ
     ComPtr<ID3D12Resource> m_pRenderTargets[FRAME_BUFFER_COUNT] = {nullptr}; // レンダーターゲット（ダブルバッファリングするので2個）
-    ComPtr<ID3D12Resource> m_pPeraResource;
-    ComPtr<ID3D12DescriptorHeap> m_pPeraRTVHeap;
-    std::shared_ptr<DescriptorHandle> m_pPeraTexHandle;
 
     std::shared_ptr<engine::VertexBuffer> m_pVertBuff;
     std::shared_ptr<engine::IndexBuffer> m_pIndexBuff;

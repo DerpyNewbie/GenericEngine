@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "InputManager.h"
 #include "application.h"
 InputManager g_Input;
