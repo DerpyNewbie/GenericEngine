@@ -36,6 +36,8 @@ public:
     static std::shared_ptr<Object> GetObjectDragDropTarget(const ImGuiPayload *payload);
     static std::shared_ptr<Object> GetObjectDragDropTarget();
 
+    static ImVec2 GetFieldRect();
+
     template <typename T> requires !std::is_base_of_v<Component, T>
     static std::shared_ptr<T> MakeCompatible(std::shared_ptr<Object> object);
 
@@ -47,6 +49,12 @@ public:
 
     template <typename T>
     static bool AssetPicker(IAssetPtr &asset_ptr);
+
+    static bool BoolField(const char *label, bool &value);
+
+    static bool FloatField(const char *label, float &value);
+
+    static bool IntField(const char *label, int &value);
 
     template <typename T>
     static bool PropertyField(const char *label, IAssetPtr &value);
@@ -176,9 +184,7 @@ bool Gui::PropertyField(const char *label, IAssetPtr &value)
             ImGui::EndPopup();
         }
 
-        const auto height = ImGui::GetTextLineHeightWithSpacing();
-        const auto width = ImGui::GetContentRegionAvail().x;
-        if (ImGui::Button(value.Name().c_str(), ImVec2(width * 0.7F - 0.25F, height)))
+        if (ImGui::Button(value.Name().c_str(), GetFieldRect()))
         {
             ImGui::OpenPopup("##PROPERTY_FIELD_POPUP");
         }

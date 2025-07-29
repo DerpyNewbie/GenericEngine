@@ -8,8 +8,8 @@
 // ReSharper disable once CppInconsistentNaming
 namespace DxLibHelper
 {
-constexpr float kDefaultBillboardSize = 0.01F;
-constexpr float kDefaultAxisLength = 0.5F;
+constexpr float kDefaultBillboardSize = 0.25F;
+constexpr float kDefaultAxisLength = 10.0F;
 
 /**
  * 3D空間に文字列を描画します。

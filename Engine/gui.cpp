@@ -181,4 +181,26 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget()
 {
     return GetObjectDragDropTarget(ImGui::GetDragDropPayload());
 }
+
+ImVec2 Gui::GetFieldRect()
+{
+    const auto height = ImGui::GetTextLineHeightWithSpacing();
+    const auto width = ImGui::GetContentRegionAvail().x;
+    return ImVec2(width * 0.7F - 0.25F, height);
+}
+
+bool Gui::BoolField(const char *label, bool &value)
+{
+    return ImGui::Checkbox(label, &value);
+}
+
+bool Gui::FloatField(const char *label, float &value)
+{
+    return ImGui::DragFloat(label, &value, 0.01F, 0.0F, 0.0F, "%.2f");
+}
+
+bool Gui::IntField(const char *label, int &value)
+{
+    return ImGui::DragInt(label, &value, 1.0F, 0.0F, 0.0F, "%d");
+}
 }

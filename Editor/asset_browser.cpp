@@ -68,69 +68,75 @@ bool DrawAssetHierarchyPopup(const std::shared_ptr<engine::AssetHierarchy> &asse
 
 bool DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
 {
+    ImGui::TableNextRow();
+    ImGui::TableNextColumn();
+
     ImGui::PushID(asset_hierarchy.get());
 
-    if (asset_hierarchy->IsFile())
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+    flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    flags |= ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
+    flags |= ImGuiTreeNodeFlags_SpanFullWidth;
+
+    if (!asset_hierarchy->IsDirectory())
     {
-        if (ImGui::Selectable(asset_hierarchy->asset->path_hint.filename().string().c_str()))
-        {
-            if (asset_hierarchy->asset->managed_object == nullptr)
-                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path_hint);
-            Editor::Instance()->SetSelectedObject(asset_hierarchy);
-        }
-
-        if (ImGui::BeginDragDropSource())
-        {
-            const auto guid_str = asset_hierarchy->asset->guid.str();
-            ImGui::SetDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
-            ImGui::Text("Dragging %s", asset_hierarchy->asset->path_hint.string().c_str());
-            ImGui::EndDragDropSource();
-        }
-
-        if (DrawAssetHierarchyPopup(asset_hierarchy))
-        {
-            ImGui::PopID();
-            return true;
-        }
+        flags |= ImGuiTreeNodeFlags_Leaf;
     }
 
-    if (asset_hierarchy->IsDirectory())
+    if (Editor::Instance()->SelectedObject() == asset_hierarchy)
     {
-        const bool is_open = ImGui::CollapsingHeader(asset_hierarchy->Name().c_str());
-        if (ImGui::IsItemClicked())
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+
+    const bool open = ImGui::TreeNodeEx("", flags, "%s", asset_hierarchy->Name().c_str());
+    if (asset_hierarchy->IsFile() && ImGui::BeginDragDropSource())
+    {
+        const auto guid_str = asset_hierarchy->asset->guid.str();
+        ImGui::SetDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
+        ImGui::Text("Dragging %s", asset_hierarchy->asset->path_hint.string().c_str());
+        ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        if (asset_hierarchy->asset != nullptr)
+            engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path_hint);
+        Editor::Instance()->SetSelectedObject(asset_hierarchy);
+
+        auto path = engine::AssetDatabase::GetProjectDirectory();
+        if (asset_hierarchy->asset != nullptr)
+            path = asset_hierarchy->asset->path_hint;
+        if (!asset_hierarchy->IsDirectory())
+            path = path.parent_path();
+
+        Editor::Instance()->SetSelectedDirectory(path);
+    }
+
+    if (DrawAssetHierarchyPopup(asset_hierarchy))
+    {
+        if (open)
+            ImGui::TreePop();
+        ImGui::PopID();
+        return true;
+    }
+
+    if (asset_hierarchy->IsDirectory() && open)
+    {
+        for (auto &child : asset_hierarchy->children)
         {
-            Editor::Instance()->SetSelectedObject(asset_hierarchy);
-
-            auto path = engine::AssetDatabase::GetProjectDirectory();
-            if (asset_hierarchy->asset != nullptr)
-                path = asset_hierarchy->asset->path_hint;
-
-            Editor::Instance()->SetSelectedDirectory(path);
-        }
-
-        if (DrawAssetHierarchyPopup(asset_hierarchy))
-        {
-            ImGui::PopID();
-            return true;
-        }
-
-        if (is_open)
-        {
-            ImGui::Indent();
-            for (auto &child : asset_hierarchy->children)
+            // HACK: early-return when itr has changed to prevent invalidated itr issues
+            if (DrawAssetHierarchy(child))
             {
-                // HACK: early-return when itr has changed to prevent invalidated itr issues
-                if (DrawAssetHierarchy(child))
-                {
-                    ImGui::Unindent();
-                    ImGui::PopID();
-                    return true;
-                }
+                if (open)
+                    ImGui::TreePop();
+                ImGui::PopID();
+                return true;
             }
-            ImGui::Unindent();
         }
     }
 
+    if (open)
+        ImGui::TreePop();
     ImGui::PopID();
     return false;
 }
@@ -151,6 +157,11 @@ void AssetBrowser::OnEditorGui()
     }
 
     const auto asset_hierarchy = engine::AssetDatabase::GetRootAssetHierarchy();
-    DrawAssetHierarchy(asset_hierarchy);
+
+    if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg))
+    {
+        DrawAssetHierarchy(asset_hierarchy);
+        ImGui::EndTable();
+    }
 }
 }

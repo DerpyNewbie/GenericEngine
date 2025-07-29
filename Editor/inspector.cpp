@@ -161,7 +161,7 @@ void Inspector::DrawInspectable(const std::shared_ptr<engine::Inspectable> &insp
 {
     inspectable->OnInspectorGui();
 }
-void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
+void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy, bool root)
 {
     ImGui::PushID(asset_hierarchy.get());
     auto asset = asset_hierarchy->asset;
@@ -205,11 +205,14 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
 
     if (asset_hierarchy->IsDirectory())
     {
-        for (const auto &child : asset_hierarchy->children)
+        if (!root || ImGui::CollapsingHeader("Show Children"))
         {
-            ImGui::Indent();
-            DrawAssetHierarchy(child);
-            ImGui::Unindent();
+            for (const auto &child : asset_hierarchy->children)
+            {
+                ImGui::Indent();
+                DrawAssetHierarchy(child, false);
+                ImGui::Unindent();
+            }
         }
     }
 
