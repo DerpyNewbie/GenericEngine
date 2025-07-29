@@ -27,7 +27,7 @@ public:
     void OnInspectorGui() override;
 
     void OnDraw() override;
-    void Reconstruct() override;
+    void ReconstructBuffer() override;
     void UpdateBuffers() override;
 
     template <class Archive>

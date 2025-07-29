@@ -9,7 +9,6 @@
 #include "gui.h"
 #include "scene.h"
 #include "Asset/asset_database.h"
-#include "Engine/gui.h"
 
 #include <shobjidl.h>
 
@@ -157,6 +156,7 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
 }
+
 bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
 {
     const auto editor = Editor::Instance();

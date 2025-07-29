@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "component.h"
 #include "renderer.h"
 #include "Rendering/material_data.h"
@@ -13,18 +12,18 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    bool m_already_calc_bounds_ = false;
+    bool is_calculate_bounding_box = false;
 
     std::weak_ptr<Transform> GetTransform() override;
 
 protected:
     bool m_draw_bounds_ = false;
 
-    virtual void Reconstruct();
+    virtual void ReconstructBuffer();
     virtual void UpdateWVPBuffer();
 
     void DrawBounds();
-    void CalcBoundingBox();
+    void ReCalculateBoundingBox();
     void ReconstructMeshesBuffer();
     void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
 
@@ -37,7 +36,6 @@ public:
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> wvp_buffers;
 
     bool buffer_creation_failed = false;
-    bool is_material_error = false;
 
     void OnInspectorGui() override;
     void OnUpdate() override;

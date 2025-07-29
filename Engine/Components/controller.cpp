@@ -46,13 +46,13 @@ void Controller::OnUpdate()
 
     // Rotation input
     Vector2 delta_rot = {0, 0};
-    if (CheckHitKey(KEY_INPUT_UP))
+    if (g_Input.IsKeyDown(Keyboard::Up))
         delta_rot.x += rotate_speed;
-    if (CheckHitKey(KEY_INPUT_DOWN))
+    if (g_Input.IsKeyDown(Keyboard::Down))
         delta_rot.x -= rotate_speed;
-    if (CheckHitKey(KEY_INPUT_LEFT))
+    if (g_Input.IsKeyDown(Keyboard::Left))
         delta_rot.y += rotate_speed;
-    if (CheckHitKey(KEY_INPUT_RIGHT))
+    if (g_Input.IsKeyDown(Keyboard::Right))
         delta_rot.y -= rotate_speed;
 
     m_last_rotation_input_ = delta_rot;

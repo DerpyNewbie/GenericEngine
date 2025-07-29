@@ -7,12 +7,6 @@
 #include <memory>
 using namespace DirectX;
 
-std::wstring FileExtension(const std::wstring &path)
-{
-    auto idx = path.rfind(L'.');
-    return path.substr(idx + 1, path.length() - idx - 1);
-}
-
 engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
     auto texture_2d = Object::Instantiate<Texture2D>();
@@ -45,14 +39,14 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(std::istream &
     const auto path = asset->path_hint;
     TexMetadata meta = {};
     ScratchImage scratch = {};
-    auto ext = FileExtension(path);
+    auto ext = path.extension();
 
     HRESULT hr = S_FALSE;
-    if (ext == L"png") // use WICFile when png
+    if (ext == L".png") // use WICFile when png
     {
         hr = LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &meta, scratch);
     }
-    else if (ext == L"tga") // use TGAFile when tga
+    else if (ext == L".tga") // use TGAFile when tga
     {
         hr = LoadFromTGAFile(path.c_str(), &meta, scratch);
     }

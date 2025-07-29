@@ -72,7 +72,6 @@ void ShaderExporter::Export(std::ostream &output_stream, AssetDescriptor *asset)
 
     asset->ClearKeys();
     asset->SetString("shader_meta", string_buffer.GetString());
-    //test
 }
 
 bool ShaderExporter::CanExport(const std::shared_ptr<Object> &object)

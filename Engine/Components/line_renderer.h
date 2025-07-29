@@ -4,15 +4,16 @@
 
 namespace engine
 {
-class line_renderer : public Renderer
+class LineRendererComponent : public Renderer
 {
     LineRenderer m_LineRenderer;
+
 public:
     void SetVertices(std::vector<Vertex> vertices);
     void SetIndices(std::vector<uint32_t> indices);
 
     void OnInspectorGui() override;
-    
+
     void OnDraw() override;
 
 };

@@ -34,8 +34,8 @@ void SkinnedMeshRenderer::UpdateWVPBuffer()
     const auto camera = Camera::Main();
 
     wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
-    wvp.WVP[1] = camera.lock()->GetViewMatrix();
-    wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
+    wvp.WVP[1] = camera->GetViewMatrix();
+    wvp.WVP[2] = camera->GetProjectionMatrix();
 
     for (auto &wvp_buffer : wvp_buffers)
     {
@@ -142,9 +142,9 @@ void SkinnedMeshRenderer::OnDraw()
         DrawBones();
 }
 
-void SkinnedMeshRenderer::Reconstruct()
+void SkinnedMeshRenderer::ReconstructBuffer()
 {
-    MeshRenderer::Reconstruct();
+    MeshRenderer::ReconstructBuffer();
 
     for (auto &bone_matrices_buffer : bone_matrices_buffers)
         if (!bone_matrices_buffer)
@@ -156,7 +156,7 @@ void SkinnedMeshRenderer::Reconstruct()
 
 void SkinnedMeshRenderer::UpdateBuffers()
 {
-    Reconstruct();
+    ReconstructBuffer();
     UpdateWVPBuffer();
     UpdateBoneTransformsBuffer();
 }

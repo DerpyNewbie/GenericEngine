@@ -19,8 +19,8 @@ void MeshRenderer::UpdateWVPBuffer()
     const auto camera = Camera::Main();
 
     wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
-    wvp.WVP[1] = camera.lock()->GetViewMatrix();
-    wvp.WVP[2] = camera.lock()->GetProjectionMatrix();
+    wvp.WVP[1] = camera->GetViewMatrix();
+    wvp.WVP[2] = camera->GetProjectionMatrix();
 
     for (auto &wvp_buffer : wvp_buffers)
     {
@@ -29,7 +29,7 @@ void MeshRenderer::UpdateWVPBuffer()
     }
 }
 
-void MeshRenderer::CalcBoundingBox()
+void MeshRenderer::ReCalculateBoundingBox()
 {
     auto min_pos = Vector3(0, 0, 0);
     auto max_pos = Vector3(0, 0, 0);
@@ -45,7 +45,7 @@ void MeshRenderer::CalcBoundingBox()
         max_pos.z = max(max_pos.z, vertex.z);
     }
     DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);
-    m_already_calc_bounds_ = true;
+    is_calculate_bounding_box = true;
 }
 
 void MeshRenderer::OnInspectorGui()
@@ -104,8 +104,10 @@ void MeshRenderer::OnInspectorGui()
 
 void MeshRenderer::OnUpdate()
 {
-    if (!m_already_calc_bounds_)
-        CalcBoundingBox();
+    if (!is_calculate_bounding_box)
+    {
+        ReCalculateBoundingBox();
+    }
 }
 
 void MeshRenderer::OnDraw()
@@ -167,7 +169,7 @@ std::weak_ptr<Transform> MeshRenderer::GetTransform()
     return GameObject()->Transform();
 }
 
-void MeshRenderer::Reconstruct()
+void MeshRenderer::ReconstructBuffer()
 {
     if (!vertex_buffer || index_buffers.empty())
     {
@@ -254,7 +256,7 @@ void MeshRenderer::ReconstructMeshesBuffer()
 
 void MeshRenderer::UpdateBuffers()
 {
-    Reconstruct();
+    ReconstructBuffer();
     UpdateWVPBuffer();
 }
 

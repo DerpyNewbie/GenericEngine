@@ -33,7 +33,7 @@ void Gizmos::OnDraw()
     if (m_vertices_.empty())
         return;
 
-    const auto camera = Camera::Main().lock();
+    const auto camera = Camera::Main();
     if (camera == nullptr)
     {
         Logger::Error<Gizmos>("Main Camera is not set!");

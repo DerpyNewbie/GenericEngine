@@ -35,8 +35,8 @@ void LineRenderer::UpdateIndexBuffer(std::vector<uint32_t> indices)
 void LineRenderer::UpdateViewProjectionBuffer()
 {
     const auto camera = engine::Camera::Main();
-    const Matrix view = camera.lock()->GetViewMatrix();
-    const Matrix proj = camera.lock()->GetProjectionMatrix();
+    const Matrix view = camera->GetViewMatrix();
+    const Matrix proj = camera->GetProjectionMatrix();
 
     for (auto &vp_buffer : m_ViewProjectionBuffers)
     {

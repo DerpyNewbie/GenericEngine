@@ -1,22 +1,22 @@
 #include "pch.h"
 #include "line_renderer.h"
 
-void engine::line_renderer::SetVertices(std::vector<Vertex> vertices)
+void engine::LineRendererComponent::SetVertices(std::vector<Vertex> vertices)
 {
-        m_LineRenderer.UpdateVertexBuffer(vertices);
+    m_LineRenderer.UpdateVertexBuffer(vertices);
 }
 
-void engine::line_renderer::SetIndices(std::vector<uint32_t> indices)
+void engine::LineRendererComponent::SetIndices(std::vector<uint32_t> indices)
 {
     m_LineRenderer.UpdateIndexBuffer(indices);
 }
 
-void engine::line_renderer::OnInspectorGui()
+void engine::LineRendererComponent::OnInspectorGui()
 {
     Renderer::OnInspectorGui();
 }
 
-void engine::line_renderer::OnDraw()
+void engine::LineRendererComponent::OnDraw()
 {
     m_LineRenderer.Draw();
 }

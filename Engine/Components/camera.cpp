@@ -16,24 +16,6 @@ namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
 
-void Camera::ApplyCameraSettingToDxLib() const
-{
-    SetBackgroundColor(m_background_color_.R() * 255, m_background_color_.G() * 255, m_background_color_.B() * 255);
-    const auto t = GameObject()->Transform();
-
-    int x, y;
-    GetDrawScreenSize(&x, &y);
-    const float aspect = static_cast<float>(x) / static_cast<float>(y);
-    const auto proj = m_view_mode_ == kViewMode::kPerspective
-                          ? Matrix::CreatePerspectiveFieldOfView(m_field_of_view_ * Mathf::kDeg2Rad, aspect,
-                                                                 m_near_plane_, m_far_plane_)
-                          : Matrix::CreateOrthographic(m_ortho_size_, m_ortho_size_, m_near_plane_, m_far_plane_);
-    const auto view = Matrix::CreateLookAt(t->Position(), t->Position() + t->Forward(), t->Up());
-
-    SetupCamera_ProjectionMatrix(DxLibConverter::From(proj));
-    SetCameraViewMatrix(DxLibConverter::From(view));
-}
-
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     const std::vector<std::weak_ptr<Renderer>> &renderers)
 {
@@ -65,11 +47,6 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
 void Camera::OnAwake()
 {
     m_main_camera_ = shared_from_base<Camera>();
-}
-
-void Camera::OnUpdate()
-{
-    ApplyCameraSettingToDxLib();
 }
 
 void Camera::OnInspectorGui()
@@ -122,9 +99,9 @@ void Camera::OnDisabled()
     UpdateManager::UnsubscribeDrawCall(shared_from_base<Camera>());
 }
 
-std::weak_ptr<Camera> Camera::Main()
+std::shared_ptr<Camera> Camera::Main()
 {
-    return m_main_camera_;
+    return m_main_camera_.lock();
 }
 
 Matrix Camera::GetViewMatrix() const
@@ -138,7 +115,7 @@ Matrix Camera::GetProjectionMatrix() const
 {
     const float aspect = static_cast<float>(Application::WindowWidth()) / static_cast<float>(
                              Application::WindowHeight());
-    return DirectX::XMMatrixPerspectiveFovRH(m_field_of_view_, aspect, 0.3f, 1000.0f);
+    return DirectX::XMMatrixPerspectiveFovRH(DirectX::XMConvertToRadians(m_field_of_view_), aspect, 0.3f, 1000.0f);
 }
 }
 

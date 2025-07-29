@@ -2,10 +2,10 @@
 
 #include "renderer.h"
 
-std::vector<std::weak_ptr<engine::Renderer>> engine::Renderer::renderers;
-
 namespace engine
 {
+std::vector<std::weak_ptr<Renderer>> Renderer::renderers;
+
 void Renderer::SetVisible(const bool visible)
 {
     if (m_is_visible_ == visible)
