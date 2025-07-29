@@ -1,12 +1,12 @@
 #include "pch.h"
-
 #include "controller.h"
-
 #include "engine_time.h"
 #include "game_object.h"
 #include "gui.h"
 #include "transform.h"
+#include "Rendering/CabotEngine/Engine/InputManager.h"
 
+using namespace DirectX;
 
 namespace engine
 {
@@ -40,13 +40,13 @@ void Controller::OnUpdate()
     // Rotation input
     Vector2 delta_rot = {0, 0};
     if (g_Input.IsKeyDown(Keyboard::Up))
-        delta_rot.x += rotate_speed;
+        delta_rot.x += 1.0f;
     if (g_Input.IsKeyDown(Keyboard::Down))
-        delta_rot.x -= rotate_speed;
+        delta_rot.x -= 1.0f;
     if (g_Input.IsKeyDown(Keyboard::Left))
-        delta_rot.y += rotate_speed;
+        delta_rot.y += 1.0f;
     if (g_Input.IsKeyDown(Keyboard::Right))
-        delta_rot.y -= rotate_speed;
+        delta_rot.y -= 1.0f;
 
     m_last_rotation_input_ = delta_rot;
 

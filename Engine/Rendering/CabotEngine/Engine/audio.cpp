@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "audio.h"
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
