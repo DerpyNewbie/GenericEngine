@@ -160,11 +160,11 @@ void MeshRenderer::OnDraw()
 
 void MeshRenderer::DrawBounds()
 {
-    auto matrix = GetTransform().lock()->WorldMatrix();
+    auto matrix = BoundsOrigin().lock()->WorldMatrix();
     Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, matrix);
 }
 
-std::weak_ptr<Transform> MeshRenderer::GetTransform()
+std::weak_ptr<Transform> MeshRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
 }

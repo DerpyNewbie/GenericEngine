@@ -1,13 +1,14 @@
-#include <DirectXColors.h>
-#include "sprite_renderer.h"
+#include "pch.h"
 #include "gui.h"
-#include "Rendering/CabotEngine/Engine/InputManager.h"
+#include "sprite_renderer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-
 #include <Rendering/CabotEngine/Graphics/RootSignatureManager.h>
+
 using namespace DirectX;
 
-void engine::SpriteRenderer::OnInspectorGui()
+namespace engine
+{
+void SpriteRenderer::OnInspectorGui()
 {
     float pos[2];
     EngineUtil::ToFloat2(pos, position);
@@ -37,7 +38,7 @@ void engine::SpriteRenderer::OnInspectorGui()
     }
 }
 
-void engine::SpriteRenderer::OnDraw()
+void SpriteRenderer::OnDraw()
 {
     if (!font_data.Lock())
     {
@@ -51,7 +52,8 @@ void engine::SpriteRenderer::OnDraw()
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
 }
 
-std::weak_ptr<engine::Transform> engine::SpriteRenderer::GetTransform()
+std::weak_ptr<Transform> SpriteRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
+}
 }

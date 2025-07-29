@@ -14,7 +14,7 @@ class MeshRenderer : public Renderer
 {
     bool is_calculate_bounding_box = false;
 
-    std::weak_ptr<Transform> GetTransform() override;
+    std::weak_ptr<Transform> BoundsOrigin() override;
 
 protected:
     bool m_draw_bounds_ = false;

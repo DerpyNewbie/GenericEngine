@@ -15,7 +15,7 @@ namespace engine
 {
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 {
-    for (auto bone_matrices_buffer : bone_matrices_buffers)
+    for (auto bone_matrices_buffer : bone_matrix_buffers)
     {
         std::vector<Matrix> matrices(transforms.size());
         for (int i = 0; i < transforms.size(); ++i)
@@ -59,7 +59,7 @@ void SkinnedMeshRenderer::DrawBones()
     }
 }
 
-std::weak_ptr<Transform> SkinnedMeshRenderer::GetTransform()
+std::weak_ptr<Transform> SkinnedMeshRenderer::BoundsOrigin()
 {
     return root_bone.CastedLock()->Parent();
 }
@@ -75,7 +75,7 @@ void SkinnedMeshRenderer::OnInspectorGui()
     {
         for (int i = 0; i < transforms.size(); i++)
         {
-            //ImGui::Text("%d: %s", i, transforms[i].lock()->Name().c_str());
+            ImGui::Text("%d: %s", i, transforms[i].lock()->Name().c_str());
         }
     }
 
@@ -110,7 +110,7 @@ void SkinnedMeshRenderer::OnDraw()
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
         cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
-        cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrices_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffers[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
         cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
@@ -146,7 +146,7 @@ void SkinnedMeshRenderer::ReconstructBuffer()
 {
     MeshRenderer::ReconstructBuffer();
 
-    for (auto &bone_matrices_buffer : bone_matrices_buffers)
+    for (auto &bone_matrices_buffer : bone_matrix_buffers)
         if (!bone_matrices_buffer)
         {
             bone_matrices_buffer = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());

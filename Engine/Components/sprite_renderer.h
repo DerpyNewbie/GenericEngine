@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "renderer.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/FontData.h"
@@ -18,6 +17,6 @@ public:
     void OnInspectorGui() override;
     void OnDraw() override;
 
-    std::weak_ptr<Transform> GetTransform() override;
+    std::weak_ptr<Transform> BoundsOrigin() override;
 };
 }

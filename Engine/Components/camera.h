@@ -1,5 +1,6 @@
 #pragma once
 #include "component.h"
+#include "event_receivers.h"
 #include "renderer.h"
 
 namespace engine

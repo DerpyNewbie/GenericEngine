@@ -28,7 +28,7 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     std::vector<std::shared_ptr<Renderer>> visible_objects;
     for (auto renderer : renderers)
     {
-        auto transform = renderer.lock()->GetTransform();
+        auto transform = renderer.lock()->BoundsOrigin();
         auto world_matrix = transform.lock()->WorldMatrix();
         auto bounds = renderer.lock()->bounds;
         auto min_pos = bounds.Center + Vector3(-bounds.Extents.x, -bounds.Extents.y, -bounds.Extents.z);

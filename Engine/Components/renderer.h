@@ -1,6 +1,5 @@
 #pragma once
 #include "component.h"
-#include "event_receivers.h"
 #include "transform.h"
 
 namespace engine
@@ -26,6 +25,6 @@ public:
     void OnDisabled() override;
     void OnDestroy() override;
 
-    virtual std::weak_ptr<Transform> GetTransform() = 0;
+    virtual std::weak_ptr<Transform> BoundsOrigin() = 0;
 };
 }
