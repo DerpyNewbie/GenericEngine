@@ -14,7 +14,7 @@ engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOL
     texture_2d->width = 4;
     texture_2d->height = 4;
     texture_2d->format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    texture_2d->mip_levels = 1;
+    texture_2d->mip_level = 1;
 
     size_t pixelCount = 4 * 4;
     texture_2d->tex_data.reserve(pixelCount);
@@ -60,7 +60,7 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(std::istream &
     texture_2d->width = meta.width;
     texture_2d->height = meta.height;
     texture_2d->format = meta.format;
-    texture_2d->mip_levels = meta.mipLevels;
+    texture_2d->mip_level = meta.mipLevels;
 
     auto img = scratch.GetImage(0, 0, 0);
     const uint8_t *src = img->pixels;

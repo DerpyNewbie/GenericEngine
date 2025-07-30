@@ -20,7 +20,7 @@ void Texture2D::CreateBuffer()
                                              width,
                                              height,
                                              1,
-                                             mip_levels);
+                                             mip_level);
 
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
