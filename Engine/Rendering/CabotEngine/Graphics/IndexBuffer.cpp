@@ -18,7 +18,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
         IID_PPV_ARGS(m_pBuffer.GetAddressOf()));
     if (FAILED(hr))
     {
-        printf("[OnInit] インデックスバッファリソースの生成に失敗");
+        Logger::Error<IndexBuffer>("failed to create index buffer resource");
         return;
     }
 
@@ -35,7 +35,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
         hr = m_pBuffer->Map(0, nullptr, &ptr);
         if (FAILED(hr))
         {
-            printf("[OnInit] インデックスバッファマッピングに失敗");
+            Logger::Error<IndexBuffer>("failed to index buffer mapping");
             return;
         }
 
