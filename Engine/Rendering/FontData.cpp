@@ -21,8 +21,6 @@ void engine::FontData::Initialize()
     sprite_batch->SetViewport(g_RenderEngine->ViewPort());
 
     auto future = resource_upload_batch.End(g_RenderEngine->CommandQueue());
-
-    g_RenderEngine->WaitRender();
     future.wait();
 }
 
