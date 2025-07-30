@@ -2,12 +2,19 @@
 #include "Asset/inspectable_asset.h"
 #include "Rendering/buffers.h"
 
+namespace engine
+{
+class Texture2DImporter;
+}
+
 struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
 class Texture2D final : public engine::InspectableAsset, public IBuffer
 {
+    friend class engine::Texture2DImporter;
+
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
     UINT width = 0;
     UINT height = 0;
