@@ -1,5 +1,6 @@
 #include "pch.h"
-#include "line_renderer.h"
+#include "Rendering/line_renderer_component.h"
+#include "line_renderer_component.h"
 
 void engine::LineRendererComponent::SetVertices(std::vector<Vertex> vertices)
 {

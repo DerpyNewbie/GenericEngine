@@ -4,7 +4,7 @@
 #include "game_object.h"
 #include "gui.h"
 #include "transform.h"
-#include "Rendering/CabotEngine/Engine/InputManager.h"
+#include "Rendering/CabotEngine/Engine/Input.h"
 
 using namespace DirectX;
 
@@ -18,17 +18,17 @@ void Controller::OnUpdate()
     Vector3 dir = {0, 0, 0};
     float up_down = 0.0f;
 
-    if (g_Input.IsKeyDown(Keyboard::W))
+    if (Input::Get()->IsKeyDown(Keyboard::W))
         dir.z -= 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::S))
+    if (Input::Get()->IsKeyDown(Keyboard::S))
         dir.z += 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::D))
+    if (Input::Get()->IsKeyDown(Keyboard::D))
         dir.x += 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::A))
+    if (Input::Get()->IsKeyDown(Keyboard::A))
         dir.x -= 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::Space))
+    if (Input::Get()->IsKeyDown(Keyboard::Space))
         up_down += 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::LeftControl))
+    if (Input::Get()->IsKeyDown(Keyboard::LeftControl))
         up_down -= 1.0f;
 
     // Normalize movement vector if not zero
@@ -39,13 +39,13 @@ void Controller::OnUpdate()
 
     // Rotation input
     Vector2 delta_rot = {0, 0};
-    if (g_Input.IsKeyDown(Keyboard::Up))
+    if (Input::Get()->IsKeyDown(Keyboard::Up))
         delta_rot.x += 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::Down))
+    if (Input::Get()->IsKeyDown(Keyboard::Down))
         delta_rot.x -= 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::Left))
+    if (Input::Get()->IsKeyDown(Keyboard::Left))
         delta_rot.y += 1.0f;
-    if (g_Input.IsKeyDown(Keyboard::Right))
+    if (Input::Get()->IsKeyDown(Keyboard::Right))
         delta_rot.y -= 1.0f;
 
     m_last_rotation_input_ = delta_rot;

@@ -1,6 +1,6 @@
 #pragma once
 #include "renderer.h"
-#include "Rendering/line_renderer.h"
+#include "Rendering/line_renderer_component.h"
 
 namespace engine
 {

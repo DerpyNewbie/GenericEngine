@@ -21,7 +21,7 @@
 #include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
-#include "Rendering/CabotEngine/Engine/InputManager.h"
+#include "Rendering/CabotEngine/Engine/Input.h"
 
 #include <DxLib.h>
 
@@ -39,12 +39,13 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-    g_Input.Initialize();
+    g_DescriptorHeapManager.Initialize();
     g_RootSignatureManager.Initialize();
     g_PSOManager.Initialize();
 
     Gizmos::Init();
     Time::Get()->Init();
+    Input::Get()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     SceneManager::CreateScene("Default Scene");
@@ -68,7 +69,7 @@ void Engine::MainLoop() const
             Time::Get()->IncrementFrame();
 
             Profiler::Begin("Update");
-            g_Input.Update();
+            Input::Get()->Update();
             UpdateManager::InvokeUpdate();
             Profiler::End("Update");
 

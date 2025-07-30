@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "line_renderer.h"
+#include "line_renderer_component.h"
 #include "Components/camera.h"
 #include "Components/mesh_renderer.h"
 
