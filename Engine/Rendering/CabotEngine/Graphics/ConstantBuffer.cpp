@@ -35,14 +35,14 @@ void ConstantBuffer::CreateBuffer()
         IID_PPV_ARGS(m_pBuffer.GetAddressOf()));
     if (FAILED(hr))
     {
-        printf("定数バッファリソースの生成に失敗\n");
+        engine::Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
         return;
     }
 
     hr = m_pBuffer->Map(0, nullptr, &m_pMappedPtr);
     if (FAILED(hr))
     {
-        printf("定数バッファのマッピングに失敗\n");
+        engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
         return;
     }
 
