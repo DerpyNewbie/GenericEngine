@@ -45,6 +45,8 @@ public:
         return m_Viewport;
     }
 
+    void SetBackGroundColor(Color color);
+
 private:
     // DirectX12初期化に使う関数たち
     bool CreateDevice(); // デバイスを生成
@@ -60,6 +62,7 @@ private:
     UINT m_FrameBufferWidth = 0;
     UINT m_FrameBufferHeight = 0;
     UINT m_CurrentBackBufferIndex = 0;
+    float m_BackGroundColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
     ComPtr<ID3D12Device6> m_pDevice = nullptr; // デバイス
     ComPtr<ID3D12CommandQueue> m_pQueue = nullptr; // コマンドキュー

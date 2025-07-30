@@ -74,6 +74,7 @@ void Camera::OnInspectorGui()
     if (ImGui::ColorPicker4("Background Color", color_buf))
     {
         m_background_color_ = Color{color_buf[0], color_buf[1], color_buf[2], color_buf[3]};
+        g_RenderEngine->SetBackGroundColor(m_background_color_);
     }
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }

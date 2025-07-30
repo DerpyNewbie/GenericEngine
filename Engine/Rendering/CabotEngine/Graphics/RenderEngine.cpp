@@ -1,14 +1,9 @@
 ﻿#include "pch.h"
 
 #include "RenderEngine.h"
-
 #include "PSOManager.h"
-#include "RootSignatureManager.h"
 #include "application.h"
-#include "update_manager.h"
 #include "Rendering/FontData.h"
-
-#include <DirectXColors.h>
 
 RenderEngine *g_RenderEngine;
 
@@ -93,8 +88,7 @@ void RenderEngine::BeginRender()
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    constexpr float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
-    m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
+    m_pCommandList->ClearRenderTargetView(currentRtvHandle, m_BackGroundColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
     m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -128,6 +122,14 @@ void RenderEngine::EndRender()
 
     // バックバッファ番号更新
     m_CurrentBackBufferIndex = m_pSwapChain->GetCurrentBackBufferIndex();
+}
+
+void RenderEngine::SetBackGroundColor(Color color)
+{
+    m_BackGroundColor[0] = color.R();
+    m_BackGroundColor[1] = color.G();
+    m_BackGroundColor[2] = color.B();
+    m_BackGroundColor[3] = color.A();
 }
 
 bool RenderEngine::CreateDevice()
