@@ -8,7 +8,7 @@
 class LineRenderer
 {
     unsigned int m_NumIndices;
-    
+
     std::shared_ptr<engine::VertexBuffer> m_VertexBuffer;
     std::shared_ptr<engine::IndexBuffer> m_IndexBuffer;
     std::shared_ptr<ConstantBuffer> m_ViewProjectionBuffers[RenderEngine::FRAME_BUFFER_COUNT];
@@ -20,7 +20,10 @@ public:
     void UpdateViewProjectionBuffer();
     LineRenderer(const std::vector<Vertex> &vertices, const std::vector<uint32_t> &indices);
 
-    bool IsValid(){return m_IsValid;};
+    bool IsValid()
+    {
+        return m_IsValid;
+    };
 
     void Draw();
 };
