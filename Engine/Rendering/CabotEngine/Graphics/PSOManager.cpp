@@ -75,12 +75,7 @@ bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std
     auto it = m_PSOCache_.find(pso_name);
     if (it != m_PSOCache_.end())
     {
-        //TODO:レンダリング周りのリファクタリングができたらこれを始動してほしい
-        /*if (m_CurrentPSO_ != pso_name)*/
-        {
-            m_CurrentPSO_ = pso_name;
-            cmd_list->SetPipelineState(Get(shader->Name()));
-        }
+        cmd_list->SetPipelineState(Get(shader->Name()));
         return true;
     }
     return false;

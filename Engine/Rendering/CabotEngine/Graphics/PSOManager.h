@@ -15,7 +15,6 @@ struct PSOSetting
 class PSOManager
 {
     std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_PSOCache_;
-    std::string m_CurrentPSO_;
 
 public:
     void Initialize();
