@@ -5,6 +5,7 @@
 #include "default_editor_menus.h"
 #include "imgui_stdlib.h"
 #include "game_object.h"
+#include "gui.h"
 #include "Asset/asset_database.h"
 
 namespace editor
@@ -131,6 +132,12 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
                     }
 
                     ImGui::EndPopup();
+                }
+
+                if (ImGui::BeginDragDropSource())
+                {
+                    engine::Gui::SetObjectDragDropTarget(component);
+                    ImGui::EndDragDropSource();
                 }
 
                 ImGui::Indent();
