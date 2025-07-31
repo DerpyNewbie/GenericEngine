@@ -3,7 +3,7 @@
 
 namespace engine
 {
-class AudioImporter : public engine::AssetImporter
+class AudioImporter : public AssetImporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;

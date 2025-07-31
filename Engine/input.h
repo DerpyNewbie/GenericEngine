@@ -2,17 +2,18 @@
 #include <directxtk12/Keyboard.h>
 #include <directxtk12/Mouse.h>
 
-
+namespace engine
+{
 class Input
 {
-    friend class engine::Engine;
+    friend class Engine;
 
-    DirectX::Keyboard::State m_KeyboardState;
-    DirectX::Keyboard::KeyboardStateTracker m_KeyboardTracker;
-    std::unique_ptr<DirectX::Keyboard> m_Keyboard;
-    std::unique_ptr<DirectX::Mouse> m_Mouse;
-    DirectX::Mouse::State m_MouseState;
-    DirectX::Mouse::ButtonStateTracker m_MouseTracker;
+    DirectX::Keyboard::State m_keyboard_state_;
+    DirectX::Keyboard::KeyboardStateTracker m_keyboard_tracker_;
+    std::unique_ptr<DirectX::Keyboard> m_keyboard_;
+    std::unique_ptr<DirectX::Mouse> m_mouse_;
+    DirectX::Mouse::State m_mouse_state_;
+    DirectX::Mouse::ButtonStateTracker m_mouse_tracker_;
 
     Input();
     void Init();
@@ -24,13 +25,16 @@ public:
     static Input *Get();
     DirectX::Keyboard *Keyboard() const;
 
-    [[nodiscard]] static bool IsKeyDown(DirectX::Keyboard::Keys key);
-    [[nodiscard]] static bool IsKeyPressed(DirectX::Keyboard::Keys key);
-    [[nodiscard]] static bool IsKeyReleased(DirectX::Keyboard::Keys key);
+    [[nodiscard]] static bool GetKey(DirectX::Keyboard::Keys key);
+    [[nodiscard]] static bool GetKeyDown(DirectX::Keyboard::Keys key);
+    [[nodiscard]] static bool GetKeyUp(DirectX::Keyboard::Keys key);
 
-    [[nodiscard]] static bool IsLeftButtonDown();
-    [[nodiscard]] static bool IsLeftButtonPressed();
-    [[nodiscard]] static bool IsRightButtonDown();
-    [[nodiscard]] static bool IsRightButtonPressed();
-    [[nodiscard]] static Vector2 MousePos();
+    [[nodiscard]] static bool GetMouseLeft();
+    [[nodiscard]] static bool GetMouseLeftDown();
+    [[nodiscard]] static bool GetMouseLeftUp();
+    [[nodiscard]] static bool GetMouseRight();
+    [[nodiscard]] static bool GetMouseRightDown();
+    [[nodiscard]] static bool GetMouseRightUp();
+    [[nodiscard]] static Vector2 MousePosition();
 };
+}

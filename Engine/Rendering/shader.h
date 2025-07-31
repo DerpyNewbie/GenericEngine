@@ -39,7 +39,6 @@ public:
 
 
     void OnInspectorGui() override;
-    void OnConstructed() override;
     static std::shared_ptr<Shader> GetDefault();
 
     CD3DX12_SHADER_BYTECODE GetByteCode(ShaderType type) const

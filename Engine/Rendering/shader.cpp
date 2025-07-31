@@ -99,9 +99,4 @@ void Shader::OnInspectorGui()
     }
     ImGui::PopID();
 }
-
-void Shader::OnConstructed()
-{
-    InspectableAsset::OnConstructed();
-}
 }

@@ -117,7 +117,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         if (result_mesh->HasBoneWeights())
         {
             auto skinned_mesh_renderer = node_go->AddComponent<SkinnedMeshRenderer>();
-            skinned_mesh_renderer->SetMesh(result_mesh);
+            skinned_mesh_renderer->SetSharedMesh(result_mesh);
             skinned_mesh_renderer->shared_materials = materials;
             skinned_mesh_renderer->transforms = bone_transforms;
             skinned_mesh_renderer->root_bone = AssetPtr<Transform>::FromManaged(root_bone);
@@ -125,7 +125,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         else
         {
             auto mesh_renderer = node_go->AddComponent<MeshRenderer>();
-            mesh_renderer->SetMesh(result_mesh);
+            mesh_renderer->SetSharedMesh(result_mesh);
             mesh_renderer->shared_materials = materials;
         }
     }

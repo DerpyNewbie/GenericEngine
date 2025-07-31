@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include <directxtk12/SpriteFont.h>
 #include <directxtk12/ResourceUploadBatch.h>
 

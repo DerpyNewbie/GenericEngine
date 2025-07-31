@@ -2,6 +2,7 @@
 
 #include "RenderEngine.h"
 #include "PSOManager.h"
+#include "RootSignature.h"
 #include "application.h"
 #include "Rendering/font_data.h"
 
@@ -9,6 +10,12 @@ RenderEngine *g_RenderEngine;
 
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 {
+    ID3D12Debug *debugController;
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+    {
+        debugController->EnableDebugLayer();
+    }
+
     m_FrameBufferWidth = windowWidth;
     m_FrameBufferHeight = windowHeight;
     m_hWnd = hwnd;
@@ -93,6 +100,10 @@ void RenderEngine::BeginRender()
 
     // 深度ステンシルビューをクリア
     m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
+    auto descriptor_heap = DescriptorHeap::GetHeap();
+    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 void RenderEngine::EndRender()

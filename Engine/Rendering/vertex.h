@@ -1,8 +1,9 @@
 #pragma once
 
+namespace engine
+{
 struct Vertex
 {
-public:
     Vector3 vertex;
     Color color;
     Vector3 normal;
@@ -18,3 +19,4 @@ private:
     static constexpr int InputElementCount = 15;
     static const D3D12_INPUT_ELEMENT_DESC InputElements[InputElementCount];
 };
+}

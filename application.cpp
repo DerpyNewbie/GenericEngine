@@ -7,6 +7,7 @@
 #include "engine.h"
 #include "scene.h"
 #include "game_object.h"
+#include "input.h"
 
 #include "Components/camera.h"
 #include "Components/controller.h"
@@ -23,6 +24,10 @@ HWND Application::m_h_wnd_ = nullptr;
 
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
+    if (engine::Input::Get()->Keyboard())
+    {
+        engine::Input::Get()->Keyboard()->ProcessMessage(msg, wparam, lparam);
+    }
     for (auto callback : std::views::values(m_callbacks_))
     {
         return callback(hwnd, msg, wparam, lparam);

@@ -12,36 +12,39 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    bool is_calculate_bounding_box = false;
-
     std::weak_ptr<Transform> BoundsOrigin() override;
 
 protected:
     bool m_draw_bounds_ = false;
 
-    virtual void ReconstructBuffer();
-    virtual void UpdateWVPBuffer();
-
-    void DrawBounds();
-    void ReCalculateBoundingBox();
-    void ReconstructMeshesBuffer();
-    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
-
-public:
     std::shared_ptr<Mesh> shared_mesh;
-    std::vector<AssetPtr<Material>> shared_materials;
-
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> wvp_buffers;
 
+    virtual void ReconstructBuffer();
+    virtual void UpdateWVPBuffer();
+
+    void DrawBounds();
+    void RecalculateBoundingBox();
+    void ReconstructMeshesBuffer();
+    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
+
+public:
+    std::vector<AssetPtr<Material>> shared_materials;
+
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
-    void OnUpdate() override;
     void OnDraw() override;
 
-    void SetMesh(std::shared_ptr<Mesh> mesh);
+    void SetSharedMesh(std::shared_ptr<Mesh> mesh);
+
+    std::shared_ptr<Mesh> GetSharedMesh()
+    {
+        return shared_mesh;
+    }
+
     virtual void UpdateBuffers();
 
     template <class Archive>

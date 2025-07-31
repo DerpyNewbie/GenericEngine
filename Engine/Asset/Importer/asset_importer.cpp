@@ -2,8 +2,6 @@
 
 #include "asset_importer.h"
 
-namespace engine
-{
 std::set<std::shared_ptr<AssetImporter>> AssetImporter::m_importers_;
 std::unordered_map<std::string, std::shared_ptr<AssetImporter>> AssetImporter::m_importer_extension_map_;
 
@@ -26,5 +24,4 @@ std::shared_ptr<AssetImporter> AssetImporter::Get(const std::string &file_extens
 std::set<std::shared_ptr<AssetImporter>> AssetImporter::Get()
 {
     return m_importers_;
-}
 }

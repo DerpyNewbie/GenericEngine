@@ -17,7 +17,7 @@ void PSOManager::Initialize()
 {
     PSOSetting BasicSetting;
     BasicSetting.PSOName = "Basic";
-    BasicSetting.InputLayout = Vertex::InputLayout;
+    BasicSetting.InputLayout = engine::Vertex::InputLayout;
     BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
@@ -59,7 +59,7 @@ bool PSOManager::Register(PSOSetting setting)
 bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string pso_name)
 {
     auto pso = new PipelineState;
-    pso->SetInputLayout(Vertex::InputLayout);
+    pso->SetInputLayout(engine::Vertex::InputLayout);
     pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
     pso->SetShader(shader);
     pso->Create();

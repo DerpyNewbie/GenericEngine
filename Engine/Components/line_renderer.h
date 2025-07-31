@@ -9,12 +9,12 @@ namespace engine
 {
 class LineRenderer : public Renderer
 {
-    unsigned int m_NumIndices;
+    unsigned int m_num_indices;
 
-    std::shared_ptr<VertexBuffer> m_VertexBuffer;
-    std::shared_ptr<IndexBuffer> m_IndexBuffer;
-    std::shared_ptr<ConstantBuffer> m_ViewProjectionBuffers[RenderEngine::FRAME_BUFFER_COUNT];
-    bool m_IsValid = true;
+    std::shared_ptr<VertexBuffer> m_vertex_buffer;
+    std::shared_ptr<IndexBuffer> m_index_buffer;
+    std::shared_ptr<ConstantBuffer> m_view_projection_buffers[RenderEngine::FRAME_BUFFER_COUNT];
+    bool m_is_valid = true;
 
 public:
     void SetVertices(std::vector<Vertex> vertices);

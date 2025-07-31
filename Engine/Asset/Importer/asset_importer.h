@@ -1,8 +1,6 @@
 #pragma once
 #include "Asset/asset_descriptor.h"
 
-namespace engine
-{
 class AssetImporter
 {
     static std::set<std::shared_ptr<AssetImporter>> m_importers_;
@@ -23,7 +21,7 @@ public:
     /// <param name="input_stream">An input stream containing Object in serialized form</param>
     /// <param name="asset">A valid AssetDescriptor</param>
     /// <returns>Object representation of a file that AssetDescriptor points to. `nullptr` if the file cannot be converted to Object.</returns>
-    virtual std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) = 0;
+    virtual std::shared_ptr<engine::Object> Import(std::istream &input_stream, engine::AssetDescriptor *asset) = 0;
 
     /// <summary>
     /// Add AssetImporter implementations to make impl retrievable with supported file extension.
@@ -51,4 +49,3 @@ public:
     /// <returns>Set of registered AssetImporter instances.</returns>
     static std::set<std::shared_ptr<AssetImporter>> Get();
 };
-}

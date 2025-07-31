@@ -11,7 +11,6 @@ using namespace DirectX;
 
 void Texture2D::OnInspectorGui()
 {
-    // TODO: implement inspector
 }
 
 void Texture2D::CreateBuffer()

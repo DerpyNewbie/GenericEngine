@@ -17,11 +17,8 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "application.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "input.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
-
 
 namespace engine
 {
@@ -57,38 +54,34 @@ void Engine::MainLoop() const
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
+            continue;
         }
-        else
+        Profiler::NewFrame();
+        Time::Get()->IncrementFrame();
+
+        Profiler::Begin("Fixed Update");
+        const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
+        for (int i = 0; i < fixed_update_count; i++)
         {
-            Profiler::NewFrame();
-            Time::Get()->IncrementFrame();
-
-            Profiler::Begin("Fixed Update");
-            const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
-            for (int i = 0; i < fixed_update_count; i++)
-            {
-                UpdateManager::InvokeFixedUpdate();
-            }
-            Profiler::End("Fixed Update");
-
-            Profiler::Begin("Update");
-            Input::Get()->Update();
-            UpdateManager::InvokeUpdate();
-            Profiler::End("Update");
-
-            Profiler::Begin("Draw Call");
-            g_RenderEngine->BeginRender();
-            g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-            auto descriptor_heap = DescriptorHeap::GetHeap();
-            g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
-            UpdateManager::InvokeDrawCall();
-            g_RenderEngine->EndRender();
-            Profiler::End("Draw Call");
-
-            Profiler::Begin("Cleanup Objects");
-            Object::GarbageCollect();
-            Profiler::End("Cleanup Objects");
+            UpdateManager::InvokeFixedUpdate();
         }
+        Profiler::End("Fixed Update");
+
+        Profiler::Begin("Update");
+        Input::Get()->Update();
+        UpdateManager::InvokeUpdate();
+        Profiler::End("Update");
+
+        Profiler::Begin("Draw Call");
+        g_RenderEngine->BeginRender();
+        UpdateManager::InvokeDrawCall();
+        g_RenderEngine->EndRender();
+        Profiler::End("Draw Call");
+
+        Profiler::Begin("Cleanup Objects");
+        Object::GarbageCollect();
+        Profiler::End("Cleanup Objects");
+
     }
 }
 }

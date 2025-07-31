@@ -42,7 +42,10 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
 
 void Camera::OnAwake()
 {
-    m_main_camera_ = shared_from_base<Camera>();
+    if (!m_main_camera_.lock())
+    {
+        m_main_camera_ = shared_from_base<Camera>();
+    }
 }
 
 void Camera::OnInspectorGui()

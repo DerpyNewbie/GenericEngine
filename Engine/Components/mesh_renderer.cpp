@@ -29,7 +29,7 @@ void MeshRenderer::UpdateWVPBuffer()
     }
 }
 
-void MeshRenderer::ReCalculateBoundingBox()
+void MeshRenderer::RecalculateBoundingBox()
 {
     auto min_pos = Vector3(0, 0, 0);
     auto max_pos = Vector3(0, 0, 0);
@@ -45,7 +45,6 @@ void MeshRenderer::ReCalculateBoundingBox()
         max_pos.z = max(max_pos.z, vertex.z);
     }
     DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);
-    is_calculate_bounding_box = true;
 }
 
 void MeshRenderer::OnInspectorGui()
@@ -102,14 +101,6 @@ void MeshRenderer::OnInspectorGui()
     ImGui::Checkbox("Draw Bounds", &m_draw_bounds_);
 }
 
-void MeshRenderer::OnUpdate()
-{
-    if (!is_calculate_bounding_box)
-    {
-        ReCalculateBoundingBox();
-    }
-}
-
 void MeshRenderer::OnDraw()
 {
     UpdateBuffers();
@@ -158,10 +149,10 @@ void MeshRenderer::OnDraw()
         DrawBounds();
 }
 
-void MeshRenderer::SetMesh(std::shared_ptr<Mesh> mesh)
+void MeshRenderer::SetSharedMesh(std::shared_ptr<Mesh> mesh)
 {
     shared_mesh = mesh;
-    ReCalculateBoundingBox();
+    RecalculateBoundingBox();
 }
 
 void MeshRenderer::DrawBounds()

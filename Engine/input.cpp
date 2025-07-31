@@ -2,27 +2,29 @@
 #include "Input.h"
 #include "application.h"
 
+namespace engine
+{
 Input *Input::m_instance_;
 
 Input::Input()
 {
-    m_Keyboard = std::make_unique<DirectX::Keyboard>();
-    m_Mouse = std::make_unique<DirectX::Mouse>();
+    m_keyboard_ = std::make_unique<DirectX::Keyboard>();
+    m_mouse_ = std::make_unique<DirectX::Mouse>();
 }
 
 void Input::Init()
 {
-    m_Mouse->SetWindow(Application::GetWindowHandle());
-    m_Mouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+    m_mouse_->SetWindow(Application::GetWindowHandle());
+    m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 }
 
 void Input::Update()
 {
-    m_KeyboardState = m_Keyboard->GetState();
-    m_KeyboardTracker.Update(m_KeyboardState);
+    m_keyboard_state_ = m_keyboard_->GetState();
+    m_keyboard_tracker_.Update(m_keyboard_state_);
 
-    m_MouseState = m_Mouse->GetState();
-    m_MouseTracker.Update(m_MouseState);
+    m_mouse_state_ = m_mouse_->GetState();
+    m_mouse_tracker_.Update(m_mouse_state_);
 }
 
 Input *Input::Get()
@@ -36,45 +38,56 @@ Input *Input::Get()
 
 DirectX::Keyboard *Input::Keyboard() const
 {
-    return m_Keyboard.get();
+    return m_keyboard_.get();
 }
 
-bool Input::IsKeyDown(DirectX::Keyboard::Keys key)
+bool Input::GetKey(DirectX::Keyboard::Keys key)
 {
-    return m_instance_->m_KeyboardState.IsKeyDown(key);
+    return m_instance_->m_keyboard_state_.IsKeyDown(key);
 }
 
-bool Input::IsKeyPressed(DirectX::Keyboard::Keys key)
+bool Input::GetKeyDown(DirectX::Keyboard::Keys key)
 {
-    return m_instance_->m_KeyboardTracker.IsKeyPressed(key);
+    return m_instance_->m_keyboard_tracker_.IsKeyPressed(key);
 }
 
-bool Input::IsKeyReleased(DirectX::Keyboard::Keys key)
+bool Input::GetKeyUp(DirectX::Keyboard::Keys key)
 {
-    return m_instance_->m_KeyboardTracker.IsKeyReleased(key);
+    return m_instance_->m_keyboard_tracker_.IsKeyReleased(key);
 }
 
-bool Input::IsLeftButtonDown()
+bool Input::GetMouseLeft()
 {
-    return m_instance_->m_MouseState.leftButton;
+    return m_instance_->m_mouse_state_.leftButton;
 }
 
-bool Input::IsLeftButtonPressed()
+bool Input::GetMouseLeftDown()
 {
-    return m_instance_->m_MouseTracker.leftButton == DirectX::Mouse::ButtonStateTracker::PRESSED;
+    return m_instance_->m_mouse_tracker_.leftButton == DirectX::Mouse::ButtonStateTracker::PRESSED;
 }
 
-bool Input::IsRightButtonDown()
+bool Input::GetMouseLeftUp()
 {
-    return m_instance_->m_MouseState.rightButton;
+    return m_instance_->m_mouse_tracker_.leftButton == DirectX::Mouse::ButtonStateTracker::RELEASED;
 }
 
-bool Input::IsRightButtonPressed()
+bool Input::GetMouseRight()
 {
-    return m_instance_->m_MouseTracker.rightButton == DirectX::Mouse::ButtonStateTracker::PRESSED;
+    return m_instance_->m_mouse_state_.rightButton;
 }
 
-Vector2 Input::MousePos()
+bool Input::GetMouseRightDown()
 {
-    return {static_cast<float>(m_instance_->m_MouseState.x), static_cast<float>(m_instance_->m_MouseState.y)};
+    return m_instance_->m_mouse_tracker_.rightButton == DirectX::Mouse::ButtonStateTracker::PRESSED;
+}
+
+bool Input::GetMouseRightUp()
+{
+    return m_instance_->m_mouse_tracker_.rightButton == DirectX::Mouse::ButtonStateTracker::RELEASED;
+}
+
+Vector2 Input::MousePosition()
+{
+    return {static_cast<float>(m_instance_->m_mouse_state_.x), static_cast<float>(m_instance_->m_mouse_state_.y)};
+}
 }

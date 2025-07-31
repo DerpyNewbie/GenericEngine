@@ -18,17 +18,17 @@ void Controller::OnUpdate()
     Vector3 dir = {0, 0, 0};
     float up_down = 0.0f;
 
-    if (Input::IsKeyDown(Keyboard::W))
+    if (Input::GetKey(Keyboard::W))
         dir.z -= 1.0f;
-    if (Input::IsKeyDown(Keyboard::S))
+    if (Input::GetKey(Keyboard::S))
         dir.z += 1.0f;
-    if (Input::IsKeyDown(Keyboard::D))
+    if (Input::GetKey(Keyboard::D))
         dir.x += 1.0f;
-    if (Input::IsKeyDown(Keyboard::A))
+    if (Input::GetKey(Keyboard::A))
         dir.x -= 1.0f;
-    if (Input::IsKeyDown(Keyboard::Space))
+    if (Input::GetKey(Keyboard::Space))
         up_down += 1.0f;
-    if (Input::IsKeyDown(Keyboard::LeftControl))
+    if (Input::GetKey(Keyboard::LeftControl))
         up_down -= 1.0f;
 
     // Normalize movement vector if not zero
@@ -39,14 +39,14 @@ void Controller::OnUpdate()
 
     // Rotation input
     Vector2 delta_rot = {0, 0};
-    if (Input::IsKeyDown(Keyboard::Up))
-        delta_rot.x += 1.0f;
-    if (Input::IsKeyDown(Keyboard::Down))
-        delta_rot.x -= 1.0f;
-    if (Input::IsKeyDown(Keyboard::Left))
-        delta_rot.y += 1.0f;
-    if (Input::IsKeyDown(Keyboard::Right))
-        delta_rot.y -= 1.0f;
+    if (Input::GetKey(Keyboard::Up))
+        delta_rot.x += m_rotation_speed_;
+    if (Input::GetKey(Keyboard::Down))
+        delta_rot.x -= m_rotation_speed_;
+    if (Input::GetKey(Keyboard::Left))
+        delta_rot.y += m_rotation_speed_;
+    if (Input::GetKey(Keyboard::Right))
+        delta_rot.y -= m_rotation_speed_;
 
     m_last_rotation_input_ = delta_rot;
 
