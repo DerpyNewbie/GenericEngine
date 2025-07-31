@@ -5,12 +5,8 @@
 #include "DxLib/dxlib_converter.h"
 #include "application.h"
 #include "game_object.h"
-#include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
-
-#include <Rendering/CabotEngine/Graphics/RootSignatureManager.h>
 
 namespace engine
 {

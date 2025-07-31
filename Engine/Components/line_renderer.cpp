@@ -1,11 +1,10 @@
 #include "pch.h"
 #include "line_renderer.h"
-
-#include "CabotEngine/Graphics/PSOManager.h"
 #include "Components/camera.h"
-#include "Components/mesh_renderer.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
-void LineRenderer::UpdateVertexBuffer(std::vector<Vertex> vertices)
+
+void engine::LineRenderer::SetVertices(std::vector<Vertex> vertices)
 {
     m_VertexBuffer = std::make_shared<engine::VertexBuffer>(vertices.size(), vertices.data());
     if (m_VertexBuffer)
@@ -19,7 +18,7 @@ void LineRenderer::UpdateVertexBuffer(std::vector<Vertex> vertices)
     }
 }
 
-void LineRenderer::UpdateIndexBuffer(std::vector<uint32_t> indices)
+void engine::LineRenderer::SetIndices(std::vector<uint32_t> indices)
 {
     m_NumIndices = indices.size();
     if (m_IndexBuffer)
@@ -31,12 +30,16 @@ void LineRenderer::UpdateIndexBuffer(std::vector<uint32_t> indices)
     {
         m_IsValid = false;
     }
-
 }
 
-void LineRenderer::UpdateViewProjectionBuffer()
+void engine::LineRenderer::OnInspectorGui()
 {
-    const auto camera = engine::Camera::Main();
+    Renderer::OnInspectorGui();
+}
+
+void engine::LineRenderer::OnDraw()
+{
+    const auto camera = Camera::Main();
     const Matrix view = camera->GetViewMatrix();
     const Matrix proj = camera->GetProjectionMatrix();
 
@@ -46,25 +49,6 @@ void LineRenderer::UpdateViewProjectionBuffer()
         ptr[0] = view;
         ptr[1] = proj;
     }
-}
-
-LineRenderer::LineRenderer(const std::vector<Vertex> &vertices, const std::vector<unsigned int> &indices)
-{
-    UpdateVertexBuffer(vertices);
-    UpdateIndexBuffer(indices);
-    for (auto &vp_buffer : m_ViewProjectionBuffers)
-    {
-        vp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 2);
-        if (!vp_buffer->IsValid())
-        {
-            engine::Logger::Error<LineRenderer>("Failed to create ViewProjection buffer!");
-        }
-    }
-}
-
-void LineRenderer::Draw()
-{
-    UpdateViewProjectionBuffer();
 
     auto cmd_list = g_RenderEngine->CommandList();
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
