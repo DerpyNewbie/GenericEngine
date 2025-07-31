@@ -127,12 +127,15 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
 void Gui::SetObjectDragDropTarget(const std::shared_ptr<Object> &object)
 {
     SetObjectDragDropTarget(object->Guid());
+    ImGui::Text("Name: %s", NameOf(object).c_str());
 }
 
 void Gui::SetObjectDragDropTarget(const xg::Guid guid)
 {
     const auto guid_str = guid.str();
     ImGui::SetDragDropPayload(DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
+    ImGui::Text("Dragging Object");
+    ImGui::Text("Guid: %s", guid.str().c_str());
 }
 
 std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload)
@@ -180,6 +183,22 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload
 std::shared_ptr<Object> Gui::GetObjectDragDropTarget()
 {
     return GetObjectDragDropTarget(ImGui::GetDragDropPayload());
+}
+
+std::string Gui::NameOf(const std::shared_ptr<Object> &object)
+{
+    if (object == nullptr)
+    {
+        return "null";
+    }
+
+    const auto component = std::dynamic_pointer_cast<Component>(object);
+    if (component != nullptr && component->GameObject() != nullptr)
+    {
+        return component->GameObject()->Name() + " (" + component->Name() + ")";
+    }
+
+    return object->Name();
 }
 
 ImVec2 Gui::GetFieldRect()

@@ -45,6 +45,8 @@ public:
     static std::shared_ptr<Object> GetObjectDragDropTarget(const ImGuiPayload *payload);
     static std::shared_ptr<Object> GetObjectDragDropTarget();
 
+    static std::string NameOf(const std::shared_ptr<Object> &object);
+
     static ImVec2 GetFieldRect();
 
     template <typename T>
