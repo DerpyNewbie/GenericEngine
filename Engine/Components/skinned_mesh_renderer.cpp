@@ -15,7 +15,7 @@ namespace engine
 {
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 {
-    for (auto bone_matrices_buffer : bone_matrix_buffers)
+    for (auto bone_matrices_buffer : m_bone_matrix_buffers_)
     {
         std::vector<Matrix> matrices(transforms.size());
         for (int i = 0; i < transforms.size(); ++i)
@@ -110,7 +110,7 @@ void SkinnedMeshRenderer::OnDraw()
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
         cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
-        cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, m_bone_matrix_buffers_[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
         cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
@@ -146,7 +146,7 @@ void SkinnedMeshRenderer::ReconstructBuffer()
 {
     MeshRenderer::ReconstructBuffer();
 
-    for (auto &bone_matrices_buffer : bone_matrix_buffers)
+    for (auto &bone_matrices_buffer : m_bone_matrix_buffers_)
         if (!bone_matrices_buffer)
         {
             bone_matrices_buffer = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());

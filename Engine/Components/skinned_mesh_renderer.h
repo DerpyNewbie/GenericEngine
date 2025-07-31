@@ -10,6 +10,7 @@ class Transform;
 class SkinnedMeshRenderer : public MeshRenderer
 {
     bool m_draw_bones_ = false;
+    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_bone_matrix_buffers_;
 
     void DrawBones();
     void UpdateBoneTransformsBuffer();
@@ -21,7 +22,6 @@ protected:
 public:
     constexpr static int kMaxBonesPerVertex = 4;
     std::vector<std::weak_ptr<Transform>> transforms;
-    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::FRAME_BUFFER_COUNT> bone_matrix_buffers;
     AssetPtr<Transform> root_bone;
 
     void OnInspectorGui() override;

@@ -37,7 +37,7 @@ bool Engine::Init()
 
     Gizmos::Init();
     Time::Get()->Init();
-    Input::Get()->Init();
+    Input::Instance()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     SceneManager::CreateScene("Default Scene");
@@ -68,7 +68,7 @@ void Engine::MainLoop() const
         Profiler::End("Fixed Update");
 
         Profiler::Begin("Update");
-        Input::Get()->Update();
+        Input::Instance()->Update();
         UpdateManager::InvokeUpdate();
         Profiler::End("Update");
 

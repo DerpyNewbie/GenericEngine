@@ -24,9 +24,9 @@ HWND Application::m_h_wnd_ = nullptr;
 
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-    if (engine::Input::Get()->Keyboard())
+    if (engine::Input::Instance()->Keyboard())
     {
-        engine::Input::Get()->Keyboard()->ProcessMessage(msg, wparam, lparam);
+        engine::Input::Instance()->Keyboard()->ProcessMessage(msg, wparam, lparam);
     }
     for (auto callback : std::views::values(m_callbacks_))
     {

@@ -4,7 +4,7 @@
 
 namespace engine
 {
-Input *Input::m_instance_;
+std::shared_ptr<Input> Input::m_instance_;
 
 Input::Input()
 {
@@ -27,11 +27,11 @@ void Input::Update()
     m_mouse_tracker_.Update(m_mouse_state_);
 }
 
-Input *Input::Get()
+std::shared_ptr<Input> Input::Instance()
 {
-    if (m_instance_ == nullptr)
+    if (!m_instance_)
     {
-        m_instance_ = new Input;
+        m_instance_ = std::make_shared<Input>();
     }
     return m_instance_;
 }

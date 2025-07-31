@@ -1,6 +1,8 @@
 #pragma once
 #include "Asset/asset_descriptor.h"
 
+namespace engine
+{
 class AssetImporter
 {
     static std::set<std::shared_ptr<AssetImporter>> m_importers_;
@@ -49,3 +51,4 @@ public:
     /// <returns>Set of registered AssetImporter instances.</returns>
     static std::set<std::shared_ptr<AssetImporter>> Get();
 };
+}

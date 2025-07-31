@@ -15,14 +15,15 @@ class Input
     DirectX::Mouse::State m_mouse_state_;
     DirectX::Mouse::ButtonStateTracker m_mouse_tracker_;
 
-    Input();
     void Init();
     void Update();
 
-    [[nodiscard]] static Input *m_instance_;
+    [[nodiscard]] static std::shared_ptr<Input> m_instance_;
 
 public:
-    static Input *Get();
+    static std::shared_ptr<Input> Instance();
+
+    Input();
     DirectX::Keyboard *Keyboard() const;
 
     [[nodiscard]] static bool GetKey(DirectX::Keyboard::Keys key);

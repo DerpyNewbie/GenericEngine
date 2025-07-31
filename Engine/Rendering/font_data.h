@@ -8,30 +8,30 @@ namespace engine
 {
 class FontData : public Object
 {
-    static std::shared_ptr<DirectX::GraphicsMemory> graphics_memory;
-    static std::shared_ptr<DirectX::SpriteBatch> sprite_batch;
-    std::shared_ptr<DirectX::SpriteFont> m_Spritefont_;
-    std::shared_ptr<DescriptorHandle> m_SpritefontHandle_;
+    static std::shared_ptr<DirectX::GraphicsMemory> m_graphics_memory_;
+    static std::shared_ptr<DirectX::SpriteBatch> m_sprite_batch_;
+    std::shared_ptr<DirectX::SpriteFont> m_spritefont_;
+    std::shared_ptr<DescriptorHandle> m_spritefont_handle_;
 
 public:
     static std::shared_ptr<DirectX::GraphicsMemory> GraphicsMemory()
     {
-        return graphics_memory;
+        return m_graphics_memory_;
     }
 
     static std::shared_ptr<DirectX::SpriteBatch> SpriteBatch()
     {
-        return sprite_batch;
+        return m_sprite_batch_;
     }
 
     std::shared_ptr<DirectX::SpriteFont> SpriteFont()
     {
-        return m_Spritefont_;
+        return m_spritefont_;
     }
 
     std::shared_ptr<DescriptorHandle> SpritefontHandle()
     {
-        return m_SpritefontHandle_;
+        return m_spritefont_handle_;
     }
 
 
