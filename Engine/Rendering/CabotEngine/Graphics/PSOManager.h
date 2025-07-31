@@ -7,7 +7,6 @@ struct PSOSetting
     std::string PSOName;
     std::wstring VSPath;
     std::wstring PSPath;
-    ID3D12RootSignature *RootSignature;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
 };
@@ -16,18 +15,19 @@ class PSOManager
 {
     std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_PSOCache_;
 
-public:
-    void Initialize();
-    bool Register(PSOSetting setting);
-    bool Register(std::shared_ptr<engine::Shader> shader, std::string pso_name);
+    static std::shared_ptr<PSOManager> m_instance_;
 
-    ID3D12PipelineState *Get(const std::string &id)
+    static std::shared_ptr<PSOManager> Instance();
+
+public:
+    static void Initialize();
+    static bool Register(PSOSetting setting);
+    static bool Register(std::shared_ptr<engine::Shader> shader, std::string pso_name);
+
+    static ID3D12PipelineState *Get(const std::string &id)
     {
-        return m_PSOCache_[id]->Get();
+        return Instance()->m_PSOCache_[id]->Get();
     }
 
-    bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader);
-
+    static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader);
 };
-
-extern PSOManager g_PSOManager;

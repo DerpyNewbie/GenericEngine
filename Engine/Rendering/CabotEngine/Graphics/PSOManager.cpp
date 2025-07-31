@@ -1,15 +1,22 @@
 ﻿#include "pch.h"
 #include "PSOManager.h"
-#include "RootSignatureManager.h"
-#include "Rendering/Vertex.h"
+#include "Rendering/vertex.h"
 
-PSOManager g_PSOManager;
+std::shared_ptr<PSOManager> PSOManager::m_instance_;
+
+std::shared_ptr<PSOManager> PSOManager::Instance()
+{
+    if (!m_instance_)
+    {
+        m_instance_ = std::make_shared<PSOManager>();
+    }
+    return m_instance_;
+}
 
 void PSOManager::Initialize()
 {
     PSOSetting BasicSetting;
     BasicSetting.PSOName = "Basic";
-    BasicSetting.RootSignature = g_RootSignatureManager.Get("Basic");
     BasicSetting.InputLayout = Vertex::InputLayout;
     BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
@@ -34,7 +41,6 @@ bool PSOManager::Register(PSOSetting setting)
 {
     PipelineState *pso = new PipelineState;
     pso->SetInputLayout(setting.InputLayout);
-    pso->SetRootSignature(setting.RootSignature);
     pso->SetPrimitiveTopologyType(setting.PrimitiveType);
     pso->SetVS(setting.VSPath);
     pso->SetPS(setting.PSPath);
@@ -45,7 +51,7 @@ bool PSOManager::Register(PSOSetting setting)
         return false;
     }
 
-    m_PSOCache_.emplace(setting.PSOName, pso);
+    Instance()->m_PSOCache_.emplace(setting.PSOName, pso);
 
     return true;
 }
@@ -54,7 +60,6 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
 {
     auto pso = new PipelineState;
     pso->SetInputLayout(Vertex::InputLayout);
-    pso->SetRootSignature(g_RootSignatureManager.Get("Basic"));
     pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
     pso->SetShader(shader);
     pso->Create();
@@ -64,7 +69,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
         return false;
     }
 
-    m_PSOCache_.emplace(pso_name, pso);
+    Instance()->m_PSOCache_.emplace(pso_name, pso);
     return true;
 }
 
@@ -72,8 +77,8 @@ bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std
 {
     //PSO name is the same as the shader name.
     std::string pso_name = shader->Name();
-    auto it = m_PSOCache_.find(pso_name);
-    if (it != m_PSOCache_.end())
+    auto it = Instance()->m_PSOCache_.find(pso_name);
+    if (it != Instance()->m_PSOCache_.end())
     {
         cmd_list->SetPipelineState(Get(shader->Name()));
         return true;

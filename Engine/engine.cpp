@@ -8,7 +8,6 @@
 #endif
 
 #include "engine.h"
-
 #include "component_factory.h"
 #include "Asset/asset_database.h"
 #include "engine_profiler.h"
@@ -18,12 +17,11 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "application.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
-#include "Rendering/CabotEngine/Graphics/RootSignatureManager.h"
-#include "Rendering/CabotEngine/Engine/Input.h"
+#include "input.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
-#include <DxLib.h>
 
 namespace engine
 {
@@ -39,9 +37,6 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-    g_DescriptorHeapManager.Initialize();
-    g_RootSignatureManager.Initialize();
-    g_PSOManager.Initialize();
 
     Gizmos::Init();
     Time::Get()->Init();
@@ -68,11 +63,6 @@ void Engine::MainLoop() const
             Profiler::NewFrame();
             Time::Get()->IncrementFrame();
 
-            Profiler::Begin("Update");
-            Input::Get()->Update();
-            UpdateManager::InvokeUpdate();
-            Profiler::End("Update");
-
             Profiler::Begin("Fixed Update");
             const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
             for (int i = 0; i < fixed_update_count; i++)
@@ -81,11 +71,15 @@ void Engine::MainLoop() const
             }
             Profiler::End("Fixed Update");
 
+            Profiler::Begin("Update");
+            Input::Get()->Update();
+            UpdateManager::InvokeUpdate();
+            Profiler::End("Update");
+
             Profiler::Begin("Draw Call");
             g_RenderEngine->BeginRender();
-            g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
-            auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
-            auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+            g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+            auto descriptor_heap = DescriptorHeap::GetHeap();
             g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
             UpdateManager::InvokeDrawCall();
             g_RenderEngine->EndRender();

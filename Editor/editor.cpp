@@ -17,10 +17,8 @@
 #include <imgui_impl_dx12.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
-#include "Rendering/CabotEngine/Engine/Input.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "input.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Asset/asset_database.h"
 #include "Asset/text_asset.h"
 #include "Rendering/material.h"
 
@@ -98,7 +96,7 @@ void Editor::Init()
                                                     io.Fonts->GetGlyphRangesJapanese());
         IM_ASSERT(font != nullptr);
 
-        auto descriptor_handle = g_DescriptorHeapManager.Get().Allocate();
+        auto descriptor_handle = DescriptorHeap::Allocate();
         // フォントディスクリプタ取得
         D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
@@ -108,7 +106,7 @@ void Editor::Init()
             g_RenderEngine->Device(),
             RenderEngine::FRAME_BUFFER_COUNT,
             DXGI_FORMAT_R8G8B8A8_UNORM,
-            g_DescriptorHeapManager.Get().GetHeap(),
+            DescriptorHeap::GetHeap(),
             font_cpu_desc_handle,
             font_gpu_desc_handle
             );
@@ -209,12 +207,12 @@ std::shared_ptr<Object> Editor::SelectedObject() const
     return m_selected_object_.lock();
 }
 
-void Editor::SetSelectedDirectory(const path &path)
+void Editor::SetSelectedDirectory(const std::filesystem::path &path)
 {
     m_selected_directory_ = path;
 }
 
-path Editor::SelectedDirectory() const
+std::filesystem::path Editor::SelectedDirectory() const
 {
     return m_selected_directory_;
 }

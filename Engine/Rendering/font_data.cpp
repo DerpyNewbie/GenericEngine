@@ -1,11 +1,15 @@
-#include "FontData.h"
-#include "CabotEngine/Graphics/DescriptorHeapManager.h"
+#include "pch.h"
+#include "font_data.h"
+
+#include "CabotEngine/Graphics/DescriptorHeap.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
-std::shared_ptr<DirectX::GraphicsMemory> engine::FontData::graphics_memory;
-std::shared_ptr<DirectX::SpriteBatch> engine::FontData::sprite_batch;
+namespace engine
+{
+std::shared_ptr<DirectX::GraphicsMemory> FontData::graphics_memory;
+std::shared_ptr<DirectX::SpriteBatch> FontData::sprite_batch;
 
-void engine::FontData::Initialize()
+FontData::FontData()
 {
     auto device = g_RenderEngine->Device();
     graphics_memory = std::make_shared<DirectX::GraphicsMemory>(device);
@@ -24,14 +28,14 @@ void engine::FontData::Initialize()
     future.wait();
 }
 
-void engine::FontData::LoadFont(const std::wstring &font_path)
+void FontData::LoadFont(const std::wstring &font_path)
 {
     auto device = g_RenderEngine->Device();
 
     DirectX::ResourceUploadBatch resource_upload_batch(device);
     resource_upload_batch.Begin();
 
-    m_SpritefontHandle_ = g_DescriptorHeapManager.Get().Allocate();
+    m_SpritefontHandle_ = DescriptorHeap::Allocate();
     m_Spritefont_ = std::make_shared<DirectX::SpriteFont>(device,
                                                           resource_upload_batch,
                                                           font_path.c_str(),
@@ -42,4 +46,5 @@ void engine::FontData::LoadFont(const std::wstring &font_path)
 
     g_RenderEngine->WaitRender();
     future.wait();
+}
 }

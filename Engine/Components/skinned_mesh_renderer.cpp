@@ -106,7 +106,7 @@ void SkinnedMeshRenderer::OnDraw()
     if (material->IsValid())
     {
         if (shader)
-            g_PSOManager.SetPipelineState(cmd_list, shader);
+            PSOManager::SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
         cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
@@ -126,7 +126,7 @@ void SkinnedMeshRenderer::OnDraw()
             shader = material->p_shared_shader.CastedLock();
             cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
             if (shader)
-                g_PSOManager.SetPipelineState(cmd_list, shader);
+                PSOManager::SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];
             auto sub_mesh = shared_mesh->sub_meshes[i];
             auto ibView = ib->View();

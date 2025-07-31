@@ -125,7 +125,7 @@ void MeshRenderer::OnDraw()
     if (material->IsValid())
     {
         if (shader)
-            g_PSOManager.SetPipelineState(cmd_list, shader);
+            PSOManager::SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
         cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
@@ -144,7 +144,7 @@ void MeshRenderer::OnDraw()
             shader = material->p_shared_shader.CastedLock();
             cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
             if (shader)
-                g_PSOManager.SetPipelineState(cmd_list, shader);
+                PSOManager::SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];
             auto sub_mesh = shared_mesh->sub_meshes[i];
             auto ibView = ib->View();
@@ -156,6 +156,12 @@ void MeshRenderer::OnDraw()
     }
     if (m_draw_bounds_)
         DrawBounds();
+}
+
+void MeshRenderer::SetMesh(std::shared_ptr<Mesh> mesh)
+{
+    shared_mesh = mesh;
+    ReCalculateBoundingBox();
 }
 
 void MeshRenderer::DrawBounds()

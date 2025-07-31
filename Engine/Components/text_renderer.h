@@ -1,12 +1,12 @@
 #pragma once
 #include "renderer.h"
 #include "Asset/asset_ptr.h"
-#include "Rendering/FontData.h"
+#include "Rendering/font_data.h"
 
 namespace engine
 {
 
-class SpriteRenderer : public Renderer
+class TextRenderer : public Renderer
 {
 public:
     Vector2 position;

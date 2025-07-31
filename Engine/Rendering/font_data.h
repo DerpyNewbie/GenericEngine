@@ -15,12 +15,12 @@ class FontData : public Object
     std::shared_ptr<DescriptorHandle> m_SpritefontHandle_;
 
 public:
-    static std::weak_ptr<DirectX::GraphicsMemory> GMamory()
+    static std::shared_ptr<DirectX::GraphicsMemory> GraphicsMemory()
     {
         return graphics_memory;
     }
 
-    static std::weak_ptr<DirectX::SpriteBatch> SpriteBatch()
+    static std::shared_ptr<DirectX::SpriteBatch> SpriteBatch()
     {
         return sprite_batch;
     }
@@ -35,7 +35,8 @@ public:
         return m_SpritefontHandle_;
     }
 
-    static void Initialize();
+
+    FontData();
     void LoadFont(const std::wstring &font_path);
 };
 }

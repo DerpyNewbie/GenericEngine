@@ -41,6 +41,7 @@ public:
     void OnUpdate() override;
     void OnDraw() override;
 
+    void SetMesh(std::shared_ptr<Mesh> mesh);
     virtual void UpdateBuffers();
 
     template <class Archive>

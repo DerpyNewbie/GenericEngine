@@ -1,5 +1,7 @@
 #include "pch.h"
-#include "line_renderer_component.h"
+#include "line_renderer.h"
+
+#include "CabotEngine/Graphics/PSOManager.h"
 #include "Components/camera.h"
 #include "Components/mesh_renderer.h"
 
@@ -62,17 +64,17 @@ LineRenderer::LineRenderer(const std::vector<Vertex> &vertices, const std::vecto
 
 void LineRenderer::Draw()
 {
-    /*UpdateViewProjectionBuffer();
+    UpdateViewProjectionBuffer();
 
     auto cmd_list = g_RenderEngine->CommandList();
     auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
     auto vbView = m_VertexBuffer->View();
     auto ibView = m_IndexBuffer->View();
 
-    cmd_list->SetPipelineState(g_PSOManager.Get("Line"));
+    cmd_list->SetPipelineState(PSOManager::Get("Line"));
     cmd_list->SetGraphicsRootConstantBufferView(0, m_ViewProjectionBuffers[currentIndex]->GetAddress());
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
     cmd_list->IASetVertexBuffers(0, 1, &vbView);
     cmd_list->IASetIndexBuffer(&ibView);
-    cmd_list->DrawIndexedInstanced(m_NumIndices, 1, 0, 0, 0);*/
+    cmd_list->DrawIndexedInstanced(m_NumIndices, 1, 0, 0, 0);
 }

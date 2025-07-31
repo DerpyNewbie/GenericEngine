@@ -1,5 +1,5 @@
 #pragma once
-#include "Vertex.h"
+#include "vertex.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/IndexBuffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"

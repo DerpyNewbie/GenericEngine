@@ -1,7 +1,6 @@
 ﻿#pragma once
-#include "Rendering/CabotEngine/Graphics/DescriptorHeapManager.h"
-#include "RenderEngine.h"
-#include "Engine/Rendering/buffers.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
+#include "Engine/Rendering/ibuffer.h"
 
 namespace engine
 {

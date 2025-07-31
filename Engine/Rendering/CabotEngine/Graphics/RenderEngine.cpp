@@ -3,7 +3,7 @@
 #include "RenderEngine.h"
 #include "PSOManager.h"
 #include "application.h"
-#include "Rendering/FontData.h"
+#include "Rendering/font_data.h"
 
 RenderEngine *g_RenderEngine;
 
@@ -15,43 +15,44 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 
     if (!CreateDevice())
     {
-        printf("デバイスの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create Device");
         return false;
     }
     if (!CreateCommandQueue())
     {
-        printf("コマンドキューの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create CommandQueue");
         return false;
     }
     if (!CreateSwapChain())
     {
-        printf("スワップチェインの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create SwapChain");
         return false;
     }
     if (!CreateCommandList())
     {
-        printf("コマンドリストの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create CommandList");
         return false;
     }
     if (!CreateFence())
     {
-        printf("フェンスの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create CreateFence");
         return false;
     }
     CreateViewPort();
     CreateScissorRect();
     if (!CreateRenderTarget())
     {
-        printf("レンダーターゲットの生成に失敗");
+        engine::Logger::Error<RenderEngine>("Failed to create MainRenderTarget");
         return false;
     }
     if (!CreateDepthStencil())
     {
-        printf("デプスステンシルバッファの生成に失敗\n");
+        engine::Logger::Error<RenderEngine>("Failed to create DepthStencil");
         return false;
     }
 
-    printf("描画エンジンの初期化に成功\n");
+    engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
+    PSOManager::Initialize();
     return true;
 }
 
@@ -115,7 +116,7 @@ void RenderEngine::EndRender()
 
     // スワップチェーンを切り替え
     m_pSwapChain->Present(1, 0);
-    engine::FontData::GMamory().lock()->Commit(m_pQueue.Get());
+    engine::FontData::GraphicsMemory()->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
     WaitRender();

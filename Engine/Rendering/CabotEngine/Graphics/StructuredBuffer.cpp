@@ -1,6 +1,8 @@
 ﻿#include "pch.h"
 #include "StructuredBuffer.h"
 
+#include "RenderEngine.h"
+
 void engine::StructuredBuffer::CreateBuffer()
 {
     size_t totalSize = m_stride * m_elementCount;
@@ -67,7 +69,7 @@ void engine::StructuredBuffer::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> engine::StructuredBuffer::UploadBuffer()
 {
-    auto pHandle = g_DescriptorHeapManager.Get().Register(*this);
+    auto pHandle = DescriptorHeap::Register(*this);
     return pHandle;
 }
 

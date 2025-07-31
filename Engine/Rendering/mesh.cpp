@@ -173,49 +173,9 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
         }
         for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         {
-            auto bind_pose = aiMatrixToXMMatrix(GetBindPose(bone_names, mesh->mBones[i]->mNode));
+            auto bind_pose = AssimpUtil::GetBindPose(bone_names, mesh->mBones[i]->mNode);
             result->bind_poses.emplace_back(bind_pose);
         }
-    }
-    return result;
-}
-
-std::vector<std::shared_ptr<Mesh>> Mesh::CreateFromMV1(const int model_handle, const int frame_index)
-{
-    auto mesh_num = MV1GetFrameMeshNum(model_handle, frame_index);
-    if (mesh_num == 0)
-    {
-        Logger::Error<Mesh>("CreateFromMV1: No mesh found for handle %d", model_handle);
-        return {};
-    }
-
-    std::vector<std::shared_ptr<Mesh>> result;
-    for (int i = 0; i < mesh_num; i++)
-    {
-        const auto mesh_index = MV1GetFrameMesh(model_handle, frame_index, i);
-        if (mesh_index == -1)
-        {
-            Logger::Error<Mesh>("CreateFromMV1: Failed to get mesh index for handle %d", model_handle);
-            return {};
-        }
-
-        if (MV1SetupReferenceMesh(model_handle, frame_index, false, false, mesh_index))
-        {
-            Logger::Error<Mesh>("CreateFromMV1: Failed to setup reference mesh for handle %d", model_handle);
-            continue;
-        }
-
-        const auto polygon_list = MV1GetReferenceMesh(model_handle, frame_index, false, false, mesh_index);
-        if (polygon_list.VertexNum == 0)
-        {
-            Logger::Error<Mesh>("CreateFromMV1: No polygon found for handle %d", model_handle);
-            MV1TerminateReferenceMesh(model_handle, frame_index, false, false, mesh_index);
-            continue;
-        }
-
-        auto mesh = CreateFromMV1ReferenceMesh(polygon_list);
-        result.emplace_back(std::move(mesh));
-        MV1TerminateReferenceMesh(model_handle, frame_index, false, false, mesh_index);
     }
     return result;
 }

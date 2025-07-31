@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Rendering/buffers.h"
+#include "Rendering/ibuffer.h"
 
 class ConstantBuffer : public IBuffer
 {

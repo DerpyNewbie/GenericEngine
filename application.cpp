@@ -13,9 +13,9 @@
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 #include "Editor/editor.h"
-#include "Rendering/FontData.h"
+#include "Rendering/font_data.h"
 
-Application *g_app;
+std::shared_ptr<Application> Application::m_instance_;
 std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
 float Application::m_window_height_ = 1080;
 float Application::m_window_width_ = 1920;
@@ -30,6 +30,11 @@ LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
+std::shared_ptr<Application> Application::Instance()
+{
+    return m_instance_;
+}
+
 void Application::StartApp()
 {
     const auto engine = std::make_shared<engine::Engine>();
@@ -38,7 +43,6 @@ void Application::StartApp()
     engine->Init();
     editor->Init();
     editor->Attach();
-    engine::FontData::Initialize();
 
     {
         // Sample scene creation
@@ -97,7 +101,7 @@ void Application::InitWindow()
 
     w.cbSize = sizeof(WNDCLASSEX);
     w.lpfnWndProc = static_cast<WNDPROC>(WndProcedure); //コールバック関数の指定
-    w.lpszClassName = _T("DX12Sample"); //アプリケーションクラス名
+    w.lpszClassName = _T("GenericEngine"); //アプリケーションクラス名
     w.hInstance = GetModuleHandle(nullptr); //ハンドルの取得
 
     RegisterClassEx(&w); //アプリケーションクラス(ウィンドウクラスの指定をOSに伝える)
@@ -109,7 +113,7 @@ void Application::InitWindow()
 
     //ウィンドウオブジェクトの生成
     m_h_wnd_ = CreateWindow(w.lpszClassName,
-                            _T("DX12"),
+                            _T("GenericEngine"),
                             WS_OVERLAPPEDWINDOW,
                             CW_USEDEFAULT,
                             CW_USEDEFAULT,

@@ -49,7 +49,7 @@
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
         <ClCompile Include="Engine\audio_asset.cpp"/>
-        <ClCompile Include="Engine\Components\audio_emitter.cpp"/>
+        <ClCompile Include="Engine\Components\audio_emitter_component.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -58,7 +58,7 @@
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
-        <ClCompile Include="Engine\Components\sprite_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\component_factory.cpp"/>
@@ -67,10 +67,88 @@
         <ClCompile Include="Engine\engine_util.cpp"/>
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
-        <ClCompile Include="Engine\Math\bounds.cpp"/>
+        <ClCompile Include="Engine\input.cpp">
+            <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+            <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+            <Optimization>Disabled</Optimization>
+            <SupportJustMyCode>true</SupportJustMyCode>
+            <AssemblerOutput>NoListing</AssemblerOutput>
+            <AssemblerListingLocation>GenericEngine\x64\Debug\</AssemblerListingLocation>
+            <UndefineAllPreprocessorDefinitions>false</UndefineAllPreprocessorDefinitions>
+            <BrowseInformation>false</BrowseInformation>
+            <BrowseInformationFile>GenericEngine\x64\Debug\</BrowseInformationFile>
+            <CompileAs>Default</CompileAs>
+            <UseDynamicDebugging>false</UseDynamicDebugging>
+            <ConformanceMode>true</ConformanceMode>
+            <DiagnosticsFormat>Column</DiagnosticsFormat>
+            <DisableLanguageExtensions>false</DisableLanguageExtensions>
+            <ErrorReporting>Prompt</ErrorReporting>
+            <ExpandAttributedSource>false</ExpandAttributedSource>
+            <ExceptionHandling>Sync</ExceptionHandling>
+            <EnableASAN>false</EnableASAN>
+            <EnableFuzzer>false</EnableFuzzer>
+            <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
+            <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+            <EnableVectorLength>NotSet</EnableVectorLength>
+            <FloatingPointModel>Precise</FloatingPointModel>
+            <ForceConformanceInForLoopScope>true</ForceConformanceInForLoopScope>
+            <GenerateModuleDependencies>false</GenerateModuleDependencies>
+            <GenerateSourceDependencies>false</GenerateSourceDependencies>
+            <GenerateXMLDocumentationFiles>false</GenerateXMLDocumentationFiles>
+            <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+            <IntrinsicFunctions>false</IntrinsicFunctions>
+            <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
+            <LanguageStandard>stdcpp20</LanguageStandard>
+            <LanguageStandard_C>Default</LanguageStandard_C>
+            <MinimalRebuild>false</MinimalRebuild>
+            <ModuleDependenciesFile>GenericEngine\x64\Debug\</ModuleDependenciesFile>
+            <ModuleOutputFile>GenericEngine\x64\Debug\</ModuleOutputFile>
+            <OmitDefaultLibName>false</OmitDefaultLibName>
+            <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+            <WholeProgramOptimization>false</WholeProgramOptimization>
+            <ObjectFileName>GenericEngine\x64\Debug\</ObjectFileName>
+            <CallingConvention>Cdecl</CallingConvention>
+            <ProgramDataBaseFileName>GenericEngine\x64\Debug\vc143.pdb</ProgramDataBaseFileName>
+            <PrecompiledHeader>NotUsing</PrecompiledHeader>
+            <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
+            <PrecompiledHeaderOutputFile>GenericEngine\x64\Debug\GenericEngine.pch</PrecompiledHeaderOutputFile>
+            <PreprocessToFile>false</PreprocessToFile>
+            <PreprocessKeepComments>false</PreprocessKeepComments>
+            <PreprocessSuppressLineNumbers>false</PreprocessSuppressLineNumbers>
+            <RemoveUnreferencedCodeData>true</RemoveUnreferencedCodeData>
+            <ScanSourceForModuleDependencies>false</ScanSourceForModuleDependencies>
+            <ShowIncludes>false</ShowIncludes>
+            <SourceDependenciesFile>GenericEngine\x64\Debug\</SourceDependenciesFile>
+            <SuppressStartupBanner>true</SuppressStartupBanner>
+            <BufferSecurityCheck>true</BufferSecurityCheck>
+            <SmallerTypeCheck>false</SmallerTypeCheck>
+            <SpectreMitigation>false</SpectreMitigation>
+            <StructMemberAlignment>Default</StructMemberAlignment>
+            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
+            <TranslateIncludes>false</TranslateIncludes>
+            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+            <TreatWarningAsError>false</TreatWarningAsError>
+            <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+            <UseFullPaths>true</UseFullPaths>
+            <WarningLevel>Level3</WarningLevel>
+            <XMLDocumentationFileName>GenericEngine\x64\Debug\</XMLDocumentationFileName>
+            <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+            <IntelJCCErratum>false</IntelJCCErratum>
+            <BuildStlModules>false</BuildStlModules>
+            <TreatAngleIncludeAsExternal>false</TreatAngleIncludeAsExternal>
+            <ExternalWarningLevel>InheritWarningLevel</ExternalWarningLevel>
+            <TreatExternalTemplatesAsInternal>true</TreatExternalTemplatesAsInternal>
+            <DisableAnalyzeExternal>false</DisableAnalyzeExternal>
+            <PreprocessorDefinitions>_DEBUG;_CONSOLE;_MBCS;</PreprocessorDefinitions>
+            <SDLCheck>true</SDLCheck>
+            <AdditionalIncludeDirectories>C:\Projects\team\;C:\Projects\team\Engine;C:\Projects\team\ThirdParty\dxlib_h;C:\Projects\team\vcpkg_installed\x64-windows\x64-windows\include</AdditionalIncludeDirectories>
+            <MultiProcessorCompilation>true</MultiProcessorCompilation>
+            <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+            <LinkCompiled>true</LinkCompiled>
+        </ClCompile>
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
-        <ClCompile Include="Engine\Rendering\buffers.cpp"/>
+        <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
             <ObjectFileOutput>C:\Projects\team\x64\Debug\2DPixelShader.cso</ObjectFileOutput>
             <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
@@ -106,10 +184,8 @@
             <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Engine\audio.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Engine\Input.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl">
             <FileType>Document</FileType>
@@ -125,11 +201,10 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
-        <ClCompile Include="Engine\Rendering\FontData.cpp"/>
+        <ClCompile Include="Engine\Rendering\font_data.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
         <ClCompile Include="Engine\Rendering\line_renderer.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
@@ -138,8 +213,9 @@
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
+        <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
-        <ClCompile Include="Engine\Rendering\Vertex.cpp"/>
+        <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\world_view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
         <ClCompile Include="Engine\scene_manager.cpp"/>
@@ -182,7 +258,7 @@
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
         <ClInclude Include="Engine\audio_asset.h"/>
-        <ClInclude Include="Engine\Components\audio_emitter.h"/>
+        <ClInclude Include="Engine\Components\audio_emitter_component.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -191,7 +267,7 @@
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
-        <ClInclude Include="Engine\Components\sprite_renderer.h"/>
+        <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
@@ -207,22 +283,19 @@
         <ClInclude Include="Engine\game_object.h"/>
         <ClInclude Include="Engine\gui.h"/>
         <ClInclude Include="Engine\guid_serializer.h"/>
+        <ClInclude Include="Engine\input.h"/>
         <ClInclude Include="Engine\inspectable.h"/>
         <ClInclude Include="Engine\logger.h"/>
-        <ClInclude Include="Engine\Math\bounds.h"/>
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
-        <ClInclude Include="Engine\Rendering\buffers.h"/>
+        <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Engine\audio.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Engine\Input.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h"/>
@@ -232,9 +305,9 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
-        <ClInclude Include="Engine\Rendering\FontData.h"/>
+        <ClInclude Include="Engine\Rendering\font_data.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
-        <ClInclude Include="Engine\Rendering\line_renderer_component.h"/>
+        <ClInclude Include="Engine\Rendering\line_renderer.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
         <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
@@ -242,8 +315,9 @@
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
+        <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
-        <ClInclude Include="Engine\Rendering\Vertex.h"/>
+        <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\world_view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>
         <ClInclude Include="Engine\scene_manager.h"/>

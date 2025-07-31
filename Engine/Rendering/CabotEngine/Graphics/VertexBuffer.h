@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "../../mesh.h"
-#include "Rendering/Vertex.h"
+#include "Rendering/vertex.h"
 
 namespace engine
 {

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "audio_asset.h"
 
 CEREAL_REGISTER_TYPE(engine::AudioAsset)

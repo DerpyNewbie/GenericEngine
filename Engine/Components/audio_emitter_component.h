@@ -5,7 +5,7 @@
 
 namespace engine
 {
-class audio_emitter : public Component
+class AudioEmitterComponent : public Component
 {
 public:
     AssetPtr<AudioAsset> audio_asset;

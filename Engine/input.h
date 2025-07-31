@@ -24,13 +24,13 @@ public:
     static Input *Get();
     DirectX::Keyboard *Keyboard() const;
 
-    [[nodiscard]] bool IsKeyDown(DirectX::Keyboard::Keys key) const;
-    [[nodiscard]] bool IsKeyPressed(DirectX::Keyboard::Keys key) const;
-    [[nodiscard]] bool IsKeyReleased(DirectX::Keyboard::Keys key) const;
+    [[nodiscard]] static bool IsKeyDown(DirectX::Keyboard::Keys key);
+    [[nodiscard]] static bool IsKeyPressed(DirectX::Keyboard::Keys key);
+    [[nodiscard]] static bool IsKeyReleased(DirectX::Keyboard::Keys key);
 
-    [[nodiscard]] bool IsLeftButtonDown() const;
-    [[nodiscard]] bool IsLeftButtonPressed() const;
-    [[nodiscard]] bool IsRightButtonDown() const;
-    [[nodiscard]] bool IsRightButtonPressed() const;
-    [[nodiscard]] Vector2 MousePos() const;
+    [[nodiscard]] static bool IsLeftButtonDown();
+    [[nodiscard]] static bool IsLeftButtonPressed();
+    [[nodiscard]] static bool IsRightButtonDown();
+    [[nodiscard]] static bool IsRightButtonPressed();
+    [[nodiscard]] static Vector2 MousePos();
 };

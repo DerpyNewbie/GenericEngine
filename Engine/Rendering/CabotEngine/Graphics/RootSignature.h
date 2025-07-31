@@ -18,13 +18,16 @@ enum kRootParameterIndex
 
 class RootSignature
 {
-public:
-    RootSignature(); // コンストラクタでルートシグネチャを生成
-    bool IsValid(); // ルートシグネチャの生成に成功したかどうかを返す
-    ID3D12RootSignature *Get(); // ルートシグネチャを返す
+    static std::shared_ptr<RootSignature> m_instance_;
 
-private:
-    bool m_IsValid = false; // ルートシグネチャの生成に成功したかどうか
-    ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr; // ルートシグネチャ
+    bool m_IsValid = false;
+    ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
+
+public:
+    static std::shared_ptr<RootSignature> Instance();
+    static ID3D12RootSignature *Get();
+    static bool IsValid();
+
+    RootSignature();
 };
 }

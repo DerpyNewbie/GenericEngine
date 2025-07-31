@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "assimp_util.h"
 
-DirectX::XMMATRIX engine::aiMatrixToXMMatrix(const aiMatrix4x4t<float> &src)
+namespace AssimpUtil
+{
+DirectX::XMMATRIX ToXMMatrix(const aiMatrix4x4t<float> &src)
 {
     return DirectX::XMMATRIX({src.a1, src.b1, src.c1, src.d1},
                              {src.a2, src.b2, src.c2, src.d2},
@@ -9,7 +11,7 @@ DirectX::XMMATRIX engine::aiMatrixToXMMatrix(const aiMatrix4x4t<float> &src)
                              {src.a4, src.b4, src.c4, src.d4});
 }
 
-aiMatrix4x4 engine::XMMatrixToaiMatrix(const DirectX::XMMATRIX src)
+aiMatrix4x4 ToaiMatrix(const DirectX::XMMATRIX src)
 {
     return aiMatrix4x4(src.r->m128_f32[0], src.r->m128_f32[4], src.r->m128_f32[8], src.r->m128_f32[12],
                        src.r->m128_f32[1], src.r->m128_f32[5], src.r->m128_f32[9], src.r->m128_f32[13],
@@ -18,7 +20,7 @@ aiMatrix4x4 engine::XMMatrixToaiMatrix(const DirectX::XMMATRIX src)
         );
 }
 
-std::vector<std::string> engine::CreateBoneNamesList(aiMesh *mesh)
+std::vector<std::string> CreateBoneNamesList(aiMesh *mesh)
 {
     std::vector<std::string> bone_names{mesh->mNumBones};
     for (unsigned int i = 0; i < mesh->mNumBones; ++i)
@@ -30,7 +32,7 @@ std::vector<std::string> engine::CreateBoneNamesList(aiMesh *mesh)
 }
 
 
-aiMatrix4x4 engine::GetBindPose(const std::vector<std::string> &bone_names, const aiNode *node)
+Matrix GetBindPose(const std::vector<std::string> &bone_names, const aiNode *node)
 {
     aiMatrix4x4 transform = node->mTransformation;
     const aiNode *parent = node->mParent;
@@ -48,25 +50,25 @@ aiMatrix4x4 engine::GetBindPose(const std::vector<std::string> &bone_names, cons
             }
         }
         if (find == false)
-            return transform;
+            return ToXMMatrix(transform);
         transform = parent->mTransformation * transform;
         parent = parent->mParent;
     }
 
-    return transform;
+    return ToXMMatrix(transform);
 }
 
 
-std::vector<Matrix> engine::GetBindPoses(const std::vector<std::string> &bone_names, const aiMesh *mesh)
+std::vector<Matrix> GetBindPoses(const std::vector<std::string> &bone_names, const aiMesh *mesh)
 {
     std::vector<Matrix> bind_poses;
     for (int i = 0; i < mesh->mNumBones; ++i)
-        bind_poses.emplace_back(aiMatrixToXMMatrix(GetBindPose(bone_names, mesh->mBones[i]->mNode)));
+        bind_poses.emplace_back(GetBindPose(bone_names, mesh->mBones[i]->mNode));
     return bind_poses;
 }
 
 
-aiNode *engine::GetRootBone(const std::vector<std::string> &bone_names, aiBone *bone)
+aiNode *GetRootBone(const std::vector<std::string> &bone_names, aiBone *bone)
 {
     aiNode *current_node = bone->mNode;
     aiNode *parent = current_node->mParent;
@@ -89,4 +91,5 @@ aiNode *engine::GetRootBone(const std::vector<std::string> &bone_names, aiBone *
         parent = current_node->mParent;
     }
     return current_node;
+}
 }

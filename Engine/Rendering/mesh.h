@@ -1,5 +1,4 @@
 #pragma once
-#include "Math/bounds.h"
 #include "bone_weight.h"
 #include "sub_mesh.h"
 
@@ -24,9 +23,6 @@ public:
     std::vector<SubMesh> sub_meshes;
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
-
-    // TODO: remove DxLib dependency
-    static std::vector<std::shared_ptr<Mesh>> CreateFromMV1(int model_handle, int frame_index);
 
     void Append(Mesh other);
     std::vector<Vector2> *GetUV(int index);

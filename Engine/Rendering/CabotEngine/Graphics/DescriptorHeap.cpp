@@ -6,6 +6,17 @@
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
+std::shared_ptr<DescriptorHeap> DescriptorHeap::m_instance_;
+
+std::shared_ptr<DescriptorHeap> DescriptorHeap::Instance()
+{
+    if (!m_instance_)
+    {
+        m_instance_ = std::make_shared<DescriptorHeap>();
+    }
+    return m_instance_;
+}
+
 DescriptorHeap::DescriptorHeap()
 {
     m_FreeIndices_.reserve(kHandleMax);
@@ -40,12 +51,12 @@ DescriptorHeap::DescriptorHeap()
 
 ID3D12DescriptorHeap *DescriptorHeap::GetHeap()
 {
-    return m_pHeap_.Get();
+    return Instance()->m_pHeap_.Get();
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Texture2D> texture)
 {
-    auto pHandle = Allocate();
+    auto pHandle = Instance()->Allocate();
 
     auto device = g_RenderEngine->Device();
     auto resource = texture->Resource();
@@ -57,7 +68,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Textu
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuffer &structured_buffer)
 {
-    auto pHandle = Allocate();
+    auto pHandle = Instance()->Allocate();
 
     auto device = g_RenderEngine->Device();
     auto resource = structured_buffer.Resource();
@@ -69,7 +80,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuf
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &constant_buffer)
 {
-    auto pHandle = Allocate();
+    auto pHandle = Instance()->Allocate();
 
     auto view_desc = constant_buffer.ViewDesc();
     g_RenderEngine->Device()->CreateConstantBufferView(&view_desc, pHandle->HandleCPU);
@@ -79,41 +90,42 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
+    auto instance = Instance();
     UINT index;
 
-    if (!m_FreeIndices_.empty())
+    if (!m_instance_->m_FreeIndices_.empty())
     {
         // 再利用できるスロットがある
-        index = m_FreeIndices_.front();
-        m_FreeIndices_.erase(m_FreeIndices_.begin());
+        index = m_instance_->m_FreeIndices_.front();
+        instance->m_FreeIndices_.erase(instance->m_FreeIndices_.begin());
     }
     else
     {
-        if (m_pHandles_.size() >= kHandleMax)
+        if (instance->m_pHandles_.size() >= kHandleMax)
             return nullptr;
 
-        index = static_cast<UINT>(m_pHandles_.size());
+        index = static_cast<UINT>(Instance()->m_pHandles_.size());
     }
 
     std::shared_ptr<DescriptorHandle> pHandle = std::make_shared<DescriptorHandle>();
     pHandle->index = index;
 
-    auto handleCPU = m_pHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += m_IncrementSize_ * index;
+    auto handleCPU = instance->m_pHeap_->GetCPUDescriptorHandleForHeapStart();
+    handleCPU.ptr += instance->m_IncrementSize_ * index;
 
-    auto handleGPU = m_pHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += m_IncrementSize_ * index;
+    auto handleGPU = instance->m_pHeap_->GetGPUDescriptorHandleForHeapStart();
+    handleGPU.ptr += instance->m_IncrementSize_ * index;
 
     pHandle->HandleCPU = handleCPU;
     pHandle->HandleGPU = handleGPU;
 
-    if (index < m_pHandles_.size())
+    if (index < instance->m_pHandles_.size())
     {
-        m_pHandles_[index] = pHandle;
+        instance->m_pHandles_[index] = pHandle;
     }
     else
     {
-        m_pHandles_.push_back(pHandle);
+        m_instance_->m_pHandles_.push_back(pHandle);
     }
 
     return pHandle;
@@ -121,15 +133,16 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 
 void DescriptorHeap::Free(std::shared_ptr<DescriptorHandle> handle)
 {
-    if (!handle || handle->index >= m_pHandles_.size())
+    if (!handle || handle->index >= m_instance_->m_pHandles_.size())
         return;
 
-    m_pHandles_[handle->index] = nullptr; // スロットを無効化
-    m_FreeIndices_.push_back(handle->index); // 空きとして登録
+    m_instance_->m_pHandles_[handle->index] = nullptr; // スロットを無効化
+    m_instance_->m_FreeIndices_.push_back(handle->index); // 空きとして登録
 }
 
 void DescriptorHeap::Release()
 {
-    m_pHandles_.clear();
-    m_FreeIndices_.clear();
+    auto instance = Instance();
+    instance->m_pHandles_.clear();
+    instance->m_FreeIndices_.clear();
 }

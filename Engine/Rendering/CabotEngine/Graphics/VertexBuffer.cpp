@@ -5,7 +5,9 @@
 #include "Rendering/Vertex.h"
 #include "Components/skinned_mesh_renderer.h"
 
-engine::VertexBuffer::VertexBuffer(const Mesh *p_init_data)
+namespace engine
+{
+VertexBuffer::VertexBuffer(const Mesh *p_init_data)
 {
     auto size = sizeof(Vertex) * p_init_data->vertices.size();
     auto stride = sizeof(Vertex);
@@ -24,7 +26,7 @@ engine::VertexBuffer::VertexBuffer(const Mesh *p_init_data)
 
     if (FAILED(hr))
     {
-        printf("頂点バッファリソースの生成に失敗");
+        Logger::Error<VertexBuffer>("Failed to Create VertexBuffer Resource");
         return;
     }
 
@@ -40,7 +42,7 @@ engine::VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         hr = m_pBuffer->Map(0, nullptr, &ptr);
         if (FAILED(hr))
         {
-            printf("頂点バッファマッピングに失敗");
+            Logger::Error<VertexBuffer>("Failed to mapping VertexBuffer");
             return;
         }
 
@@ -86,7 +88,7 @@ engine::VertexBuffer::VertexBuffer(const Mesh *p_init_data)
     m_IsValid = true;
 }
 
-engine::VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
+VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
 {
     auto size = sizeof(Vertex) * num_vertices;
     auto stride = sizeof(Vertex);
@@ -105,7 +107,7 @@ engine::VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
 
     if (FAILED(hr))
     {
-        printf("頂点バッファリソースの生成に失敗");
+        Logger::Error<VertexBuffer>("Failed to Create VertexBuffer Resource");
         return;
     }
 
@@ -121,7 +123,7 @@ engine::VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
         hr = m_pBuffer->Map(0, nullptr, &ptr);
         if (FAILED(hr))
         {
-            printf("頂点バッファマッピングに失敗");
+            Logger::Error<VertexBuffer>("Failed to mapping VertexBuffer");
             return;
         }
 
@@ -133,12 +135,13 @@ engine::VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
     m_IsValid = true;
 }
 
-D3D12_VERTEX_BUFFER_VIEW engine::VertexBuffer::View() const
+D3D12_VERTEX_BUFFER_VIEW VertexBuffer::View() const
 {
     return m_View;
 }
 
-bool engine::VertexBuffer::IsValid()
+bool VertexBuffer::IsValid()
 {
     return m_IsValid;
+}
 }

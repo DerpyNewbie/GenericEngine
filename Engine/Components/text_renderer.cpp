@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "gui.h"
-#include "sprite_renderer.h"
+#include "text_renderer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include <Rendering/CabotEngine/Graphics/RootSignatureManager.h>
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 using namespace DirectX;
 
 namespace engine
 {
-void SpriteRenderer::OnInspectorGui()
+void TextRenderer::OnInspectorGui()
 {
     float pos[2];
     EngineUtil::ToFloat2(pos, position);
@@ -38,7 +38,7 @@ void SpriteRenderer::OnInspectorGui()
     }
 }
 
-void SpriteRenderer::OnDraw()
+void TextRenderer::OnDraw()
 {
     if (!font_data.Lock())
     {
@@ -46,13 +46,13 @@ void SpriteRenderer::OnDraw()
     }
     auto sprite_batch = FontData::SpriteBatch();
     auto sprite_font = font_data.CastedLock()->SpriteFont();
-    sprite_batch.lock()->Begin(g_RenderEngine->CommandList());
-    sprite_font->DrawString(sprite_batch.lock().get(), string.c_str(), position, color);
-    sprite_batch.lock()->End();
-    g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
+    sprite_batch->Begin(g_RenderEngine->CommandList());
+    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
+    sprite_batch->End();
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
 }
 
-std::weak_ptr<Transform> SpriteRenderer::BoundsOrigin()
+std::weak_ptr<Transform> TextRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
 }

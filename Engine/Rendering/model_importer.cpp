@@ -11,16 +11,11 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "game_object.h"
-#include "str_util.h"
 #include "mesh.h"
-
-// TODO: remove DxLib dependency
 #include "assimp_util.h"
-#include "DxLib/dxlib_converter.h"
 
 namespace engine
 {
@@ -51,7 +46,7 @@ std::shared_ptr<GameObject> CreateFromNode(const aiScene *scene, const aiNode *n
         node_transform->SetParent(parent_node->Transform());
     }
 
-    node_transform->SetLocalMatrix(aiMatrixToXMMatrix(node->mTransformation));
+    node_transform->SetLocalMatrix(AssimpUtil::ToXMMatrix(node->mTransformation));
 
     // create children
     for (unsigned int i = 0; i < node->mNumChildren; ++i)
@@ -91,8 +86,8 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         materials.emplace_back(AssetPtr<Material>::FromManaged(Object::Instantiate<Material>()));
 
         //create bone info
-        auto bone_names = CreateBoneNamesList(current_mesh);
-        meshes[i]->bind_poses = GetBindPoses(bone_names, current_mesh);
+        auto bone_names = AssimpUtil::CreateBoneNamesList(current_mesh);
+        meshes[i]->bind_poses = AssimpUtil::GetBindPoses(bone_names, current_mesh);
 
         for (unsigned int j = 0; j < current_mesh->mNumBones; ++j)
         {
@@ -106,7 +101,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         if (current_mesh->mNumBones)
         {
             //適当なボーンからルートボーンをたどっていく
-            auto root_node = GetRootBone(bone_names, current_mesh->mBones[0]);
+            auto root_node = AssimpUtil::GetRootBone(bone_names, current_mesh->mBones[0]);
             root_bone = node_map[reinterpret_cast<std::uintptr_t>(root_node)]->Transform();
         }
     }
@@ -122,7 +117,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         if (result_mesh->HasBoneWeights())
         {
             auto skinned_mesh_renderer = node_go->AddComponent<SkinnedMeshRenderer>();
-            skinned_mesh_renderer->shared_mesh = result_mesh;
+            skinned_mesh_renderer->SetMesh(result_mesh);
             skinned_mesh_renderer->shared_materials = materials;
             skinned_mesh_renderer->transforms = bone_transforms;
             skinned_mesh_renderer->root_bone = AssetPtr<Transform>::FromManaged(root_bone);
@@ -130,7 +125,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         else
         {
             auto mesh_renderer = node_go->AddComponent<MeshRenderer>();
-            mesh_renderer->shared_mesh = result_mesh;
+            mesh_renderer->SetMesh(result_mesh);
             mesh_renderer->shared_materials = materials;
         }
     }
@@ -163,59 +158,5 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
     AttachMeshObject(scene, scene->mRootNode, nullptr, node_map);
     parent_node_obj->SetName(RetrieveNameFromPath(file_path));
     return parent_node_obj;
-}
-
-std::shared_ptr<GameObject> ModelImporter::LoadModelFromMV1(const char *file_path)
-{
-    const auto model_handle = MV1LoadModel(file_path);
-    if (model_handle == -1)
-    {
-        Logger::Error<ModelImporter>("Failed to load model `%s` from MV1!", file_path);
-        return nullptr;
-    }
-
-    const auto root = Object::Instantiate<GameObject>(RetrieveNameFromPath(file_path));
-    const auto root_transform = root->Transform();
-
-    const auto frame_count = MV1GetFrameNum(model_handle);
-    auto frame_transforms = std::vector<std::weak_ptr<Transform>>(frame_count);
-    auto frame_local_matrix = std::vector<Matrix>(frame_count);
-
-    // Populate frame transforms
-    for (int i = 0; i < frame_count; ++i)
-    {
-        const auto frame_name = StringUtil::ShiftJisToUtf8(std::string(MV1GetFrameName(model_handle, i)));
-        const auto frame_obj = Object::Instantiate<GameObject>(frame_name);
-        frame_transforms[i] = frame_obj->Transform();
-        frame_local_matrix[i] = DxLibConverter::To(MV1GetFrameBaseLocalMatrix(model_handle, i));
-
-        const auto frame_data = frame_obj->AddComponent<FrameMetaData>();
-        frame_data->max_vert_pos = DxLibConverter::To(MV1GetFrameMaxVertexLocalPosition(model_handle, i));
-        frame_data->min_vert_pos = DxLibConverter::To(MV1GetFrameMinVertexLocalPosition(model_handle, i));
-        frame_data->avg_vert_pos = DxLibConverter::To(MV1GetFrameAvgVertexLocalPosition(model_handle, i));
-        frame_data->bind_pose = DxLibConverter::To(MV1GetFrameBaseLocalMatrix(model_handle, i));
-        frame_data->verts = MV1GetFrameVertexNum(model_handle, i);
-        frame_data->tris = MV1GetFrameTriangleNum(model_handle, i);
-        frame_data->meshes = MV1GetFrameMeshNum(model_handle, i);
-
-        if (MV1GetFrameMeshNum(model_handle, i) > 0)
-        {
-            for (const auto meshes = Mesh::CreateFromMV1(model_handle, i); auto &mesh : meshes)
-            {
-                frame_obj->AddComponent<MeshRenderer>()->shared_mesh = mesh;
-            }
-        }
-    }
-
-    // Create parent-child relations
-    for (int i = 0; i < frame_count; ++i)
-    {
-        const auto frame_parent = MV1GetFrameParent(model_handle, i);
-        const auto frame_transform = frame_transforms[i].lock();
-        frame_transform->SetParent(frame_parent <= -1 ? root_transform : frame_transforms[frame_parent]);
-        frame_transform->SetLocalMatrix(frame_local_matrix[i]);
-    }
-
-    return root;
 }
 }

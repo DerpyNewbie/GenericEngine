@@ -1,10 +1,9 @@
 #include "pch.h"
-#include "material.h"
 
+#include "material.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
 
-#include <memory>
 
 namespace engine
 {

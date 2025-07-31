@@ -1,5 +1,6 @@
 #pragma once
 class DescriptorHandle;
+
 namespace engine
 {
 enum kParameterBufferType
@@ -11,6 +12,7 @@ enum kParameterBufferType
     kParameterBufferType_Count
 };
 }
+
 class IBuffer
 {
 public:

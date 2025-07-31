@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "shader.h"
 
-std::shared_ptr<engine::Shader> engine::Shader::m_pDefaultShader;
+namespace engine
+{
+std::shared_ptr<Shader> Shader::m_pDefaultShader;
 
-std::shared_ptr<engine::Shader> engine::Shader::GetDefault()
+std::shared_ptr<Shader> Shader::GetDefault()
 {
     if (!m_pDefaultShader)
     {
@@ -24,7 +26,7 @@ std::shared_ptr<engine::Shader> engine::Shader::GetDefault()
     return m_pDefaultShader;
 }
 
-void engine::Shader::OnInspectorGui()
+void Shader::OnInspectorGui()
 {
     auto vertex_params = std::views::filter(parameters, [](auto &p) {
         return p->shader_type == kShaderType_Vertex;
@@ -98,7 +100,8 @@ void engine::Shader::OnInspectorGui()
     ImGui::PopID();
 }
 
-void engine::Shader::OnConstructed()
+void Shader::OnConstructed()
 {
     InspectableAsset::OnConstructed();
+}
 }

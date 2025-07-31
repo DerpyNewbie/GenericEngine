@@ -1,10 +1,11 @@
 #pragma once
+#include "shader_parameter.h"
 #include "Asset/inspectable_asset.h"
-#include "Asset/Importer/shader_importer.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 
 namespace engine
 {
+class ShaderImporter;
 
 enum kShaderType
 {
@@ -12,22 +13,6 @@ enum kShaderType
     kShaderType_Pixel,
 
     kShaderType_Count
-};
-
-
-struct ShaderParameter
-{
-    int index;
-    kShaderType shader_type;
-    std::string name;
-    std::string display_name;
-    std::string type_hint;
-
-    template <class Archive>
-    void serialize(Archive &ar)
-    {
-        ar(name, index, shader_type, type_hint);
-    }
 };
 
 /// <summary>

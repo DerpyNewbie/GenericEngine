@@ -54,7 +54,7 @@ bool ShaderImporter::CompileShader(std::shared_ptr<Shader> shader, std::wstring 
         }
     }
 
-    // TODO: impl
+    //シェーダーの種類を追加する場合ここに追加してください
     return false;
 }
 
@@ -165,7 +165,7 @@ std::shared_ptr<Object> ShaderImporter::Import(std::istream &input_stream, Asset
 
     CompileShader(shader, asset->path_hint);
     LoadParameters(shader, asset);
-    g_PSOManager.Register(shader, asset->path_hint.filename().string());
+    PSOManager::Register(shader, asset->path_hint.filename().string());
     return shader;
 }
 }

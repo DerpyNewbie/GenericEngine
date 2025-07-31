@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "ConstantBuffer.h"
-#include "DescriptorHeapManager.h"
+#include "DescriptorHeap.h"
 #include "RenderEngine.h"
 
 ConstantBuffer::ConstantBuffer(size_t size)
@@ -60,7 +60,7 @@ void ConstantBuffer::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 {
-    auto pHandle = g_DescriptorHeapManager.Get().Register(*this);
+    auto pHandle = DescriptorHeap::Register(*this);
     return pHandle;
 }
 

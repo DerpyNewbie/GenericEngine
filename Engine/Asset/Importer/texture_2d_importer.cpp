@@ -7,7 +7,9 @@
 #include <memory>
 using namespace DirectX;
 
-engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
+namespace engine
+{
+IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
     auto texture_2d = Object::Instantiate<Texture2D>();
 
@@ -27,12 +29,12 @@ engine::IAssetPtr engine::Texture2DImporter::GetColorTexture(PackedVector::XMCOL
     return asset_ptr;
 }
 
-std::vector<std::string> engine::Texture2DImporter::SupportedExtensions()
+std::vector<std::string> Texture2DImporter::SupportedExtensions()
 {
     return {".png", ".tga"};
 }
 
-std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
+std::shared_ptr<Object> Texture2DImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
 {
     auto texture_2d = Object::Instantiate<Texture2D>(asset->guid);
 
@@ -83,4 +85,5 @@ std::shared_ptr<engine::Object> engine::Texture2DImporter::Import(std::istream &
     }
 
     return texture_2d;
+}
 }

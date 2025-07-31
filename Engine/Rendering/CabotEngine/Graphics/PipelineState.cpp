@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
-
 #include "PipelineState.h"
 #include "RenderEngine.h"
+#include "RootSignature.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 
@@ -20,9 +20,10 @@ PipelineState::PipelineState()
     desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
+    desc.pRootSignature = engine::RootSignature::Get();
 }
 
-bool PipelineState::IsValid()
+bool PipelineState::IsValid() const
 {
     return m_IsValid;
 }
@@ -32,11 +33,6 @@ void PipelineState::SetInputLayout(D3D12_INPUT_LAYOUT_DESC layout)
     desc.InputLayout = layout;
 }
 
-void PipelineState::SetRootSignature(ID3D12RootSignature *rootSignature)
-{
-    desc.pRootSignature = rootSignature;
-}
-
 void PipelineState::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type)
 {
     desc.PrimitiveTopologyType = primitive_type;
@@ -44,11 +40,10 @@ void PipelineState::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primi
 
 void PipelineState::SetVS(std::wstring filePath)
 {
-    // 頂点シェーダー読み込み
     auto hr = D3DReadFileToBlob(filePath.c_str(), m_pVsBlob.GetAddressOf());
     if (FAILED(hr))
     {
-        printf("頂点シェーダーの読み込みに失敗");
+        engine::Logger::Error<PipelineState>("Failed to load vertex shader");
         return;
     }
 
@@ -57,11 +52,10 @@ void PipelineState::SetVS(std::wstring filePath)
 
 void PipelineState::SetPS(std::wstring filePath)
 {
-    // ピクセルシェーダー読み込み
     auto hr = D3DReadFileToBlob(filePath.c_str(), m_pPsBlob.GetAddressOf());
     if (FAILED(hr))
     {
-        printf("ピクセルシェーダーの読み込みに失敗");
+        engine::Logger::Error<PipelineState>("Failed to load pixel shader");
         return;
     }
 
@@ -73,7 +67,7 @@ void PipelineState::SetGS(std::wstring filePath)
     auto hr = D3DReadFileToBlob(filePath.c_str(), m_pGsBlob.GetAddressOf());
     if (FAILED(hr))
     {
-        printf("ピクセルシェーダーの読み込みに失敗");
+        engine::Logger::Error<PipelineState>("Failed to load geometry shader");
         return;
     }
 
@@ -88,12 +82,11 @@ void PipelineState::SetShader(std::shared_ptr<engine::Shader> shader)
 
 void PipelineState::Create()
 {
-    // パイプラインステートを生成
     auto hr = g_RenderEngine->Device()->CreateGraphicsPipelineState(
         &desc, IID_PPV_ARGS(m_pPipelineState.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
-        printf("パイプラインステートの生成に失敗");
+        engine::Logger::Error<PipelineState>("Failed to create PipelineState");
         return;
     }
 

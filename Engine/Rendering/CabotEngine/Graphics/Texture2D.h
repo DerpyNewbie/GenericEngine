@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Asset/inspectable_asset.h"
-#include "Rendering/buffers.h"
+#include "Rendering/ibuffer.h"
 
 namespace engine
 {
