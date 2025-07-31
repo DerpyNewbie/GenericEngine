@@ -55,6 +55,8 @@
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
         <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
+        <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
+        <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
@@ -198,6 +200,8 @@
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
         <ClInclude Include="Engine\Audio\audio_source_component.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
+        <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
+        <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
