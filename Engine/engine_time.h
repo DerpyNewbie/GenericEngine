@@ -125,6 +125,11 @@ public:
         m_seconds_per_frame_ = 1.0 / m_fps_target_;
     }
 
+    void FixedDeltaTime(const float fixed_delta_time)
+    {
+        m_fixed_delta_time_ = fixed_delta_time;
+    }
+
     [[nodiscard]] double CurrentFrameTime() const;
 
     static Instant Instant();
