@@ -3,10 +3,10 @@
 
 namespace engine
 {
-class AudioImporter : public engine::AssetImporter
+class AudioImporter : public AssetImporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;
-    std::shared_ptr<engine::Object> Import(std::istream &input_stream, engine::AssetDescriptor *asset) override;
+    std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) override;
 };
 }
