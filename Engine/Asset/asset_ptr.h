@@ -84,15 +84,39 @@ private:
     {
     }
 
+
 public:
     AssetPtr() = default;
 
     std::shared_ptr<T> CastedLock()
     {
-        if (m_external_reference_.expired())
-            return nullptr;
+        return std::dynamic_pointer_cast<T>(Lock());
+    }
 
-        return std::dynamic_pointer_cast<T>(m_external_reference_.lock());
+    static AssetPtr FromIAssetPtr(IAssetPtr &ptr)
+    {
+        return {ptr};
+    }
+
+    static AssetPtr FromManaged(const std::weak_ptr<T> &ptr)
+    {
+        auto lock = ptr.lock();
+        return {
+            ptr,
+            {},
+            lock != nullptr ? lock->Guid() : kNullGuid,
+            lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
+        };
+    }
+
+    static AssetPtr FromInstance(const std::shared_ptr<T> &ptr)
+    {
+        return {
+            {},
+            ptr,
+            ptr != nullptr ? ptr->Guid() : kNullGuid,
+            ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
+        };
     }
 
     static AssetPtr FromIAssetPtr(IAssetPtr &ptr)

@@ -33,7 +33,7 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
                                      IID_PPV_ARGS(&p_default_folder));
     if (SUCCEEDED(hr))
     {
-        hr = p_file_open->SetDefaultFolder(p_default_folder);
+        p_file_open->SetDefaultFolder(p_default_folder);
         p_default_folder->Release();
         p_default_folder = nullptr;
     }
@@ -127,12 +127,15 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
 void Gui::SetObjectDragDropTarget(const std::shared_ptr<Object> &object)
 {
     SetObjectDragDropTarget(object->Guid());
+    ImGui::Text("Name: %s", NameOf(object).c_str());
 }
 
 void Gui::SetObjectDragDropTarget(const xg::Guid guid)
 {
     const auto guid_str = guid.str();
     ImGui::SetDragDropPayload(DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
+    ImGui::Text("Dragging Object");
+    ImGui::Text("Guid: %s", guid.str().c_str());
 }
 
 std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload)
@@ -182,11 +185,27 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget()
     return GetObjectDragDropTarget(ImGui::GetDragDropPayload());
 }
 
+std::string Gui::NameOf(const std::shared_ptr<Object> &object)
+{
+    if (object == nullptr)
+    {
+        return "null";
+    }
+
+    const auto component = std::dynamic_pointer_cast<Component>(object);
+    if (component != nullptr && component->GameObject() != nullptr)
+    {
+        return component->GameObject()->Name() + " (" + component->Name() + ")";
+    }
+
+    return object->Name();
+}
+
 ImVec2 Gui::GetFieldRect()
 {
     const auto height = ImGui::GetTextLineHeightWithSpacing();
-    const auto width = ImGui::GetContentRegionAvail().x;
-    return ImVec2(width * 0.7F - 0.25F, height);
+    const auto width = ImGui::CalcItemWidth();
+    return {width, height};
 }
 
 bool Gui::BoolField(const char *label, bool &value)
@@ -202,5 +221,102 @@ bool Gui::FloatField(const char *label, float &value)
 bool Gui::IntField(const char *label, int &value)
 {
     return ImGui::DragInt(label, &value, 1.0F, 0.0F, 0.0F, "%d");
+}
+
+bool Gui::Vector2Field(const char *label, Vector2 &value)
+{
+    float v[2] = {value.x, value.y};
+    const auto changed = ImGui::DragFloat2(label, v, 0.01F, 0.0F, 0.0F, "%.2f");
+    if (changed)
+    {
+        value.x = v[0];
+        value.y = v[1];
+    }
+
+    return changed;
+}
+
+bool Gui::Vector3Field(const char *label, Vector3 &value)
+{
+    float v[3] = {value.x, value.y, value.z};
+    const auto changed = ImGui::DragFloat3(label, v, 0.01F, 0.0F, 0.0F, "%.2f");
+    if (changed)
+    {
+        value.x = v[0];
+        value.y = v[1];
+        value.z = v[2];
+    }
+
+    return changed;
+}
+
+bool Gui::QuaternionField(const char *label, Quaternion &value)
+{
+    auto euler = value.ToEuler() * Mathf::kRad2Deg;
+    const auto changed = Vector3Field(label, euler);
+    if (changed)
+    {
+        euler *= Mathf::kDeg2Rad;
+        value = Quaternion::CreateFromYawPitchRoll(euler.y, euler.x, euler.z);
+    }
+
+    return changed;
+}
+
+bool Gui::ColorField(const char *label, Color &value)
+{
+    float color_buf[4] = {value.x, value.y, value.z, value.w};
+    const auto changed = ImGui::ColorPicker4(label, color_buf);
+    if (changed)
+    {
+        value.x = color_buf[0];
+        value.y = color_buf[1];
+        value.z = color_buf[2];
+        value.w = color_buf[3];
+    }
+
+    return changed;
+}
+
+template <>
+bool Gui::PropertyField<int>(const char *label, int &value)
+{
+    return IntField(label, value);
+}
+
+template <>
+bool Gui::PropertyField<float>(const char *label, float &value)
+{
+    return FloatField(label, value);
+}
+
+template <>
+bool Gui::PropertyField<bool>(const char *label, bool &value)
+{
+    return BoolField(label, value);
+}
+
+template <>
+bool Gui::PropertyField<Vector2>(const char *label, Vector2 &value)
+{
+    return Vector2Field(label, value);
+}
+
+template <>
+bool Gui::PropertyField<Vector3>(const char *label, Vector3 &value)
+{
+    return Vector3Field(label, value);
+}
+
+template <>
+bool Gui::PropertyField<Quaternion>(const char *label, Quaternion &value)
+{
+    return QuaternionField(label, value);
+}
+
+template <>
+bool Gui::PropertyField<Color>(const char *label, Color &value)
+{
+    return ImGui::ColorPicker4(label, &value.x);
 }
 }
