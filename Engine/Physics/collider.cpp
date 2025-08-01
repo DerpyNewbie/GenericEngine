@@ -5,6 +5,11 @@
 
 namespace engine
 {
+void Collider::MarkDirty()
+{
+    m_is_dirty_ = true;
+}
+
 void Collider::OnInspectorGui()
 {
     if (ImGui::CollapsingHeader("Collider Info", ImGuiTreeNodeFlags_DefaultOpen))
@@ -20,6 +25,8 @@ void Collider::OnInspectorGui()
             ImGui::Text("attached to rigidbody");
             ImGui::Text("path: %s", rb->GameObject()->Path().c_str());
         }
+
+        ImGui::Text("margin: %f", GetShape()->getMargin());
         ImGui::Unindent();
     }
 }

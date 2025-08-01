@@ -9,9 +9,13 @@ class Collider : public Component
     friend class RigidbodyComponent;
 
     std::weak_ptr<RigidbodyComponent> m_rigidbody_;
+    bool m_is_dirty_ = true;
 
     virtual void UpdateShape() = 0;
     virtual btCollisionShape *GetShape() = 0;
+
+protected:
+    void MarkDirty();
 
 public:
     void OnInspectorGui() override;

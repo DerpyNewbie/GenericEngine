@@ -76,6 +76,8 @@ void RigidbodyComponent::ReadFromPhysics()
 
 void RigidbodyComponent::WriteToPhysics()
 {
+    UpdateCompoundShape();
+
     const auto transform = GameObject()->Transform();
     const auto pos = transform->Position();
     const auto rot = transform->Rotation();
@@ -97,6 +99,19 @@ void RigidbodyComponent::UnregisterFromPhysics()
     Physics::RemoveRigidbody(shared_from_base<RigidbodyComponent>());
     m_bt_rigidbody_.reset();
     m_is_registered_ = false;
+}
+
+void RigidbodyComponent::UpdateCompoundShape()
+{
+    for (auto &weak_collider : m_colliders_)
+    {
+        auto collider = weak_collider.lock();
+        if (collider == nullptr || !collider->m_is_dirty_)
+            continue;
+
+        RemoveColliderFromCompoundShape(collider);
+        AddColliderToCompoundShape(collider);
+    }
 }
 
 void RigidbodyComponent::AddCollider(const std::shared_ptr<Collider> &collider)
@@ -128,6 +143,7 @@ void RigidbodyComponent::AddColliderToCompoundShape(const std::shared_ptr<Collid
     bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
 
     m_bt_compound_shape_->addChildShape(bt_transform, collider->GetShape());
+    collider->m_is_dirty_ = false;
     Logger::Log<RigidbodyComponent>("Collider %s has been added at {%.2f, %.2f, %.2f}",
                                     collider->GameObject()->Name().c_str(), pos.x, pos.y, pos.z);
 }

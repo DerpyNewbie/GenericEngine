@@ -21,6 +21,7 @@ void SphereCollider::UpdateShape()
     m_radius_ = max(m_radius_, Mathf::kEpsilon);
 
     m_shape_.setUnscaledRadius(m_radius_);
+    MarkDirty();
 }
 
 btCollisionShape *SphereCollider::GetShape()

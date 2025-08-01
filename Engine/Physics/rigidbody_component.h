@@ -31,6 +31,7 @@ class RigidbodyComponent : public Component
     void ReadFromPhysics();
     void WriteToPhysics();
     void UnregisterFromPhysics();
+    void UpdateCompoundShape();
 
     void AddCollider(const std::shared_ptr<Collider> &collider);
     void RemoveCollider(const std::shared_ptr<Collider> &collider);
