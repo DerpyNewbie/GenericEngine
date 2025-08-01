@@ -244,10 +244,6 @@
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
     </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Engine\Rendering\CabotEngine\Engine\"/>
-        <Folder Include="Resources\"/>
-    </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>
         <Keyword>Win32Proj</Keyword>
