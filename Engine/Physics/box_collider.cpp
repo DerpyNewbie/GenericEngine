@@ -28,6 +28,17 @@ btCollisionShape *BoxCollider::GetShape()
 {
     return &m_box_shape_;
 }
+
+Vector3 BoxCollider::Extents() const
+{
+    return m_extents_;
+}
+
+void BoxCollider::SetExtents(const Vector3 extents)
+{
+    m_extents_ = extents;
+    UpdateShape();
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::BoxCollider)

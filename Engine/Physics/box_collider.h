@@ -16,6 +16,10 @@ public:
     void UpdateShape() override;
     btCollisionShape *GetShape() override;
 
+    [[nodiscard]] Vector3 Extents() const;
+
+    void SetExtents(Vector3 extents);
+
     template <class Archive>
     void serialize(Archive &ar)
     {
