@@ -35,7 +35,8 @@ bool Engine::Init()
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
-    
+
+    Gizmos::Init();
     Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
