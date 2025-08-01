@@ -6,7 +6,6 @@
 #include "Components/transform.h"
 #include "game_object.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/world_view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
@@ -28,17 +27,10 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 
 void SkinnedMeshRenderer::UpdateWVPBuffer()
 {
-    WorldViewProjection wvp;
-    const auto camera = Camera::Main();
-
-    wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
-    wvp.WVP[1] = camera->GetViewMatrix();
-    wvp.WVP[2] = camera->GetProjectionMatrix();
-
-    for (auto &wvp_buffer : wvp_buffers)
+    for (auto &world_matrix_buffer : world_matrix_buffers)
     {
-        auto ptr = wvp_buffer->GetPtr<WorldViewProjection>();
-        *ptr = wvp;
+        auto ptr = world_matrix_buffer->GetPtr<Matrix>();
+        *ptr = GameObject()->Transform()->Parent()->WorldMatrix();
     }
 }
 
@@ -107,7 +99,7 @@ void SkinnedMeshRenderer::OnDraw()
             PSOManager::SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
         cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, m_bone_matrix_buffers_[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
@@ -122,7 +114,7 @@ void SkinnedMeshRenderer::OnDraw()
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();
-            cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+            cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
             if (shader)
                 PSOManager::SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];

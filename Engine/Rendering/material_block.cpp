@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "material_block.h"
 #include "material_data.h"
-#include "world_view_projection.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
 namespace
@@ -16,12 +15,6 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     }},
     {"float", [](const ShaderParameter &param) {
         return std::make_shared<MaterialData<float>>(0, param);
-    }},
-    {"__WVP__", [](const ShaderParameter &param) {
-        auto wvp = WorldViewProjection{};
-        for (int i = 0; i < 3; ++i)
-            wvp.WVP[i] = Matrix::Identity;
-        return std::make_shared<MaterialData<WorldViewProjection>>(wvp, param);
     }},
     {"vector<Matrix>", [](const ShaderParameter &param) {
         auto identity = std::vector{Matrix::Identity};

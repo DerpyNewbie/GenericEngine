@@ -1,16 +1,19 @@
 cbuffer Transform : register(b0)
 {
-    float4x4 World; // ワールド行列
-    float4x4 View; // ビュー行列
-    float4x4 Proj; // 投影行列
+    float4x4 World;
+}
+cbuffer Transform : register(b1)
+{
+    float4x4 View;
+    float4x4 Proj;
 }
 
-cbuffer DebugType : register(b1)
+cbuffer DebugType : register(b2)
 {
     int debug_type;
 }
 
-cbuffer WeightIndex : register(b2)
+cbuffer WeightIndex : register(b3)
 {
     int weight_idx;
 }

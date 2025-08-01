@@ -20,7 +20,7 @@ protected:
     std::shared_ptr<Mesh> shared_mesh;
     std::shared_ptr<VertexBuffer> vertex_buffer;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> wvp_buffers;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> world_matrix_buffers;
 
     virtual void ReconstructBuffer();
     virtual void UpdateWVPBuffer();
