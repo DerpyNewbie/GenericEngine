@@ -9,6 +9,7 @@ unsigned int Object::m_last_instantiated_name_count_ = 0;
 unsigned int Object::m_last_immediately_destroyed_objects_ = 0;
 std::unordered_map<xg::Guid, std::shared_ptr<Object>> Object::m_objects_;
 std::vector<std::shared_ptr<Object>> Object::m_destroying_objects_;
+std::vector<std::shared_ptr<Object>> Object::m_destroyed_objects_;
 
 void Object::GarbageCollect()
 {
@@ -23,6 +24,10 @@ void Object::GarbageCollect()
         Logger::Log<Object>("Immediately destroyed %d objects.", m_last_immediately_destroyed_objects_);
         m_last_immediately_destroyed_objects_ = 0;
     }
+
+    m_destroyed_objects_.clear();
+    m_destroyed_objects_.insert(m_destroyed_objects_.begin(),
+                                m_destroying_objects_.begin(), m_destroying_objects_.end());
 
     if (!m_destroying_objects_.empty())
     {

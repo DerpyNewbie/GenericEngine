@@ -4,7 +4,13 @@
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
 #include "Exporter/asset_exporter.h"
+#include "Exporter/material_exporter.h"
+#include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
+#include "Importer/shader_importer.h"
+#include "Importer/font_importer.h"
+#include "Importer/material_importer.h"
+#include "Importer/texture_2d_importer.h"
 
 namespace engine
 {
@@ -28,7 +34,12 @@ void AssetDatabase::Init()
 {
     AssetImporter::Register(std::make_shared<TxtImporter>());
     AssetExporter::Register(std::make_shared<TxtExporter>());
-
+    AssetImporter::Register(std::make_shared<ShaderImporter>());
+    AssetExporter::Register(std::make_shared<ShaderExporter>());
+    AssetImporter::Register(std::make_shared<MaterialImporter>());
+    AssetExporter::Register(std::make_shared<MaterialExporter>());
+    AssetImporter::Register(std::make_shared<Texture2DImporter>());
+    AssetImporter::Register(std::make_shared<FontImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 
@@ -240,7 +251,14 @@ void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
         return;
     }
 
+    std::stringstream ss;
+    std::ifstream input_stream(asset_descriptor->path_hint);
+    ss << input_stream.rdbuf();
+    input_stream.close();
+
     std::ofstream output_stream(asset_descriptor->path_hint);
+    output_stream << ss.str();
+
     exporter->Export(output_stream, asset_descriptor);
     output_stream.close();
     asset_descriptor->Save();

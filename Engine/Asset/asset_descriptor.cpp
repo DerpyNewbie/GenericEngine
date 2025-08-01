@@ -94,9 +94,10 @@ GenericValue<UTF8<>> &AssetDescriptor::GetDataValue()
 
 void AssetDescriptor::PopulateMetaJson()
 {
-    if (m_meta_json_.Null())
+    if (!m_meta_json_.IsObject())
     {
         m_meta_json_.SetObject();
+        Logger::Warn<AssetDescriptor>("Meta json is not an object! Resetting!");
     }
 
     auto &a = m_meta_json_.GetAllocator();
@@ -192,6 +193,12 @@ void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, c
     auto input_stream = std::ifstream(instance->path_hint);
     const auto object = asset_importer->Import(input_stream, instance.get());
     input_stream.close();
+
+    if (object == nullptr)
+    {
+        Logger::Error<AssetDescriptor>("Failed to import asset '%s'!", instance->path_hint.string().c_str());
+        return;
+    }
 
     if (object->Guid() != instance->guid)
     {

@@ -10,7 +10,7 @@ std::vector<std::string> TxtImporter::SupportedExtensions()
 {
     return {".txt"};
 }
-std::shared_ptr<Object> TxtImporter::Import(const std::istream &input_stream, AssetDescriptor *asset)
+std::shared_ptr<Object> TxtImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
 {
     auto text = Object::Instantiate<TextAsset>(asset->guid);
     std::stringstream ss;
@@ -22,7 +22,6 @@ std::shared_ptr<Object> TxtImporter::Import(const std::istream &input_stream, As
         text->key_value_pairs[key] = asset->GetString(key);
     }
 
-    asset->managed_object = text;
     return text;
 }
 }

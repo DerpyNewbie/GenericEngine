@@ -2,10 +2,10 @@
 
 #include "renderer.h"
 
-#include "update_manager.h"
-
 namespace engine
 {
+std::vector<std::weak_ptr<Renderer>> Renderer::renderers;
+
 void Renderer::SetVisible(const bool visible)
 {
     if (m_is_visible_ == visible)
@@ -17,11 +17,16 @@ void Renderer::SetVisible(const bool visible)
 
     if (m_is_visible_)
     {
-        UpdateManager::SubscribeDrawCall(shared_from_base<Renderer>());
+        renderers.emplace_back(shared_from_base<Renderer>());
     }
     else
     {
-        UpdateManager::UnsubscribeDrawCall(shared_from_base<Renderer>());
+        const auto pos = std::ranges::find_if(renderers, [&](const auto &r) {
+            return r.lock() == shared_from_base<Renderer>();
+        });
+        if (pos == renderers.end())
+            return;
+        renderers.erase(pos);
     }
 }
 

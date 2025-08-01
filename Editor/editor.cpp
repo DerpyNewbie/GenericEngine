@@ -11,12 +11,15 @@
 #include "profiler.h"
 #include "update_man_debugger.h"
 
+#include "application.h"
+
 #include <imgui_impl_win32.h>
-#include <imgui_impl_dx11.h>
+#include <imgui_impl_dx12.h>
 #include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
-#include "Asset/asset_database.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
+#include "Rendering/material.h"
 
 #include <ranges>
 
@@ -68,6 +71,7 @@ void Editor::Init()
     m_instance_ = this;
 
     {
+        Application::AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -87,9 +91,20 @@ void Editor::Init()
                                                     io.Fonts->GetGlyphRangesJapanese());
         IM_ASSERT(font != nullptr);
 
-        ImGui_ImplWin32_Init(GetMainWindowHandle());
-        ImGui_ImplDX11_Init((ID3D11Device *)GetUseDirect3D11Device(),
-                            (ID3D11DeviceContext *)GetUseDirect3D11DeviceContext());
+        auto descriptor_handle = DescriptorHeap::Allocate();
+        // フォントディスクリプタ取得
+        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
+        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
+
+        ImGui_ImplWin32_Init(Application::GetWindowHandle());
+        ImGui_ImplDX12_Init(
+            g_RenderEngine->Device(),
+            RenderEngine::FRAME_BUFFER_COUNT,
+            DXGI_FORMAT_R8G8B8A8_UNORM,
+            DescriptorHeap::GetHeap(),
+            font_cpu_desc_handle,
+            font_gpu_desc_handle
+            );
 
         SetHookWinProc(WndProc);
     }
@@ -118,6 +133,10 @@ void Editor::Init()
         AddCreateMenu("Text Asset", ".txt", [] {
             return Object::Instantiate<TextAsset>("New Text Asset");
         });
+
+        AddCreateMenu("Material", ".material", [] {
+            return Object::Instantiate<Material>("New Material");
+        });
     }
 }
 
@@ -129,8 +148,8 @@ void Editor::Attach()
 void Editor::OnDraw()
 {
     {
-        ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
+        ImGui_ImplDX12_NewFrame();
         ImGui::NewFrame();
     }
 
@@ -152,7 +171,9 @@ void Editor::OnDraw()
 
     {
         ImGui::Render();
-        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+        auto draw_data = ImGui::GetDrawData();
+        auto cmd_list = g_RenderEngine->CommandList();
+        ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
             ImGui::UpdatePlatformWindows();
@@ -166,7 +187,7 @@ void Editor::OnDraw()
 void Editor::Finalize()
 {
     ImGui_ImplWin32_Shutdown();
-    ImGui_ImplDX11_Shutdown();
+    ImGui_ImplDX12_Shutdown();
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
@@ -181,12 +202,12 @@ std::shared_ptr<Object> Editor::SelectedObject() const
     return m_selected_object_.lock();
 }
 
-void Editor::SetSelectedDirectory(const path &path)
+void Editor::SetSelectedDirectory(const std::filesystem::path &path)
 {
     m_selected_directory_ = path;
 }
 
-path Editor::SelectedDirectory() const
+std::filesystem::path Editor::SelectedDirectory() const
 {
     return m_selected_directory_;
 }

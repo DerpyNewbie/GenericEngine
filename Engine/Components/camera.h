@@ -1,17 +1,19 @@
 #pragma once
 #include "component.h"
+#include "event_receivers.h"
+#include "renderer.h"
 
 namespace engine
 {
-class Camera : public Component
+class Camera : public Component, public IDrawCallReceiver
 {
-
-
     enum class kViewMode : unsigned char
     {
         kPerspective,
         kOrthographic
     };
+
+    static std::weak_ptr<Camera> m_main_camera_;
 
     kViewMode m_view_mode_ = kViewMode::kPerspective;
     float m_field_of_view_ = 70;
@@ -19,8 +21,8 @@ class Camera : public Component
     float m_far_plane_ = 1000.0f;
     float m_ortho_size_ = 50;
     Color m_background_color_ = Color(0x1A1A1AFF);
-
-    void ApplyCameraSettingToDxLib() const;
+    UINT m_drawcall_count_ = 0;
+    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
     static constexpr float min_field_of_view = 1.0f;
@@ -28,8 +30,16 @@ public:
     static constexpr float min_clipping_plane = 0.01f;
     static constexpr float max_clipping_plane = 10000.0f;
 
-    void OnUpdate() override;
+    void OnAwake() override;
     void OnInspectorGui() override;
+    void OnDraw() override;
+    void OnEnabled() override;
+    void OnDisabled() override;
+
+    static std::shared_ptr<Camera> Main();
+
+    Matrix GetViewMatrix() const;
+    Matrix GetProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)

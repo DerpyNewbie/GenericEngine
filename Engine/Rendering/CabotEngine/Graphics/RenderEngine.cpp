@@ -1,0 +1,405 @@
+﻿#include "pch.h"
+
+#include "RenderEngine.h"
+#include "PSOManager.h"
+#include "RootSignature.h"
+#include "application.h"
+#include "Rendering/font_data.h"
+
+RenderEngine *g_RenderEngine;
+
+bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
+{
+    ID3D12Debug *debugController;
+    if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+    {
+        debugController->EnableDebugLayer();
+    }
+
+    m_FrameBufferWidth = windowWidth;
+    m_FrameBufferHeight = windowHeight;
+    m_hWnd = hwnd;
+
+    if (!CreateDevice())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create Device");
+        return false;
+    }
+    if (!CreateCommandQueue())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create CommandQueue");
+        return false;
+    }
+    if (!CreateSwapChain())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create SwapChain");
+        return false;
+    }
+    if (!CreateCommandList())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create CommandList");
+        return false;
+    }
+    if (!CreateFence())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create CreateFence");
+        return false;
+    }
+    CreateViewPort();
+    CreateScissorRect();
+    if (!CreateRenderTarget())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create MainRenderTarget");
+        return false;
+    }
+    if (!CreateDepthStencil())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create DepthStencil");
+        return false;
+    }
+
+    engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
+    PSOManager::Initialize();
+    return true;
+}
+
+void RenderEngine::BeginRender()
+{
+    // 現在のレンダーターゲットを更新
+    m_currentRenderTarget = m_pRenderTargets[m_CurrentBackBufferIndex].Get();
+
+    // コマンドを初期化してためる準備をする
+    m_pAllocator[m_CurrentBackBufferIndex]->Reset();
+    m_pCommandList->Reset(m_pAllocator[m_CurrentBackBufferIndex].Get(), nullptr);
+
+    // ビューポートとシザー矩形を設定
+    m_pCommandList->RSSetViewports(1, &m_Viewport);
+    m_pCommandList->RSSetScissorRects(1, &m_Scissor);
+
+    auto currentRtvHandle = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart();
+    currentRtvHandle.ptr += m_CurrentBackBufferIndex * m_RtvDescriptorSize;
+    auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+
+    // レンダーターゲットが使用可能になるまで待つ
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
+                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+
+    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE
+        );
+    m_pCommandList->ResourceBarrier(1, &dsBarrier);
+
+    // レンダーターゲットを設定
+    m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
+
+    // レンダーターゲットをクリア
+    m_pCommandList->ClearRenderTargetView(currentRtvHandle, m_BackGroundColor, 0, nullptr);
+
+    // 深度ステンシルビューをクリア
+    m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
+    auto descriptor_heap = DescriptorHeap::GetHeap();
+    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
+}
+
+void RenderEngine::EndRender()
+{
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_RENDER_TARGET,
+                                                        D3D12_RESOURCE_STATE_PRESENT);
+    m_pCommandList->ResourceBarrier(1, &barrier);
+    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pDepthStencilBuffer.Get(),
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_COMMON
+        );
+    m_pCommandList->ResourceBarrier(1, &dsBarrier);
+
+    // コマンドの記録を終了
+    m_pCommandList->Close();
+
+    // コマンドを実行
+    ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
+    m_pQueue->ExecuteCommandLists(1, ppCmdLists);
+
+    // スワップチェーンを切り替え
+    m_pSwapChain->Present(1, 0);
+    engine::FontData::GraphicsMemory()->Commit(m_pQueue.Get());
+
+    // 描画完了を待つ
+    WaitRender();
+
+    // バックバッファ番号更新
+    m_CurrentBackBufferIndex = m_pSwapChain->GetCurrentBackBufferIndex();
+}
+
+void RenderEngine::SetBackGroundColor(Color color)
+{
+    m_BackGroundColor[0] = color.R();
+    m_BackGroundColor[1] = color.G();
+    m_BackGroundColor[2] = color.B();
+    m_BackGroundColor[3] = color.A();
+}
+
+bool RenderEngine::CreateDevice()
+{
+    auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_pDevice.ReleaseAndGetAddressOf()));
+    return SUCCEEDED(hr);
+}
+
+bool RenderEngine::CreateCommandQueue()
+{
+    D3D12_COMMAND_QUEUE_DESC desc = {};
+    desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
+    desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
+    desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
+    desc.NodeMask = 0;
+
+    auto hr = m_pDevice->CreateCommandQueue(&desc, IID_PPV_ARGS(m_pQueue.ReleaseAndGetAddressOf()));
+
+    return SUCCEEDED(hr);
+}
+
+bool RenderEngine::CreateSwapChain()
+{
+    // DXGIファクトリーの生成
+    IDXGIFactory4 *pFactory = nullptr;
+    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    // スワップチェインの生成
+    DXGI_SWAP_CHAIN_DESC desc = {};
+    desc.BufferDesc.Width = m_FrameBufferWidth;
+    desc.BufferDesc.Height = m_FrameBufferHeight;
+    desc.BufferDesc.RefreshRate.Numerator = 60;
+    desc.BufferDesc.RefreshRate.Denominator = 1;
+    desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+    desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    desc.SampleDesc.Count = 1;
+    desc.SampleDesc.Quality = 0;
+    desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    desc.BufferCount = FRAME_BUFFER_COUNT;
+    desc.OutputWindow = m_hWnd;
+    desc.Windowed = TRUE;
+    desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
+    desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+    // スワップチェインの生成
+    IDXGISwapChain *pSwapChain = nullptr;
+    hr = pFactory->CreateSwapChain(m_pQueue.Get(), &desc, &pSwapChain);
+    if (FAILED(hr))
+    {
+        pFactory->Release();
+        return false;
+    }
+
+    // IDXGISwapChain3を取得
+    hr = pSwapChain->QueryInterface(IID_PPV_ARGS(m_pSwapChain.ReleaseAndGetAddressOf()));
+    if (FAILED(hr))
+    {
+        pFactory->Release();
+        pSwapChain->Release();
+        return false;
+    }
+
+    // バックバッファ番号を取得
+    m_CurrentBackBufferIndex = m_pSwapChain->GetCurrentBackBufferIndex();
+
+    pFactory->Release();
+    pSwapChain->Release();
+    return true;
+}
+
+bool RenderEngine::CreateCommandList()
+{
+    // コマンドアロケーターの作成
+    HRESULT hr;
+    for (size_t i = 0; i < FRAME_BUFFER_COUNT; i++)
+    {
+        hr = m_pDevice->CreateCommandAllocator(
+            D3D12_COMMAND_LIST_TYPE_DIRECT,
+            IID_PPV_ARGS(m_pAllocator[i].ReleaseAndGetAddressOf()));
+    }
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    // コマンドリストの生成
+    hr = m_pDevice->CreateCommandList(
+        0,
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        m_pAllocator[m_CurrentBackBufferIndex].Get(),
+        nullptr,
+        IID_PPV_ARGS(&m_pCommandList)
+        );
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    //コマンドリストは開かれている状態で作成されるので、いったん閉じる。
+    m_pCommandList->Close();
+
+    return true;
+}
+
+bool RenderEngine::CreateFence()
+{
+    for (auto i = 0u; i < FRAME_BUFFER_COUNT; i++)
+    {
+        m_fenceValue[i] = 0;
+    }
+
+    auto hr = m_pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_pFence.ReleaseAndGetAddressOf()));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    m_fenceValue[m_CurrentBackBufferIndex]++;
+
+    //同期を行うときのイベントハンドラを作成する。
+    m_fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+    return m_fenceEvent != nullptr;
+}
+
+void RenderEngine::CreateViewPort()
+{
+    m_Viewport.TopLeftX = 0;
+    m_Viewport.TopLeftY = 0;
+    m_Viewport.Width = static_cast<float>(m_FrameBufferWidth);
+    m_Viewport.Height = static_cast<float>(m_FrameBufferHeight);
+    m_Viewport.MinDepth = 0.0f;
+    m_Viewport.MaxDepth = 1.0f;
+}
+
+void RenderEngine::CreateScissorRect()
+{
+    m_Scissor.left = 0;
+    m_Scissor.right = m_FrameBufferWidth;
+    m_Scissor.top = 0;
+    m_Scissor.bottom = m_FrameBufferHeight;
+}
+
+bool RenderEngine::CreateRenderTarget()
+{
+    // RTV用のディスクリプタヒープを作成する
+    D3D12_DESCRIPTOR_HEAP_DESC desc = {};
+    desc.NumDescriptors = FRAME_BUFFER_COUNT;
+    desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+    desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    auto hr = m_pDevice->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_pRtvHeap.ReleaseAndGetAddressOf()));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    // ディスクリプタのサイズを取得。
+    m_RtvDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_pRtvHeap->GetCPUDescriptorHandleForHeapStart();
+
+    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+
+    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
+    for (UINT i = 0; i < FRAME_BUFFER_COUNT; i++)
+    {
+        m_pSwapChain->GetBuffer(i, IID_PPV_ARGS(m_pRenderTargets[i].ReleaseAndGetAddressOf()));
+        m_pDevice->CreateRenderTargetView(m_pRenderTargets[i].Get(), &rtvDesc, rtvHandle);
+        rtvHandle.ptr += m_RtvDescriptorSize;
+    }
+
+    return true;
+}
+
+bool RenderEngine::CreateDepthStencil()
+{
+    //DSV用のディスクリプタヒープを作成する
+    D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+    heapDesc.NumDescriptors = 1;
+    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    auto hr = m_pDevice->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_pDsvHeap));
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    //ディスクリプタのサイズを取得
+    m_DsvDescriptorSize = m_pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
+
+    D3D12_CLEAR_VALUE dsvClearValue;
+    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvClearValue.DepthStencil.Depth = 1.0f;
+    dsvClearValue.DepthStencil.Stencil = 0;
+
+    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    CD3DX12_RESOURCE_DESC resourceDesc(
+        D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+        0,
+        m_FrameBufferWidth,
+        m_FrameBufferHeight,
+        1,
+        1,
+        DXGI_FORMAT_D32_FLOAT,
+        1,
+        0,
+        D3D12_TEXTURE_LAYOUT_UNKNOWN,
+        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+    hr = m_pDevice->CreateCommittedResource(
+        &heapProp,
+        D3D12_HEAP_FLAG_NONE,
+        &resourceDesc,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        &dsvClearValue,
+        IID_PPV_ARGS(m_pDepthStencilBuffer.ReleaseAndGetAddressOf())
+        );
+
+    if (FAILED(hr))
+    {
+        return false;
+    }
+
+    //ディスクリプタを作成
+    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+
+    m_pDevice->CreateDepthStencilView(m_pDepthStencilBuffer.Get(), nullptr, dsvHandle);
+
+    return true;
+}
+
+void RenderEngine::WaitRender()
+{
+    //描画終了待ち
+    const UINT64 fenceValue = m_fenceValue[m_CurrentBackBufferIndex];
+    m_pQueue->Signal(m_pFence.Get(), fenceValue);
+    m_fenceValue[m_CurrentBackBufferIndex]++;
+
+    // 次のフレームの描画準備がまだであれば待機する.
+    if (m_pFence->GetCompletedValue() < fenceValue)
+    {
+        // 完了時にイベントを設定.
+        auto hr = m_pFence->SetEventOnCompletion(fenceValue, m_fenceEvent);
+        if (FAILED(hr))
+        {
+            return;
+        }
+
+        // 待機処理.
+        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_fenceEvent, INFINITE, FALSE))
+        {
+            return;
+        }
+    }
+}

@@ -1,34 +1,80 @@
 #pragma once
-#include "object.h"
+#include "material_data.h"
+#include "shader.h"
+#include "CabotEngine/Graphics/StructuredBuffer.h"
+#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {
-class Texture2D;
+struct MaterialDataPair
+{
+    std::shared_ptr<IMaterialData> data = nullptr;
+    std::shared_ptr<DescriptorHandle> handle = nullptr;
+
+    template <typename Archive>
+    void serialize(Archive &ar)
+    {
+        ar(CEREAL_NVP(data));
+    }
+};
+
+struct ShaderDataIndex
+{
+    int cbv_length = 0;
+    int srv_length = 0;
+    int uav_length = 0;
+
+    int *GetLengthField(kParameterBufferType type);
+    int GetLength(kParameterBufferType type) const;
+    int GetOffset(kParameterBufferType type) const;
+    int GetFullLength() const;
+
+    template <typename Archive>
+    void serialize(Archive &ar)
+    {
+        ar(CEREAL_NVP(cbv_length), CEREAL_NVP(srv_length), CEREAL_NVP(uav_length));
+    }
+};
+
 /// <summary>
 /// Shared shader parameters.
 /// </summary>
 /// <remarks>
 /// Used by Material for better memory-management among the same objects
 /// </remarks>
-class MaterialBlock : public Object
+class MaterialBlock : public InspectableAsset
 {
 public:
-    std::unordered_map<std::string, float> params_float;
-    std::unordered_map<std::string, int> params_int;
-    std::unordered_map<std::string, bool> params_bool;
-    std::unordered_map<std::string, Vector2> params_vec2;
-    std::unordered_map<std::string, Vector3> params_vec3;
-    std::unordered_map<std::string, Vector4> params_vec4;
-    std::unordered_map<std::string, Matrix> params_mat4;
-    std::unordered_map<std::string, std::shared_ptr<Texture2D>> params_tex2d;
+    ShaderDataIndex pixel_shader_index = {};
+    ShaderDataIndex vertex_shader_index = {};
+
+    std::vector<MaterialDataPair> material_data = {};
+
+    MaterialBlock() = default;
+    ~MaterialBlock() override;
+
+    void OnInspectorGui() override;
+
+    void LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params);
+
+    ShaderDataIndex *GetShaderDataIndex(kShaderType type);
+    int GetOffset(kShaderType type) const;
+
+    void Insert(const std::shared_ptr<IMaterialData> &data);
+    bool Empty(kShaderType shader_type, kParameterBufferType buffer_type);
+    std::vector<MaterialDataPair>::iterator Begin(kShaderType shader_type, kParameterBufferType buffer_type);
+    std::vector<MaterialDataPair>::iterator End(kShaderType shader_type, kParameterBufferType buffer_type);
+
+    std::shared_ptr<IMaterialData> FindMaterialDataByName(const std::string &name);
+
+    void UpdateBuffer();
+    bool IsDirty();
 
     template <class Archive>
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Object>(this),
-           CEREAL_NVP(params_float), CEREAL_NVP(params_int), CEREAL_NVP(params_bool),
-           CEREAL_NVP(params_vec2), CEREAL_NVP(params_vec3), CEREAL_NVP(params_vec4), CEREAL_NVP(params_mat4),
-           CEREAL_NVP(params_tex2d));
+           CEREAL_NVP(material_data), CEREAL_NVP(pixel_shader_index), CEREAL_NVP(vertex_shader_index));
     }
 };
 }

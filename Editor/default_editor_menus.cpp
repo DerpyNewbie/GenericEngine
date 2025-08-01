@@ -58,6 +58,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 
     throw std::runtime_error("Unknown editor menu: " + name);
 }
+
 void editor::DefaultEditorMenu::DrawDefaultMenu()
 {
     DrawFilesMenu();
@@ -65,6 +66,7 @@ void editor::DefaultEditorMenu::DrawDefaultMenu()
     DrawObjectMenu();
     DrawWindowMenu();
 }
+
 void editor::DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
@@ -105,6 +107,7 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
         serializer.Save(ofs, target_scene);
     }
 }
+
 void editor::DefaultEditorMenu::DrawEditMenu()
 {
     if (ImGui::BeginMenu("Prefs"))
@@ -115,6 +118,7 @@ void editor::DefaultEditorMenu::DrawEditMenu()
         ImGui::EndMenu();
     }
 }
+
 void editor::DefaultEditorMenu::DrawObjectMenu()
 {
     if (ImGui::MenuItem("Create Empty"))
@@ -122,6 +126,7 @@ void editor::DefaultEditorMenu::DrawObjectMenu()
         engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
     }
 }
+
 void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go)
 {
     if (go == nullptr)
@@ -141,6 +146,7 @@ void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::
         ImGui::EndDisabled();
     }
 }
+
 void editor::DefaultEditorMenu::DrawWindowMenu()
 {
     const auto editor = Editor::Instance();
@@ -150,6 +156,7 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
         ImGui::MenuItem(name.c_str(), nullptr, &editor->GetEditorWindow(name)->is_open);
     }
 }
+
 bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
 {
     const auto editor = Editor::Instance();

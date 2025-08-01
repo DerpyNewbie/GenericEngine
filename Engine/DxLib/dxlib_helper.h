@@ -2,6 +2,8 @@
 
 #pragma once
 #include "DxLib.h"
+#include "dxlib_converter.h"
+#include "Rendering/gizmos.h"
 
 // ReSharper disable once CppInconsistentNaming
 namespace DxLibHelper
@@ -109,6 +111,9 @@ static void GetLocalAxis(const MATRIX &matrix, VECTOR &out_left, VECTOR &out_up,
 static void DrawAxis3D(const MATRIX &m, const float len = kDefaultAxisLength)
 {
     const auto origin = VTransform({0, 0, 0}, m);
+
+    engine::Gizmos::DrawSphere(DxLibConverter::To(origin), 50);
+
     DrawSphere3D(origin, len * 0.1F, 8, 0xFFFFFFFF, 0xFFFFFFFF, false);
     DrawLine3D(origin, VTransform({len, 0, 0}, m), GetColor(255, 0, 0));
     DrawLine3D(origin, VTransform({0, len, 0}, m), GetColor(0, 255, 0));
@@ -142,6 +147,11 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
     const float x_end = spacing.u * static_cast<float>(min_x);
     const float z_end = spacing.v * static_cast<float>(min_z);
 
+    constexpr auto color_default = Color(0.6F, 0.6F, 0.6F, 1.0F);
+    constexpr auto color_z = Color(0.6F, 0.6F, 1.0F, 1.0F);
+    constexpr auto color_x = Color(1.0F, 0.6F, 0.6F, 1.0F);
+    constexpr auto color_y = Color(0.6F, 1.0F, 0.6F, 1.0F);
+
     for (int z = min_z; z < max_z; ++z)
     {
         for (int x = min_x; x < max_x; ++x)
@@ -149,18 +159,19 @@ static void DrawYPlaneGrid(const FLOAT2 spacing = {50, 50}, const int count = 50
             const auto dx = spacing.u * static_cast<float>(x);
             const auto dz = spacing.v * static_cast<float>(z);
 
-            const VECTOR z_line_begin = {dx, 0, dz};
-            const VECTOR z_line_end = {dx, 0, z_end};
+            const Vector3 z_line_begin = {dx, 0, dz};
+            const Vector3 z_line_end = {dx, 0, z_end};
 
-            const VECTOR x_line_begin = {dx, 0, dz};
-            const VECTOR x_line_end = {x_end, 0, dz};
+            const Vector3 x_line_begin = {dx, 0, dz};
+            const Vector3 x_line_end = {x_end, 0, dz};
 
-            DrawLine3D(z_line_begin, z_line_end, x % 5 == 0 ? 0xffa1a1ff : 0x10A1A1A1);
-            DrawLine3D(x_line_begin, x_line_end, z % 5 == 0 ? 0xffffa1a1 : 0x10A1A1A1);
+            engine::Gizmos::DrawLine(z_line_begin, z_line_end, x % 5 == 0 ? color_z : color_default);
+
+            engine::Gizmos::DrawLine(x_line_begin, x_line_end, z % 5 == 0 ? color_x : color_default);
 
             if (x % 5 == 0 && z % 5 == 0)
             {
-                DrawLine3D({dx, 0, dz}, {dx, cam_y, dz}, 0xffa1ffa1);
+                engine::Gizmos::DrawLine({dx, 0, dz}, {dx, cam_y, dz}, color_y);
             }
         }
     }

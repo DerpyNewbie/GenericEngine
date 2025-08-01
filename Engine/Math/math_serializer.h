@@ -1,5 +1,4 @@
 #pragma once
-#include "bounds.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -10,27 +9,25 @@ void serialize(Archive &ar, Color &v)
 {
     ar(v.x, v.y, v.z, v.w);
 }
-template <class Archive>
-void serialize(Archive &ar, engine::Bounds &v)
-{
-    ar(v.center, v.extents, v.size, v.min_point, v.max_point);
-}
 
 template <class Archive>
 void serialize(Archive &ar, Vector2 &v)
 {
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y));
 }
+
 template <class Archive>
 void serialize(Archive &ar, Vector3 &v)
 {
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y), CEREAL_NVP(v.z));
 }
+
 template <class Archive>
 void serialize(Archive &ar, Vector4 &v)
 {
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y), CEREAL_NVP(v.z), CEREAL_NVP(v.w));
 }
+
 template <class Archive>
 void serialize(Archive &ar, Matrix &v)
 {
@@ -39,16 +36,19 @@ void serialize(Archive &ar, Matrix &v)
        CEREAL_NVP(v.m[2][0]), CEREAL_NVP(v.m[2][1]), CEREAL_NVP(v.m[2][2]), CEREAL_NVP(v.m[2][3]),
        CEREAL_NVP(v.m[3][0]), CEREAL_NVP(v.m[3][1]), CEREAL_NVP(v.m[3][2]), CEREAL_NVP(v.m[3][3]));
 }
+
 template <class Archive>
 void serialize(Archive &ar, Quaternion &v)
 {
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y), CEREAL_NVP(v.z), CEREAL_NVP(v.w));
 }
+
 template <class Archive>
 void serialize(Archive &ar, Plane &v)
 {
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y), CEREAL_NVP(v.z), CEREAL_NVP(v.w));
 }
+
 template <class Archive>
 void serialize(Archive &ar, struct Rectangle &v)
 {

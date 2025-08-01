@@ -16,6 +16,7 @@ std::string Hierarchy::Name()
 {
     return "Hierarchy";
 }
+
 void Hierarchy::OnEditorGui()
 {
     for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
@@ -34,6 +35,7 @@ void Hierarchy::OnEditorGui()
                                     DxLibConverter::From(locked->Transform()->WorldMatrix()));
     }
 }
+
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 {
     auto draw = ImGui::CollapsingHeader(scene->Name().c_str());
@@ -63,6 +65,7 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
         }
     }
 }
+
 void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
 {
     ImGui::TableNextRow();
@@ -131,6 +134,7 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
 
     ImGui::PopID();
 }
+
 bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;

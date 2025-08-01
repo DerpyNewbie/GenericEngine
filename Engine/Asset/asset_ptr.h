@@ -29,7 +29,8 @@ protected:
         m_stored_reference_(shared_ptr),
         m_guid_(guid),
         m_type_(type)
-    {}
+    {
+    }
 
 public:
     static const xg::Guid kNullGuid;
@@ -76,10 +77,13 @@ private:
              const xg::Guid guid,
              const AssetPtrType type) :
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
-    {}
+    {
+    }
 
     AssetPtr(const IAssetPtr &ptr) : IAssetPtr(ptr)
-    {}
+    {
+    }
+
 
 public:
     AssetPtr() = default;
@@ -87,6 +91,32 @@ public:
     std::shared_ptr<T> CastedLock()
     {
         return std::dynamic_pointer_cast<T>(Lock());
+    }
+
+    static AssetPtr FromIAssetPtr(IAssetPtr &ptr)
+    {
+        return {ptr};
+    }
+
+    static AssetPtr FromManaged(const std::weak_ptr<T> &ptr)
+    {
+        auto lock = ptr.lock();
+        return {
+            ptr,
+            {},
+            lock != nullptr ? lock->Guid() : kNullGuid,
+            lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
+        };
+    }
+
+    static AssetPtr FromInstance(const std::shared_ptr<T> &ptr)
+    {
+        return {
+            {},
+            ptr,
+            ptr != nullptr ? ptr->Guid() : kNullGuid,
+            ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
+        };
     }
 
     static AssetPtr FromIAssetPtr(IAssetPtr &ptr)

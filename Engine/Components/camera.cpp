@@ -1,32 +1,51 @@
 #include "pch.h"
 
 #include "camera.h"
+#include "application.h"
 #include "game_object.h"
+#include "update_manager.h"
+#include "Rendering/gizmos.h"
 
 namespace engine
 {
-void Camera::ApplyCameraSettingToDxLib() const
+std::weak_ptr<Camera> Camera::m_main_camera_;
+
+std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
+    const std::vector<std::weak_ptr<Renderer>> &renderers)
 {
-    SetBackgroundColor(m_background_color_.R() * 255, m_background_color_.G() * 255, m_background_color_.B() * 255);
-    const auto t = GameObject()->Transform();
+    Matrix view_matrix = GetViewMatrix();
+    Matrix proj_matrix = GetProjectionMatrix();
+    DirectX::BoundingFrustum frustum;
+    DirectX::BoundingFrustum::CreateFromMatrix(frustum, proj_matrix, true);
+    frustum.Transform(frustum, view_matrix.Invert());
 
-    int x, y;
-    GetDrawScreenSize(&x, &y);
-    const float aspect = static_cast<float>(x) / static_cast<float>(y);
-    const auto proj = m_view_mode_ == kViewMode::kPerspective
-                          ? Matrix::CreatePerspectiveFieldOfView(m_field_of_view_ * Mathf::kDeg2Rad, aspect,
-                                                                 m_near_plane_, m_far_plane_)
-                          : Matrix::CreateOrthographic(m_ortho_size_, m_ortho_size_, m_near_plane_, m_far_plane_);
-    const auto view = Matrix::CreateLookAt(t->Position(), t->Position() + t->Forward(), t->Up());
-
-    SetupCamera_ProjectionMatrix(DxLibConverter::From(proj));
-    SetCameraViewMatrix(DxLibConverter::From(view));
+    std::vector<std::shared_ptr<Renderer>> visible_objects;
+    for (auto renderer : renderers)
+    {
+        auto transform = renderer.lock()->BoundsOrigin();
+        auto world_matrix = transform.lock()->WorldMatrix();
+        auto bounds = renderer.lock()->bounds;
+        auto min_pos = bounds.Center + Vector3(-bounds.Extents.x, -bounds.Extents.y, -bounds.Extents.z);
+        auto max_pos = bounds.Center + Vector3(bounds.Extents.x, bounds.Extents.y, bounds.Extents.z);
+        min_pos = Vector3::Transform(min_pos, world_matrix);
+        max_pos = Vector3::Transform(max_pos, world_matrix);
+        DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);
+        if (frustum.Intersects(bounds))
+        {
+            visible_objects.emplace_back(renderer);
+        }
+    }
+    return visible_objects;
 }
 
-void Camera::OnUpdate()
+void Camera::OnAwake()
 {
-    ApplyCameraSettingToDxLib();
+    if (!m_main_camera_.lock())
+    {
+        m_main_camera_ = shared_from_base<Camera>();
+    }
 }
+
 void Camera::OnInspectorGui()
 {
     ImGui::SliderFloat("Field of View", &m_field_of_view_,
@@ -52,7 +71,49 @@ void Camera::OnInspectorGui()
     if (ImGui::ColorPicker4("Background Color", color_buf))
     {
         m_background_color_ = Color{color_buf[0], color_buf[1], color_buf[2], color_buf[3]};
+        g_RenderEngine->SetBackGroundColor(m_background_color_);
     }
+    ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
+}
+
+void Camera::OnDraw()
+{
+    m_drawcall_count_ = 0;
+    auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
+    for (auto object : objects_in_view)
+    {
+        m_drawcall_count_++;
+        object->OnDraw();
+    }
+}
+
+void Camera::OnEnabled()
+{
+    UpdateManager::SubscribeDrawCall(shared_from_base<Camera>());
+}
+
+void Camera::OnDisabled()
+{
+    UpdateManager::UnsubscribeDrawCall(shared_from_base<Camera>());
+}
+
+std::shared_ptr<Camera> Camera::Main()
+{
+    return m_main_camera_.lock();
+}
+
+Matrix Camera::GetViewMatrix() const
+{
+    const auto transform = GameObject()->Transform();
+    return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
+                                     transform->Up());
+}
+
+Matrix Camera::GetProjectionMatrix() const
+{
+    const float aspect = static_cast<float>(Application::WindowWidth()) / static_cast<float>(
+                             Application::WindowHeight());
+    return DirectX::XMMatrixPerspectiveFovRH(DirectX::XMConvertToRadians(m_field_of_view_), aspect, 0.3f, 1000.0f);
 }
 }
 

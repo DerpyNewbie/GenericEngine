@@ -1,12 +1,12 @@
 #include "pch.h"
-
 #include "controller.h"
-
 #include "engine_time.h"
 #include "game_object.h"
 #include "gui.h"
 #include "transform.h"
+#include "input.h"
 
+using namespace DirectX;
 
 namespace engine
 {
@@ -18,17 +18,17 @@ void Controller::OnUpdate()
     Vector3 dir = {0, 0, 0};
     float up_down = 0.0f;
 
-    if (CheckHitKey(KEY_INPUT_W))
+    if (Input::GetKey(Keyboard::W))
         dir.z -= 1.0f;
-    if (CheckHitKey(KEY_INPUT_S))
+    if (Input::GetKey(Keyboard::S))
         dir.z += 1.0f;
-    if (CheckHitKey(KEY_INPUT_D))
+    if (Input::GetKey(Keyboard::D))
         dir.x += 1.0f;
-    if (CheckHitKey(KEY_INPUT_A))
+    if (Input::GetKey(Keyboard::A))
         dir.x -= 1.0f;
-    if (CheckHitKey(KEY_INPUT_SPACE))
+    if (Input::GetKey(Keyboard::Space))
         up_down += 1.0f;
-    if (CheckHitKey(KEY_INPUT_LCONTROL))
+    if (Input::GetKey(Keyboard::LeftControl))
         up_down -= 1.0f;
 
     // Normalize movement vector if not zero
@@ -39,13 +39,13 @@ void Controller::OnUpdate()
 
     // Rotation input
     Vector2 delta_rot = {0, 0};
-    if (CheckHitKey(KEY_INPUT_UP))
+    if (Input::GetKey(Keyboard::Up))
         delta_rot.x += m_rotation_speed_;
-    if (CheckHitKey(KEY_INPUT_DOWN))
+    if (Input::GetKey(Keyboard::Down))
         delta_rot.x -= m_rotation_speed_;
-    if (CheckHitKey(KEY_INPUT_LEFT))
+    if (Input::GetKey(Keyboard::Left))
         delta_rot.y += m_rotation_speed_;
-    if (CheckHitKey(KEY_INPUT_RIGHT))
+    if (Input::GetKey(Keyboard::Right))
         delta_rot.y -= m_rotation_speed_;
 
     m_last_rotation_input_ = delta_rot;
@@ -70,6 +70,7 @@ void Controller::OnUpdate()
         transform->SetPosition(new_pos);
     }
 }
+
 void Controller::OnInspectorGui()
 {
     Gui::FloatField("Movement Speed", m_movement_speed_);
