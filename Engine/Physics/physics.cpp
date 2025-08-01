@@ -42,6 +42,24 @@ Physics::Physics()
     m_world_->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe + btIDebugDraw::DBG_DrawContactPoints);
 }
 
+void Physics::OnCollisionStarted(const ContactPair &pair, const btPersistentManifold *manifold)
+{
+    pair.first->GameObject()->InvokeOnCollisionEnter({pair.second->GameObject().get()});
+    pair.second->GameObject()->InvokeOnCollisionEnter({pair.first->GameObject().get()});
+}
+
+void Physics::OnCollisionStayed(const ContactPair &pair, const btPersistentManifold *manifold)
+{
+    pair.first->GameObject()->InvokeOnCollisionStay({pair.second->GameObject().get()});
+    pair.second->GameObject()->InvokeOnCollisionStay({pair.first->GameObject().get()});
+}
+
+void Physics::OnCollisionExited(const ContactPair &pair, const btPersistentManifold *manifold)
+{
+    pair.first->GameObject()->InvokeOnCollisionExit({pair.second->GameObject().get()});
+    pair.second->GameObject()->InvokeOnCollisionExit({pair.first->GameObject().get()});
+}
+
 int Physics::Order()
 {
     return IFixedUpdateReceiver::Order();
@@ -75,6 +93,43 @@ void Physics::OnFixedUpdate()
 
         rb->ReadFromPhysics();
     }
+
+    m_current_contacts_.clear();
+
+    const auto dispatcher = m_world_->getDispatcher();
+    const int manifolds_count = dispatcher->getNumManifolds();
+    for (int i = 0; i < manifolds_count; i++)
+    {
+        const btPersistentManifold *manifold = dispatcher->getManifoldByIndexInternal(i);
+        if (manifold->getNumContacts() > 0)
+        {
+            const btCollisionObject *body_0 = manifold->getBody0();
+            const btCollisionObject *body_1 = manifold->getBody1();
+            auto rb_0 = static_cast<RigidbodyComponent *>(body_0->getUserPointer());
+            auto rb_1 = static_cast<RigidbodyComponent *>(body_1->getUserPointer());
+            auto pair = std::minmax(rb_0, rb_1);
+            m_current_contacts_.emplace(pair, manifold);
+
+            if (!m_previous_contacts_.contains(pair))
+            {
+                OnCollisionStarted(pair, manifold);
+            }
+            else
+            {
+                OnCollisionStayed(pair, manifold);
+            }
+        }
+    }
+
+    for (auto &[pair, manifold] : m_previous_contacts_)
+    {
+        if (!m_current_contacts_.contains(pair))
+        {
+            OnCollisionExited(pair, manifold);
+        }
+    }
+
+    m_previous_contacts_ = m_current_contacts_;
 }
 void Physics::DebugDraw()
 {

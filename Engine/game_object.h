@@ -148,6 +148,7 @@ private:
     friend class Scene;
     friend class SceneManager;
     friend class Transform;
+    friend class Physics;
 
     bool m_is_active_self_ = true;
     std::weak_ptr<engine::Scene> m_scene_ = {};
@@ -156,6 +157,10 @@ private:
     void InvokeUpdate();
     void InvokeFixedUpdate() const;
     void NotifyIsActiveChanged() const;
+
+    void InvokeOnCollisionEnter(const Collision &collision) const;
+    void InvokeOnCollisionStay(const Collision &collision) const;
+    void InvokeOnCollisionExit(const Collision &collision) const;
 
     void SetAsRootObject(bool is_root_object);
 

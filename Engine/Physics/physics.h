@@ -23,9 +23,17 @@ class Physics : public IFixedUpdateReceiver
     std::unique_ptr<BulletDebugDrawer> m_debug_drawer_;
     std::vector<std::weak_ptr<RigidbodyComponent>> m_rigidbodies_;
 
+    using ContactPair = std::pair<const RigidbodyComponent *, const RigidbodyComponent *>;
+    std::map<ContactPair, const btPersistentManifold *> m_current_contacts_;
+    std::map<ContactPair, const btPersistentManifold *> m_previous_contacts_;
+
     static void Init();
 
     Physics();
+
+    static void OnCollisionStarted(const ContactPair &pair, const btPersistentManifold *manifold);
+    static void OnCollisionStayed(const ContactPair &pair, const btPersistentManifold *manifold);
+    static void OnCollisionExited(const ContactPair &pair, const btPersistentManifold *manifold);
 
 public:
     int Order() override;
