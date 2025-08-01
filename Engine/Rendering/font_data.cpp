@@ -36,11 +36,11 @@ void FontData::LoadFont(const std::wstring &font_path)
     resource_upload_batch.Begin();
 
     m_spritefont_handle_ = DescriptorHeap::Allocate();
-    m_spritefont_ = std::make_shared<DirectX::SpriteFont>(device,
-                                                          resource_upload_batch,
-                                                          font_path.c_str(),
-                                                          m_spritefont_handle_->HandleCPU,
-                                                          m_spritefont_handle_->HandleGPU);
+    m_sprite_font_ = std::make_shared<DirectX::SpriteFont>(device,
+                                                           resource_upload_batch,
+                                                           font_path.c_str(),
+                                                           m_spritefont_handle_->HandleCPU,
+                                                           m_spritefont_handle_->HandleGPU);
 
     auto future = resource_upload_batch.End(g_RenderEngine->CommandQueue());
 

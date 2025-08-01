@@ -9,8 +9,6 @@
 #include "Rendering/world_view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
-#include <DxLib.h>
-
 namespace engine
 {
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
