@@ -6,7 +6,10 @@ namespace engine
 {
 
 void PlaneCollider::UpdateShape()
-{}
+{
+    // NOTE(derpy): Plane has no need to be updated
+}
+
 btCollisionShape *PlaneCollider::GetShape()
 {
     return &m_plane_;
