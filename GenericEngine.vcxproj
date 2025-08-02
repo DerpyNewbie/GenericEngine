@@ -53,6 +53,7 @@
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\rect_transform.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
@@ -65,6 +66,7 @@
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
+        <ClCompile Include="Engine\Math\rect.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
@@ -179,6 +181,7 @@
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\rect_transform.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
@@ -202,6 +205,7 @@
         <ClInclude Include="Engine\logger.h"/>
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
+        <ClInclude Include="Engine\Math\rect.h"/>
         <ClInclude Include="Engine\object.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
