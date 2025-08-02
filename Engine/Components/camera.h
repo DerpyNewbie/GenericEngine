@@ -2,6 +2,8 @@
 #include "component.h"
 #include "event_receivers.h"
 #include "renderer.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
@@ -22,6 +24,10 @@ class Camera : public Component, public IDrawCallReceiver
     float m_ortho_size_ = 50;
     Color m_background_color_ = Color(0x1A1A1AFF);
     UINT m_drawcall_count_ = 0;
+
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
+
+    void SetViewProjMatrix();
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
@@ -31,6 +37,7 @@ public:
     static constexpr float max_clipping_plane = 10000.0f;
 
     void OnAwake() override;
+    void OnConstructed() override;
     void OnInspectorGui() override;
     void OnDraw() override;
     void OnEnabled() override;

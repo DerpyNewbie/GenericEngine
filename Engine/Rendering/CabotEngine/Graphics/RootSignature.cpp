@@ -25,7 +25,8 @@ RootSignature::RootSignature()
 
     std::vector<CD3DX12_ROOT_PARAMETER> rootParam(kRootParameterIndexCount);
 
-    rootParam[kWVPCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kWorldCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kBoneSRV].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
 
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
@@ -35,10 +36,10 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 1);
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 2);
     tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 1);
     tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
-    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 1);
+    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 2);
     tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 1);
     tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
 

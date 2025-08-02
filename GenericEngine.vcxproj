@@ -133,7 +133,7 @@
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
-        <ClCompile Include="Engine\Rendering\world_view_projection.cpp"/>
+        <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
         <ClCompile Include="Engine\scene_manager.cpp"/>
         <ClCompile Include="Engine\serializer.cpp"/>
@@ -230,7 +230,7 @@
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
-        <ClInclude Include="Engine\Rendering\world_view_projection.h"/>
+        <ClInclude Include="Engine\Rendering\view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>
         <ClInclude Include="Engine\scene_manager.h"/>
         <ClInclude Include="Engine\serializer.h"/>
@@ -243,6 +243,9 @@
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>
