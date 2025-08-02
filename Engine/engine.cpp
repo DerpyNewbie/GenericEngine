@@ -20,6 +20,7 @@
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "input.h"
 #include "Physics/physics.h"
+#include "Audio/audio.h"
 
 namespace engine
 {
@@ -36,6 +37,7 @@ bool Engine::Init()
         Logger::Log<Engine>("Failed to initialize render engine");
     }
 
+    Audio::Init();
     Gizmos::Init();
     Physics::Init();
     Time::Get()->Init();

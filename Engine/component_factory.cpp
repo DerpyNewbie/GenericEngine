@@ -2,6 +2,8 @@
 
 #include "component_factory.h"
 
+#include "Audio/audio_listener_component.h"
+#include "Audio/audio_source_component.h"
 #include "Components/text_renderer.h"
 #include "Components/camera.h"
 #include "Components/controller.h"
@@ -36,6 +38,8 @@ void IComponentFactory::Init()
     ADD_COMPONENT(BoxCollider);
     ADD_COMPONENT(CapsuleCollider);
     ADD_COMPONENT(RigidbodyTesterComponent);
+    ADD_COMPONENT(AudioSourceComponent);
+    ADD_COMPONENT(AudioListenerComponent);
 #undef ADD_COMPONENT
 }
 

@@ -21,6 +21,7 @@
     <ItemGroup>
         <ClCompile Include="application.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
+        <ClCompile Include="Editor\audio_window.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
         <ClCompile Include="Editor\editor_menu.cpp"/>
         <ClCompile Include="Editor\editor_prefs.cpp"/>
@@ -39,6 +40,7 @@
         <ClCompile Include="Engine\Asset\Exporter\material_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\audio_clip_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
@@ -47,6 +49,10 @@
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
+        <ClCompile Include="Engine\Audio\audio.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -155,6 +161,7 @@
     <ItemGroup>
         <ClInclude Include="application.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
+        <ClInclude Include="Editor\audio_window.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
         <ClInclude Include="Editor\editor_menu.h"/>
         <ClInclude Include="Editor\editor_prefs.h"/>
@@ -172,6 +179,7 @@
         <ClInclude Include="Engine\Asset\Exporter\material_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
+        <ClInclude Include="Engine\Asset\Importer\audio_clip_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
@@ -182,6 +190,10 @@
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
+        <ClInclude Include="Engine\Audio\audio.h"/>
+        <ClInclude Include="Engine\Audio\audio_clip.h"/>
+        <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
+        <ClInclude Include="Engine\Audio\audio_source_component.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
