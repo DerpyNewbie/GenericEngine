@@ -142,7 +142,7 @@ void RenderEngine::ExecuteCommandList()
     ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
     m_pQueue->ExecuteCommandLists(1, ppCmdLists);
 
-    engine::FontData::GMamory().lock()->Commit(m_pQueue.Get());
+    engine::FontData::GraphicsMemory()->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
     WaitRender();

@@ -3,7 +3,7 @@
 #include "game_object.h"
 #include "logger.h"
 #include "Components/camera.h"
-#include "Rendering/world_view_projection.h"
+#include "Rendering/view_projection.h"
 using namespace DirectX::SimpleMath;
 
 void Billboard::Update()
@@ -11,7 +11,7 @@ void Billboard::Update()
     //create vertex buffer
     if (!vertex_buffer)
     {
-        std::array<Vertex, 4> vertices;
+        std::array<engine::Vertex, 4> vertices;
         vertices[0].vertex = Vector3(-5, -5, 0.0f);
         vertices[1].vertex = Vector3(-5, 5, 0.0f);
         vertices[2].vertex = Vector3(5, -5, 0.0f);
@@ -83,13 +83,11 @@ void Billboard::Update()
     {
         if (!wvp_buffer)
         {
-            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(WorldViewProjection));
+            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
             wvp_buffer->CreateBuffer();
         }
-        WorldViewProjection wvp;
-        wvp.WVP[0] = world_matrix;
-        wvp.WVP[1] = camera->GetViewMatrix();
-        wvp.WVP[2] = camera->GetProjectionMatrix();
+        Matrix wvp;
+        wvp = world_matrix;
         wvp_buffer->UpdateBuffer(&wvp);
     }
 }

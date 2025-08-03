@@ -28,7 +28,6 @@ class Camera : public Component, public IDrawCallReceiver
 
     bool BeginRender();
     void EndRender();
-    void ApplyCameraSettingToDxLib() const;
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
@@ -41,7 +40,6 @@ public:
 
     int Order() override;
     void OnAwake() override;
-    void OnUpdate() override;
     void OnInspectorGui() override;
     void OnDraw() override;
     void OnEnabled() override;

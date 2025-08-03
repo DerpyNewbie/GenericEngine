@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "render_texture.h"
 #include "application.h"
 #include "logger.h"
@@ -17,8 +19,8 @@ void RenderTexture::CreateBuffer()
     clearValue.Color[2] = 0.5f;
     clearValue.Color[3] = 0.5f;
 
-    width = g_app->WindowWidth();
-    height = g_app->WindowHeight();
+    width = Application::WindowWidth();
+    height = Application::WindowHeight();
 
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,

@@ -6,6 +6,8 @@
 #include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -15,7 +17,7 @@ std::weak_ptr<Camera> Camera::m_current_camera_;
 bool Camera::BeginRender()
 {
 
-    if (Main().lock() == shared_from_base<Camera>())
+    if (Main() == shared_from_base<Camera>())
     {
         g_RenderEngine->SetMainRenderTarget();
         return true;
@@ -30,7 +32,7 @@ bool Camera::BeginRender()
 
 void Camera::EndRender()
 {
-    if (Main().lock() == shared_from_base<Camera>())
+    if (Main() == shared_from_base<Camera>())
     {
         return;
     }
@@ -38,29 +40,10 @@ void Camera::EndRender()
     {
         render_tex->EndRender();
         g_RenderEngine->BeginRender();
-        g_RenderEngine->CommandList()->SetGraphicsRootSignature(g_RootSignatureManager.Get("Basic"));
-        auto &descriptor_heap_wrapped = g_DescriptorHeapManager.Get();
-        auto descriptor_heap = descriptor_heap_wrapped.GetHeap();
+        g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+        auto descriptor_heap = DescriptorHeap::GetHeap();
         g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     }
-}
-
-void Camera::ApplyCameraSettingToDxLib() const
-{
-    SetBackgroundColor(m_background_color_.R() * 255, m_background_color_.G() * 255, m_background_color_.B() * 255);
-    const auto t = GameObject()->Transform();
-
-    int x, y;
-    GetDrawScreenSize(&x, &y);
-    const float aspect = static_cast<float>(x) / static_cast<float>(y);
-    const auto proj = m_view_mode_ == kViewMode::kPerspective
-                          ? Matrix::CreatePerspectiveFieldOfView(m_field_of_view_ * Mathf::kDeg2Rad, aspect,
-                                                                 m_near_plane_, m_far_plane_)
-                          : Matrix::CreateOrthographic(m_ortho_size_, m_ortho_size_, m_near_plane_, m_far_plane_);
-    const auto view = Matrix::CreateLookAt(t->Position(), t->Position() + t->Forward(), t->Up());
-
-    SetupCamera_ProjectionMatrix(DxLibConverter::From(proj));
-    SetCameraViewMatrix(DxLibConverter::From(view));
 }
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
@@ -93,7 +76,7 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
 
 int Camera::Order()
 {
-    return Main().lock() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
+    return Main() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
 }
 
 void Camera::OnAwake()

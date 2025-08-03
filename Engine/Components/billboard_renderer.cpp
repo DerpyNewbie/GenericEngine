@@ -57,7 +57,7 @@ void engine::BillboardRenderer::OnDraw()
         const auto ibView = m_billboard_.index_buffer->View();
         auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
 
-        g_PSOManager.SetPipelineState(cmd_list, shader);
+        PSOManager::SetPipelineState(cmd_list, shader);
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmd_list->IASetVertexBuffers(0, 1, &vb_view);
         cmd_list->IASetIndexBuffer(&ibView);
@@ -69,7 +69,7 @@ void engine::BillboardRenderer::OnDraw()
     }
 }
 
-std::weak_ptr<engine::Transform> engine::BillboardRenderer::GetTransform()
+std::weak_ptr<engine::Transform> engine::BillboardRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
+#include "Components/camera.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -57,4 +58,5 @@ std::weak_ptr<Transform> TextRenderer::BoundsOrigin()
     return Camera::Current().lock()->GameObject()->Transform();
 }
 }
+
 CEREAL_REGISTER_TYPE(engine::TextRenderer)

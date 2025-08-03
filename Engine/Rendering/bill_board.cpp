@@ -3,7 +3,7 @@
 #include "game_object.h"
 #include "logger.h"
 #include "update_manager.h"
-#include "world_view_projection.h"
+#include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/RootSignature.h"
@@ -22,7 +22,7 @@ void BillBoard::OnDraw()
     //create vertex buffer
     if (!m_vertex_buffer_)
     {
-        std::array<Vertex, 4> vertices;
+        std::array<engine::Vertex, 4> vertices;
         vertices[0] = {Vector3(-5, -5, 0.0f), Color(1, 1, 1, 1)};
         vertices[1] = {Vector3(-5, 5, 0.0f), Color(1, 1, 1, 1)};
         vertices[2] = {Vector3(5, -5, 0.0f), Color(1, 1, 1, 1)};
@@ -81,13 +81,11 @@ void BillBoard::OnDraw()
     {
         if (!wvp_buffer)
         {
-            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(WorldViewProjection));
+            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
             wvp_buffer->CreateBuffer();
         }
-        WorldViewProjection wvp;
-        wvp.WVP[0] = world_matrix;
-        wvp.WVP[1] = camera->GetViewMatrix();
-        wvp.WVP[2] = camera->GetProjectionMatrix();
+        Matrix wvp;
+        wvp = world_matrix;
         wvp_buffer->UpdateBuffer(&wvp);
     }
 
@@ -98,7 +96,7 @@ void BillBoard::OnDraw()
     auto ibView = m_index_buffer_->View();
     auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
 
-    cmd_list->SetPipelineState(g_PSOManager.Get("Basic"));
+    cmd_list->SetPipelineState(PSOManager::Get("Basic"));
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
     cmd_list->IASetIndexBuffer(&ibView);

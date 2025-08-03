@@ -83,7 +83,7 @@ void Gizmos::Render()
     cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_handle_->HandleGPU);
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
-    cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);*/
+    cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);
 
     m_has_drawn_ = true;
 }

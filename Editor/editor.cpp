@@ -20,6 +20,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
 #include "Rendering/material.h"
+#include "Rendering/render_texture.h"
 
 #include <ranges>
 

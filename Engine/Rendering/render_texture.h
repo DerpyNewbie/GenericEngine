@@ -1,5 +1,4 @@
 #pragma once
-#include "object.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 

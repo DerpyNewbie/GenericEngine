@@ -19,7 +19,7 @@ public:
     void OnConstructed() override;
     void OnInspectorGui() override;
     void OnDraw() override;
-    std::weak_ptr<Transform> GetTransform() override;
+    std::weak_ptr<Transform> BoundsOrigin() override;
 
     template <class Archive>
     void serialize(Archive &ar)

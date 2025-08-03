@@ -6,7 +6,7 @@
 #include "Components/transform.h"
 #include "game_object.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/world_view_projection.h"
+#include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
@@ -28,14 +28,12 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 
 void SkinnedMeshRenderer::UpdateWVPBuffer()
 {
-    WorldViewProjection wvp;
+    ViewProjection wvp;
     const auto camera = Camera::Current();
 
-    wvp.WVP[0] = GameObject()->Transform()->Parent()->WorldMatrix();
-    wvp.WVP[1] = camera->GetViewMatrix();
-    wvp.WVP[2] = camera->GetProjectionMatrix();
+    wvp.matrices[0] = GameObject()->Transform()->Parent()->WorldMatrix();
 
-    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<WorldViewProjection>() = wvp;
+    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<ViewProjection>() = wvp;
 }
 
 void SkinnedMeshRenderer::DrawBones()

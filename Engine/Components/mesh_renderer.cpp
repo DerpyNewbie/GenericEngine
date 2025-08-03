@@ -8,21 +8,15 @@
 #include "game_object.h"
 #include "camera.h"
 #include "Rendering/material_data.h"
-#include "Rendering/world_view_projection.h"
+#include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
 void MeshRenderer::UpdateWVPBuffer()
 {
-    WorldViewProjection wvp;
-    const auto camera = Camera::Current();
-
-    wvp.WVP[0] = GameObject()->Transform()->WorldMatrix();
-    wvp.WVP[1] = camera->GetViewMatrix();
-    wvp.WVP[2] = camera->GetProjectionMatrix();
-
-    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<WorldViewProjection>() = wvp;
+    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<Matrix>() = GameObject()->Transform()->
+        WorldMatrix();
 }
 
 void MeshRenderer::RecalculateBoundingBox()
@@ -177,7 +171,7 @@ void MeshRenderer::ReconstructBuffer()
     {
         if (!wvp_buffer)
         {
-            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(WorldViewProjection));
+            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
             wvp_buffer->CreateBuffer();
         }
     }
