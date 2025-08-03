@@ -31,7 +31,7 @@ void SkinnedMeshRenderer::UpdateWVPBuffer()
     ViewProjection wvp;
     const auto camera = Camera::Current();
 
-    wvp.matrices[0] = GameObject()->Transform()->Parent()->WorldMatrix();
+    aaaaawvp.matrices[0] = GameObject()->Transform()->Parent()->WorldMatrix();
 
     *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<ViewProjection>() = wvp;
 }
@@ -101,7 +101,7 @@ void SkinnedMeshRenderer::OnDraw()
             PSOManager::SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
         cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, m_bone_matrix_buffers_[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
@@ -116,7 +116,7 @@ void SkinnedMeshRenderer::OnDraw()
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();
-            cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+            cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
             if (shader)
                 PSOManager::SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];

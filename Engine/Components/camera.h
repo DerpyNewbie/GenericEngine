@@ -2,6 +2,8 @@
 #include "component.h"
 #include "event_receivers.h"
 #include "renderer.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/render_texture.h"
 
@@ -28,6 +30,10 @@ class Camera : public Component, public IDrawCallReceiver
 
     bool BeginRender();
     void EndRender();
+
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
+
+    void SetViewProjMatrix();
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
 
 public:
@@ -40,6 +46,7 @@ public:
 
     int Order() override;
     void OnAwake() override;
+    void OnConstructed() override;
     void OnInspectorGui() override;
     void OnDraw() override;
     void OnEnabled() override;

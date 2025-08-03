@@ -162,7 +162,6 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
     {
         engine::Gui::SetObjectDragDropTarget(game_object);
-        ImGui::Text("Dragging %s", game_object->Path().c_str());
         ImGui::EndDragDropSource();
     }
 

@@ -6,8 +6,6 @@
 #include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -44,6 +42,20 @@ void Camera::EndRender()
         auto descriptor_heap = DescriptorHeap::GetHeap();
         g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     }
+}
+
+void Camera::SetViewProjMatrix()
+{
+    for (auto view_proj_matrix_buffer : m_view_proj_matrix_buffers_)
+    {
+        auto ptr = view_proj_matrix_buffer->GetPtr<ViewProjection>();
+        ptr->matrices[0] = GetViewMatrix();
+        ptr->matrices[1] = GetProjectionMatrix();
+    }
+    auto cmd_list = g_RenderEngine->CommandList();
+    auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
+    cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV,
+                                                m_view_proj_matrix_buffers_[current_buffer]->GetAddress());
 }
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
@@ -87,6 +99,15 @@ void Camera::OnAwake()
     }
 }
 
+void Camera::OnConstructed()
+{
+    for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_)
+    {
+        view_proj_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
+        view_proj_matrix_buffer->CreateBuffer();
+    }
+}
+
 void Camera::OnInspectorGui()
 {
     ImGui::SliderFloat("Field of View", &m_field_of_view_,
@@ -121,6 +142,7 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
+    SetViewProjMatrix();
     if (BeginRender())
     {
         m_current_camera_ = shared_from_base<Camera>();

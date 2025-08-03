@@ -45,10 +45,12 @@ IAssetPtr IAssetPtr::FromAssetDescriptor(const std::shared_ptr<AssetDescriptor> 
         AssetPtrType::kExternalReference
     };
 }
+
 xg::Guid IAssetPtr::Guid() const
 {
     return m_guid_;
 }
+
 std::shared_ptr<Object> IAssetPtr::Lock()
 {
     switch (m_type_)

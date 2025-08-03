@@ -29,8 +29,7 @@ protected:
         m_stored_reference_(shared_ptr),
         m_guid_(guid),
         m_type_(type)
-    {
-    }
+    {}
 
 public:
     static const xg::Guid kNullGuid;
@@ -77,22 +76,17 @@ private:
              const xg::Guid guid,
              const AssetPtrType type) :
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
-    {
-    }
+    {}
 
     AssetPtr(const IAssetPtr &ptr) : IAssetPtr(ptr)
-    {
-    }
+    {}
 
 public:
     AssetPtr() = default;
 
     std::shared_ptr<T> CastedLock()
     {
-        if (m_external_reference_.expired())
-            return nullptr;
-
-        return std::dynamic_pointer_cast<T>(m_external_reference_.lock());
+        return std::dynamic_pointer_cast<T>(Lock());
     }
 
     static AssetPtr FromIAssetPtr(IAssetPtr &ptr)

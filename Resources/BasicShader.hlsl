@@ -1,8 +1,11 @@
 cbuffer Transform : register(b0)
 {
-    float4x4 World; // ワールド行列
-    float4x4 View; // ビュー行列
-    float4x4 Proj; // 投影行列
+    float4x4 World;
+}
+cbuffer Transforms : register(b1)
+{
+    float4x4 View;
+    float4x4 Proj;
 }
 
 StructuredBuffer<float4x4> BoneMatrices : register(t0);

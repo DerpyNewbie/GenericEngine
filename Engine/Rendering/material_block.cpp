@@ -17,12 +17,6 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     {"float", [](const ShaderParameter &param) {
         return std::make_shared<MaterialData<float>>(0, param);
     }},
-    {"__WVP__", [](const ShaderParameter &param) {
-        auto wvp = ViewProjection{};
-        for (int i = 0; i < 3; ++i)
-            wvp.matrices[i] = Matrix::Identity;
-        return std::make_shared<MaterialData<ViewProjection>>(wvp, param);
-    }},
     {"vector<Matrix>", [](const ShaderParameter &param) {
         auto identity = std::vector{Matrix::Identity};
         return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);

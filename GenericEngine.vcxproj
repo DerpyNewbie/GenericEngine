@@ -257,7 +257,6 @@
         <Content Include="vcpkg.json"/>
     </ItemGroup>
     <ItemGroup>
-        <Folder Include="Engine\Rendering\CabotEngine\Engine\"/>
         <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">

@@ -109,7 +109,7 @@ void MeshRenderer::OnDraw()
             PSOManager::SetPipelineState(cmd_list, shader);
         auto ibView = index_buffers[0]->View();
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list, 0);
 
         cmd_list->DrawIndexedInstanced(shared_mesh->HasSubMeshes()
@@ -123,7 +123,7 @@ void MeshRenderer::OnDraw()
         if (material->IsValid())
         {
             shader = material->p_shared_shader.CastedLock();
-            cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV, wvp_buffers[current_buffer]->GetAddress());
+            cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffers[current_buffer]->GetAddress());
             if (shader)
                 PSOManager::SetPipelineState(cmd_list, shader);
             auto ib = index_buffers[i + 1];
@@ -167,12 +167,12 @@ void MeshRenderer::ReconstructBuffer()
         ReconstructMeshesBuffer();
     }
 
-    for (auto &wvp_buffer : wvp_buffers)
+    for (auto &world_matrix_buffer : world_matrix_buffers)
     {
-        if (!wvp_buffer)
+        if (!world_matrix_buffer)
         {
-            wvp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-            wvp_buffer->CreateBuffer();
+            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+            world_matrix_buffer->CreateBuffer();
         }
     }
 }
@@ -267,14 +267,13 @@ void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int m
             }
 
             // +2 for engine pre-defined shader variables
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 2;
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 3;
             const auto itr = material_block->Begin(shader_type, param_type);
             const auto desc_handle = itr->handle->HandleGPU;
             cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
         }
     }
 }
-
 }
 
 CEREAL_REGISTER_TYPE(engine::MeshRenderer)
