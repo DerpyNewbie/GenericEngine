@@ -121,6 +121,11 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
             skinned_mesh_renderer->shared_materials = materials;
             skinned_mesh_renderer->transforms = bone_transforms;
             skinned_mesh_renderer->root_bone = AssetPtr<Transform>::FromManaged(root_bone);
+            skinned_mesh_renderer->inverted_bind_poses.resize(result_mesh->bind_poses.size());
+            for (int i = 0; i < result_mesh->bind_poses.size(); ++i)
+            {
+                skinned_mesh_renderer->inverted_bind_poses[i] = result_mesh->bind_poses[i].Invert();
+            }
         }
         else
         {

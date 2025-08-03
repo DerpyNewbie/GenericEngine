@@ -12,18 +12,20 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    std::weak_ptr<Transform> BoundsOrigin() override;
+    std::shared_ptr<Transform> BoundsOrigin() override;
 
 protected:
-    bool m_draw_bounds_ = false;
+    static bool m_draw_bounds_;
 
-    std::shared_ptr<Mesh> shared_mesh;
-    std::shared_ptr<VertexBuffer> vertex_buffer;
-    std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> world_matrix_buffers;
+    std::shared_ptr<Mesh> m_shared_mesh_;
+    std::shared_ptr<VertexBuffer> m_vertex_buffer_;
+    std::vector<std::shared_ptr<IndexBuffer>> m_index_buffers_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_world_matrix_buffers_;
 
     virtual void ReconstructBuffer();
-    virtual void UpdateWVPBuffer();
+    virtual Matrix WorldMatrix();
+
+    void UpdateWorldBuffer();
 
     void DrawBounds();
     void RecalculateBoundingBox();
@@ -38,11 +40,11 @@ public:
     void OnInspectorGui() override;
     void OnDraw() override;
 
-    void SetSharedMesh(std::shared_ptr<Mesh> mesh);
+    void SetSharedMesh(const std::shared_ptr<Mesh> &mesh);
 
     std::shared_ptr<Mesh> GetSharedMesh()
     {
-        return shared_mesh;
+        return m_shared_mesh_;
     }
 
     virtual void UpdateBuffers();
@@ -50,7 +52,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(shared_mesh), CEREAL_NVP(shared_materials));
+        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_shared_mesh_), CEREAL_NVP(shared_materials));
     }
 };
 }

@@ -44,23 +44,18 @@ void LineRenderer::OnDraw()
     const Matrix view = camera->GetViewMatrix();
     const Matrix proj = camera->GetProjectionMatrix();
 
-    for (auto &vp_buffer : m_view_projection_buffers_)
-    {
-        auto ptr = vp_buffer->GetPtr<Matrix>();
-        ptr[0] = view;
-        ptr[1] = proj;
-    }
+    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto &view_projection_buffer = m_view_projection_buffers_[current_buffer_idx];
+    const auto view_projection = view_projection_buffer->GetPtr<Matrix>();
+    view_projection[0] = view;
+    view_projection[1] = proj;
 
-    auto cmd_list = g_RenderEngine->CommandList();
-    auto currentIndex = g_RenderEngine->CurrentBackBufferIndex();
-    auto vbView = m_vertex_buffer_->View();
-    auto ibView = m_index_buffer_->View();
-
+    const auto cmd_list = g_RenderEngine->CommandList();
     cmd_list->SetPipelineState(PSOManager::Get("Line"));
-    cmd_list->SetGraphicsRootConstantBufferView(0, m_view_projection_buffers_[currentIndex]->GetAddress());
+    cmd_list->SetGraphicsRootConstantBufferView(0, view_projection_buffer->GetAddress());
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);
-    cmd_list->IASetVertexBuffers(0, 1, &vbView);
-    cmd_list->IASetIndexBuffer(&ibView);
+    cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
+    cmd_list->IASetIndexBuffer(m_index_buffer_->View());
     cmd_list->DrawIndexedInstanced(m_num_indices_, 1, 0, 0, 0);
 }
 }

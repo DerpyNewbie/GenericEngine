@@ -52,7 +52,7 @@ void TextRenderer::OnDraw()
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
 }
 
-std::weak_ptr<Transform> TextRenderer::BoundsOrigin()
+std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
 }
