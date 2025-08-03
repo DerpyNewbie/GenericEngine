@@ -14,14 +14,12 @@ void Transform::OnInspectorGui()
 
 Matrix Transform::LocalMatrix() const
 {
-    return m_matrix_;
+    return m_local_matrix_;
 }
 
 Matrix Transform::WorldMatrix() const
 {
-    return m_parent_.expired()
-               ? m_matrix_
-               : m_matrix_ * m_parent_.lock()->WorldMatrix();
+    return m_world_matrix_;
 }
 
 Matrix Transform::WorldToLocal() const
@@ -137,6 +135,7 @@ void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
         parent->m_children_.emplace_back(shared_from_base<Transform>());
     }
 
+    RecalculateWorldMatrix();
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
 
@@ -208,13 +207,14 @@ void Transform::SetLocalScale(const Vector3 &local_scale)
 
 void Transform::SetLocalMatrix(const Matrix &matrix)
 {
-    m_matrix_ = matrix;
+    m_local_matrix_ = matrix;
+    RecalculateWorldMatrix();
 }
 
 void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
 {
-    m_matrix_ = Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) *
-                Matrix::CreateTranslation(position);
+    SetLocalMatrix(
+        Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) * Matrix::CreateTranslation(position));
 }
 
 void Transform::RenderLocalTransformGui()
@@ -288,6 +288,24 @@ void Transform::RenderGlobalTransformGui()
     }
 
     ImGui::PopID();
+}
+
+void Transform::RecalculateWorldMatrix()
+{
+    const auto parent = m_parent_.lock();
+    if (parent == nullptr)
+    {
+        m_world_matrix_ = m_local_matrix_;
+    }
+    else
+    {
+        m_world_matrix_ = m_local_matrix_ * parent->WorldMatrix();
+    }
+
+    for (const auto child : m_children_)
+    {
+        child->RecalculateWorldMatrix();
+    }
 }
 
 void Transform::OnDestroy()
