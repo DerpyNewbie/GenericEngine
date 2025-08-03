@@ -66,6 +66,14 @@
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
+        <ClCompile Include="Engine\Physics\bullet_debug_drawer.cpp"/>
+        <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\collider.cpp"/>
+        <ClCompile Include="Engine\Physics\box_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\physics.cpp"/>
+        <ClCompile Include="Engine\Physics\plane_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\rigidbody_component.cpp"/>
+        <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
@@ -203,6 +211,14 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\Physics\bullet_debug_drawer.h"/>
+        <ClInclude Include="Engine\Physics\capsule_collider.h"/>
+        <ClInclude Include="Engine\Physics\collider.h"/>
+        <ClInclude Include="Engine\Physics\box_collider.h"/>
+        <ClInclude Include="Engine\Physics\physics.h"/>
+        <ClInclude Include="Engine\Physics\plane_collider.h"/>
+        <ClInclude Include="Engine\Physics\rigidbody_component.h"/>
+        <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
@@ -279,7 +295,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -301,7 +317,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -323,7 +339,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -346,7 +362,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>

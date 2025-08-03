@@ -4,6 +4,11 @@ namespace engine
 {
 class GameObject;
 
+struct Collision
+{
+    GameObject *other;
+};
+
 class Component : public Object
 {
 private:
@@ -34,6 +39,15 @@ public:
     {}
 
     virtual void OnRender()
+    {}
+
+    virtual void OnCollisionEnter(const Collision &collision)
+    {}
+
+    virtual void OnCollisionStay(const Collision &collision)
+    {}
+
+    virtual void OnCollisionExit(const Collision &collision)
     {}
 
     virtual void OnInspectorGui();

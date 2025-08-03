@@ -7,6 +7,7 @@ class EditorPrefs final : public EditorWindow
 {
 public:
     static bool show_grid;
+    static bool show_physics_debug;
     static int theme;
 
     std::string Name() override;

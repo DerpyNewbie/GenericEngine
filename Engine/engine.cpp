@@ -19,6 +19,7 @@
 #include "Rendering/gizmos.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "input.h"
+#include "Physics/physics.h"
 
 namespace engine
 {
@@ -36,6 +37,7 @@ bool Engine::Init()
     }
 
     Gizmos::Init();
+    Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
     AssetDatabase::Init();
