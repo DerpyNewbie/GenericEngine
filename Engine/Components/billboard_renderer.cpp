@@ -23,7 +23,7 @@ void engine::BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cm
             }
 
             // +2 for engine pre-defined shader variables
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 2;
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 3;
             const auto itr = material_block->Begin(shader_type, param_type);
             const auto desc_handle = itr->handle->HandleGPU;
             cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
@@ -61,7 +61,7 @@ void engine::BillboardRenderer::OnDraw()
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmd_list->IASetVertexBuffers(0, 1, &vb_view);
         cmd_list->IASetIndexBuffer(&ibView);
-        cmd_list->SetGraphicsRootConstantBufferView(kWVPCBV,
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV,
                                                     m_billboard_.wvp_buffers[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list);
 

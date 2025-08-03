@@ -1,5 +1,7 @@
 {
     "guid": "bc765414-7e84-4aec-b970-bb1daa170511",
     "type": ".hlsl",
-    "data": {}
+    "data": {
+        "shader_meta": "{\"parameters\":{\"vertex\":[],\"pixel\":[{\"name\":\"Albedo\",\"type\":\"Texture2D\"}]}}"
+    }
 }

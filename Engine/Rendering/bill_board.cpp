@@ -100,7 +100,7 @@ void BillBoard::OnDraw()
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
     cmd_list->IASetIndexBuffer(&ibView);
-    cmd_list->SetGraphicsRootConstantBufferView(engine::kWVPCBV, m_wvp_buffers_[current_buffer]->GetAddress());
+    cmd_list->SetGraphicsRootConstantBufferView(engine::kWorldCBV, m_wvp_buffers_[current_buffer]->GetAddress());
 
     cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }

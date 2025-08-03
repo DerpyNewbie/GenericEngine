@@ -7,15 +7,13 @@
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
 #include "camera.h"
-#include "Rendering/material_data.h"
-#include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
 void MeshRenderer::UpdateWVPBuffer()
 {
-    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<Matrix>() = GameObject()->Transform()->
+    *world_matrix_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<Matrix>() = GameObject()->Transform()->
         WorldMatrix();
 }
 

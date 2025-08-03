@@ -28,12 +28,8 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 
 void SkinnedMeshRenderer::UpdateWVPBuffer()
 {
-    ViewProjection wvp;
-    const auto camera = Camera::Current();
-
-    aaaaawvp.matrices[0] = GameObject()->Transform()->Parent()->WorldMatrix();
-
-    *wvp_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<ViewProjection>() = wvp;
+    *world_matrix_buffers[g_RenderEngine->CurrentBackBufferIndex()]->GetPtr<Matrix>() = GameObject()->Transform()->
+        Parent()->WorldMatrix();
 }
 
 void SkinnedMeshRenderer::DrawBones()

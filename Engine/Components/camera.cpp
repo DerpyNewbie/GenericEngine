@@ -6,6 +6,9 @@
 #include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/view_projection.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace engine
 {
@@ -14,7 +17,6 @@ std::weak_ptr<Camera> Camera::m_current_camera_;
 
 bool Camera::BeginRender()
 {
-
     if (Main() == shared_from_base<Camera>())
     {
         g_RenderEngine->SetMainRenderTarget();
@@ -37,10 +39,6 @@ void Camera::EndRender()
     if (auto render_tex = render_texture.CastedLock())
     {
         render_tex->EndRender();
-        g_RenderEngine->BeginRender();
-        g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-        auto descriptor_heap = DescriptorHeap::GetHeap();
-        g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
     }
 }
 
@@ -142,9 +140,9 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    SetViewProjMatrix();
     if (BeginRender())
     {
+        SetViewProjMatrix();
         m_current_camera_ = shared_from_base<Camera>();
         m_drawcall_count_ = 0;
         auto objects_in_view = FilterVisibleObjects(Renderer::renderers);

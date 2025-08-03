@@ -165,8 +165,6 @@ void Editor::OnDraw()
 
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
-    if (EditorPrefs::show_grid)
-        DxLibHelper::DrawYPlaneGrid();
 
     for (const auto &window : m_editor_windows_ | std::views::values)
     {

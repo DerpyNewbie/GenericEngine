@@ -73,6 +73,7 @@ void Engine::MainLoop() const
         Profiler::End("Update");
 
         Profiler::Begin("Draw Call");
+        Gizmos::ClearVertices();
         g_RenderEngine->BeginRender();
         UpdateManager::InvokeDrawCall();
         g_RenderEngine->EndRender();

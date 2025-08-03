@@ -104,9 +104,12 @@ void RenderEngine::SetMainRenderTarget()
 
     // 深度ステンシルビューをクリア
     m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
+    auto descriptor_heap = DescriptorHeap::GetHeap();
+    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
-void RenderEngine::SetRenderTarget(ID3D12Resource *render_target, ID3D12DescriptorHeap *rtv_heap) const
+void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
@@ -131,21 +134,6 @@ void RenderEngine::SetRenderTarget(ID3D12Resource *render_target, ID3D12Descript
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
     auto descriptor_heap = DescriptorHeap::GetHeap();
     g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
-}
-
-void RenderEngine::ExecuteCommandList()
-{
-    // コマンドの記録を終了
-    m_pCommandList->Close();
-
-    // コマンドを実行
-    ID3D12CommandList *ppCmdLists[] = {m_pCommandList.Get()};
-    m_pQueue->ExecuteCommandLists(1, ppCmdLists);
-
-    engine::FontData::GraphicsMemory()->Commit(m_pQueue.Get());
-
-    // 描画完了を待つ
-    WaitRender();
 }
 
 void RenderEngine::EndRender()

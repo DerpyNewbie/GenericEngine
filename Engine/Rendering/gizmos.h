@@ -5,6 +5,8 @@
 #include "CabotEngine/Graphics/VertexBuffer.h"
 #include "Components/renderer.h"
 
+#include <DxLib.h>
+
 namespace engine
 {
 using namespace DirectX::SimpleMath;
@@ -28,7 +30,6 @@ class Gizmos
     std::shared_ptr<DescriptorHandle> m_desc_handle_;
 
     static void Init();
-    static void ClearVertices();
     static void PreDrawCheck();
 
 public:
@@ -36,6 +37,7 @@ public:
 
     static void Render();
 
+    static void ClearVertices();
     static void DrawLine(const Vector3 &start, const Vector3 &end, const Color &color = kDefaultColor);
     static void DrawLines(const std::vector<Vector3> &line, const Color &color = kDefaultColor);
     static void DrawCircle(const Vector3 &center, float radius, const Color &color = kDefaultColor,
@@ -43,5 +45,6 @@ public:
     static void DrawSphere(const Vector3 &center, float radius, const Color &color = kDefaultColor, int segments = 16);
     static void DrawBounds(const DirectX::BoundingBox &bounds, const Color &color = kDefaultColor,
                            const Matrix &mat = DirectX::XMMatrixIdentity());
+    static void DrawYPlaneGrid(FLOAT2 spacing = {50, 50}, int count = 50);
 };
 }

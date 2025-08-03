@@ -7,6 +7,9 @@
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/camera.h"
+#include "DxLib/dxlib_helper.h"
+#include "Editor/editor.h"
+#include "Editor/editor_prefs.h"
 
 namespace engine
 {
@@ -43,6 +46,12 @@ void Gizmos::Render()
 {
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
 
+    if (editor::EditorPrefs::show_grid)
+    {
+        DrawYPlaneGrid();
+    }
+
+    auto a = m_vertices_.size();
     if (m_vertices_.empty())
         return;
 
@@ -66,9 +75,12 @@ void Gizmos::Render()
     mat[1] = camera->GetProjectionMatrix();
     constant_buffer->UpdateBuffer(mat);
 
-    const auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
-    m_instance_->m_vertex_buffers_[buffer_index] = std::make_shared<VertexBuffer>(
-        m_vertices_.size(), m_vertices_.data());
+    auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
+
+    if (!m_has_drawn_)
+        m_instance_->m_vertex_buffers_[buffer_index] = std::make_shared<VertexBuffer>(
+            m_vertices_.size(), m_vertices_.data());
+
     const auto &vertex_buffer = m_instance_->m_vertex_buffers_[buffer_index];
     if (!vertex_buffer->IsValid())
     {
@@ -90,18 +102,22 @@ void Gizmos::Render()
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)
 {
-    PreDrawCheck();
+    if (m_has_drawn_)
+        return;
 
     Vertex vert_start{start, color};
     Vertex vert_end{end, color};
 
+    auto buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
     m_vertices_.emplace_back(vert_start);
     m_vertices_.emplace_back(vert_end);
+    auto a = m_vertices_.size();
 }
 
 void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
 {
-    PreDrawCheck();
+    if (m_has_drawn_)
+        return;
 
     for (size_t i = 0; i < line.size() - 1; i++)
     {
@@ -112,7 +128,8 @@ void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
 void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &color,
                         const Quaternion &rotation, const int segments)
 {
-    PreDrawCheck();
+    if (m_has_drawn_)
+        return;
 
     std::vector<Vector3> circle(segments);
     for (auto i = 0; i < segments; i++)
@@ -132,7 +149,8 @@ void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &
 
 void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &color, const int segments)
 {
-    PreDrawCheck();
+    if (m_has_drawn_)
+        return;
 
     for (int i = 0; i < segments; i++)
     {
@@ -147,7 +165,8 @@ void Gizmos::DrawSphere(const Vector3 &center, const float radius, const Color &
 
 void Gizmos::DrawBounds(const DirectX::BoundingBox &bounds, const Color &color, const Matrix &mat)
 {
-    PreDrawCheck();
+    if (m_has_drawn_)
+        return;
 
     Vector3 local[8] = {
         bounds.Center + Vector3(-bounds.Extents.x, -bounds.Extents.y, -bounds.Extents.z),
@@ -170,5 +189,50 @@ void Gizmos::DrawBounds(const DirectX::BoundingBox &bounds, const Color &color, 
     };
     for (auto &p : e)
         DrawLine(local[p[0]], local[p[1]], color);
+}
+
+void Gizmos::DrawYPlaneGrid(const FLOAT2 spacing, const int count)
+{
+    const MATRIX camera_view_matrix = MInverse(GetCameraViewMatrix());
+    const auto [cam_x, cam_y, cam_z] = VTransform({0, 0, 0}, camera_view_matrix);
+    const int half_count = count / 2;
+    const int center_x_index = static_cast<int>(cam_x / spacing.u);
+    const int center_z_index = static_cast<int>(cam_z / spacing.v);
+    const int max_x = center_x_index + half_count;
+    const int min_x = center_x_index - half_count;
+    const int max_z = center_z_index + half_count;
+    const int min_z = center_z_index - half_count;
+
+    const float x_end = spacing.u * static_cast<float>(min_x);
+    const float z_end = spacing.v * static_cast<float>(min_z);
+
+    constexpr auto color_default = Color(0.6F, 0.6F, 0.6F, 1.0F);
+    constexpr auto color_z = Color(0.6F, 0.6F, 1.0F, 1.0F);
+    constexpr auto color_x = Color(1.0F, 0.6F, 0.6F, 1.0F);
+    constexpr auto color_y = Color(0.6F, 1.0F, 0.6F, 1.0F);
+
+    for (int z = min_z; z < max_z; ++z)
+    {
+        for (int x = min_x; x < max_x; ++x)
+        {
+            const auto dx = spacing.u * static_cast<float>(x);
+            const auto dz = spacing.v * static_cast<float>(z);
+
+            const Vector3 z_line_begin = {dx, 0, dz};
+            const Vector3 z_line_end = {dx, 0, z_end};
+
+            const Vector3 x_line_begin = {dx, 0, dz};
+            const Vector3 x_line_end = {x_end, 0, dz};
+
+            DrawLine(z_line_begin, z_line_end, x % 5 == 0 ? color_z : color_default);
+
+            DrawLine(x_line_begin, x_line_end, z % 5 == 0 ? color_x : color_default);
+
+            if (x % 5 == 0 && z % 5 == 0)
+            {
+                DrawLine({dx, 0, dz}, {dx, cam_y, dz}, color_y);
+            }
+        }
+    }
 }
 }

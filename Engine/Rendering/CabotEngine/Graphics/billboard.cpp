@@ -45,7 +45,7 @@ void Billboard::Update()
         }
     }
 
-    const auto camera = engine::Camera::Current().lock();
+    const auto camera = engine::Camera::Main();
     if (camera == nullptr)
     {
         engine::Logger::Error<Billboard>("Main Camera is not set!");
