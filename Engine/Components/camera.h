@@ -7,35 +7,58 @@
 
 namespace engine
 {
+enum class kViewMode : unsigned char
+{
+    kPerspective,
+    kOrthographic
+};
+
+struct CameraProperty : Inspectable
+{
+    static constexpr float kMinFieldOfView = 1.0f;
+    static constexpr float kMaxFieldOfView = 179.0f;
+    static constexpr float kMinClippingPlane = 0.01f;
+    static constexpr float kMaxClippingPlane = 10000.0f;
+
+    kViewMode view_mode = kViewMode::kPerspective;
+    float field_of_view = 70;
+    float near_plane = 0.1;
+    float far_plane = 1000;
+    float ortho_size = 50;
+    float aspect_ratio = 16.0f / 9.0f;
+    Color background_color = Color(0x1A1A1AFF);
+
+    void OnInspectorGui() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(CEREAL_NVP(view_mode),
+           CEREAL_NVP(field_of_view),
+           CEREAL_NVP(near_plane),
+           CEREAL_NVP(far_plane),
+           CEREAL_NVP(ortho_size),
+           CEREAL_NVP(aspect_ratio),
+           CEREAL_NVP(background_color));
+    }
+};
+
 class Camera : public Component, public IDrawCallReceiver
 {
-    enum class kViewMode : unsigned char
-    {
-        kPerspective,
-        kOrthographic
-    };
-
     static std::weak_ptr<Camera> m_main_camera_;
 
-    kViewMode m_view_mode_ = kViewMode::kPerspective;
-    float m_field_of_view_ = 70;
-    float m_near_plane_ = 0.1f;
-    float m_far_plane_ = 1000.0f;
-    float m_ortho_size_ = 50;
-    Color m_background_color_ = Color(0x1A1A1AFF);
+    CameraProperty m_property_;
+
     UINT m_drawcall_count_ = 0;
 
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
 
-    void SetViewProjMatrix();
-    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(const std::vector<std::weak_ptr<Renderer>> &renderers);
+    void SetViewProjMatrix() const;
+
+    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
+        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
 
 public:
-    static constexpr float min_field_of_view = 1.0f;
-    static constexpr float max_field_of_view = 179.0f;
-    static constexpr float min_clipping_plane = 0.01f;
-    static constexpr float max_clipping_plane = 10000.0f;
-
     void OnAwake() override;
     void OnConstructed() override;
     void OnInspectorGui() override;
@@ -45,19 +68,14 @@ public:
 
     static std::shared_ptr<Camera> Main();
 
-    Matrix GetViewMatrix() const;
-    Matrix GetProjectionMatrix() const;
+    [[nodiscard]] Matrix GetViewMatrix() const;
+    [[nodiscard]] Matrix GetProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_view_mode_),
-           CEREAL_NVP(m_field_of_view_),
-           CEREAL_NVP(m_ortho_size_),
-           CEREAL_NVP(m_near_plane_),
-           CEREAL_NVP(m_far_plane_),
-           CEREAL_NVP(m_background_color_));
+           CEREAL_NVP(m_property_));
     }
 };
 }

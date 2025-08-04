@@ -17,6 +17,6 @@ public:
     void OnInspectorGui() override;
     void OnDraw() override;
 
-    std::weak_ptr<Transform> BoundsOrigin() override;
+    std::shared_ptr<Transform> BoundsOrigin() override;
 };
 }

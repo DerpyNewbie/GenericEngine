@@ -4,7 +4,7 @@
 
 namespace engine
 {
-std::vector<std::weak_ptr<Renderer>> Renderer::renderers;
+std::vector<std::weak_ptr<Renderer>> Renderer::m_renderers_;
 
 void Renderer::SetVisible(const bool visible)
 {
@@ -17,16 +17,16 @@ void Renderer::SetVisible(const bool visible)
 
     if (m_is_visible_)
     {
-        renderers.emplace_back(shared_from_base<Renderer>());
+        m_renderers_.emplace_back(shared_from_base<Renderer>());
     }
     else
     {
-        const auto pos = std::ranges::find_if(renderers, [&](const auto &r) {
+        const auto pos = std::ranges::find_if(m_renderers_, [&](const auto &r) {
             return r.lock() == shared_from_base<Renderer>();
         });
-        if (pos == renderers.end())
+        if (pos == m_renderers_.end())
             return;
-        renderers.erase(pos);
+        m_renderers_.erase(pos);
     }
 }
 
