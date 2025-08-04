@@ -33,8 +33,8 @@ void engine::StructuredBuffer::CreateBuffer()
         IID_PPV_ARGS(&m_pUploadBuffer)
         );
 
-    m_pDefaultBuffer->SetName(L"Default");
-    m_pUploadBuffer->SetName(L"Upload");
+    m_pDefaultBuffer->SetName(L"StructuredBuffer_Default");
+    m_pUploadBuffer->SetName(L"StructuredBuffer_Upload");
 
     if (FAILED(hr))
     {

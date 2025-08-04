@@ -171,9 +171,9 @@ std::shared_ptr<Camera> Camera::Main()
     return m_main_camera_.lock();
 }
 
-std::weak_ptr<Camera> Camera::Current()
+std::shared_ptr<Camera> Camera::Current()
 {
-    return m_current_camera_;
+    return m_current_camera_.lock();
 }
 
 Matrix Camera::GetViewMatrix() const

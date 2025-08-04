@@ -396,7 +396,7 @@ bool RenderEngine::CreateDepthStencil()
         IID_PPV_ARGS(m_pDepthStencilBuffer.ReleaseAndGetAddressOf())
         );
 
-    m_pDepthStencilBuffer->SetName(L"DepthStencil");
+    m_pDepthStencilBuffer->SetName(L"DepthStencilBuffer");
 
     if (FAILED(hr))
     {

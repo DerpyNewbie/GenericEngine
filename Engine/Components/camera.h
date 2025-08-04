@@ -20,6 +20,7 @@ class Camera : public Component, public IDrawCallReceiver
     static std::weak_ptr<Camera> m_main_camera_;
     static std::weak_ptr<Camera> m_current_camera_;
 
+    AssetPtr<RenderTexture> render_texture;
     kViewMode m_view_mode_ = kViewMode::kPerspective;
     float m_field_of_view_ = 70;
     float m_near_plane_ = 0.1f;
@@ -42,8 +43,6 @@ public:
     static constexpr float min_clipping_plane = 0.01f;
     static constexpr float max_clipping_plane = 10000.0f;
 
-    AssetPtr<RenderTexture> render_texture;
-
     int Order() override;
     void OnAwake() override;
     void OnConstructed() override;
@@ -53,7 +52,7 @@ public:
     void OnDisabled() override;
 
     static std::shared_ptr<Camera> Main();
-    static std::weak_ptr<Camera> Current();
+    static std::shared_ptr<Camera> Current();
 
     Matrix GetViewMatrix() const;
     Matrix GetProjectionMatrix() const;

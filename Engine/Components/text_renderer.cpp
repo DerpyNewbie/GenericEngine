@@ -55,7 +55,7 @@ void TextRenderer::OnDraw()
 
 std::weak_ptr<Transform> TextRenderer::BoundsOrigin()
 {
-    return Camera::Current().lock()->GameObject()->Transform();
+    return Camera::Current()->GameObject()->Transform();
 }
 }
 

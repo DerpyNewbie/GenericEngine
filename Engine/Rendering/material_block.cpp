@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "material_block.h"
 #include "material_data.h"
-#include "view_projection.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
 namespace

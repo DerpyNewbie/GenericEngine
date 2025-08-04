@@ -69,7 +69,6 @@
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
-        <ClCompile Include="Engine\Rendering\bill_board.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
@@ -212,7 +211,6 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
-        <ClInclude Include="Engine\Rendering\bill_board.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>

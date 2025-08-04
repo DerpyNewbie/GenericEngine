@@ -55,7 +55,7 @@ void Gizmos::Render()
     if (m_vertices_.empty())
         return;
 
-    const auto camera = Camera::Current().lock();
+    const auto camera = Camera::Current();
     if (camera == nullptr)
     {
         Logger::Error<Gizmos>("Main Camera is not set!");

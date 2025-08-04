@@ -11,8 +11,6 @@
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 #include "Editor/editor.h"
-#include "Rendering/font_data.h"
-#include "Rendering/bill_board.h"
 
 std::shared_ptr<Application> Application::m_instance_;
 std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;

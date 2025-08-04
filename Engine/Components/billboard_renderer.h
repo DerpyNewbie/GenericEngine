@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "renderer.h"
 #include "Rendering/CabotEngine/Graphics/billboard.h"
 

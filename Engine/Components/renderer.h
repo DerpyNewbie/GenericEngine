@@ -1,7 +1,6 @@
 #pragma once
 #include "component.h"
 #include "transform.h"
-#include "event_receivers.h"
 
 namespace engine
 {

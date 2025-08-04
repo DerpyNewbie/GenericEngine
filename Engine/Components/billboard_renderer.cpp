@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "billboard_renderer.h"
 #include "game_object.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
