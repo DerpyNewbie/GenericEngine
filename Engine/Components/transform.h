@@ -5,12 +5,14 @@ namespace engine
 {
 class Transform : public Component
 {
-    Matrix m_matrix_ = Matrix::Identity;
+    Matrix m_local_matrix_ = Matrix::Identity;
+    Matrix m_world_matrix_ = Matrix::Identity;
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
     void RenderLocalTransformGui();
     void RenderGlobalTransformGui();
+    void RecalculateWorldMatrix();
 
 public:
     void OnDestroy() override;
@@ -81,7 +83,7 @@ public:
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_matrix_),
+           CEREAL_NVP(m_local_matrix_),
            CEREAL_NVP(m_parent_),
            CEREAL_NVP(m_children_));
     }
