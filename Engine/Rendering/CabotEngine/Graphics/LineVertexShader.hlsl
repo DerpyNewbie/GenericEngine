@@ -1,4 +1,4 @@
-cbuffer Transform : register(b1)
+cbuffer Transform : register(b2)
 {
     float4x4 View;
     float4x4 Proj;
