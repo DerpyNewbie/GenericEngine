@@ -2,6 +2,7 @@
 
 #include "transform.h"
 #include "game_object.h"
+#include "scene.h"
 
 namespace engine
 {
@@ -90,6 +91,24 @@ std::shared_ptr<Transform> Transform::GetChild(const int i) const
     return m_children_.at(i);
 }
 
+int Transform::GetSiblingIndex() const
+{
+    const auto parent = Parent();
+    if (parent == nullptr)
+    {
+        auto root_objects = GameObject()->Scene()->RootGameObjects();
+        const auto itr = std::ranges::find(root_objects, GameObject());
+        return std::distance(root_objects.begin(), itr);
+    }
+
+    auto children = parent->m_children_;
+    auto guid = Guid();
+    const auto itr = std::ranges::find_if(children, [&guid](auto &other) {
+        return other->Guid() == guid;
+    });
+    return std::distance(children.begin(), itr);
+}
+
 bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const bool deep) const
 {
     auto parent = m_parent_.lock();
@@ -137,6 +156,63 @@ void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
 
     RecalculateWorldMatrix();
     GameObject()->SetAsRootObject(m_parent_.expired());
+}
+
+void Transform::SetSiblingIndex(const int index)
+{
+    const auto parent = Parent();
+    if (parent == nullptr)
+    {
+        const auto game_object = GameObject();
+        const auto scene = GameObject()->Scene();
+        auto &root_objects = scene->m_root_game_objects_;;
+        std::erase(root_objects, game_object);
+        if (index <= 0)
+        {
+            root_objects.insert(root_objects.begin(), game_object);
+            return;
+        }
+
+        if (root_objects.size() < index)
+        {
+            root_objects.emplace_back(game_object);
+            return;
+        }
+
+        root_objects.insert(root_objects.begin() + index, game_object);
+        return;
+    }
+
+    const auto transform = shared_from_base<Transform>();
+    auto &children = parent->m_children_;
+    auto guid = Guid();
+    std::erase_if(children, [&guid](auto &other) {
+        return other->Guid() == guid;
+    });
+
+    if (index <= 0)
+    {
+        children.insert(children.begin(), transform);
+        return;
+    }
+
+    if (children.size() < index)
+    {
+        children.emplace_back(transform);
+        return;
+    }
+
+    children.insert(children.begin() + index, transform);
+}
+
+void Transform::SetAsFirstSibling()
+{
+    SetSiblingIndex(0);
+}
+
+void Transform::SetAsLastSibling()
+{
+    SetSiblingIndex(INT_MAX);
 }
 
 void Transform::SetPosition(const Vector3 &position)

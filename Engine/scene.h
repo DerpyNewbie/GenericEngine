@@ -7,6 +7,8 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
 {
     friend class GameObject;
     friend class SceneManager;
+    friend class Transform;
+
     std::vector<std::shared_ptr<GameObject>> m_root_game_objects_;
     std::vector<std::shared_ptr<GameObject>> m_all_game_objects_;
     bool m_has_destroying_game_object_ = false;
