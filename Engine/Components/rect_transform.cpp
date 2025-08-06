@@ -2,9 +2,42 @@
 #include "rect_transform.h"
 
 #include "engine_util.h"
+#include "game_object.h"
 
 namespace engine
 {
+void RectTransform::OnAwake()
+{
+    std::shared_ptr<RectTransform> rect_transform = shared_from_base<RectTransform>();
+    std::shared_ptr<Transform> transform;
+
+    UINT itr = 0;
+    bool find = false;
+    for (size_t i = 0; i < GameObject()->m_components_.size(); ++i)
+    {
+        auto &component = GameObject()->m_components_[i];
+        transform = std::dynamic_pointer_cast<Transform>(component);
+        if (transform)
+        {
+            itr = i;
+            find = true;
+            break;
+        }
+    }
+    if (!find)
+    {
+        return;
+    }
+
+    rect_transform->m_parent_ = transform->Parent();
+    for (int i = 0; i < transform->ChildCount(); ++i)
+    {
+        rect_transform->m_children_[i] = GameObject()->Transform()->GetChild(i);
+    }
+    GameObject()->m_components_[itr] = rect_transform;
+
+}
+
 void RectTransform::OnInspectorGui()
 {
     float anc_min[2], anc_max[2];
@@ -42,17 +75,12 @@ void RectTransform::OnInspectorGui()
     }
 }
 
-void RectTransform::SetParent(std::shared_ptr<RectTransform> parent)
+Rect RectTransform::CalculateScreenRect() const
 {
-    m_parent_ = parent;
-}
-
-Rect RectTransform::CalculateScreenRect(Vector2 canvas_size) const
-{
-    Vector2 parentSize = canvas_size;
-    if (auto parent = m_parent_.lock())
+    Vector2 parentSize = Vector2::Zero;
+    if (auto parent = std::dynamic_pointer_cast<RectTransform>(Parent()))
     {
-        auto rect = parent->CalculateScreenRect(canvas_size);
+        auto rect = parent->CalculateScreenRect();
         parentSize = rect.size;
     }
 
@@ -72,3 +100,5 @@ Rect RectTransform::CalculateScreenRect(Vector2 canvas_size) const
     return {screen_pos, final_size};
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::RectTransform)

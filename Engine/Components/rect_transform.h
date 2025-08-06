@@ -1,14 +1,12 @@
 #pragma once
 #include "component.h"
-#include "Asset/asset_ptr.h"
+#include "transform.h"
 #include "Math/rect.h"
 
 namespace engine
 {
-class RectTransform : public Component
+class RectTransform : public Transform
 {
-    std::weak_ptr<RectTransform> m_parent_ = {};
-
 public:
     Vector2 anchor_min = {0.5f, 0.5f};
     Vector2 anchor_max = {0.5f, 0.5f};
@@ -16,10 +14,20 @@ public:
     Vector2 size_delta = {100.0f, 100.0f};
     Vector2 anchored_position = {0.0f, 0.0f};
 
+    void OnAwake() override;
     void OnInspectorGui() override;
-    void SetParent(std::shared_ptr<RectTransform> parent);
 
-    [[nodiscard]] Rect CalculateScreenRect(Vector2 canvas_size) const;
+    [[nodiscard]] Rect CalculateScreenRect() const;
 
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Transform>(this),
+           CEREAL_NVP(anchor_min),
+           CEREAL_NVP(anchor_max),
+           CEREAL_NVP(pivot),
+           CEREAL_NVP(size_delta),
+           CEREAL_NVP(anchored_position));
+    }
 };
 }

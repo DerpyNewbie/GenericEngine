@@ -47,7 +47,10 @@
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
+        <ClCompile Include="Engine\Components\image.cpp"/>
+        <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
+        <ClCompile Include="Engine\Components\canvas.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
@@ -175,7 +178,10 @@
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
+        <ClInclude Include="Engine\Components\image.h"/>
+        <ClInclude Include="Engine\Components\renderer_2d.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
+        <ClInclude Include="Engine\Components\canvas.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>

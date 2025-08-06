@@ -6,11 +6,12 @@ namespace engine
 class Transform : public Component
 {
     Matrix m_matrix_ = Matrix::Identity;
-    std::weak_ptr<Transform> m_parent_ = {};
-    std::vector<std::shared_ptr<Transform>> m_children_;
-
     void RenderLocalTransformGui();
     void RenderGlobalTransformGui();
+
+protected:
+    std::weak_ptr<Transform> m_parent_ = {};
+    std::vector<std::shared_ptr<Transform>> m_children_;
 
 public:
     void OnDestroy() override;

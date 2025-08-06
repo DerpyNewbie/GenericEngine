@@ -2,11 +2,14 @@
 
 #include "component_factory.h"
 
+#include "Components/image.h"
 #include "Components/text_renderer.h"
 #include "Components/camera.h"
 #include "Components/controller.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
+#include "Components/rect_transform.h"
+#include "Components/renderer_2d.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Components/text_asset_ref_test_component.h"
 
@@ -24,6 +27,9 @@ void IComponentFactory::Init()
     ADD_COMPONENT(SkinnedMeshRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(TextRenderer);
+    ADD_COMPONENT(Canvas);
+    ADD_COMPONENT(Image);
+    ADD_COMPONENT(RectTransform);
 #undef ADD_COMPONENT
 }
 

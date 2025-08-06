@@ -10,6 +10,8 @@ class Scene;
 
 class GameObject final : public Object
 {
+    friend class RectTransform;
+
 public:
     explicit GameObject();
 
