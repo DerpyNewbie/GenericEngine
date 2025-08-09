@@ -41,6 +41,7 @@ void Image::OnAwake()
 
 void Image::OnUpdate()
 {
+    Renderer2D::OnUpdate();
     if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
     {
         auto rect = NormalizedRect();

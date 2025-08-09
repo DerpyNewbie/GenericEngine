@@ -6,22 +6,33 @@
 
 namespace engine
 {
-void Renderer2D::OnEnabled()
+
+void Renderer2D::OnUpdate()
 {
-    canvas = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
-    canvas.CastedLock()->AddRenderer(shared_from_base<Renderer2D>());
+    m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
+    auto canvas = m_canvas_.CastedLock();
+    if (!canvas)
+        return;
+    canvas->AddRenderer(shared_from_base<Renderer2D>());
 }
 
 void Renderer2D::OnDisabled()
 {
-    canvas.CastedLock()->RemoveRenderer(shared_from_base<Renderer2D>());
+    m_canvas_.CastedLock()->RemoveRenderer(shared_from_base<Renderer2D>());
 }
 
 Rect Renderer2D::NormalizedRect()
 {
+    auto canvas = m_canvas_.CastedLock();
+    if (!canvas)
+    {
+        return Rect{Vector2::Zero,
+                    Vector2::Zero};
+    }
+
+    auto canvas_size = m_canvas_.CastedLock()->CanvasSize();
     auto rect_transform = GameObject()->GetComponent<RectTransform>();
     auto rect = rect_transform->CalculateScreenRect();
-    auto canvas_size = canvas.CastedLock()->CanvasSize();
     return Rect{
         rect.pos / canvas_size,
         rect.size / canvas_size};

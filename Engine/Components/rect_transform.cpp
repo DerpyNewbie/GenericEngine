@@ -32,7 +32,7 @@ void RectTransform::OnAwake()
     rect_transform->m_parent_ = transform->Parent();
     for (int i = 0; i < transform->ChildCount(); ++i)
     {
-        rect_transform->m_children_[i] = GameObject()->Transform()->GetChild(i);
+        rect_transform->m_children_.emplace_back(GameObject()->Transform()->GetChild(i));
     }
     GameObject()->m_components_[itr] = rect_transform;
 

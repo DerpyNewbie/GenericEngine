@@ -6,11 +6,10 @@ namespace engine
 {
 class Renderer2D : public Component
 {
+    AssetPtr<Canvas> m_canvas_;
 
 public:
-    AssetPtr<Canvas> canvas;
-
-    void OnEnabled() override;
+    void OnUpdate() override;
     void OnDisabled() override;
 
     Rect NormalizedRect();
