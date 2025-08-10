@@ -33,9 +33,15 @@ public:
 
     [[nodiscard]] std::shared_ptr<Transform> Parent() const;
     [[nodiscard]] std::shared_ptr<Transform> GetChild(int i) const;
+    [[nodiscard]] int GetSiblingIndex() const;
+
     [[nodiscard]] bool IsChildOf(const std::shared_ptr<Transform> &transform, bool deep = true) const;
     [[nodiscard]] int ChildCount() const;
+
     void SetParent(const std::weak_ptr<Transform> &next_parent);
+    void SetSiblingIndex(int index);
+    void SetAsFirstSibling();
+    void SetAsLastSibling();
 
     void SetPosition(const Vector3 &position);
     void SetRotation(const Quaternion &rotation);

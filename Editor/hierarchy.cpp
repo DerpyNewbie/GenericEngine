@@ -55,11 +55,13 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
     {
         if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg))
         {
+            ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
             for (const auto all_root_objects = scene->RootGameObjects();
                  const auto &root_object : all_root_objects)
             {
                 DrawObjectRecursive(root_object);
             }
+            ImGui::PopStyleVar();
 
             ImGui::EndTable();
         }
@@ -78,6 +80,8 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
     {
         ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
     }
+
+    DrawReorderingTarget(game_object, 0);
 
     const bool draw_tree = DrawObject(game_object);
     if (ImGui::BeginDragDropTarget())
@@ -118,6 +122,11 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
     if (draw_tree)
     {
         const auto transform = game_object->Transform();
+        if (transform->ChildCount() != 0)
+        {
+            DrawReorderingTarget(transform->GetChild(0)->GameObject(), 0);
+        }
+
         // Child count cannot be stored as it can be changed during DrawObjectRecursive
         for (int i = 0; i < transform->ChildCount(); ++i)
         {
@@ -126,6 +135,8 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
         }
         ImGui::TreePop();
     }
+
+    DrawReorderingTarget(game_object, 1);
 
     if (has_style_color)
     {
@@ -177,6 +188,36 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     }
 
     return open;
+}
+
+void Hierarchy::DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &game_object, const int offset)
+{
+    constexpr float reorder_target_height = 0.0001F;
+
+    auto reorder_target_size = ImGui::GetContentRegionAvail();
+    reorder_target_size.y = reorder_target_height;
+    ImGui::Dummy(reorder_target_size);
+    if (ImGui::BeginDragDropTarget())
+    {
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
+                                                                       ImGuiDragDropFlags_AcceptBeforeDelivery))
+        {
+            const auto payload_object = engine::Gui::GetObjectDragDropTarget(payload);
+            const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
+            if (payload_go != nullptr)
+            {
+                const bool can_be_parent = !game_object->Transform()->IsChildOf(payload_go->Transform());
+
+                if (can_be_parent && payload->IsDelivery())
+                {
+                    payload_go->Transform()->SetParent(game_object->Transform()->Parent());
+                    payload_go->Transform()->SetSiblingIndex(game_object->Transform()->GetSiblingIndex() + offset);
+                }
+            }
+        }
+
+        ImGui::EndDragDropTarget();
+    }
 }
 
 }
