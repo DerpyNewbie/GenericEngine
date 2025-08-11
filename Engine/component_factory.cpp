@@ -13,6 +13,7 @@
 #include "Physics/capsule_collider.h"
 #include "Physics/plane_collider.h"
 #include "Physics/rigidbody_component.h"
+#include "Physics/rigidbody_tester_component.h"
 #include "Physics/sphere_collider.h"
 
 namespace engine
@@ -34,12 +35,12 @@ void IComponentFactory::Init()
     ADD_COMPONENT(PlaneCollider);
     ADD_COMPONENT(BoxCollider);
     ADD_COMPONENT(CapsuleCollider);
+    ADD_COMPONENT(RigidbodyTesterComponent);
 #undef ADD_COMPONENT
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{
-}
+{}
 
 std::string IComponentFactory::Name()
 {

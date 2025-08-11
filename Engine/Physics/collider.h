@@ -14,6 +14,9 @@ class Collider : public Component
     virtual void UpdateShape() = 0;
     virtual btCollisionShape *GetShape() = 0;
 
+    void AddToRigidbody();
+    void RemoveFromRigidbody();
+
 protected:
     void MarkDirty();
 
@@ -21,6 +24,7 @@ public:
     void OnInspectorGui() override;
     void OnEnabled() override;
     void OnDisabled() override;
+    void OnDestroy() override;
 
     std::shared_ptr<RigidbodyComponent> Rigidbody() const;
 

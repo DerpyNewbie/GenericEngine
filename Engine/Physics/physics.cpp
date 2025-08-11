@@ -77,6 +77,11 @@ void Physics::OnFixedUpdate()
             continue;
         }
 
+        if (!rb->m_should_write_ && rb->Transform()->WorldMatrix() == rb->m_last_world_matrix_)
+        {
+            continue;
+        }
+
         rb->WriteToPhysics();
     }
 
@@ -131,6 +136,7 @@ void Physics::OnFixedUpdate()
 
     m_previous_contacts_ = m_current_contacts_;
 }
+
 void Physics::DebugDraw()
 {
     m_instance_->m_world_->debugDrawWorld();
