@@ -5,6 +5,27 @@
 
 namespace engine
 {
+void Collider::AddToRigidbody()
+{
+    auto rb = GameObject()->GetComponentInParent<RigidbodyComponent>();
+    if (rb == nullptr)
+    {
+        rb = GameObject()->AddComponent<RigidbodyComponent>();
+    }
+
+    m_rigidbody_ = rb;
+    rb->AddCollider(shared_from_base<Collider>());
+}
+
+void Collider::RemoveFromRigidbody()
+{
+    const auto locked = m_rigidbody_.lock();
+    if (locked != nullptr)
+    {
+        locked->RemoveCollider(shared_from_base<Collider>());
+    }
+}
+
 void Collider::MarkDirty()
 {
     m_is_dirty_ = true;
@@ -30,25 +51,20 @@ void Collider::OnInspectorGui()
         ImGui::Unindent();
     }
 }
+
 void Collider::OnEnabled()
 {
-    auto rb = GameObject()->GetComponentInParent<RigidbodyComponent>();
-    if (rb == nullptr)
-    {
-        rb = GameObject()->AddComponent<RigidbodyComponent>();
-    }
-
-    m_rigidbody_ = rb;
-    rb->AddCollider(shared_from_base<Collider>());
+    AddToRigidbody();
 }
 
 void Collider::OnDisabled()
 {
-    const auto locked = m_rigidbody_.lock();
-    if (locked != nullptr)
-    {
-        locked->RemoveCollider(shared_from_base<Collider>());
-    }
+    RemoveFromRigidbody();
+}
+
+void Collider::OnDestroy()
+{
+    RemoveFromRigidbody();
 }
 
 std::shared_ptr<RigidbodyComponent> Collider::Rigidbody() const
