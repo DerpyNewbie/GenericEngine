@@ -38,7 +38,7 @@ public:
     [[nodiscard]] bool IsChildOf(const std::shared_ptr<Transform> &transform, bool deep = true) const;
     [[nodiscard]] int ChildCount() const;
 
-    void SetParent(const std::weak_ptr<Transform> &next_parent);
+    void SetParent(const std::shared_ptr<Transform> &next_parent);
     void SetSiblingIndex(int index);
     void SetAsFirstSibling();
     void SetAsLastSibling();
