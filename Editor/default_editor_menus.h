@@ -12,7 +12,7 @@ public:
     static void DrawDefaultMenu();
     static void DrawFilesMenu();
     static void DrawEditMenu();
-    static void DrawObjectMenu();
+    static void DrawObjectMenu(const std::shared_ptr<engine::GameObject> &go = nullptr);
     static void DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go);
     static void DrawWindowMenu();
     static bool DrawAssetMenu(const std::filesystem::path &path);
