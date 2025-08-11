@@ -129,12 +129,11 @@ int Transform::ChildCount() const
     return static_cast<int>(m_children_.size());
 }
 
-void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
+void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 {
     const auto current_parent = m_parent_.lock();
-    const auto new_parent = next_parent.lock();
 
-    if (current_parent == new_parent)
+    if (current_parent == next_parent)
         return;
 
     if (current_parent)
@@ -386,6 +385,8 @@ void Transform::RecalculateWorldMatrix()
 
 void Transform::OnDestroy()
 {
+    SetParent(nullptr);
+
     for (const auto child : m_children_)
     {
         DestroyImmediate(child->GameObject());
