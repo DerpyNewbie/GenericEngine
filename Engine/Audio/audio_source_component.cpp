@@ -25,7 +25,7 @@ void AudioSourceComponent::OnEnabled()
 }
 void AudioSourceComponent::OnUpdate()
 {
-    if (m_sound_effect_instance_ == nullptr || !m_use_3d_)
+    if (m_sound_effect_instance_ == nullptr)
     {
         return;
     }
@@ -35,9 +35,12 @@ void AudioSourceComponent::OnUpdate()
         Play();
     }
 
-    auto listener = Audio::Instance()->AudioListener();
-    listener.SetVelocity(listener.Velocity * m_doppler_factor_);
-    m_sound_effect_instance_->Apply3D(listener, m_emitter_);
+    if (m_use_3d_ && m_sound_effect_instance_->GetState() == DirectX::PLAYING)
+    {
+        auto listener = Audio::Instance()->AudioListener();
+        listener.SetVelocity(listener.Velocity * m_doppler_factor_);
+        m_sound_effect_instance_->Apply3D(listener, m_emitter_);
+    }
 }
 
 void AudioSourceComponent::OnDisabled()
