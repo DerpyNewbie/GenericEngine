@@ -12,6 +12,7 @@
 #include "update_man_debugger.h"
 
 #include "application.h"
+#include "audio_window.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -118,6 +119,7 @@ void Editor::Init()
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
         AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
         AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
+        AddEditorWindow("Audio", std::make_shared<AudioWindow>());
     }
 
     {

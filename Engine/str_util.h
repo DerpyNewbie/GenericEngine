@@ -72,4 +72,42 @@ static std::string Utf8ToShiftJis(const std::string &utf8_string)
 {
     return Utf16ToShiftJis(Utf8ToUtf16(utf8_string));
 }
+static std::string DurationToString(std::chrono::milliseconds ms)
+{
+    const auto days = duration_cast<std::chrono::days>(ms);
+    ms -= days;
+
+    const auto hours = duration_cast<std::chrono::hours>(ms);
+    ms -= hours;
+
+    const auto minutes = duration_cast<std::chrono::minutes>(ms);
+    ms -= minutes;
+
+    const auto seconds = duration_cast<std::chrono::seconds>(ms);
+    ms -= seconds;
+
+    const auto millis = duration_cast<std::chrono::milliseconds>(ms);
+
+    std::ostringstream oss;
+    oss << std::setfill('0');
+
+    bool first = true;
+    if (days.count() > 0)
+    {
+        oss << std::setw(2) << days.count() << ":";
+        first = false;
+    }
+
+    if (!first || hours.count() > 0)
+    {
+        oss << std::setw(2) << hours.count() << ":";
+        first = false;
+    }
+
+    oss << std::setw(2) << minutes.count() << ":"
+        << std::setw(2) << seconds.count() << "."
+        << std::setw(3) << millis.count();
+
+    return oss.str();
+}
 }
