@@ -7,6 +7,7 @@ class GameObject;
 struct Collision
 {
     GameObject *other;
+    Vector3 average_normal;
 };
 
 class Component : public Object

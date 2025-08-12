@@ -1,6 +1,8 @@
 #pragma once
 #include "bullet_debug_drawer.h"
 #include "event_receivers.h"
+#include "Components/component.h"
+
 #include <bullet/btBulletDynamicsCommon.h>
 
 namespace engine
@@ -23,16 +25,19 @@ class Physics : public IFixedUpdateReceiver
     std::vector<std::weak_ptr<RigidbodyComponent>> m_rigidbodies_;
 
     using ContactPair = std::pair<const RigidbodyComponent *, const RigidbodyComponent *>;
-    std::map<ContactPair, const btPersistentManifold *> m_current_contacts_;
-    std::map<ContactPair, const btPersistentManifold *> m_previous_contacts_;
+    using CollisionPair = std::pair<Collision, Collision>;
+    std::map<ContactPair, CollisionPair> m_current_contacts_;
+    std::map<ContactPair, CollisionPair> m_previous_contacts_;
 
     static void Init();
 
     Physics();
 
-    static void OnCollisionStarted(const ContactPair &pair, const btPersistentManifold *manifold);
-    static void OnCollisionStayed(const ContactPair &pair, const btPersistentManifold *manifold);
-    static void OnCollisionExited(const ContactPair &pair, const btPersistentManifold *manifold);
+    static Vector3 CalculateNormalFromManifold(btPersistentManifold *manifold);
+
+    static void OnCollisionStarted(const ContactPair &contact_pair, const CollisionPair &collision_pair);
+    static void OnCollisionStayed(const ContactPair &contact_pair, const CollisionPair &collision_pair);
+    static void OnCollisionExited(const ContactPair &contact_pair, const CollisionPair &collision_pair);
 
 public:
     int Order() override;

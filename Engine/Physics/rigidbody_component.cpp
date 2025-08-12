@@ -10,7 +10,6 @@
 
 namespace engine
 {
-
 void RigidbodyComponent::ConstructRigidbody()
 {
     m_transform_ = GameObject()->Transform();
@@ -29,25 +28,37 @@ void RigidbodyComponent::ConstructRigidbody()
         m_bt_motion_state_ = std::make_unique<btDefaultMotionState>(starting_transform);
     }
 
-    if (m_bt_compound_shape_ == nullptr)
+    if (m_rigidbody_shape_ == nullptr)
     {
-        m_bt_compound_shape_ = std::make_unique<btCompoundShape>();
-        for (auto &weak_collider : m_colliders_)
-        {
-            AddColliderToCompoundShape(weak_collider.lock());
-        }
+        const auto transform = Transform();
+        m_rigidbody_shape_ = std::make_unique<CompoundShape>(CompoundShape{transform});
+    }
+
+    if (m_ghost_shape_ == nullptr)
+    {
+        const auto transform = Transform();
+        m_ghost_shape_ = std::make_unique<CompoundShape>(CompoundShape{transform});
     }
 
     if (m_bt_rigidbody_ == nullptr)
     {
         auto ctor_info = btRigidBody::btRigidBodyConstructionInfo(
-            IsKinematicOrStatic() ? 0 : m_mass_, m_bt_motion_state_.get(), m_bt_compound_shape_.get());
+            IsKinematicOrStatic() ? 0 : m_mass_, m_bt_motion_state_.get(), m_rigidbody_shape_->GetShape());
         m_bt_rigidbody_ = std::make_unique<btRigidBody>(ctor_info);
         m_bt_rigidbody_->setUserPointer(this);
         m_is_registered_ = false;
-        m_should_reconstruct_ = false;
 
-        WriteToPhysics();
+        WriteRigidbody();
+    }
+
+    if (m_bt_ghost_object_ == nullptr)
+    {
+        m_bt_ghost_object_ = std::make_unique<btPairCachingGhostObject>();
+        m_bt_ghost_object_->setCollisionShape(m_ghost_shape_->GetShape());
+        m_bt_ghost_object_->setWorldTransform(m_bt_rigidbody_->getWorldTransform());
+        m_bt_ghost_object_->setUserPointer(this);
+        m_bt_ghost_object_->setCollisionFlags(
+            m_bt_ghost_object_->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
     }
 }
 
@@ -63,7 +74,7 @@ void RigidbodyComponent::RegisterToPhysics()
     m_is_registered_ = true;
 }
 
-void RigidbodyComponent::ReadFromPhysics()
+void RigidbodyComponent::ReadRigidbody()
 {
     btTransform bt_transform = m_bt_rigidbody_->getWorldTransform();
 
@@ -80,7 +91,7 @@ void RigidbodyComponent::ReadFromPhysics()
     m_angular_velocity_ = Vector3{bt_ang_vel.x(), bt_ang_vel.y(), bt_ang_vel.z()};
 }
 
-void RigidbodyComponent::WriteToPhysics()
+void RigidbodyComponent::WriteRigidbody()
 {
     UpdateCompoundShape();
 
@@ -105,12 +116,32 @@ void RigidbodyComponent::WriteToPhysics()
     bt_transform.setOrigin({center_of_mass.x, center_of_mass.y, center_of_mass.z});
     m_bt_rigidbody_->setCenterOfMassTransform(bt_transform);
 
+    int flags = btRigidBody::CF_DYNAMIC_OBJECT;
+    if (m_is_static_)
+    {
+        flags |= btRigidBody::CF_STATIC_OBJECT;
+    }
+
+    if (m_is_kinematic_)
+    {
+        flags |= btRigidBody::CF_KINEMATIC_OBJECT;
+    }
+
+    m_bt_rigidbody_->setFlags(IsKinematicOrStatic() ? BT_DISABLE_WORLD_GRAVITY : 0);
+    m_bt_rigidbody_->setCollisionFlags(flags);
+    m_bt_rigidbody_->setActivationState(!m_is_kinematic_ && !m_is_static_
+                                            ? ACTIVE_TAG
+                                            : m_is_kinematic_
+                                            ? DISABLE_DEACTIVATION
+                                            : ISLAND_SLEEPING);
+    m_bt_rigidbody_->activate();
+
     btVector3 inertia;
-    m_bt_compound_shape_->calculateLocalInertia(m_mass_, inertia);
+    m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
     m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
-    m_bt_rigidbody_->setGravity(IsKinematicOrStatic()
-                                    ? btVector3{0, 0, 0}
-                                    : btVector3{Physics::Gravity().x, Physics::Gravity().y, Physics::Gravity().z});
+    // m_bt_rigidbody_->setGravity(IsKinematicOrStatic()
+    //                                 ? btVector3{0, 0, 0}
+    //                                 : btVector3{Physics::Gravity().x, Physics::Gravity().y, Physics::Gravity().z});
 
     m_should_write_ = false;
 }
@@ -118,84 +149,64 @@ void RigidbodyComponent::WriteToPhysics()
 void RigidbodyComponent::UnregisterFromPhysics()
 {
     Physics::RemoveRigidbody(shared_from_base<RigidbodyComponent>());
-    m_bt_rigidbody_.reset();
     m_is_registered_ = false;
 }
 
-void RigidbodyComponent::UpdateCompoundShape()
+void RigidbodyComponent::UpdateCompoundShape() const
 {
-    for (auto &weak_collider : m_colliders_)
-    {
-        auto collider = weak_collider.lock();
-        if (collider == nullptr || !collider->m_is_dirty_)
-            continue;
+    m_rigidbody_shape_->UpdateShape();
+    m_ghost_shape_->UpdateShape();
+}
 
-        RemoveColliderFromCompoundShape(collider);
-        AddColliderToCompoundShape(collider);
+void RigidbodyComponent::UpdatePhysics()
+{
+    if (m_is_registered_)
+    {
+        UnregisterFromPhysics();
+        WriteRigidbody();
+        RegisterToPhysics();
     }
 }
 
-void RigidbodyComponent::AddCollider(const std::shared_ptr<Collider> &collider)
+void RigidbodyComponent::OnPrePhysicsUpdate()
 {
-    m_colliders_.emplace_back(collider);
-    AddColliderToCompoundShape(collider);
+    if (m_should_write_ || Transform()->WorldMatrix() != m_last_world_matrix_)
+    {
+        WriteRigidbody();
+        m_last_world_matrix_ = Transform()->WorldMatrix();
+    }
+
+    m_bt_ghost_object_->setWorldTransform(m_bt_rigidbody_->getWorldTransform());
 }
 
-void RigidbodyComponent::RemoveCollider(const std::shared_ptr<Collider> &collider)
+void RigidbodyComponent::OnPostPhysicsUpdate()
 {
-    erase_if(m_colliders_, [&](auto a) {
-        return a.lock() == collider;
-    });
-    RemoveColliderFromCompoundShape(collider);
+    ReadRigidbody();
+
+    for (int i = 0; i < m_bt_ghost_object_->getNumOverlappingObjects(); i++)
+    {
+        const auto other = m_bt_ghost_object_->getOverlappingObject(i);
+        const auto other_component = static_cast<RigidbodyComponent *>(other->getUserPointer());
+        if (other_component == nullptr)
+        {}
+
+    }
 }
 
-void RigidbodyComponent::AddColliderToCompoundShape(const std::shared_ptr<Collider> &collider)
+void RigidbodyComponent::AddCollider(const std::shared_ptr<Collider> &collider) const
 {
-    const auto collider_matrix = collider->GameObject()->Transform()->WorldMatrix();
-    const auto this_matrix = GameObject()->Transform()->WorldMatrix();
-    auto relative_matrix = collider_matrix * this_matrix.Invert();
-
-    Vector3 pos, sca;
-    Quaternion rot;
-    relative_matrix.Decompose(sca, rot, pos);
-
-    btTransform bt_transform = btTransform::getIdentity();
-    bt_transform.setOrigin({pos.x, pos.y, pos.z});
-    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
-
-    m_bt_compound_shape_->addChildShape(bt_transform, collider->GetShape());
-    collider->m_is_dirty_ = false;
-    m_should_write_ = true;
-
-    Logger::Log<RigidbodyComponent>("Collider %s has been added at {%.2f, %.2f, %.2f}",
-                                    collider->GameObject()->Name().c_str(), pos.x, pos.y, pos.z);
+    (collider->IsTrigger() ? m_ghost_shape_ : m_rigidbody_shape_)->AddChild(collider);
 }
 
-void RigidbodyComponent::RemoveColliderFromCompoundShape(const std::shared_ptr<Collider> &collider)
+void RigidbodyComponent::RemoveCollider(const std::shared_ptr<Collider> &collider) const
 {
-    m_bt_compound_shape_->removeChildShape(collider->GetShape());
-    m_should_write_ = true;
-
-    Logger::Log<RigidbodyComponent>("Collider %s has been removed", collider->GameObject()->Name().c_str());
+    m_ghost_shape_->RemoveChild(collider);
+    m_rigidbody_shape_->RemoveChild(collider);
 }
 
 void RigidbodyComponent::OnEnabled()
 {
     RegisterToPhysics();
-}
-
-void RigidbodyComponent::OnUpdate()
-{
-    if (!m_should_write_ && Transform()->WorldMatrix() != m_last_world_matrix_)
-    {
-        Logger::Log<RigidbodyComponent>("Rigidbody has been moved");
-        m_should_write_ = true;
-    }
-
-    if (m_should_reconstruct_)
-    {
-        RegisterToPhysics();
-    }
 }
 
 void RigidbodyComponent::OnDisabled()
@@ -321,7 +332,8 @@ void RigidbodyComponent::OnInspectorGui()
         ImGui::Text("Restitution(Bounciness): %.2f", m_bt_rigidbody_->getRestitution());
         ImGui::Text("Ang Damping: %.2f", m_bt_rigidbody_->getAngularDamping());
         ImGui::Text("Lin Damping: %.2f", m_bt_rigidbody_->getLinearDamping());
-        ImGui::Text("Flags    : %d", m_bt_rigidbody_->getFlags());
+        ImGui::Text("Flags          : %d", m_bt_rigidbody_->getFlags());
+        ImGui::Text("Collision Flags: %d", m_bt_rigidbody_->getCollisionFlags());
         ImGui::Text("Is In World              : %d", m_bt_rigidbody_->isInWorld());
         ImGui::Text("Deactivation Time        : %f", m_bt_rigidbody_->getDeactivationTime());
         ImGui::Text("Is Static Or Kinematic   : %d", m_bt_rigidbody_->isStaticOrKinematicObject());
@@ -446,14 +458,12 @@ void RigidbodyComponent::SetVelocity(const Vector3 &velocity)
 {
     m_velocity_ = velocity;
     m_should_write_ = true;
-    WakeUp();
 }
 
 void RigidbodyComponent::SetAngularVelocity(const Vector3 &angular_velocity)
 {
     m_angular_velocity_ = angular_velocity;
     m_should_write_ = true;
-    WakeUp();
 }
 
 void RigidbodyComponent::SetCenterOfMass(const Vector3 &center_of_mass)
@@ -507,15 +517,15 @@ void RigidbodyComponent::SetAngularDamping(const float angular_damping)
 void RigidbodyComponent::SetKinematic(const bool next_kinematic)
 {
     m_is_kinematic_ = next_kinematic;
-    m_should_reconstruct_ = true;
     m_should_write_ = true;
+    UpdatePhysics();
 }
 
 void RigidbodyComponent::SetStatic(const bool next_static)
 {
     m_is_static_ = next_static;
-    m_should_reconstruct_ = true;
     m_should_write_ = true;
+    UpdatePhysics();
 }
 
 void RigidbodyComponent::AddForce(const Vector3 &force, const kForceMode mode)
@@ -530,7 +540,7 @@ void RigidbodyComponent::AddForce(const Vector3 &force, const kForceMode mode)
         break;
     }
 
-    ReadFromPhysics();
+    ReadRigidbody();
     WakeUp();
 }
 
@@ -547,7 +557,7 @@ void RigidbodyComponent::AddForceAtPosition(const Vector3 &force, const Vector3 
         break;
     }
 
-    ReadFromPhysics();
+    ReadRigidbody();
     WakeUp();
 }
 
@@ -563,7 +573,7 @@ void RigidbodyComponent::AddTorque(const Vector3 &torque, const kForceMode mode)
         break;
     }
 
-    ReadFromPhysics();
+    ReadRigidbody();
     WakeUp();
 }
 
