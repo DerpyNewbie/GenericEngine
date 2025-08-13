@@ -139,9 +139,6 @@ void RigidbodyComponent::WriteRigidbody()
     btVector3 inertia;
     m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
     m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
-    // m_bt_rigidbody_->setGravity(IsKinematicOrStatic()
-    //                                 ? btVector3{0, 0, 0}
-    //                                 : btVector3{Physics::Gravity().x, Physics::Gravity().y, Physics::Gravity().z});
 
     m_should_write_ = false;
 }
@@ -182,14 +179,28 @@ void RigidbodyComponent::OnPrePhysicsUpdate()
 void RigidbodyComponent::OnPostPhysicsUpdate()
 {
     ReadRigidbody();
+}
 
+void RigidbodyComponent::CollectOverlaps() const
+{
+    // process trigger collisions
+    const auto this_go = GameObject();
     for (int i = 0; i < m_bt_ghost_object_->getNumOverlappingObjects(); i++)
     {
         const auto other = m_bt_ghost_object_->getOverlappingObject(i);
-        const auto other_component = static_cast<RigidbodyComponent *>(other->getUserPointer());
-        if (other_component == nullptr)
-        {}
+        const auto other_rb = static_cast<RigidbodyComponent *>(other->getUserPointer());
+        if (other_rb == this)
+        {
+            continue;
+        }
 
+        if (other_rb == nullptr)
+        {
+            Logger::Warn("Unknown CollisionObject has been collided with %s", GameObject()->Name().c_str());
+            continue;
+        }
+
+        Physics::AddTriggerOverlap(this_go, other_rb->GameObject());
     }
 }
 

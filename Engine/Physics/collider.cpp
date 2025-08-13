@@ -29,7 +29,7 @@ void Collider::RemoveFromRigidbody()
 
     m_is_registered_ = false;
 }
-void Collider::UpdateRigidbody()
+void Collider::ApplyChanges()
 {
     if (!m_is_registered_)
     {
@@ -37,19 +37,20 @@ void Collider::UpdateRigidbody()
     }
 
     RemoveFromRigidbody();
+    UpdateShape();
     AddToRigidbody();
-}
-
-void Collider::MarkDirty()
-{
-    m_is_dirty_ = true;
 }
 
 void Collider::OnInspectorGui()
 {
-    if (Gui::PropertyField<bool>("Is Trigger", m_is_trigger_))
+    if (Gui::PropertyField("Offset", m_offset_))
     {
-        SetTrigger(m_is_trigger_);
+        ApplyChanges();
+    }
+
+    if (Gui::PropertyField("Is Trigger", m_is_trigger_))
+    {
+        ApplyChanges();
     }
 
     if (ImGui::CollapsingHeader("Collider Info", ImGuiTreeNodeFlags_DefaultOpen))
@@ -104,13 +105,13 @@ Vector3 Collider::Offset() const
 void Collider::SetTrigger(const bool trigger)
 {
     m_is_trigger_ = trigger;
-    UpdateRigidbody();
+    ApplyChanges();
 }
 
 void Collider::SetOffset(const Vector3 offset)
 {
     m_offset_ = offset;
-    UpdateRigidbody();
+    ApplyChanges();
 }
 
 }

@@ -12,7 +12,6 @@ class Collider : public Component
     std::weak_ptr<RigidbodyComponent> m_rigidbody_;
     Vector3 m_offset_ = {0, 0, 0};
     bool m_is_trigger_ = false;
-    bool m_is_dirty_ = true;
     bool m_is_registered_ = false;
 
     virtual void UpdateShape() = 0;
@@ -20,10 +19,9 @@ class Collider : public Component
 
     void AddToRigidbody();
     void RemoveFromRigidbody();
-    void UpdateRigidbody();
 
 protected:
-    void MarkDirty();
+    void ApplyChanges();
 
 public:
     void OnInspectorGui() override;

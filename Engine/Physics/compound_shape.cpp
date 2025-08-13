@@ -7,7 +7,8 @@ namespace engine
 {
 void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) const
 {
-    const auto collider_matrix = collider->GameObject()->Transform()->WorldMatrix();
+    const auto collider_matrix = Matrix::CreateTranslation(collider->Offset()) *
+                                 collider->GameObject()->Transform()->WorldMatrix();
     const auto this_matrix = m_transform_.lock()->WorldMatrix();
     auto relative_matrix = collider_matrix * this_matrix.Invert();
 
@@ -20,7 +21,6 @@ void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) con
     bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
 
     m_shape_->addChildShape(bt_transform, collider->GetShape());
-    collider->m_is_dirty_ = false;
 }
 
 void CompoundShape::RemoveChildShape(const std::shared_ptr<Collider> &collider) const
@@ -53,7 +53,7 @@ void CompoundShape::UpdateShape() const
     for (auto &weak_collider : m_colliders_)
     {
         auto collider = weak_collider.lock();
-        if (collider == nullptr || !collider->m_is_dirty_)
+        if (collider == nullptr)
             continue;
 
         RemoveChildShape(collider);

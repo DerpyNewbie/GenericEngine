@@ -79,6 +79,9 @@ Vector3 Physics::CalculateNormalFromManifold(btPersistentManifold *manifold)
 
 void Physics::OnCollisionStarted(const ContactPair &contact_pair, const CollisionPair &collision_pair)
 {
+    Logger::Log<Physics>("Collision Started: %s -> %s",
+                         contact_pair.first->GameObject()->Name().c_str(),
+                         contact_pair.second->GameObject()->Name().c_str());
     contact_pair.first->GameObject()->InvokeOnCollisionEnter(collision_pair.first);
     contact_pair.second->GameObject()->InvokeOnCollisionEnter(collision_pair.second);
 }
@@ -91,44 +94,63 @@ void Physics::OnCollisionStayed(const ContactPair &contact_pair, const Collision
 
 void Physics::OnCollisionExited(const ContactPair &contact_pair, const CollisionPair &collision_pair)
 {
+    Logger::Log<Physics>("Collision Exited: %s -> %s",
+                         contact_pair.first->GameObject()->Name().c_str(),
+                         contact_pair.second->GameObject()->Name().c_str());
     contact_pair.first->GameObject()->InvokeOnCollisionExit(collision_pair.first);
     contact_pair.second->GameObject()->InvokeOnCollisionExit(collision_pair.second);
 }
 
-int Physics::Order()
+void Physics::OnTriggerStarted(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other)
 {
-    return IFixedUpdateReceiver::Order();
+    Logger::Log<Physics>("Trigger Started: %s -> %s", target->Name().c_str(), other->Name().c_str());
+    target->InvokeOnTriggerEnter(other);
 }
 
-void Physics::OnFixedUpdate()
+void Physics::OnTriggerStayed(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other)
 {
-    const auto rbs = m_rigidbodies_;
-    for (auto weak_rb : rbs)
-    {
-        auto rb = weak_rb.lock();
-        if (rb == nullptr)
-        {
-            Logger::Warn<Physics>("Invalidated Rigidbody has found in Pre Physics FixedUpdate");
-            continue;
-        }
+    target->InvokeOnTriggerStay(other);
+}
 
-        rb->OnPrePhysicsUpdate();
+void Physics::OnTriggerExited(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other)
+{
+    Logger::Log<Physics>("Trigger Exited: %s -> %s", target->Name().c_str(), other->Name().c_str());
+    target->InvokeOnTriggerExit(other);
+}
+
+void Physics::AddTriggerOverlap(const std::shared_ptr<GameObject> &a, const std::shared_ptr<GameObject> &b)
+{
+    m_instance_->m_current_overlaps_.emplace(std::minmax(a, b));
+}
+
+void Physics::AddRigidbody(const std::shared_ptr<RigidbodyComponent> &rb)
+{
+    m_instance_->m_world_->addRigidBody(rb->m_bt_rigidbody_.get());
+    m_instance_->m_world_->addCollisionObject(rb->m_bt_ghost_object_.get(), btBroadphaseProxy::SensorTrigger);
+    m_instance_->m_rigidbodies_.emplace_back(rb);
+
+    Logger::Log<Physics>("Rigidbody %s has been added", rb->GameObject()->Name().c_str());
+}
+
+void Physics::RemoveRigidbody(const std::shared_ptr<RigidbodyComponent> &rb)
+{
+    if (!rb->m_is_registered_)
+    {
+        return;
     }
 
-    m_world_->stepSimulation(Time::Get()->FixedDeltaTime(), 0);
+    m_instance_->m_world_->removeRigidBody(rb->m_bt_rigidbody_.get());
+    m_instance_->m_world_->removeCollisionObject(rb->m_bt_ghost_object_.get());
 
-    for (auto weak_rb : m_rigidbodies_)
-    {
-        auto rb = weak_rb.lock();
-        if (rb == nullptr)
-        {
-            Logger::Warn<Physics>("Invalidated Rigidbody has found in Post Physics FixedUpdate");
-            continue;
-        }
+    std::erase_if(m_instance_->m_rigidbodies_, [&](auto a) {
+        return a.lock() == rb;
+    });
 
-        rb->OnPostPhysicsUpdate();
-    }
+    Logger::Log<Physics>("Rigidbody %s has been removed", rb->GameObject()->Name().c_str());
+}
 
+void Physics::ProcessCollisions()
+{
     m_current_contacts_.clear();
 
     const auto dispatcher = m_world_->getDispatcher();
@@ -170,6 +192,71 @@ void Physics::OnFixedUpdate()
     m_previous_contacts_ = m_current_contacts_;
 }
 
+void Physics::ProcessTriggers()
+{
+    for (const auto &pair : m_current_overlaps_)
+    {
+        if (m_previous_overlaps_.contains(pair))
+        {
+            OnTriggerStayed(pair.first, pair.second);
+        }
+        else
+        {
+            OnTriggerStarted(pair.first, pair.second);
+        }
+    }
+
+    for (const auto &pair : m_previous_overlaps_)
+    {
+        if (!m_current_overlaps_.contains(pair))
+        {
+            OnTriggerExited(pair.first, pair.second);
+        }
+    }
+
+    m_previous_overlaps_ = m_current_overlaps_;
+    m_current_overlaps_ = std::set<TriggerPair>{};
+}
+
+int Physics::Order()
+{
+    return IFixedUpdateReceiver::Order();
+}
+
+void Physics::OnFixedUpdate()
+{
+    const auto rbs = m_rigidbodies_;
+    for (auto weak_rb : rbs)
+    {
+        auto rb = weak_rb.lock();
+        if (rb == nullptr)
+        {
+            Logger::Warn<Physics>("Invalidated Rigidbody has found in Pre Physics FixedUpdate");
+            continue;
+        }
+
+        rb->OnPrePhysicsUpdate();
+    }
+
+    m_world_->stepSimulation(Time::Get()->FixedDeltaTime(), 0);
+
+    for (auto weak_rb : m_rigidbodies_)
+    {
+        auto rb = weak_rb.lock();
+        if (rb == nullptr)
+        {
+            Logger::Warn<Physics>("Invalidated Rigidbody has found in Post Physics FixedUpdate");
+            continue;
+        }
+
+        rb->OnPostPhysicsUpdate();
+        rb->CollectOverlaps();
+    }
+
+    ProcessCollisions();
+    ProcessTriggers();
+}
+
 void Physics::DebugDraw()
 {
     m_instance_->m_world_->debugDrawWorld();
@@ -186,26 +273,4 @@ void Physics::SetGravity(const Vector3 &gravity)
     m_instance_->m_world_->setGravity(btVector3(gravity.x, gravity.y, gravity.z));
 }
 
-void Physics::AddRigidbody(const std::shared_ptr<RigidbodyComponent> &rb)
-{
-    m_instance_->m_world_->addRigidBody(rb->m_bt_rigidbody_.get());
-    m_instance_->m_rigidbodies_.emplace_back(rb);
-
-    Logger::Log<Physics>("Rigidbody %s has been added", rb->GameObject()->Name().c_str());
-}
-
-void Physics::RemoveRigidbody(const std::shared_ptr<RigidbodyComponent> &rb)
-{
-    if (!rb->m_is_registered_)
-    {
-        return;
-    }
-
-    m_instance_->m_world_->removeRigidBody(rb->m_bt_rigidbody_.get());
-    std::erase_if(m_instance_->m_rigidbodies_, [&](auto a) {
-        return a.lock() == rb;
-    });
-
-    Logger::Log<Physics>("Rigidbody %s has been removed", rb->GameObject()->Name().c_str());
-}
 }

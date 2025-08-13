@@ -51,6 +51,15 @@ public:
     virtual void OnCollisionExit(const Collision &collision)
     {}
 
+    virtual void OnTriggerEnter(const std::shared_ptr<GameObject> &other)
+    {}
+
+    virtual void OnTriggerStay(const std::shared_ptr<GameObject> &other)
+    {}
+
+    virtual void OnTriggerExit(const std::shared_ptr<GameObject> &other)
+    {}
+
     virtual void OnInspectorGui();
 
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const;

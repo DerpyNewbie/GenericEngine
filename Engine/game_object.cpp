@@ -229,6 +229,60 @@ void GameObject::InvokeOnCollisionExit(const Collision &collision) const
     }
 }
 
+void GameObject::InvokeOnTriggerEnter(const std::shared_ptr<GameObject> &other) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnTriggerEnter(other);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnTriggerEnter(other);
+        }
+    }
+}
+
+void GameObject::InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnTriggerStay(other);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnTriggerStay(other);
+        }
+    }
+}
+
+void GameObject::InvokeOnTriggerExit(const std::shared_ptr<GameObject> &other) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnTriggerExit(other);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnTriggerExit(other);
+        }
+    }
+}
+
 void GameObject::SetAsRootObject(const bool is_root_object)
 {
     auto shared_this = shared_from_base<GameObject>();

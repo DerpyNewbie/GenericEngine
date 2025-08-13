@@ -27,6 +27,8 @@ class RigidbodyComponent : public Component
     std::unique_ptr<CompoundShape> m_rigidbody_shape_ = nullptr;
     std::unique_ptr<CompoundShape> m_ghost_shape_ = nullptr;
 
+    std::list<std::weak_ptr<class GameObject>> m_last_ghost_overlapping_objects_;
+
     std::weak_ptr<Transform> m_transform_ = {};
 
     bool m_should_write_ = true;
@@ -59,6 +61,8 @@ class RigidbodyComponent : public Component
 
     void OnPrePhysicsUpdate();
     void OnPostPhysicsUpdate();
+
+    void CollectOverlaps() const;
 
     void AddCollider(const std::shared_ptr<Collider> &collider) const;
     void RemoveCollider(const std::shared_ptr<Collider> &collider) const;
