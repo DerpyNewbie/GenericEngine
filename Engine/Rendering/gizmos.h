@@ -5,8 +5,6 @@
 #include "CabotEngine/Graphics/VertexBuffer.h"
 #include "Components/renderer.h"
 
-#include <DxLib.h>
-
 namespace engine
 {
 using namespace DirectX::SimpleMath;
@@ -17,27 +15,32 @@ using namespace DirectX::SimpleMath;
 /// <remarks>
 /// Can be called at any time. Rendering is guaranteed at the end of a frame. 
 /// </remarks>
-class Gizmos
+class Gizmos : public IDrawCallReceiver
 {
     friend class Engine;
 
-    static bool m_has_drawn_;
     static std::shared_ptr<Gizmos> m_instance_;
     static std::vector<Vertex> m_vertices_;
 
     std::shared_ptr<VertexBuffer> m_vertex_buffers_[RenderEngine::FRAME_BUFFER_COUNT];
-    std::shared_ptr<ConstantBuffer> m_constant_buffer_;
-    std::shared_ptr<DescriptorHandle> m_desc_handle_;
+    int m_vertices_count_[RenderEngine::FRAME_BUFFER_COUNT];
+    int m_last_back_buffer_idx_ = -1;
 
     static void Init();
-    static void PreDrawCheck();
+    void CreateVertexBuffer(int current_back_buffer_idx);
 
 public:
     static constexpr auto kDefaultColor = Color(1, 1, 1);
 
-    static void Render();
+    int Order() override
+    {
+        return INT_MAX - 1000; // at the very last. but before the editor.
+    }
 
-    static void ClearVertices();
+    void Render(int current_back_buffer_idx, ID3D12GraphicsCommandList *command_list);
+
+    void OnDraw() override;
+
     static void DrawLine(const Vector3 &start, const Vector3 &end, const Color &color = kDefaultColor);
     static void DrawLines(const std::vector<Vector3> &line, const Color &color = kDefaultColor);
     static void DrawCircle(const Vector3 &center, float radius, const Color &color = kDefaultColor,
@@ -45,6 +48,5 @@ public:
     static void DrawSphere(const Vector3 &center, float radius, const Color &color = kDefaultColor, int segments = 16);
     static void DrawBounds(const DirectX::BoundingBox &bounds, const Color &color = kDefaultColor,
                            const Matrix &mat = DirectX::XMMatrixIdentity());
-    static void DrawYPlaneGrid(FLOAT2 spacing = {50, 50}, int count = 50);
 };
 }

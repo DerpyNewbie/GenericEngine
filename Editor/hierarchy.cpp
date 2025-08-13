@@ -2,6 +2,7 @@
 
 #include "hierarchy.h"
 
+#include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "gui.h"
 #include "DxLib/dxlib_helper.h"
@@ -26,6 +27,16 @@ void Hierarchy::OnEditorGui()
         DrawScene(scene);
         ImGui::PopID();
     }
+
+    auto available_space = ImGui::GetContentRegionAvail();
+    ImGui::PushID("HIERARCHY_EMPTY_SPACE");
+    ImGui::Dummy(available_space);
+    if (ImGui::BeginPopupContextItem("HIERARCHY_EMPTY_SPACE"))
+    {
+        DefaultEditorMenu::DrawObjectMenu();
+        ImGui::EndPopup();
+    }
+    ImGui::PopID();
 
     const auto locked = std::dynamic_pointer_cast<engine::GameObject>(Editor::Instance()->SelectedObject());
     if (locked != nullptr)
@@ -60,7 +71,6 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
             {
                 DrawObjectRecursive(root_object);
             }
-
             ImGui::EndTable();
         }
     }
@@ -79,7 +89,77 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
         ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
     }
 
-    const bool draw_tree = DrawObject(game_object);
+    ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+    DrawReorderingTarget(game_object, 0);
+    ImGui::PopStyleVar();
+
+    if (DrawObject(game_object))
+    {
+        const auto transform = game_object->Transform();
+        if (transform->ChildCount() != 0)
+        {
+            DrawReorderingTarget(transform->GetChild(0)->GameObject(), 0);
+        }
+
+        // Child count cannot be stored as it can be changed during DrawObjectRecursive
+        for (int i = 0; i < transform->ChildCount(); ++i)
+        {
+            const auto child_go = transform->GetChild(i)->GameObject();
+            DrawObjectRecursive(child_go);
+        }
+        ImGui::TreePop();
+    }
+
+    ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+    DrawReorderingTarget(game_object, 1);
+    ImGui::PopStyleVar();
+
+    if (has_style_color)
+    {
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::PopID();
+}
+
+bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
+{
+    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+    flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+    flags |= ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
+    flags |= ImGuiTreeNodeFlags_SpanFullWidth;
+
+    if (game_object->Transform()->ChildCount() == 0)
+    {
+        flags |= ImGuiTreeNodeFlags_Leaf;
+    }
+
+    if (game_object == Editor::Instance()->SelectedObject())
+    {
+        flags |= ImGuiTreeNodeFlags_Selected;
+    }
+
+    ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+    const bool open = ImGui::TreeNodeEx("", flags, "%s", game_object->Name().c_str());
+    ImGui::PopStyleVar();
+
+    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+    {
+        Editor::Instance()->SetSelectedObject(game_object);
+    }
+
+    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+    {
+        engine::Gui::SetObjectDragDropTarget(game_object);
+        ImGui::EndDragDropSource();
+    }
+
+    if (ImGui::BeginPopupContextItem())
+    {
+        DefaultEditorMenu::DrawObjectMenu(game_object);
+        ImGui::EndPopup();
+    }
+
     if (ImGui::BeginDragDropTarget())
     {
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
@@ -115,68 +195,37 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
         ImGui::EndDragDropTarget();
     }
 
-    if (draw_tree)
-    {
-        const auto transform = game_object->Transform();
-        // Child count cannot be stored as it can be changed during DrawObjectRecursive
-        for (int i = 0; i < transform->ChildCount(); ++i)
-        {
-            const auto child_go = transform->GetChild(i)->GameObject();
-            DrawObjectRecursive(child_go);
-        }
-        ImGui::TreePop();
-    }
-
-    if (has_style_color)
-    {
-        ImGui::PopStyleColor();
-    }
-
-    ImGui::PopID();
+    return open;
 }
 
-bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
+void Hierarchy::DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &game_object, const int offset)
 {
-    ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
-    flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
-    flags |= ImGuiTreeNodeFlags_NavLeftJumpsBackHere;
-    flags |= ImGuiTreeNodeFlags_SpanFullWidth;
+    constexpr float reorder_target_height = 0.0001F;
 
-    if (game_object->Transform()->ChildCount() == 0)
+    auto reorder_target_size = ImGui::GetContentRegionAvail();
+    reorder_target_size.y = reorder_target_height;
+    ImGui::Dummy(reorder_target_size);
+    if (ImGui::BeginDragDropTarget())
     {
-        flags |= ImGuiTreeNodeFlags_Leaf;
-    }
-
-    if (game_object == Editor::Instance()->SelectedObject())
-    {
-        flags |= ImGuiTreeNodeFlags_Selected;
-    }
-
-    const bool open = ImGui::TreeNodeEx("", flags, "%s", game_object->Name().c_str());
-
-    if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
-    {
-        Editor::Instance()->SetSelectedObject(game_object);
-    }
-
-    if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
-    {
-        engine::Gui::SetObjectDragDropTarget(game_object);
-        ImGui::EndDragDropSource();
-    }
-
-    if (ImGui::BeginPopupContextItem())
-    {
-        ImGui::Text("Game Object Context Menu for %s", game_object->Path().c_str());
-        if (ImGui::MenuItem("Delete"))
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
+                                                                       ImGuiDragDropFlags_AcceptBeforeDelivery))
         {
-            engine::Object::Destroy(game_object);
+            const auto payload_object = engine::Gui::GetObjectDragDropTarget(payload);
+            const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
+            if (payload_go != nullptr)
+            {
+                const bool can_be_parent = !game_object->Transform()->IsChildOf(payload_go->Transform());
+
+                if (can_be_parent && payload->IsDelivery())
+                {
+                    payload_go->Transform()->SetParent(game_object->Transform()->Parent());
+                    payload_go->Transform()->SetSiblingIndex(game_object->Transform()->GetSiblingIndex() + offset);
+                }
+            }
         }
 
-        ImGui::EndPopup();
+        ImGui::EndDragDropTarget();
     }
-
-    return open;
 }
 
 }

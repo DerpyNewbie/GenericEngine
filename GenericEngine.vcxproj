@@ -21,6 +21,7 @@
     <ItemGroup>
         <ClCompile Include="application.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
+        <ClCompile Include="Editor\audio_window.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
         <ClCompile Include="Editor\editor_menu.cpp"/>
         <ClCompile Include="Editor\editor_prefs.cpp"/>
@@ -40,6 +41,7 @@
         <ClCompile Include="Engine\Asset\Exporter\render_texture_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\shader_exporter.cpp"/>
         <ClCompile Include="Engine\Asset\Exporter\txt_exporter.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\audio_clip_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
@@ -50,6 +52,10 @@
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
         <ClCompile Include="Engine\Components\billboard_renderer.cpp"/>
+        <ClCompile Include="Engine\Audio\audio.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
+        <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
         <ClCompile Include="Engine\Components\camera.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -69,6 +75,15 @@
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
+        <ClCompile Include="Engine\Physics\bullet_debug_drawer.cpp"/>
+        <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\collider.cpp"/>
+        <ClCompile Include="Engine\Physics\box_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\physics.cpp"/>
+        <ClCompile Include="Engine\Physics\plane_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\rigidbody_component.cpp"/>
+        <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
+        <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
@@ -151,6 +166,7 @@
     <ItemGroup>
         <ClInclude Include="application.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
+        <ClInclude Include="Editor\audio_window.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
         <ClInclude Include="Editor\editor_menu.h"/>
         <ClInclude Include="Editor\editor_prefs.h"/>
@@ -169,6 +185,7 @@
         <ClInclude Include="Engine\Asset\Exporter\render_texture_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\shader_exporter.h"/>
         <ClInclude Include="Engine\Asset\Exporter\txt_exporter.h"/>
+        <ClInclude Include="Engine\Asset\Importer\audio_clip_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
@@ -181,6 +198,10 @@
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
         <ClInclude Include="Engine\Components\billboard_renderer.h"/>
+        <ClInclude Include="Engine\Audio\audio.h"/>
+        <ClInclude Include="Engine\Audio\audio_clip.h"/>
+        <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
+        <ClInclude Include="Engine\Audio\audio_source_component.h"/>
         <ClInclude Include="Engine\Components\camera.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -211,6 +232,15 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\Physics\bullet_debug_drawer.h"/>
+        <ClInclude Include="Engine\Physics\capsule_collider.h"/>
+        <ClInclude Include="Engine\Physics\collider.h"/>
+        <ClInclude Include="Engine\Physics\box_collider.h"/>
+        <ClInclude Include="Engine\Physics\physics.h"/>
+        <ClInclude Include="Engine\Physics\plane_collider.h"/>
+        <ClInclude Include="Engine\Physics\rigidbody_component.h"/>
+        <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
+        <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
@@ -289,7 +319,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -311,7 +341,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -333,7 +363,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -356,7 +386,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>

@@ -5,6 +5,7 @@
 #include "engine.h"
 #include "game_object.h"
 #include "input.h"
+#include "Audio/audio_listener_component.h"
 
 #include "Components/camera.h"
 #include "Components/controller.h"
@@ -50,6 +51,7 @@ void Application::StartApp()
         const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
         camera->AddComponent<engine::Camera>();
         camera->AddComponent<engine::Controller>();
+        camera->AddComponent<engine::AudioListenerComponent>();
 
         const auto parent_obj = engine::Object::Instantiate<engine::GameObject>("Parent");
         const auto child_obj = engine::Object::Instantiate<engine::GameObject>("Child");

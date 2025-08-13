@@ -30,12 +30,10 @@ public:
     virtual ~Object() = default;
 
     virtual void OnConstructed()
-    {
-    }
+    {}
 
     virtual void OnDestroy()
-    {
-    }
+    {}
 
     xg::Guid Guid() const;
 
@@ -110,6 +108,16 @@ public:
         {
             m_objects_[m_guid_] = shared_from_this();
         }
+    }
+
+    bool Equals(const Object *rhs) const
+    {
+        return Equals(this, rhs);
+    }
+
+    static bool Equals(const Object *a, const Object *b)
+    {
+        return a == b || (a != nullptr && b != nullptr && a->Guid() == b->Guid());
     }
 };
 }

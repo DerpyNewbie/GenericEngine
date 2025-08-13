@@ -175,6 +175,60 @@ void GameObject::NotifyIsActiveChanged() const
     }
 }
 
+void GameObject::InvokeOnCollisionEnter(const Collision &collision) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnCollisionEnter(collision);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnCollisionEnter(collision);
+        }
+    }
+}
+
+void GameObject::InvokeOnCollisionStay(const Collision &collision) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnCollisionStay(collision);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnCollisionStay(collision);
+        }
+    }
+}
+
+void GameObject::InvokeOnCollisionExit(const Collision &collision) const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnCollisionExit(collision);
+    }
+
+    const auto transform = Transform();
+    if (transform != nullptr)
+    {
+        for (int i = 0; i < transform->ChildCount(); i++)
+        {
+            const auto child = transform->GetChild(i)->GameObject();
+            child->InvokeOnCollisionExit(collision);
+        }
+    }
+}
+
 void GameObject::SetAsRootObject(const bool is_root_object)
 {
     auto shared_this = shared_from_base<GameObject>();

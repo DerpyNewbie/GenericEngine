@@ -10,7 +10,7 @@ Time *Time::m_update_time_;
 void Time::IncrementFrame()
 {
     const auto now = Instant();
-    m_dt_ = duration<float>(now - m_time_).count();
+    m_delta_time_ = duration<float>(now - m_time_).count();
     m_time_ = now;
 
     ++m_fps_counter_;

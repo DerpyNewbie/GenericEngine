@@ -157,7 +157,8 @@ void RenderEngine::EndRender()
 
     // スワップチェーンを切り替え
     m_pSwapChain->Present(1, 0);
-    engine::FontData::GraphicsMemory()->Commit(m_pQueue.Get());
+    if (const auto graphics_memory = engine::FontData::GraphicsMemory())
+        graphics_memory->Commit(m_pQueue.Get());
 
     // 描画完了を待つ
     WaitRender();

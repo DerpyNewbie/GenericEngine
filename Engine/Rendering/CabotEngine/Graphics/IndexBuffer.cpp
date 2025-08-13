@@ -54,7 +54,7 @@ bool engine::IndexBuffer::IsValid() const
     return m_IsValid;
 }
 
-D3D12_INDEX_BUFFER_VIEW engine::IndexBuffer::View() const
+D3D12_INDEX_BUFFER_VIEW *engine::IndexBuffer::View()
 {
-    return m_View;
+    return &m_View;
 }

@@ -18,7 +18,8 @@
       ]
     },
     "implot",
-    "crossguid"
+    "crossguid",
+    "bullet3"
   ],
   "overrides": [
     {

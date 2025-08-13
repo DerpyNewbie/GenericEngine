@@ -12,6 +12,7 @@
 #include "update_man_debugger.h"
 
 #include "application.h"
+#include "audio_window.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -21,6 +22,7 @@
 #include "Asset/text_asset.h"
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
+#include "Physics/physics.h"
 
 #include <ranges>
 
@@ -118,6 +120,7 @@ void Editor::Init()
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
         AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
         AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
+        AddEditorWindow("Audio", std::make_shared<AudioWindow>());
     }
 
     {
@@ -165,6 +168,10 @@ void Editor::OnDraw()
 
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
+    if (EditorPrefs::show_grid)
+        DxLibHelper::DrawYPlaneGrid();
+    if (EditorPrefs::show_physics_debug)
+        Physics::DebugDraw();
 
     for (const auto &window : m_editor_windows_ | std::views::values)
     {

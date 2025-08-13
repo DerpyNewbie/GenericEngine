@@ -6,7 +6,7 @@ class IndexBuffer
 public:
     IndexBuffer(size_t size, const uint32_t *pInitData = nullptr);
     bool IsValid() const;
-    D3D12_INDEX_BUFFER_VIEW View() const;
+    D3D12_INDEX_BUFFER_VIEW *View();
 
 private:
     bool m_IsValid = false;

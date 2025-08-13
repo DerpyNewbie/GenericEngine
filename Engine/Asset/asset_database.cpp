@@ -8,6 +8,7 @@
 #include "Exporter/render_texture_exporter.h"
 #include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
+#include "Importer/audio_clip_importer.h"
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
@@ -44,6 +45,7 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<FontImporter>());
     AssetImporter::Register(std::make_shared<RenderTextureImporter>());
     AssetExporter::Register(std::make_shared<RenderTextureExporter>());
+    AssetImporter::Register(std::make_shared<AudioClipImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 

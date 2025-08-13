@@ -2,6 +2,8 @@
 
 #include "component_factory.h"
 
+#include "Audio/audio_listener_component.h"
+#include "Audio/audio_source_component.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
 #include "Components/camera.h"
@@ -10,6 +12,12 @@
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Components/text_asset_ref_test_component.h"
+#include "Physics/box_collider.h"
+#include "Physics/capsule_collider.h"
+#include "Physics/plane_collider.h"
+#include "Physics/rigidbody_component.h"
+#include "Physics/rigidbody_tester_component.h"
+#include "Physics/sphere_collider.h"
 
 namespace engine
 {
@@ -26,12 +34,19 @@ void IComponentFactory::Init()
     ADD_COMPONENT(BillboardRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(TextRenderer);
+    ADD_COMPONENT(RigidbodyComponent);
+    ADD_COMPONENT(SphereCollider);
+    ADD_COMPONENT(PlaneCollider);
+    ADD_COMPONENT(BoxCollider);
+    ADD_COMPONENT(CapsuleCollider);
+    ADD_COMPONENT(RigidbodyTesterComponent);
+    ADD_COMPONENT(AudioSourceComponent);
+    ADD_COMPONENT(AudioListenerComponent);
 #undef ADD_COMPONENT
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{
-}
+{}
 
 std::string IComponentFactory::Name()
 {
