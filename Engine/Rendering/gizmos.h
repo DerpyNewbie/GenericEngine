@@ -23,16 +23,21 @@ class Gizmos : public IDrawCallReceiver
     static std::vector<Vertex> m_vertices_;
 
     std::shared_ptr<VertexBuffer> m_vertex_buffers_[RenderEngine::FRAME_BUFFER_COUNT];
+    int m_vertices_count_[RenderEngine::FRAME_BUFFER_COUNT];
+    int m_last_back_buffer_idx_ = -1;
 
     static void Init();
+    void CreateVertexBuffer(int current_back_buffer_idx);
 
 public:
     static constexpr auto kDefaultColor = Color(1, 1, 1);
 
     int Order() override
     {
-        return INT_MAX - 1000; // at the very last
+        return INT_MAX - 1000; // at the very last. but before the editor.
     }
+
+    void Render(int current_back_buffer_idx, ID3D12GraphicsCommandList *command_list);
 
     void OnDraw() override;
 
