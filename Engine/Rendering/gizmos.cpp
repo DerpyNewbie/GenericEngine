@@ -16,8 +16,6 @@ void Gizmos::Init()
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
 
     m_instance_ = std::make_shared<Gizmos>();
-
-    UpdateManager::SubscribeDrawCall(m_instance_);
 }
 
 void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
@@ -46,20 +44,22 @@ void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
     m_vertices_.clear();
 }
 
-void Gizmos::Render(const int current_back_buffer_idx, ID3D12GraphicsCommandList *command_list)
+void Gizmos::Render()
 {
+    auto current_back_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
 
     // have we created a vertex buffer for this frame? 
-    if (current_back_buffer_idx != m_last_back_buffer_idx_)
+    if (current_back_buffer_idx != m_instance_->m_last_back_buffer_idx_)
     {
         // if not, create a new vertex buffer for this frame
-        CreateVertexBuffer(current_back_buffer_idx);
-        m_last_back_buffer_idx_ = current_back_buffer_idx;
+        m_instance_->CreateVertexBuffer(current_back_buffer_idx);
+        m_instance_->m_last_back_buffer_idx_ = current_back_buffer_idx;
     }
 
-    const auto current_vertex_buffer = m_vertex_buffers_[current_back_buffer_idx];
-    const auto current_vertices_count = m_vertices_count_[current_back_buffer_idx];
+    const auto current_vertex_buffer = m_instance_->m_vertex_buffers_[current_back_buffer_idx];
+    const auto current_vertices_count = m_instance_->m_vertices_count_[current_back_buffer_idx];
 
     // if we had nothing to render, ignore it
     if (current_vertices_count == 0 || current_vertex_buffer == nullptr)
@@ -68,15 +68,11 @@ void Gizmos::Render(const int current_back_buffer_idx, ID3D12GraphicsCommandList
     }
 
     // render stuff
+    auto command_list = g_RenderEngine->CommandList();
     command_list->SetPipelineState(PSOManager::Get("Line"));
     command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     command_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
     command_list->DrawInstanced(current_vertices_count, 1, 0, 0);
-}
-
-void Gizmos::OnDraw()
-{
-    Render(static_cast<int>(g_RenderEngine->CurrentBackBufferIndex()), g_RenderEngine->CommandList());
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

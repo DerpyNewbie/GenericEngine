@@ -22,7 +22,7 @@ bool Camera::BeginRender()
         g_RenderEngine->SetMainRenderTarget();
         return true;
     }
-    if (auto render_tex = render_texture.CastedLock())
+    if (auto render_tex = m_render_texture_.CastedLock())
     {
         render_tex->BeginRender();
         return true;
@@ -36,7 +36,7 @@ void Camera::EndRender()
     {
         return;
     }
-    if (auto render_tex = render_texture.CastedLock())
+    if (auto render_tex = m_render_texture_.CastedLock())
     {
         render_tex->EndRender();
     }
@@ -127,7 +127,7 @@ void Camera::OnConstructed()
 void Camera::OnInspectorGui()
 {
     m_property_.OnInspectorGui();
-
+    Gui::PropertyField("RenderTexture", m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }
 
@@ -139,17 +139,16 @@ void Camera::OnDraw()
         SetViewProjMatrix();
         m_current_camera_ = shared_from_base<Camera>();
         m_drawcall_count_ = 0;
-        auto objects_in_view = FilterVisibleObjects(Renderer::renderers);
+        auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
         for (auto object : objects_in_view)
         {
             m_drawcall_count_++;
             object->OnDraw();
         }
+        m_drawcall_count_ = objects_in_view.size();
         Gizmos::Render();
         EndRender();
     }
-
-    m_drawcall_count_ = objects_in_view.size();
 }
 
 void Camera::OnEnabled()

@@ -51,6 +51,7 @@ class Camera : public Component, public IDrawCallReceiver
     static std::weak_ptr<Camera> m_current_camera_;
 
     CameraProperty m_property_;
+    AssetPtr<RenderTexture> m_render_texture_;
 
     UINT m_drawcall_count_ = 0;
 
@@ -68,6 +69,7 @@ public:
     void OnAwake() override;
     void OnConstructed() override;
     void OnInspectorGui() override;
+    int Order() override;
     void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;

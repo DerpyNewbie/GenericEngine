@@ -55,14 +55,12 @@ void engine::BillboardRenderer::OnDraw()
     {
         auto shader = shared_material->p_shared_shader.CastedLock();
         const auto cmd_list = g_RenderEngine->CommandList();
-        const auto vb_view = m_billboard_.vertex_buffer->View();
-        const auto ibView = m_billboard_.index_buffer->View();
         auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
 
         PSOManager::SetPipelineState(cmd_list, shader);
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        cmd_list->IASetVertexBuffers(0, 1, &vb_view);
-        cmd_list->IASetIndexBuffer(&ibView);
+        cmd_list->IASetVertexBuffers(0, 1, m_billboard_.vertex_buffer->View());
+        cmd_list->IASetIndexBuffer(m_billboard_.index_buffer->View());
         cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV,
                                                     m_billboard_.wvp_buffers[current_buffer]->GetAddress());
         SetDescriptorTable(cmd_list);
@@ -71,7 +69,7 @@ void engine::BillboardRenderer::OnDraw()
     }
 }
 
-std::weak_ptr<engine::Transform> engine::BillboardRenderer::BoundsOrigin()
+std::shared_ptr<engine::Transform> engine::BillboardRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
 }
