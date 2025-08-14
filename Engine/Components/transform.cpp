@@ -336,12 +336,12 @@ void Transform::TransformGui(const bool is_local)
         scale = Scale();
     }
 
-    if (Gui::PropertyField(is_local ? "Local Position" : "Position", position) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Position" : "Position", position))
     {
         is_local ? SetLocalPosition(position) : SetPosition(position);
     }
 
-    if (Gui::PropertyField(is_local ? "Local Rotation" : "Rotation", rotation) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Rotation" : "Rotation", rotation))
     {
         const auto rot_quat = Quaternion::CreateFromYawPitchRoll(rotation * Mathf::kDeg2Rad);
         is_local ? SetLocalRotation(rot_quat) : SetRotation(rot_quat);
@@ -352,7 +352,7 @@ void Transform::TransformGui(const bool is_local)
         ImGui::BeginDisabled();
     }
 
-    if (Gui::PropertyField(is_local ? "Local Scale" : "Scale", scale) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Scale" : "Scale", scale))
     {
         SetLocalScale(scale);
     }
