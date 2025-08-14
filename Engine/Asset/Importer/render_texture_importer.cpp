@@ -9,8 +9,7 @@ std::vector<std::string> RenderTextureImporter::SupportedExtensions()
     return {".rendertexture"};
 }
 
-std::shared_ptr<engine::Object> RenderTextureImporter::Import(std::istream &input_stream,
-                                                              engine::AssetDescriptor *asset)
+std::shared_ptr<Object> RenderTextureImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
 {
     return Object::Instantiate<RenderTexture>(asset->guid);
 }
