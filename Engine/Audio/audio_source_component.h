@@ -50,5 +50,13 @@ public:
     void Pause() const;
     void Resume() const;
     void Stop();
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_clip_), CEREAL_NVP(m_volume_), CEREAL_NVP(m_pitch_), CEREAL_NVP(m_doppler_factor_),
+           CEREAL_NVP(m_loop_), CEREAL_NVP(m_use_3d_), CEREAL_NVP(m_play_on_start_));
+    }
 };
 }
