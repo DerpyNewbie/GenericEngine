@@ -14,31 +14,17 @@ namespace engine
 std::weak_ptr<Camera> Camera::m_main_camera_;
 std::weak_ptr<Camera> Camera::m_current_camera_;
 
-bool Camera::BeginRender()
+void Camera::Render()
 {
-    if (Main() == shared_from_base<Camera>())
+    SetViewProjMatrix();
+    m_current_camera_ = shared_from_base<Camera>();
+    auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
+    for (auto object : objects_in_view)
     {
-        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
-        return true;
+        object->OnDraw();
     }
-    if (auto render_tex = m_render_texture_.CastedLock())
-    {
-        render_tex->BeginRender(m_property_.background_color);
-        return true;
-    }
-    return false;
-}
-
-void Camera::EndRender()
-{
-    if (Main() == shared_from_base<Camera>())
-    {
-        return;
-    }
-    if (auto render_tex = m_render_texture_.CastedLock())
-    {
-        render_tex->EndRender();
-    }
+    m_drawcall_count_ = objects_in_view.size();
+    Gizmos::Render();
 }
 
 void CameraProperty::OnInspectorGui()
@@ -133,19 +119,15 @@ void Camera::OnInspectorGui()
 void Camera::OnDraw()
 {
     g_RenderEngine->SetBackGroundColor(m_property_.background_color);
-    if (BeginRender())
+    if (auto render_tex = m_render_texture_.CastedLock())
     {
-        SetViewProjMatrix();
-        m_current_camera_ = shared_from_base<Camera>();
-        m_drawcall_count_ = 0;
-        auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-        for (auto object : objects_in_view)
-        {
-            object->OnDraw();
-        }
-        m_drawcall_count_ = objects_in_view.size();
-        Gizmos::Render();
-        EndRender();
+        render_tex->BeginRender(m_property_.background_color);
+        Render();
+    }
+    if (Main() == shared_from_base<Camera>())
+    {
+        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
+        Render();
     }
 }
 

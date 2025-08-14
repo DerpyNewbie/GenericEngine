@@ -125,7 +125,7 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_gr
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    const float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
+    float clearColor[] = {back_ground_color.R(), back_ground_color.G(), back_ground_color.B(), back_ground_color.A()};
     m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア

@@ -35,6 +35,11 @@ void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
     }
 }
 
+void BillboardRenderer::OnAwake()
+{
+
+}
+
 void BillboardRenderer::OnConstructed()
 {
     shared_material = Instantiate<Material>();
