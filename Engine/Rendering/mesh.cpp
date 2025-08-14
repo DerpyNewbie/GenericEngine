@@ -8,7 +8,6 @@
 
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
-#include "DxLib/dxlib_converter.h"
 #include "mesh.h"
 
 #include "assimp_util.h"

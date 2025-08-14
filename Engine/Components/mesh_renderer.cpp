@@ -1,12 +1,13 @@
 #include "pch.h"
 
 #include "mesh_renderer.h"
-#include "DxLib/dxlib_helper.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
 #include "camera.h"
+#include "Rendering/gizmos.h"
+#include "Rendering/material_data.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine

@@ -10,7 +10,7 @@ void SphereCollider::OnInspectorGui()
 {
     if (Gui::FloatField("Radius", m_radius_))
     {
-        UpdateShape();
+        ApplyChanges();
     }
 
     Collider::OnInspectorGui();
@@ -21,7 +21,6 @@ void SphereCollider::UpdateShape()
     m_radius_ = max(m_radius_, Mathf::kEpsilon);
 
     m_shape_.setUnscaledRadius(m_radius_);
-    MarkDirty();
 }
 
 btCollisionShape *SphereCollider::GetShape()
@@ -37,7 +36,7 @@ float SphereCollider::Radius() const
 void SphereCollider::SetRadius(const float radius)
 {
     m_radius_ = radius;
-    UpdateShape();
+    ApplyChanges();
 }
 }
 

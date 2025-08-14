@@ -14,5 +14,11 @@ public:
     void OnInspectorGui() override;
 
     static std::shared_ptr<AudioListenerComponent> ActiveListener();
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this));
+    }
 };
 }

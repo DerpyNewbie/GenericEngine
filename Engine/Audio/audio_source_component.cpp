@@ -239,3 +239,5 @@ void AudioSourceComponent::Stop()
     m_sound_effect_instance_ = nullptr;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AudioSourceComponent)

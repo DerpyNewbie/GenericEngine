@@ -7,6 +7,7 @@ class GameObject;
 struct Collision
 {
     GameObject *other;
+    Vector3 average_normal;
 };
 
 class Component : public Object
@@ -48,6 +49,15 @@ public:
     {}
 
     virtual void OnCollisionExit(const Collision &collision)
+    {}
+
+    virtual void OnTriggerEnter(const std::shared_ptr<GameObject> &other)
+    {}
+
+    virtual void OnTriggerStay(const std::shared_ptr<GameObject> &other)
+    {}
+
+    virtual void OnTriggerExit(const std::shared_ptr<GameObject> &other)
     {}
 
     virtual void OnInspectorGui();

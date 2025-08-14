@@ -162,6 +162,10 @@ private:
     void InvokeOnCollisionStay(const Collision &collision) const;
     void InvokeOnCollisionExit(const Collision &collision) const;
 
+    void InvokeOnTriggerEnter(const std::shared_ptr<GameObject> &other) const;
+    void InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) const;
+    void InvokeOnTriggerExit(const std::shared_ptr<GameObject> &other) const;
+
     void SetAsRootObject(bool is_root_object);
 
 public:

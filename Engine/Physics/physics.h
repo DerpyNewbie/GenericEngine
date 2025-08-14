@@ -1,6 +1,8 @@
 #pragma once
 #include "bullet_debug_drawer.h"
 #include "event_receivers.h"
+#include "Components/component.h"
+
 #include <bullet/btBulletDynamicsCommon.h>
 
 namespace engine
@@ -10,6 +12,7 @@ class RigidbodyComponent;
 class Physics : public IFixedUpdateReceiver
 {
     friend class Engine;
+    friend class RigidbodyComponent;
 
     static std::shared_ptr<Physics> m_instance_;
     Vector3 m_gravity_;
@@ -23,16 +26,35 @@ class Physics : public IFixedUpdateReceiver
     std::vector<std::weak_ptr<RigidbodyComponent>> m_rigidbodies_;
 
     using ContactPair = std::pair<const RigidbodyComponent *, const RigidbodyComponent *>;
-    std::map<ContactPair, const btPersistentManifold *> m_current_contacts_;
-    std::map<ContactPair, const btPersistentManifold *> m_previous_contacts_;
+    using CollisionPair = std::pair<Collision, Collision>;
+    std::map<ContactPair, CollisionPair> m_current_contacts_;
+    std::map<ContactPair, CollisionPair> m_previous_contacts_;
+
+    using TriggerPair = std::pair<const std::shared_ptr<GameObject>, const std::shared_ptr<GameObject>>;
+    std::set<TriggerPair> m_current_overlaps_;
+    std::set<TriggerPair> m_previous_overlaps_;
 
     static void Init();
 
     Physics();
 
-    static void OnCollisionStarted(const ContactPair &pair, const btPersistentManifold *manifold);
-    static void OnCollisionStayed(const ContactPair &pair, const btPersistentManifold *manifold);
-    static void OnCollisionExited(const ContactPair &pair, const btPersistentManifold *manifold);
+    static Vector3 CalculateNormalFromManifold(btPersistentManifold *manifold);
+
+    static void OnCollisionStarted(const ContactPair &contact_pair, const CollisionPair &collision_pair);
+    static void OnCollisionStayed(const ContactPair &contact_pair, const CollisionPair &collision_pair);
+    static void OnCollisionExited(const ContactPair &contact_pair, const CollisionPair &collision_pair);
+
+    static void OnTriggerStarted(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other);
+    static void OnTriggerStayed(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other);
+    static void OnTriggerExited(const std::shared_ptr<GameObject> &target, const std::shared_ptr<GameObject> &other);
+
+    static void AddTriggerOverlap(const std::shared_ptr<GameObject> &a, const std::shared_ptr<GameObject> &b);
+
+    static void AddRigidbody(const std::shared_ptr<RigidbodyComponent> &rb);
+    static void RemoveRigidbody(const std::shared_ptr<RigidbodyComponent> &rb);
+
+    void ProcessCollisions();
+    void ProcessTriggers();
 
 public:
     int Order() override;
@@ -42,7 +64,5 @@ public:
     static Vector3 Gravity();
     static void SetGravity(const Vector3 &gravity);
 
-    static void AddRigidbody(const std::shared_ptr<RigidbodyComponent> &rb);
-    static void RemoveRigidbody(const std::shared_ptr<RigidbodyComponent> &rb);
 };
 }
