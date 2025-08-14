@@ -5,8 +5,6 @@
 #include "default_editor_menus.h"
 #include "editor_prefs.h"
 #include "gui.h"
-#include "DxLib/dxlib_helper.h"
-#include "DxLib/dxlib_converter.h"
 #include "scene.h"
 #include "scene_manager.h"
 #include "str_util.h"
@@ -37,14 +35,6 @@ void Hierarchy::OnEditorGui()
         ImGui::EndPopup();
     }
     ImGui::PopID();
-
-    const auto locked = std::dynamic_pointer_cast<engine::GameObject>(Editor::Instance()->SelectedObject());
-    if (locked != nullptr)
-    {
-        SetFontSize(12);
-        DxLibHelper::DrawObjectInfo(StringUtil::Utf8ToShiftJis(locked->Name()).c_str(),
-                                    DxLibConverter::From(locked->Transform()->WorldMatrix()));
-    }
 }
 
 void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
