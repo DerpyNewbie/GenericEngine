@@ -16,8 +16,8 @@ public:
     bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight); // エンジン初期化
 
     void BeginRender(); // 描画の開始処理
-    void SetMainRenderTarget();
-    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap) const;
+    void SetMainRenderTarget(Color back_ground_color);
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_ground_color) const;
     void EndRender(); // 描画の終了処理
     void WaitRender(); // 描画完了を待つ処理
 

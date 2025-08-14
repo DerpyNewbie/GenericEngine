@@ -80,7 +80,7 @@ void RenderEngine::BeginRender()
     m_pCommandList->ResourceBarrier(1, &dsBarrier);
 }
 
-void RenderEngine::SetMainRenderTarget()
+void RenderEngine::SetMainRenderTarget(Color back_ground_color)
 {
     // レンダーターゲットが使用可能になるまで待つ
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
@@ -99,7 +99,7 @@ void RenderEngine::SetMainRenderTarget()
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    constexpr float clearColor[] = {0.5f, 0.5f, 0.5f, 0.5f};
+    float clearColor[] = {back_ground_color.R(), back_ground_color.G(), back_ground_color.B(), back_ground_color.A()};
     m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
@@ -109,7 +109,7 @@ void RenderEngine::SetMainRenderTarget()
     g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
-void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap) const
+void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_ground_color) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();

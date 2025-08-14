@@ -50,7 +50,7 @@ void ConstantBuffer::CreateBuffer()
     m_Desc.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
     m_Desc.SizeInBytes = UINT(m_SizeAligned);
 
-    m_pBuffer->SetName(L"Constantbuffer");
+    m_pBuffer->SetName(L"ConstantBuffer");
 
     m_IsValid = true;
 }

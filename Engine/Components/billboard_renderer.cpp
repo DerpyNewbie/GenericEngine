@@ -5,7 +5,9 @@
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
-void engine::BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
+namespace engine
+{
+void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
 {
     const auto material = shared_material;
     const auto material_block = material->p_shared_material_block;
@@ -33,18 +35,18 @@ void engine::BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cm
     }
 }
 
-void engine::BillboardRenderer::OnConstructed()
+void BillboardRenderer::OnConstructed()
 {
     shared_material = Instantiate<Material>();
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
-void engine::BillboardRenderer::OnInspectorGui()
+void BillboardRenderer::OnInspectorGui()
 {
     shared_material->OnInspectorGui();
 }
 
-void engine::BillboardRenderer::OnDraw()
+void BillboardRenderer::OnDraw()
 {
     m_billboard_.world_matrix = GameObject()->Transform()->WorldMatrix();
     m_billboard_.Update();
@@ -69,9 +71,10 @@ void engine::BillboardRenderer::OnDraw()
     }
 }
 
-std::shared_ptr<engine::Transform> engine::BillboardRenderer::BoundsOrigin()
+std::shared_ptr<Transform> BillboardRenderer::BoundsOrigin()
 {
     return GameObject()->Transform();
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::BillboardRenderer)

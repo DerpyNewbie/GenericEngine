@@ -8,7 +8,6 @@
 #include "Rendering/gizmos.h"
 #include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace engine
 {
@@ -19,12 +18,12 @@ bool Camera::BeginRender()
 {
     if (Main() == shared_from_base<Camera>())
     {
-        g_RenderEngine->SetMainRenderTarget();
+        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
         return true;
     }
     if (auto render_tex = m_render_texture_.CastedLock())
     {
-        render_tex->BeginRender();
+        render_tex->BeginRender(m_property_.background_color);
         return true;
     }
     return false;
@@ -142,7 +141,6 @@ void Camera::OnDraw()
         auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
         for (auto object : objects_in_view)
         {
-            m_drawcall_count_++;
             object->OnDraw();
         }
         m_drawcall_count_ = objects_in_view.size();

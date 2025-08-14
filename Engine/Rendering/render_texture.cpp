@@ -6,6 +6,8 @@
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include <directx/d3dx12_barriers.h>
 
+namespace engine
+{
 void RenderTexture::CreateBuffer()
 {
     auto device = g_RenderEngine->Device();
@@ -30,7 +32,7 @@ void RenderTexture::CreateBuffer()
         &clearValue,
         IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
         );
-    m_pResource->SetName(L"renderTexture");
+    m_pResource->SetName(L"RenderTexture");
 
     if (FAILED(hr))
     {
@@ -53,7 +55,7 @@ void RenderTexture::CreateBuffer()
     device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
-void RenderTexture::BeginRender()
+void RenderTexture::BeginRender(Color back_ground_color)
 {
     if (!m_pResource)
     {
@@ -63,10 +65,10 @@ void RenderTexture::BeginRender()
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
-    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get());
+    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get(), back_ground_color);
 }
 
-void RenderTexture::EndRender()
+void RenderTexture::EndRender() const
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
@@ -82,4 +84,5 @@ D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()
     srv_desc.Texture2D.MipLevels = 1;
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     return srv_desc;
+}
 }
