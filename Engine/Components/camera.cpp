@@ -118,7 +118,6 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    g_RenderEngine->SetBackGroundColor(m_property_.background_color);
     if (auto render_tex = m_render_texture_.CastedLock())
     {
         render_tex->BeginRender(m_property_.background_color);
