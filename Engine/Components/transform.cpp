@@ -2,6 +2,7 @@
 
 #include "transform.h"
 #include "game_object.h"
+#include "gui.h"
 #include "scene.h"
 
 namespace engine
@@ -9,8 +10,34 @@ namespace engine
 
 void Transform::OnInspectorGui()
 {
-    RenderLocalTransformGui();
-    RenderGlobalTransformGui();
+    static int selected_tab = 0;
+
+    if (ImGui::BeginTabBar("##TRANSFORM_TAB_BAR", ImGuiTabBarFlags_DrawSelectedOverline))
+    {
+        if (ImGui::BeginTabItem("Local", nullptr, selected_tab == 0 ? ImGuiTabItemFlags_SetSelected : 0))
+        {
+            TransformGui(true);
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            selected_tab = 0;
+        }
+
+        if (ImGui::BeginTabItem("Global", nullptr, selected_tab == 1 ? ImGuiTabItemFlags_SetSelected : 0))
+        {
+            TransformGui(false);
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            selected_tab = 1;
+        }
+
+        ImGui::EndTabBar();
+    }
 }
 
 Matrix Transform::LocalMatrix() const
@@ -292,77 +319,48 @@ void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const V
         Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) * Matrix::CreateTranslation(position));
 }
 
-void Transform::RenderLocalTransformGui()
+void Transform::TransformGui(const bool is_local)
 {
-    if (!ImGui::CollapsingHeader("Local", ImGuiTreeNodeFlags_DefaultOpen))
-        return;
+    Vector3 position, rotation, scale;
 
-    ImGui::PushID("Local");
-
-    float local_pos[3], local_rot_euler[3], local_scale[3];
-    EngineUtil::ToFloat3(local_pos, LocalPosition());
-    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEuler() * Mathf::kRad2Deg);
-    EngineUtil::ToFloat3(local_scale, LocalScale());
-
-    if (ImGui::InputFloat3("Position", local_pos) && ImGui::IsItemDeactivatedAfterEdit())
+    if (is_local)
     {
-        Logger::Log<Transform>("New Position: %f, %f, %f", local_pos[0], local_pos[1], local_pos[2]);
-        SetLocalPosition({local_pos[0], local_pos[1], local_pos[2]});
+        position = LocalPosition();
+        rotation = LocalRotation().ToEuler() * Mathf::kRad2Deg;
+        scale = LocalScale();
+    }
+    else
+    {
+        position = Position();
+        rotation = Rotation().ToEuler() * Mathf::kRad2Deg;
+        scale = Scale();
     }
 
-    if (ImGui::InputFloat3("Rotation", local_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Position" : "Position", position) && ImGui::IsItemDeactivatedAfterEdit())
     {
-        Logger::Log<Transform>("New Rotation: %f, %f, %f", local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]);
-        SetLocalRotation(
-            Quaternion::CreateFromYawPitchRoll(
-                local_rot_euler[1] * Mathf::kDeg2Rad,
-                local_rot_euler[0] * Mathf::kDeg2Rad,
-                local_rot_euler[2] * Mathf::kDeg2Rad));
+        is_local ? SetLocalPosition(position) : SetPosition(position);
     }
 
-    if (ImGui::InputFloat3("Scale", local_scale) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Rotation" : "Rotation", rotation) && ImGui::IsItemDeactivatedAfterEdit())
     {
-        Logger::Log<Transform>("New Scale: %f, %f, %f", local_scale[0], local_scale[1], local_scale[2]);
-        SetLocalScale({local_scale[0], local_scale[1], local_scale[2]});
+        const auto rot_quat = Quaternion::CreateFromYawPitchRoll(rotation * Mathf::kDeg2Rad);
+        is_local ? SetLocalRotation(rot_quat) : SetRotation(rot_quat);
     }
 
-    ImGui::PopID();
-}
-
-void Transform::RenderGlobalTransformGui()
-{
-    if (!ImGui::CollapsingHeader("Global"))
-        return;
-
-    ImGui::PushID("Global");
-
-    float global_pos[3], global_rot_euler[3], global_scale[3];
-    EngineUtil::ToFloat3(global_pos, Position());
-    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEuler() * Mathf::kRad2Deg);
-    EngineUtil::ToFloat3(global_scale, Scale());
-
-    if (ImGui::InputFloat3("Position", global_pos) && ImGui::IsItemDeactivatedAfterEdit())
+    if (!is_local)
     {
-        Logger::Log<Transform>("New Position: %f, %f, %f", global_pos[0], global_pos[1], global_pos[2]);
-        SetPosition({global_pos[0], global_pos[1], global_pos[2]});
+        ImGui::BeginDisabled();
     }
 
-    if (ImGui::InputFloat3("Rotation", global_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Scale" : "Scale", scale) && ImGui::IsItemDeactivatedAfterEdit())
     {
-        Logger::Log<Transform>("New Rotation: %f, %f, %f",
-                               global_rot_euler[0], global_rot_euler[1], global_rot_euler[2]);
-        SetRotation(Quaternion::CreateFromYawPitchRoll(
-            global_rot_euler[1] * Mathf::kDeg2Rad,
-            global_rot_euler[0] * Mathf::kDeg2Rad,
-            global_rot_euler[2] * Mathf::kDeg2Rad));
+        SetLocalScale(scale);
     }
 
-    if (ImGui::InputFloat3("Scale", global_scale) && ImGui::IsItemDeactivatedAfterEdit())
+    if (!is_local)
     {
-        Logger::Error<Transform>("World scale is not implemented");
+        ImGui::EndDisabled();
     }
-
-    ImGui::PopID();
 }
 
 void Transform::RecalculateWorldMatrix()
