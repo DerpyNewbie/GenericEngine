@@ -7,9 +7,12 @@ namespace engine
 class Collider : public Component
 {
     friend class RigidbodyComponent;
+    friend class CompoundShape;
 
     std::weak_ptr<RigidbodyComponent> m_rigidbody_;
-    bool m_is_dirty_ = true;
+    Vector3 m_offset_ = {0, 0, 0};
+    bool m_is_trigger_ = false;
+    bool m_is_registered_ = false;
 
     virtual void UpdateShape() = 0;
     virtual btCollisionShape *GetShape() = 0;
@@ -18,7 +21,7 @@ class Collider : public Component
     void RemoveFromRigidbody();
 
 protected:
-    void MarkDirty();
+    void ApplyChanges();
 
 public:
     void OnInspectorGui() override;
@@ -26,7 +29,12 @@ public:
     void OnDisabled() override;
     void OnDestroy() override;
 
-    std::shared_ptr<RigidbodyComponent> Rigidbody() const;
+    [[nodiscard]] std::shared_ptr<RigidbodyComponent> Rigidbody() const;
+    [[nodiscard]] bool IsTrigger() const;
+    [[nodiscard]] Vector3 Offset() const;
+
+    void SetTrigger(bool trigger);
+    void SetOffset(Vector3 offset);
 
     template <class Archive>
     void serialize(Archive &ar)

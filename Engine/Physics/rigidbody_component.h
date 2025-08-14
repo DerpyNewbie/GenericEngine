@@ -1,13 +1,15 @@
 #pragma once
+#include "compound_shape.h"
 #include "Components/component.h"
 #include "Components/transform.h"
 
-#include <BulletCollision/CollisionShapes/btCompoundShape.h>
+#include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletDynamics/Dynamics/btRigidBody.h>
 #include <bullet/LinearMath/btMotionState.h>
 
 namespace engine
 {
+class Collider;
 enum class kForceMode : unsigned char
 {
     kForce,
@@ -20,12 +22,15 @@ class RigidbodyComponent : public Component
     friend class Collider;
 
     std::unique_ptr<btRigidBody> m_bt_rigidbody_ = nullptr;
+    std::unique_ptr<btGhostObject> m_bt_ghost_object_ = nullptr;
     std::unique_ptr<btMotionState> m_bt_motion_state_ = nullptr;
-    std::unique_ptr<btCompoundShape> m_bt_compound_shape_ = nullptr;
-    std::weak_ptr<Transform> m_transform_ = {};
-    std::vector<std::weak_ptr<Collider>> m_colliders_;
+    std::unique_ptr<CompoundShape> m_rigidbody_shape_ = nullptr;
+    std::unique_ptr<CompoundShape> m_ghost_shape_ = nullptr;
 
-    bool m_should_reconstruct_ = true;
+    std::list<std::weak_ptr<class GameObject>> m_last_ghost_overlapping_objects_;
+
+    std::weak_ptr<Transform> m_transform_ = {};
+
     bool m_should_write_ = true;
     bool m_is_registered_ = false;
 
@@ -45,22 +50,26 @@ class RigidbodyComponent : public Component
 
     bool m_is_kinematic_ = true;
     bool m_is_static_ = true;
+    bool m_use_gravity_ = true;
 
     void ConstructRigidbody();
     void RegisterToPhysics();
-    void ReadFromPhysics();
-    void WriteToPhysics();
+    void ReadRigidbody();
+    void WriteRigidbody();
     void UnregisterFromPhysics();
-    void UpdateCompoundShape();
+    void UpdateCompoundShape() const;
+    void UpdatePhysics();
 
-    void AddCollider(const std::shared_ptr<Collider> &collider);
-    void RemoveCollider(const std::shared_ptr<Collider> &collider);
-    void AddColliderToCompoundShape(const std::shared_ptr<Collider> &collider);
-    void RemoveColliderFromCompoundShape(const std::shared_ptr<Collider> &collider);
+    void OnPrePhysicsUpdate();
+    void OnPostPhysicsUpdate();
+
+    void CollectOverlaps() const;
+
+    void AddCollider(const std::shared_ptr<Collider> &collider) const;
+    void RemoveCollider(const std::shared_ptr<Collider> &collider) const;
 
 public:
     void OnEnabled() override;
-    void OnUpdate() override;
     void OnDisabled() override;
     void OnDestroy() override;
 
@@ -80,6 +89,7 @@ public:
     [[nodiscard]] bool IsSleeping() const;
     [[nodiscard]] bool IsKinematic() const;
     [[nodiscard]] bool IsStatic() const;
+    [[nodiscard]] bool UseGravity() const;
     [[nodiscard]] bool IsKinematicOrStatic() const;
     [[nodiscard]] bool IsDynamic() const;
 
@@ -97,6 +107,7 @@ public:
     void SetAngularDamping(float angular_damping);
     void SetKinematic(bool next_kinematic);
     void SetStatic(bool next_static);
+    void SetGravity(bool use_gravity);
 
     void AddForce(const Vector3 &force, kForceMode mode = kForceMode::kForce);
     void AddForceAtPosition(const Vector3 &force, const Vector3 &world_position, kForceMode mode = kForceMode::kForce);
@@ -110,13 +121,13 @@ public:
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_transform_), CEREAL_NVP(m_colliders_),
+           CEREAL_NVP(m_transform_), CEREAL_NVP(m_rigidbody_shape_), CEREAL_NVP(m_ghost_shape_),
            CEREAL_NVP(m_velocity_), CEREAL_NVP(m_angular_velocity_), CEREAL_NVP(m_center_of_mass_),
            CEREAL_NVP(m_mass_),
            CEREAL_NVP(m_linear_damping_), CEREAL_NVP(m_angular_damping_),
            CEREAL_NVP(m_friction_), CEREAL_NVP(m_rolling_friction_), CEREAL_NVP(m_spinning_friction_),
            CEREAL_NVP(m_bounciness_),
-           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_));
+           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_), CEREAL_NVP(m_use_gravity_));
 
         RegisterToPhysics();
     }

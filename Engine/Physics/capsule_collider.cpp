@@ -9,12 +9,12 @@ void CapsuleCollider::OnInspectorGui()
 {
     if (Gui::FloatField("Radius", m_radius_))
     {
-        UpdateShape();
+        ApplyChanges();
     }
 
     if (Gui::FloatField("Height", m_height_))
     {
-        UpdateShape();
+        ApplyChanges();
     }
 
     Collider::OnInspectorGui();
@@ -25,7 +25,6 @@ void CapsuleCollider::UpdateShape()
     m_radius_ = max(m_radius_, Mathf::kEpsilon);
     m_height_ = max(m_height_, Mathf::kEpsilon);
     m_capsule_shape_.setLocalScaling({m_radius_, m_height_, m_radius_});
-    MarkDirty();
 }
 
 btCollisionShape *CapsuleCollider::GetShape()
@@ -36,13 +35,13 @@ btCollisionShape *CapsuleCollider::GetShape()
 void CapsuleCollider::SetRadius(const float radius)
 {
     m_radius_ = radius;
-    UpdateShape();
+    ApplyChanges();
 }
 
 void CapsuleCollider::SetHeight(const float height)
 {
     m_height_ = height;
-    UpdateShape();
+    ApplyChanges();
 }
 
 float CapsuleCollider::Radius() const
