@@ -2,6 +2,7 @@
 
 #include "collider.h"
 #include "game_object.h"
+#include "gui.h"
 
 namespace engine
 {
@@ -15,6 +16,7 @@ void Collider::AddToRigidbody()
 
     m_rigidbody_ = rb;
     rb->AddCollider(shared_from_base<Collider>());
+    m_is_registered_ = true;
 }
 
 void Collider::RemoveFromRigidbody()
@@ -24,15 +26,33 @@ void Collider::RemoveFromRigidbody()
     {
         locked->RemoveCollider(shared_from_base<Collider>());
     }
-}
 
-void Collider::MarkDirty()
+    m_is_registered_ = false;
+}
+void Collider::ApplyChanges()
 {
-    m_is_dirty_ = true;
+    if (!m_is_registered_)
+    {
+        return;
+    }
+
+    RemoveFromRigidbody();
+    UpdateShape();
+    AddToRigidbody();
 }
 
 void Collider::OnInspectorGui()
 {
+    if (Gui::PropertyField("Offset", m_offset_))
+    {
+        ApplyChanges();
+    }
+
+    if (Gui::PropertyField("Is Trigger", m_is_trigger_))
+    {
+        ApplyChanges();
+    }
+
     if (ImGui::CollapsingHeader("Collider Info", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Indent();
@@ -71,6 +91,29 @@ std::shared_ptr<RigidbodyComponent> Collider::Rigidbody() const
 {
     return m_rigidbody_.lock();
 }
+
+bool Collider::IsTrigger() const
+{
+    return m_is_trigger_;
+}
+
+Vector3 Collider::Offset() const
+{
+    return m_offset_;
+}
+
+void Collider::SetTrigger(const bool trigger)
+{
+    m_is_trigger_ = trigger;
+    ApplyChanges();
+}
+
+void Collider::SetOffset(const Vector3 offset)
+{
+    m_offset_ = offset;
+    ApplyChanges();
+}
+
 }
 
 CEREAL_REGISTER_TYPE(engine::Collider)

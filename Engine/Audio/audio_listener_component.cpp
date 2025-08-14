@@ -33,3 +33,5 @@ std::shared_ptr<AudioListenerComponent> AudioListenerComponent::ActiveListener()
     return m_listeners_.front().lock();
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AudioListenerComponent)

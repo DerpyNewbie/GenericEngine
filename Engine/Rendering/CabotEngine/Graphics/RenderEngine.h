@@ -16,8 +16,8 @@ public:
     bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight); // エンジン初期化
 
     void BeginRender(); // 描画の開始処理
-    void SetMainRenderTarget(Color back_ground_color);
-    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_ground_color) const;
+    void SetMainRenderTarget(Color background_color);
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color background_color) const;
     void EndRender(); // 描画の終了処理
     void WaitRender(); // 描画完了を待つ処理
 
@@ -47,8 +47,6 @@ public:
         return m_Viewport;
     }
 
-    void SetBackGroundColor(Color color);
-
     D3D12_DESCRIPTOR_HEAP_DESC RTVHeapDesc() const
     {
         return m_pRtvHeap->GetDesc();
@@ -74,7 +72,6 @@ private:
     UINT m_FrameBufferWidth = 0;
     UINT m_FrameBufferHeight = 0;
     UINT m_CurrentBackBufferIndex = 0;
-    float m_BackGroundColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
     ComPtr<ID3D12Device6> m_pDevice = nullptr; // デバイス
     ComPtr<ID3D12CommandQueue> m_pQueue = nullptr; // コマンドキュー

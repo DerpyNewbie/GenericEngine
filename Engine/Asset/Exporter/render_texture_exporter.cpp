@@ -9,12 +9,11 @@ std::vector<std::string> RenderTextureExporter::SupportedExtensions()
     return {".rendertexture"};
 }
 
-bool RenderTextureExporter::CanExport(const std::shared_ptr<engine::Object> &object)
+bool RenderTextureExporter::CanExport(const std::shared_ptr<Object> &object)
 {
     return std::dynamic_pointer_cast<RenderTexture>(object) != nullptr;
 }
 
-void RenderTextureExporter::Export(std::ostream &output_stream, engine::AssetDescriptor *descriptor)
-{
-}
+void RenderTextureExporter::Export(std::ostream &output_stream, AssetDescriptor *descriptor)
+{}
 }

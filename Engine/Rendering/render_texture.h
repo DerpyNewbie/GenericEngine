@@ -12,7 +12,7 @@ class RenderTexture : public Texture2D
 
 public:
     void CreateBuffer() override;
-    void BeginRender(Color back_ground_color);
+    void BeginRender(Color background_color);
     void EndRender() const;
 
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;

@@ -45,7 +45,7 @@ void RenderTexture::CreateBuffer()
     hr = device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(m_RTVHeap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
-        engine::Logger::Error<RenderTexture>("Failed To Create RTV Heap for RenderTexture");
+        Logger::Error<RenderTexture>("Failed To Create RTV Heap for RenderTexture");
     }
 
     D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
@@ -55,7 +55,7 @@ void RenderTexture::CreateBuffer()
     device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
-void RenderTexture::BeginRender(Color back_ground_color)
+void RenderTexture::BeginRender(const Color background_color)
 {
     if (!m_pResource)
     {
@@ -65,7 +65,7 @@ void RenderTexture::BeginRender(Color back_ground_color)
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
-    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get(), back_ground_color);
+    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get(), background_color);
 }
 
 void RenderTexture::EndRender() const

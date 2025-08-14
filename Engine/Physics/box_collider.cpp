@@ -22,7 +22,7 @@ void BoxCollider::UpdateShape()
                          max(m_extents_.z, Mathf::kEpsilon)};
 
     m_box_shape_.setLocalScaling({m_extents_.x, m_extents_.y, m_extents_.z});
-    MarkDirty();
+    ApplyChanges();
 }
 
 btCollisionShape *BoxCollider::GetShape()

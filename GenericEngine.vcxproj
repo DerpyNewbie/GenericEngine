@@ -27,6 +27,7 @@
         <ClCompile Include="Editor\editor_prefs.cpp"/>
         <ClCompile Include="Editor\editor_window.cpp"/>
         <ClCompile Include="Editor\editor.cpp"/>
+        <ClCompile Include="Editor\editor_gizmos.cpp"/>
         <ClCompile Include="Editor\hierarchy.cpp"/>
         <ClCompile Include="Editor\imgui_demo_window.cpp"/>
         <ClCompile Include="Editor\inspector.cpp"/>
@@ -79,6 +80,7 @@
         <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
         <ClCompile Include="Engine\Physics\collider.cpp"/>
         <ClCompile Include="Engine\Physics\box_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\compound_shape.cpp"/>
         <ClCompile Include="Engine\Physics\physics.cpp"/>
         <ClCompile Include="Engine\Physics\plane_collider.cpp"/>
         <ClCompile Include="Engine\Physics\rigidbody_component.cpp"/>
@@ -172,6 +174,7 @@
         <ClInclude Include="Editor\editor_prefs.h"/>
         <ClInclude Include="Editor\editor_window.h"/>
         <ClInclude Include="Editor\editor.h"/>
+        <ClInclude Include="Editor\editor_gizmos.h"/>
         <ClInclude Include="Editor\hierarchy.h"/>
         <ClInclude Include="Editor\imgui_demo_window.h"/>
         <ClInclude Include="Editor\inspector.h"/>
@@ -214,9 +217,6 @@
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
-        <ClInclude Include="Engine\DxLib\dxlib_converter.h"/>
-        <ClInclude Include="Engine\DxLib\dxlib_helper.h"/>
-        <ClInclude Include="Engine\DxLib\dxlib_serializer.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
         <ClInclude Include="Engine\engine_profiler.h"/>
@@ -236,6 +236,7 @@
         <ClInclude Include="Engine\Physics\capsule_collider.h"/>
         <ClInclude Include="Engine\Physics\collider.h"/>
         <ClInclude Include="Engine\Physics\box_collider.h"/>
+        <ClInclude Include="Engine\Physics\compound_shape.h"/>
         <ClInclude Include="Engine\Physics\physics.h"/>
         <ClInclude Include="Engine\Physics\plane_collider.h"/>
         <ClInclude Include="Engine\Physics\rigidbody_component.h"/>
@@ -319,7 +320,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -327,10 +328,7 @@
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\lib
-            </AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
-            <DelayLoadDLLs>assimp-vc143-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -341,7 +339,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x86-windows\x86-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -351,10 +349,7 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\lib
-            </AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
-            <DelayLoadDLLs>assimp-vc143-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -363,7 +358,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -372,10 +367,7 @@
         <Link>
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\lib
-            </AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
-            <DelayLoadDLLs>$(ProjectDir)ThirdParty\assimp\lib\assimp-vc143-mtd.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -386,7 +378,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -396,10 +388,7 @@
             <EnableCOMDATFolding>true</EnableCOMDATFolding>
             <OptimizeReferences>true</OptimizeReferences>
             <GenerateDebugInformation>true</GenerateDebugInformation>
-            <AdditionalLibraryDirectories>$(ProjectDir)ThirdParty\dxlib_h;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\cereal\include;$(ProjectDir)Engine;$(ProjectDir)ThirdParty\assimp\lib
-            </AdditionalLibraryDirectories>
             <PerUserRedirection>true</PerUserRedirection>
-            <DelayLoadDLLs>assimp-vc143-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
         </Link>
     </ItemDefinitionGroup>
     <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets"/>

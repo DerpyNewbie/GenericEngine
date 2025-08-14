@@ -80,7 +80,7 @@ void RenderEngine::BeginRender()
     m_pCommandList->ResourceBarrier(1, &dsBarrier);
 }
 
-void RenderEngine::SetMainRenderTarget(Color back_ground_color)
+void RenderEngine::SetMainRenderTarget(Color background_color)
 {
     // レンダーターゲットが使用可能になるまで待つ
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
@@ -99,7 +99,7 @@ void RenderEngine::SetMainRenderTarget(Color back_ground_color)
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    float clearColor[] = {back_ground_color.R(), back_ground_color.G(), back_ground_color.B(), back_ground_color.A()};
+    float clearColor[] = {background_color.R(), background_color.G(), background_color.B(), background_color.A()};
     m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
@@ -109,7 +109,7 @@ void RenderEngine::SetMainRenderTarget(Color back_ground_color)
     g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
-void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_ground_color) const
+void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, const Color background_color) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
@@ -125,8 +125,7 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color back_gr
     m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    float clearColor[] = {back_ground_color.R(), back_ground_color.G(), back_ground_color.B(), back_ground_color.A()};
-    m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
+    m_pCommandList->ClearRenderTargetView(currentRtvHandle, background_color, 0, nullptr);
 
     // 深度ステンシルビューをクリア
     m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
@@ -165,14 +164,6 @@ void RenderEngine::EndRender()
 
     // バックバッファ番号更新
     m_CurrentBackBufferIndex = m_pSwapChain->GetCurrentBackBufferIndex();
-}
-
-void RenderEngine::SetBackGroundColor(Color color)
-{
-    m_BackGroundColor[0] = color.R();
-    m_BackGroundColor[1] = color.G();
-    m_BackGroundColor[2] = color.B();
-    m_BackGroundColor[3] = color.A();
 }
 
 bool RenderEngine::CreateDevice()
