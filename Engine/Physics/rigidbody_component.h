@@ -50,6 +50,7 @@ class RigidbodyComponent : public Component
 
     bool m_is_kinematic_ = true;
     bool m_is_static_ = true;
+    bool m_use_gravity_ = true;
 
     void ConstructRigidbody();
     void RegisterToPhysics();
@@ -88,6 +89,7 @@ public:
     [[nodiscard]] bool IsSleeping() const;
     [[nodiscard]] bool IsKinematic() const;
     [[nodiscard]] bool IsStatic() const;
+    [[nodiscard]] bool UseGravity() const;
     [[nodiscard]] bool IsKinematicOrStatic() const;
     [[nodiscard]] bool IsDynamic() const;
 
@@ -105,6 +107,7 @@ public:
     void SetAngularDamping(float angular_damping);
     void SetKinematic(bool next_kinematic);
     void SetStatic(bool next_static);
+    void SetGravity(bool use_gravity);
 
     void AddForce(const Vector3 &force, kForceMode mode = kForceMode::kForce);
     void AddForceAtPosition(const Vector3 &force, const Vector3 &world_position, kForceMode mode = kForceMode::kForce);
@@ -124,7 +127,7 @@ public:
            CEREAL_NVP(m_linear_damping_), CEREAL_NVP(m_angular_damping_),
            CEREAL_NVP(m_friction_), CEREAL_NVP(m_rolling_friction_), CEREAL_NVP(m_spinning_friction_),
            CEREAL_NVP(m_bounciness_),
-           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_));
+           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_), CEREAL_NVP(m_use_gravity_));
 
         RegisterToPhysics();
     }

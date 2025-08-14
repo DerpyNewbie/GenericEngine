@@ -140,6 +140,8 @@ void RigidbodyComponent::WriteRigidbody()
     m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
     m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
 
+    m_use_gravity_ ? m_bt_rigidbody_->clearGravity() : m_bt_rigidbody_->setGravity(btVector3(0, 0, 0));
+
     m_should_write_ = false;
 }
 
@@ -240,6 +242,11 @@ void RigidbodyComponent::OnInspectorGui()
     if (Gui::BoolField("Is Kinematic", m_is_kinematic_))
     {
         SetKinematic(m_is_kinematic_);
+    }
+
+    if (Gui::BoolField("Use Gravity", m_use_gravity_))
+    {
+        SetGravity(m_use_gravity_);
     }
 
     if (Gui::FloatField("Mass", m_mass_))
@@ -443,6 +450,11 @@ bool RigidbodyComponent::IsStatic() const
     return m_is_static_;
 }
 
+bool RigidbodyComponent::UseGravity() const
+{
+    return m_use_gravity_;
+}
+
 bool RigidbodyComponent::IsKinematicOrStatic() const
 {
     return IsKinematic() || IsStatic();
@@ -537,6 +549,12 @@ void RigidbodyComponent::SetStatic(const bool next_static)
     m_is_static_ = next_static;
     m_should_write_ = true;
     UpdatePhysics();
+}
+
+void RigidbodyComponent::SetGravity(const bool use_gravity)
+{
+    m_use_gravity_ = use_gravity;
+    m_should_write_ = true;
 }
 
 void RigidbodyComponent::AddForce(const Vector3 &force, const kForceMode mode)
