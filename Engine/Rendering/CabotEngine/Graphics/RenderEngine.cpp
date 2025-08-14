@@ -166,14 +166,6 @@ void RenderEngine::EndRender()
     m_CurrentBackBufferIndex = m_pSwapChain->GetCurrentBackBufferIndex();
 }
 
-void RenderEngine::SetBackGroundColor(Color color)
-{
-    m_BackGroundColor[0] = color.R();
-    m_BackGroundColor[1] = color.G();
-    m_BackGroundColor[2] = color.B();
-    m_BackGroundColor[3] = color.A();
-}
-
 bool RenderEngine::CreateDevice()
 {
     auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_pDevice.ReleaseAndGetAddressOf()));

@@ -132,14 +132,13 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    g_RenderEngine->SetBackGroundColor(m_property_.background_color);
+    m_drawcall_count_ = 0;
     if (BeginRender())
     {
         SetViewProjMatrix();
         m_current_camera_ = shared_from_base<Camera>();
-        m_drawcall_count_ = 0;
-        auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-        for (auto object : objects_in_view)
+        const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
+        for (const auto object : objects_in_view)
         {
             object->OnDraw();
         }
