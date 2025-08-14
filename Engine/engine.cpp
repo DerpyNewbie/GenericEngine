@@ -85,7 +85,8 @@ void Engine::MainLoop() const
         Profiler::Begin("Cleanup Objects");
         Object::GarbageCollect();
         Profiler::End("Cleanup Objects");
-
     }
+
+    Logger::Log<Engine>("Exiting Loop");
 }
 }
