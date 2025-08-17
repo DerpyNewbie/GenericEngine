@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "skinned_mesh_renderer.h"
 
-#include "camera.h"
+#include "camera_component.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"

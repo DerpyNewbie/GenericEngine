@@ -7,7 +7,7 @@
 #include "input.h"
 #include "Audio/audio_listener_component.h"
 
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Components/controller.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
@@ -49,7 +49,7 @@ void Application::StartApp()
     {
         // Sample scene creation
         const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
-        camera->AddComponent<engine::Camera>();
+        camera->AddComponent<engine::CameraComponent>();
         camera->AddComponent<engine::Controller>();
         camera->AddComponent<engine::AudioListenerComponent>();
 

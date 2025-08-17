@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "line_renderer.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
 namespace engine

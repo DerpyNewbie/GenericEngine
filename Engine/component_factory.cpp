@@ -6,7 +6,7 @@
 #include "Audio/audio_source_component.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Components/controller.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
@@ -26,7 +26,7 @@ std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> IComponentFa
 void IComponentFactory::Init()
 {
 #define ADD_COMPONENT(type) Register(std::make_shared<ComponentFactory<type>>())
-    ADD_COMPONENT(Camera);
+    ADD_COMPONENT(CameraComponent);
     ADD_COMPONENT(Controller);
     ADD_COMPONENT(FrameMetaData);
     ADD_COMPONENT(MeshRenderer);
@@ -46,7 +46,8 @@ void IComponentFactory::Init()
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{}
+{
+}
 
 std::string IComponentFactory::Name()
 {

@@ -5,7 +5,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
-#include "camera.h"
+#include "camera_component.h"
 #include "Rendering/gizmos.h"
 #include "Rendering/material_data.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
