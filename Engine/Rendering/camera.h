@@ -1,5 +1,8 @@
 #pragma once
+#include "depth_texture.h"
 #include "inspectable.h"
+#include "render_texture.h"
+#include "Asset/asset_ptr.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "Components/renderer.h"
@@ -42,33 +45,36 @@ struct CameraProperty : Inspectable
     }
 };
 
-class Camera
+class Camera : public std::enable_shared_from_this<Camera>
 {
+    friend CameraComponent;
     static std::weak_ptr<Camera> m_main_camera_;
     static std::weak_ptr<Camera> m_current_camera_;
 
     std::shared_ptr<Transform> m_transform_;
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
 
-    void SetViewProjMatrix() const;
+    std::shared_ptr<DepthTexture> m_depth_texture_;
+    AssetPtr<RenderTexture> m_render_texture_;
 
-protected:
-    static void SetMainCamera(const std::weak_ptr<Camera> &camera);
+    void SetViewProjMatrix() const;
     static void SetCurrentCamera(const std::weak_ptr<Camera> &camera);
 
 public:
     CameraProperty m_property_;
+
+    static void SetMainCamera(const std::weak_ptr<Camera> &camera);
 
     static std::shared_ptr<Camera> Main();
     static std::shared_ptr<Camera> Current();
 
     Camera();
 
-    void Render(const std::vector<std::shared_ptr<Renderer>> &renderers) const;
+    void Render(const std::vector<std::shared_ptr<Renderer>> &renderers);
 
     std::shared_ptr<Transform> GetTransform();
-    Matrix GetViewMatrix() const;
-    Matrix GetProjectionMatrix() const;
+    Matrix ViewMatrix() const;
+    Matrix ProjectionMatrix() const;
     void SetTransform(const std::shared_ptr<Transform> &transform);
 };
 }

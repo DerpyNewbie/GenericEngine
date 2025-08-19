@@ -7,7 +7,7 @@ struct VSOutput
 };
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t1);
+Texture2D _MainTex : register(t2);
 
 float4 BasicPS(VSOutput input) : SV_TARGET
 {

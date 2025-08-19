@@ -41,8 +41,8 @@ void LineRenderer::OnInspectorGui()
 void LineRenderer::OnDraw()
 {
     const auto camera = Camera::Main();
-    const Matrix view = camera->GetViewMatrix();
-    const Matrix proj = camera->GetProjectionMatrix();
+    const Matrix view = camera->ViewMatrix();
+    const Matrix proj = camera->ProjectionMatrix();
 
     const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
     const auto &view_projection_buffer = m_view_projection_buffers_[current_buffer_idx];

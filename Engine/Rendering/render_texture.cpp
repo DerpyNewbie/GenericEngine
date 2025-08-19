@@ -55,7 +55,7 @@ void RenderTexture::CreateBuffer()
     device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
-void RenderTexture::BeginRender(const Color background_color)
+void RenderTexture::BeginRender()
 {
     if (!m_pResource)
     {
@@ -65,7 +65,6 @@ void RenderTexture::BeginRender(const Color background_color)
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
-    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get(), background_color);
 }
 
 void RenderTexture::EndRender() const
@@ -74,6 +73,11 @@ void RenderTexture::EndRender() const
         m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+}
+
+ID3D12DescriptorHeap *RenderTexture::GetHeap()
+{
+    return m_RTVHeap_.Get();
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()

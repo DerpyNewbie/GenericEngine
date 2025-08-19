@@ -11,5 +11,7 @@ public:
     void CreateBuffer() override;
     void BeginRender();
     void EndRender();
+
+    ID3D12DescriptorHeap *GetHeap();
 };
 }

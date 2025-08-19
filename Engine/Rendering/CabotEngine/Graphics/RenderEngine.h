@@ -17,7 +17,7 @@ public:
 
     void BeginRender(); // 描画の開始処理
     void SetMainRenderTarget(Color background_color);
-    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color background_color) const;
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap, Color background_color) const;
     void EndRender(); // 描画の終了処理
     void WaitRender(); // 描画完了を待つ処理
 

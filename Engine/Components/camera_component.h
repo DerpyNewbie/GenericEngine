@@ -8,11 +8,10 @@
 namespace engine
 {
 
-class CameraComponent : public Component, public IDrawCallReceiver, public Camera
+class CameraComponent : public Component, public IDrawCallReceiver
 {
-
-    AssetPtr<RenderTexture> m_render_texture_;
-
+    
+    std::shared_ptr<Camera> m_camera_;
     UINT m_drawcall_count_ = 0;
 
 public:

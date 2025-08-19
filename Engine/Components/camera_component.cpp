@@ -11,8 +11,8 @@ namespace engine
 std::vector<std::shared_ptr<Renderer>> CameraComponent::FilterVisibleObjects(
     const std::vector<std::weak_ptr<Renderer>> &renderers) const
 {
-    Matrix view_matrix = GetViewMatrix();
-    Matrix proj_matrix = GetProjectionMatrix();
+    Matrix view_matrix = m_camera_->ViewMatrix();
+    Matrix proj_matrix = m_camera_->ProjectionMatrix();
 
     DirectX::BoundingFrustum frustum;
     DirectX::BoundingFrustum::CreateFromMatrix(frustum, proj_matrix, true);
@@ -33,44 +33,35 @@ std::vector<std::shared_ptr<Renderer>> CameraComponent::FilterVisibleObjects(
         }
     }
     return results;
-    return {};
 }
 
 int CameraComponent::Order()
 {
-    return Main() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
+    return Camera::Main() == m_camera_ ? INT_MAX - 20000 : INT_MAX - 30000;
 }
 
 void CameraComponent::OnAwake()
 {
-    if (Main() == nullptr)
+    m_camera_ = std::make_shared<Camera>();
+    if (Camera::Main() == nullptr)
     {
-        SetMainCamera(shared_from_base<Camera>());
+        Camera::SetMainCamera(m_camera_);
     }
 }
 
 void CameraComponent::OnInspectorGui()
 {
-    m_property_.OnInspectorGui();
-    Gui::PropertyField("RenderTexture", m_render_texture_);
+    m_camera_->m_property_.OnInspectorGui();
+    Gui::PropertyField("RenderTexture", m_camera_->m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }
 
 void CameraComponent::OnDraw()
 {
-    SetTransform(GameObject()->Transform());
-    SetCurrentCamera(shared_from_base<Camera>());
+    m_camera_->SetTransform(GameObject()->Transform());
+    Camera::SetCurrentCamera(shared_from_base<Camera>());
     auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-    if (auto render_tex = m_render_texture_.CastedLock())
-    {
-        render_tex->BeginRender(m_property_.background_color);
-        Render(objects_in_view);
-    }
-    if (Main() == shared_from_base<Camera>())
-    {
-        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
-        Render(objects_in_view);
-    }
+    m_camera_->Render(objects_in_view);
 }
 
 void CameraComponent::OnEnabled()

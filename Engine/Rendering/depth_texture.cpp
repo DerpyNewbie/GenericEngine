@@ -34,7 +34,7 @@ void DepthTexture::CreateBuffer()
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &resource_desc,
-        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &dsvClearValue,
         IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
         );
@@ -48,5 +48,30 @@ void DepthTexture::CreateBuffer()
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     device->CreateDepthStencilView(m_pResource.Get(), nullptr, dsvHandle);
+}
+
+void DepthTexture::BeginRender()
+{
+    if (m_pResource == nullptr)
+        CreateBuffer();
+
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+
+}
+
+void DepthTexture::EndRender()
+{
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_pResource.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+}
+
+ID3D12DescriptorHeap *DepthTexture::GetHeap()
+{
+    return m_dsv_heap_.Get();
 }
 }

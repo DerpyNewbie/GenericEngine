@@ -60,10 +60,13 @@
         <ClCompile Include="Engine\Components\camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
+        <ClCompile Include="Engine\Components\directional_light.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
+        <ClCompile Include="Engine\Components\light.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
+        <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
@@ -210,10 +213,13 @@
         <ClInclude Include="Engine\Components\camera_component.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
+        <ClInclude Include="Engine\Components\directional_light.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
+        <ClInclude Include="Engine\Components\light.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
+        <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>

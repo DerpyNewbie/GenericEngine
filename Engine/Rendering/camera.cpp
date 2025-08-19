@@ -5,6 +5,7 @@
 #include "gui.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/RootSignature.h"
+#include "Components/light.h"
 
 namespace engine
 {
@@ -31,14 +32,56 @@ void CameraProperty::OnInspectorGui()
     Gui::PropertyField("Background Color", background_color);
 }
 
-void Camera::Render(const std::vector<std::shared_ptr<Renderer>> &renderers) const
+void Camera::Render(const std::vector<std::shared_ptr<Renderer>> &renderers)
 {
-    SetViewProjMatrix();
-    for (auto renderer : renderers)
+    ID3D12DescriptorHeap *rtv_heap = nullptr;
+    ID3D12DescriptorHeap *dsv_heap = nullptr;
+    auto render_tex = m_render_texture_.CastedLock();
+    if (render_tex)
     {
-        renderer->OnDraw();
+        render_tex->BeginRender();
+        rtv_heap = render_tex->GetHeap();
     }
-    Gizmos::Render();
+
+    if (m_depth_texture_)
+    {
+        m_depth_texture_->BeginRender();
+        dsv_heap = m_depth_texture_->GetHeap();
+    }
+
+    if (rtv_heap != nullptr || dsv_heap != nullptr)
+    {
+        g_RenderEngine->SetRenderTarget(rtv_heap, dsv_heap, m_property_.background_color);
+        SetViewProjMatrix();
+        Light::SetLightBuffers();
+        for (auto renderer : renderers)
+        {
+            renderer->OnDraw();
+        }
+        Gizmos::Render();
+    }
+
+    if (render_tex)
+    {
+        render_tex->EndRender();
+    }
+
+    if (m_depth_texture_)
+    {
+        m_depth_texture_->EndRender();
+    }
+    
+    if (Main() == shared_from_this())
+    {
+        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
+        SetViewProjMatrix();
+        Light::SetLightBuffers();
+        for (auto renderer : renderers)
+        {
+            renderer->OnDraw();
+        }
+        Gizmos::Render();
+    }
 }
 
 std::shared_ptr<Transform> Camera::GetTransform()
@@ -58,8 +101,8 @@ void Camera::SetViewProjMatrix() const
     const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
     const auto view_projection = view_projection_buffer->GetPtr<ViewProjection>();
 
-    view_projection->matrices[0] = GetViewMatrix();
-    view_projection->matrices[1] = GetProjectionMatrix();
+    view_projection->matrices[0] = ViewMatrix();
+    view_projection->matrices[1] = ProjectionMatrix();
 
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
@@ -93,13 +136,13 @@ Camera::Camera()
     }
 }
 
-Matrix Camera::GetViewMatrix() const
+Matrix Camera::ViewMatrix() const
 {
     return DirectX::XMMatrixLookAtRH(m_transform_->Position(), m_transform_->Position() + m_transform_->Forward(),
                                      m_transform_->Up());
 }
 
-Matrix Camera::GetProjectionMatrix() const
+Matrix Camera::ProjectionMatrix() const
 {
     {
         switch (m_property_.view_mode)

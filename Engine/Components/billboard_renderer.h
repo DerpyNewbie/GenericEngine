@@ -15,7 +15,6 @@ class BillboardRenderer : public Renderer
 public:
     std::shared_ptr<Material> shared_material;
 
-    void OnAwake() override;
     void OnConstructed() override;
     void OnInspectorGui() override;
     void OnDraw() override;

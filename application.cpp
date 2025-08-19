@@ -9,6 +9,7 @@
 
 #include "Components/camera_component.h"
 #include "Components/controller.h"
+#include "Components/rotator_component.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 #include "Editor/editor.h"
@@ -61,9 +62,8 @@ void Application::StartApp()
         const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
         child_obj2->Transform()->SetParent(parent_obj2->Transform());
 
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
-        engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+        auto go = engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+        go->AddComponent<engine::RotatorComponent>();
     }
 
     engine->MainLoop();

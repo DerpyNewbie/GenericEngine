@@ -110,13 +110,15 @@ void RenderEngine::SetMainRenderTarget(Color background_color)
     g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
-void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, const Color background_color) const
+void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
+                                   const Color background_color) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
 
-    // 深度ステンシルのディスクリプタヒープの開始アドレス取得
-    auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE currentDsvHandle = dsv_heap == nullptr
+                                                       ? m_pDsvHeap->GetCPUDescriptorHandleForHeapStart()
+                                                       : dsv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // ビューポートとシザー矩形を設定
     m_pCommandList->RSSetViewports(1, &m_Viewport);
