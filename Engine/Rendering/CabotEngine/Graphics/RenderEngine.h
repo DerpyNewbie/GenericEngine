@@ -17,7 +17,7 @@ private:
     UINT m_frame_buffer_width_ = 0;
     UINT m_frame_buffer_height_ = 0;
     UINT m_current_back_buffer_index_ = 0;
-    float m_background_color_[4] = {0.5f, 0.5f, 0.5f, 0.5f};
+    Color m_background_color_ = {0.5f, 0.5f, 0.5f, 0.5f};
 
     ComPtr<ID3D12Device6> m_p_device_ = nullptr;
     ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
@@ -86,5 +86,5 @@ public:
         return Instance()->m_viewport_;
     }
 
-    void SetBackGroundColor(Color color);
+    void SetBackgroundColor(Color color);
 };

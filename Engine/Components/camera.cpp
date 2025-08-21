@@ -99,7 +99,7 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    RenderEngine::Instance()->SetBackGroundColor(m_property_.background_color);
+    RenderEngine::Instance()->SetBackgroundColor(m_property_.background_color);
     SetViewProjMatrix();
 
     const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);

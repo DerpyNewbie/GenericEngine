@@ -141,12 +141,9 @@ void RenderEngine::EndRender()
     m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
-void RenderEngine::SetBackGroundColor(Color color)
+void RenderEngine::SetBackgroundColor(Color color)
 {
-    m_background_color_[0] = color.R();
-    m_background_color_[1] = color.G();
-    m_background_color_[2] = color.B();
-    m_background_color_[3] = color.A();
+    m_background_color_ = color;
 }
 
 bool RenderEngine::CreateDevice()
