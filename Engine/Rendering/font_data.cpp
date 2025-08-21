@@ -24,7 +24,7 @@ FontData::FontData()
         DirectX::SpriteBatchPipelineStateDescription pd(rtState);
 
         m_sprite_batch_ = std::make_shared<DirectX::SpriteBatch>(device, resource_upload_batch, pd);
-        m_sprite_batch_->SetViewport(RenderEngine::ViewPort());
+        m_sprite_batch_->SetViewport(RenderEngine::Viewport());
 
         auto future = resource_upload_batch.End(RenderEngine::CommandQueue());
         future.wait();
@@ -47,7 +47,7 @@ void FontData::LoadFont(const std::wstring &font_path)
 
     auto future = resource_upload_batch.End(RenderEngine::CommandQueue());
 
-    RenderEngine::WaitRender();
+    RenderEngine::Instance()->WaitRender();
     future.wait();
 }
 }

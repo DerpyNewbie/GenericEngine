@@ -6,8 +6,6 @@
 #include "application.h"
 #include "Rendering/font_data.h"
 
-RenderEngine *RenderEngine::m_instance_;
-
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 {
     ID3D12Debug *debugController;
@@ -16,45 +14,43 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         debugController->EnableDebugLayer();
     }
 
-    m_instance_ = new RenderEngine;
+    m_frame_buffer_width_ = windowWidth;
+    m_frame_buffer_height_ = windowHeight;
+    m_h_wnd_ = hwnd;
 
-    m_instance_->m_frame_buffer_width_ = windowWidth;
-    m_instance_->m_frame_buffer_height_ = windowHeight;
-    m_instance_->m_h_wnd_ = hwnd;
-
-    if (!m_instance_->CreateDevice())
+    if (!CreateDevice())
     {
         engine::Logger::Error<RenderEngine>("Failed to create Device");
         return false;
     }
-    if (!m_instance_->CreateCommandQueue())
+    if (!CreateCommandQueue())
     {
         engine::Logger::Error<RenderEngine>("Failed to create CommandQueue");
         return false;
     }
-    if (!m_instance_->CreateSwapChain())
+    if (!CreateSwapChain())
     {
         engine::Logger::Error<RenderEngine>("Failed to create SwapChain");
         return false;
     }
-    if (!m_instance_->CreateCommandList())
+    if (!CreateCommandList())
     {
         engine::Logger::Error<RenderEngine>("Failed to create CommandList");
         return false;
     }
-    if (!m_instance_->CreateFence())
+    if (!CreateFence())
     {
         engine::Logger::Error<RenderEngine>("Failed to create CreateFence");
         return false;
     }
-    m_instance_->CreateViewPort();
-    m_instance_->CreateScissorRect();
-    if (!m_instance_->CreateRenderTarget())
+    CreateViewPort();
+    CreateScissorRect();
+    if (!CreateRenderTarget())
     {
         engine::Logger::Error<RenderEngine>("Failed to create MainRenderTarget");
         return false;
     }
-    if (!m_instance_->CreateDepthStencil())
+    if (!CreateDepthStencil())
     {
         engine::Logger::Error<RenderEngine>("Failed to create DepthStencil");
         return false;
@@ -68,45 +64,45 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 void RenderEngine::BeginRender()
 {
     // 現在のレンダーターゲットを更新
-    m_instance_->m_currentRenderTarget = m_instance_->m_p_render_targets_[m_instance_->m_current_back_buffer_index_].
+    m_currentRenderTarget = m_p_render_targets_[m_current_back_buffer_index_].
         Get();
 
     // コマンドを初期化してためる準備をする
-    m_instance_->m_p_allocator_[m_instance_->m_current_back_buffer_index_]->Reset();
-    m_instance_->m_p_command_list_->Reset(m_instance_->m_p_allocator_[m_instance_->m_current_back_buffer_index_].Get(),
-                                          nullptr);
+    m_p_allocator_[m_current_back_buffer_index_]->Reset();
+    m_p_command_list_->Reset(m_p_allocator_[m_current_back_buffer_index_].Get(),
+                             nullptr);
 
     // ビューポートとシザー矩形を設定
-    m_instance_->m_p_command_list_->RSSetViewports(1, &m_instance_->m_viewport_);
-    m_instance_->m_p_command_list_->RSSetScissorRects(1, &m_instance_->m_scissor_);
+    m_p_command_list_->RSSetViewports(1, &m_viewport_);
+    m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
 
-    auto currentRtvHandle = m_instance_->m_p_rtv_heap_->GetCPUDescriptorHandleForHeapStart();
-    currentRtvHandle.ptr += m_instance_->m_current_back_buffer_index_ * m_instance_->m_rtv_descriptor_size_;
-    auto currentDsvHandle = m_instance_->m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
+    auto currentRtvHandle = m_p_rtv_heap_->GetCPUDescriptorHandleForHeapStart();
+    currentRtvHandle.ptr += m_current_back_buffer_index_ * m_rtv_descriptor_size_;
+    auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     // レンダーターゲットが使用可能になるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_instance_->m_currentRenderTarget,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget,
                                                         D3D12_RESOURCE_STATE_PRESENT,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
-    m_instance_->m_p_command_list_->ResourceBarrier(1, &barrier);
+    m_p_command_list_->ResourceBarrier(1, &barrier);
 
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_instance_->m_p_depth_stencil_buffer_.Get(),
+        m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_DEPTH_WRITE
         );
-    m_instance_->m_p_command_list_->ResourceBarrier(1, &dsBarrier);
+    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
 
     // レンダーターゲットを設定
-    m_instance_->m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
+    m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    m_instance_->m_p_command_list_->ClearRenderTargetView(currentRtvHandle, m_instance_->m_back_ground_color_, 0,
-                                                          nullptr);
+    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, m_background_color_, 0,
+                                             nullptr);
 
     // 深度ステンシルビューをクリア
-    m_instance_->m_p_command_list_->
-                 ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    m_p_command_list_->
+        ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
     CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
     auto descriptor_heap = DescriptorHeap::GetHeap();
@@ -115,42 +111,42 @@ void RenderEngine::BeginRender()
 
 void RenderEngine::EndRender()
 {
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_instance_->m_currentRenderTarget,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                         D3D12_RESOURCE_STATE_PRESENT);
-    m_instance_->m_p_command_list_->ResourceBarrier(1, &barrier);
+    m_p_command_list_->ResourceBarrier(1, &barrier);
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_instance_->m_p_depth_stencil_buffer_.Get(),
+        m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_COMMON
         );
-    m_instance_->m_p_command_list_->ResourceBarrier(1, &dsBarrier);
+    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
 
     // コマンドの記録を終了
-    m_instance_->m_p_command_list_->Close();
+    m_p_command_list_->Close();
 
     // コマンドを実行
-    ID3D12CommandList *ppCmdLists[] = {m_instance_->m_p_command_list_.Get()};
-    m_instance_->m_p_queue_->ExecuteCommandLists(1, ppCmdLists);
+    ID3D12CommandList *ppCmdLists[] = {m_p_command_list_.Get()};
+    m_p_queue_->ExecuteCommandLists(1, ppCmdLists);
 
     // スワップチェーンを切り替え
-    m_instance_->m_p_swap_chain_->Present(1, 0);
+    m_p_swap_chain_->Present(1, 0);
     if (const auto graphics_memory = engine::FontData::GraphicsMemory())
-        graphics_memory->Commit(m_instance_->m_p_queue_.Get());
+        graphics_memory->Commit(m_p_queue_.Get());
 
     // 描画完了を待つ
     WaitRender();
 
     // バックバッファ番号更新
-    m_instance_->m_current_back_buffer_index_ = m_instance_->m_p_swap_chain_->GetCurrentBackBufferIndex();
+    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
 void RenderEngine::SetBackGroundColor(Color color)
 {
-    m_instance_->m_back_ground_color_[0] = color.R();
-    m_instance_->m_back_ground_color_[1] = color.G();
-    m_instance_->m_back_ground_color_[2] = color.B();
-    m_instance_->m_back_ground_color_[3] = color.A();
+    m_background_color_[0] = color.R();
+    m_background_color_[1] = color.G();
+    m_background_color_[2] = color.B();
+    m_background_color_[3] = color.A();
 }
 
 bool RenderEngine::CreateDevice()
@@ -388,25 +384,31 @@ bool RenderEngine::CreateDepthStencil()
     return true;
 }
 
+RenderEngine *RenderEngine::Instance()
+{
+    static auto instance = new RenderEngine;
+    return instance;
+}
+
 void RenderEngine::WaitRender()
 {
     //描画終了待ち
-    const UINT64 fenceValue = m_instance_->m_fence_value_[m_instance_->m_current_back_buffer_index_];
-    m_instance_->m_p_queue_->Signal(m_instance_->m_pFence.Get(), fenceValue);
-    m_instance_->m_fence_value_[m_instance_->m_current_back_buffer_index_]++;
+    const UINT64 fenceValue = m_fence_value_[m_current_back_buffer_index_];
+    m_p_queue_->Signal(m_pFence.Get(), fenceValue);
+    m_fence_value_[m_current_back_buffer_index_]++;
 
     // 次のフレームの描画準備がまだであれば待機する.
-    if (m_instance_->m_pFence->GetCompletedValue() < fenceValue)
+    if (m_pFence->GetCompletedValue() < fenceValue)
     {
         // 完了時にイベントを設定.
-        auto hr = m_instance_->m_pFence->SetEventOnCompletion(fenceValue, m_instance_->m_fence_event_);
+        auto hr = m_pFence->SetEventOnCompletion(fenceValue, m_fence_event_);
         if (FAILED(hr))
         {
             return;
         }
 
         // 待機処理.
-        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_instance_->m_fence_event_, INFINITE, FALSE))
+        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE))
         {
             return;
         }

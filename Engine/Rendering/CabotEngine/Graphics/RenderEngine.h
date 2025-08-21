@@ -13,13 +13,11 @@ public:
     enum { FRAME_BUFFER_COUNT = 2 };
 
 private:
-    static RenderEngine *m_instance_;
-
     HWND m_h_wnd_;
     UINT m_frame_buffer_width_ = 0;
     UINT m_frame_buffer_height_ = 0;
     UINT m_current_back_buffer_index_ = 0;
-    float m_back_ground_color_[4] = {0.5f, 0.5f, 0.5f, 0.5f};
+    float m_background_color_[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
     ComPtr<ID3D12Device6> m_p_device_ = nullptr;
     ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
@@ -56,36 +54,37 @@ private:
     bool CreateDepthStencil();
 
 public:
-    static bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
+    static RenderEngine *Instance();
+    bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
 
-    static void BeginRender();
-    static void EndRender();
-    static void WaitRender();
+    void BeginRender();
+    void EndRender();
+    void WaitRender();
 
     static ID3D12Device6 *Device()
     {
-        return m_instance_->m_p_device_.Get();
+        return Instance()->m_p_device_.Get();
     }
 
     static ID3D12GraphicsCommandList *CommandList()
     {
-        return m_instance_->m_p_command_list_.Get();
+        return Instance()->m_p_command_list_.Get();
     }
 
     static ID3D12CommandQueue *CommandQueue()
     {
-        return m_instance_->m_p_queue_.Get();
+        return Instance()->m_p_queue_.Get();
     }
 
     static UINT CurrentBackBufferIndex()
     {
-        return m_instance_->m_current_back_buffer_index_;
+        return Instance()->m_current_back_buffer_index_;
     }
 
-    static D3D12_VIEWPORT ViewPort()
+    static D3D12_VIEWPORT Viewport()
     {
-        return m_instance_->m_viewport_;
+        return Instance()->m_viewport_;
     }
 
-    static void SetBackGroundColor(Color color);
+    void SetBackGroundColor(Color color);
 };
