@@ -13,7 +13,7 @@ FontData::FontData()
 {
     if (!m_graphics_memory_)
     {
-        auto device = g_RenderEngine->Device();
+        auto device = RenderEngine::Device();
         m_graphics_memory_ = std::make_shared<DirectX::GraphicsMemory>(device);
 
         DirectX::ResourceUploadBatch resource_upload_batch(device);
@@ -24,16 +24,16 @@ FontData::FontData()
         DirectX::SpriteBatchPipelineStateDescription pd(rtState);
 
         m_sprite_batch_ = std::make_shared<DirectX::SpriteBatch>(device, resource_upload_batch, pd);
-        m_sprite_batch_->SetViewport(g_RenderEngine->ViewPort());
+        m_sprite_batch_->SetViewport(RenderEngine::ViewPort());
 
-        auto future = resource_upload_batch.End(g_RenderEngine->CommandQueue());
+        auto future = resource_upload_batch.End(RenderEngine::CommandQueue());
         future.wait();
     }
 }
 
 void FontData::LoadFont(const std::wstring &font_path)
 {
-    auto device = g_RenderEngine->Device();
+    auto device = RenderEngine::Device();
 
     DirectX::ResourceUploadBatch resource_upload_batch(device);
     resource_upload_batch.Begin();
@@ -45,9 +45,9 @@ void FontData::LoadFont(const std::wstring &font_path)
                                                            m_spritefont_handle_->HandleCPU,
                                                            m_spritefont_handle_->HandleGPU);
 
-    auto future = resource_upload_batch.End(g_RenderEngine->CommandQueue());
+    auto future = resource_upload_batch.End(RenderEngine::CommandQueue());
 
-    g_RenderEngine->WaitRender();
+    RenderEngine::WaitRender();
     future.wait();
 }
 }

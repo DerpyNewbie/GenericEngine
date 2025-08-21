@@ -12,7 +12,6 @@ std::vector<Vertex> Gizmos::m_vertices_;
 
 void Gizmos::Init()
 {
-    assert(g_RenderEngine != nullptr && "RenderEngine is not initialized");
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
 
     m_instance_ = std::make_shared<Gizmos>();
@@ -76,7 +75,7 @@ void Gizmos::Render(const int current_back_buffer_idx, ID3D12GraphicsCommandList
 
 void Gizmos::OnDraw()
 {
-    Render(static_cast<int>(g_RenderEngine->CurrentBackBufferIndex()), g_RenderEngine->CommandList());
+    Render(static_cast<int>(RenderEngine::CurrentBackBufferIndex()), RenderEngine::CommandList());
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

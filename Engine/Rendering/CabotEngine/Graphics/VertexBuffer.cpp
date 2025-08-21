@@ -16,7 +16,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -97,7 +97,7 @@ VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,

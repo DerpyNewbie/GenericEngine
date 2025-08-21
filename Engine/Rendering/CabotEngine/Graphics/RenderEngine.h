@@ -1,7 +1,7 @@
 ﻿#pragma once
 
-#pragma comment(lib, "d3d12.lib") // d3d12ライブラリをリンクする
-#pragma comment(lib, "dxgi.lib") // dxgiライブラリをリンクする
+#pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
 #include "IndexBuffer.h"
 #include "VertexBuffer.h"
 
@@ -10,88 +10,82 @@ class DescriptorHandle;
 class RenderEngine
 {
 public:
-    enum { FRAME_BUFFER_COUNT = 2 }; // ダブルバッファリングするので2
-
-public:
-    bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight); // エンジン初期化
-
-    void BeginRender(); // 描画の開始処理
-    void EndRender(); // 描画の終了処理
-    void WaitRender(); // 描画完了を待つ処理
-
-    // 外からアクセスしたいのでGetterとして公開するもの
-    ID3D12Device6 *Device()
-    {
-        return m_pDevice.Get();
-    }
-
-    ID3D12GraphicsCommandList *CommandList()
-    {
-        return m_pCommandList.Get();
-    }
-
-    ID3D12CommandQueue *CommandQueue()
-    {
-        return m_pQueue.Get();
-    }
-
-    UINT CurrentBackBufferIndex()
-    {
-        return m_CurrentBackBufferIndex;
-    }
-
-    D3D12_VIEWPORT ViewPort() const
-    {
-        return m_Viewport;
-    }
-
-    void SetBackGroundColor(Color color);
+    enum { FRAME_BUFFER_COUNT = 2 };
 
 private:
-    // DirectX12初期化に使う関数たち
-    bool CreateDevice(); // デバイスを生成
-    bool CreateCommandQueue(); // コマンドキューを生成
-    bool CreateSwapChain(); // スワップチェインを生成
-    bool CreateCommandList(); // コマンドリストとコマンドアロケーターを生成
-    bool CreateFence(); // フェンスを生成
-    void CreateViewPort(); // ビューポートを生成
-    void CreateScissorRect(); // シザー矩形を生成
+    static RenderEngine *m_instance_;
 
-    // 描画に使うDirectX12のオブジェクトたち
-    HWND m_hWnd;
-    UINT m_FrameBufferWidth = 0;
-    UINT m_FrameBufferHeight = 0;
-    UINT m_CurrentBackBufferIndex = 0;
-    float m_BackGroundColor[4] = {0.5f, 0.5f, 0.5f, 0.5f};
+    HWND m_h_wnd_;
+    UINT m_frame_buffer_width_ = 0;
+    UINT m_frame_buffer_height_ = 0;
+    UINT m_current_back_buffer_index_ = 0;
+    float m_back_ground_color_[4] = {0.5f, 0.5f, 0.5f, 0.5f};
 
-    ComPtr<ID3D12Device6> m_pDevice = nullptr; // デバイス
-    ComPtr<ID3D12CommandQueue> m_pQueue = nullptr; // コマンドキュー
-    ComPtr<IDXGISwapChain3> m_pSwapChain = nullptr; // スワップチェイン
-    ComPtr<ID3D12CommandAllocator> m_pAllocator[FRAME_BUFFER_COUNT] = {nullptr}; // コマンドアロケーたー
-    ComPtr<ID3D12GraphicsCommandList> m_pCommandList = nullptr; // コマンドリスト
-    HANDLE m_fenceEvent = nullptr; // フェンスで使うイベント
-    ComPtr<ID3D12Fence> m_pFence = nullptr; // フェンス
-    UINT64 m_fenceValue[FRAME_BUFFER_COUNT]; // フェンスの値（ダブルバッファリング用に2個）
-    D3D12_VIEWPORT m_Viewport; // ビューポート
-    D3D12_RECT m_Scissor; // シザー矩形
+    ComPtr<ID3D12Device6> m_p_device_ = nullptr;
+    ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
+    ComPtr<IDXGISwapChain3> m_p_swap_chain_ = nullptr;
+    ComPtr<ID3D12CommandAllocator> m_p_allocator_[FRAME_BUFFER_COUNT] = {nullptr};
+    ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
+    HANDLE m_fence_event_ = nullptr;
+    ComPtr<ID3D12Fence> m_pFence = nullptr;
+    UINT64 m_fence_value_[FRAME_BUFFER_COUNT] = {};
+    D3D12_VIEWPORT m_viewport_ = {};
+    D3D12_RECT m_scissor_ = {};
 
-    // 描画に使うオブジェクトとその生成関数たち
-    bool CreateRenderTarget(); // レンダーターゲットを生成
-    bool CreateDepthStencil(); // 深度ステンシルバッファを生成
+    UINT m_rtv_descriptor_size_ = 0;
+    ComPtr<ID3D12DescriptorHeap> m_p_rtv_heap_ = nullptr;
+    ComPtr<ID3D12Resource> m_p_render_targets_[FRAME_BUFFER_COUNT] = {nullptr};
 
-    UINT m_RtvDescriptorSize = 0; // レンダーターゲットビューのディスクリプタサイズ
-    ComPtr<ID3D12DescriptorHeap> m_pRtvHeap = nullptr; // レンダーターゲットのディスクリプタヒープ
-    ComPtr<ID3D12Resource> m_pRenderTargets[FRAME_BUFFER_COUNT] = {nullptr}; // レンダーターゲット（ダブルバッファリングするので2個）
+    std::shared_ptr<engine::VertexBuffer> m_p_vert_buff_;
+    std::shared_ptr<engine::IndexBuffer> m_p_index_buff_;
 
-    std::shared_ptr<engine::VertexBuffer> m_pVertBuff;
-    std::shared_ptr<engine::IndexBuffer> m_pIndexBuff;
+    UINT m_dsv_descriptor_size_ = 0;
+    ComPtr<ID3D12DescriptorHeap> m_p_dsv_heap_ = nullptr;
+    ComPtr<ID3D12Resource> m_p_depth_stencil_buffer_ = nullptr;
 
-    UINT m_DsvDescriptorSize = 0; // 深度ステンシルのディスクリプターサイズ
-    ComPtr<ID3D12DescriptorHeap> m_pDsvHeap = nullptr; // 深度ステンシルのディスクリプタヒープ
-    ComPtr<ID3D12Resource> m_pDepthStencilBuffer = nullptr; // 深度ステンシルバッファ（こっちは1つでいい
+    ID3D12Resource *m_currentRenderTarget = nullptr;
 
-    // 描画ループで使用するもの
-    ID3D12Resource *m_currentRenderTarget = nullptr; // 現在のフレームのレンダーターゲットを一時的に保存しておく関数
+    bool CreateDevice();
+    bool CreateCommandQueue();
+    bool CreateSwapChain();
+    bool CreateCommandList();
+    bool CreateFence();
+    void CreateViewPort();
+    void CreateScissorRect();
+    bool CreateRenderTarget();
+    bool CreateDepthStencil();
+
+public:
+    static bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
+
+    static void BeginRender();
+    static void EndRender();
+    static void WaitRender();
+
+    static ID3D12Device6 *Device()
+    {
+        return m_instance_->m_p_device_.Get();
+    }
+
+    static ID3D12GraphicsCommandList *CommandList()
+    {
+        return m_instance_->m_p_command_list_.Get();
+    }
+
+    static ID3D12CommandQueue *CommandQueue()
+    {
+        return m_instance_->m_p_queue_.Get();
+    }
+
+    static UINT CurrentBackBufferIndex()
+    {
+        return m_instance_->m_current_back_buffer_index_;
+    }
+
+    static D3D12_VIEWPORT ViewPort()
+    {
+        return m_instance_->m_viewport_;
+    }
+
+    static void SetBackGroundColor(Color color);
 };
-
-extern RenderEngine *g_RenderEngine; // どこからでも参照したいのでグローバルにする
