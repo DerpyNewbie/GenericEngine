@@ -13,7 +13,7 @@ public:
     enum { FRAME_BUFFER_COUNT = 2 };
 
 private:
-    HWND m_h_wnd_;
+    HWND m_h_wnd_ = nullptr;
     UINT m_frame_buffer_width_ = 0;
     UINT m_frame_buffer_height_ = 0;
     UINT m_current_back_buffer_index_ = 0;
@@ -25,7 +25,7 @@ private:
     ComPtr<ID3D12CommandAllocator> m_p_allocator_[FRAME_BUFFER_COUNT] = {nullptr};
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
     HANDLE m_fence_event_ = nullptr;
-    ComPtr<ID3D12Fence> m_pFence = nullptr;
+    ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
     UINT64 m_fence_value_[FRAME_BUFFER_COUNT] = {};
     D3D12_VIEWPORT m_viewport_ = {};
     D3D12_RECT m_scissor_ = {};
@@ -41,7 +41,7 @@ private:
     ComPtr<ID3D12DescriptorHeap> m_p_dsv_heap_ = nullptr;
     ComPtr<ID3D12Resource> m_p_depth_stencil_buffer_ = nullptr;
 
-    ID3D12Resource *m_currentRenderTarget = nullptr;
+    ID3D12Resource *m_current_render_target_ = nullptr;
 
     bool CreateDevice();
     bool CreateCommandQueue();

@@ -64,7 +64,7 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 void RenderEngine::BeginRender()
 {
     // 現在のレンダーターゲットを更新
-    m_currentRenderTarget = m_p_render_targets_[m_current_back_buffer_index_].
+    m_current_render_target_ = m_p_render_targets_[m_current_back_buffer_index_].
         Get();
 
     // コマンドを初期化してためる準備をする
@@ -81,7 +81,7 @@ void RenderEngine::BeginRender()
     auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     // レンダーターゲットが使用可能になるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_,
                                                         D3D12_RESOURCE_STATE_PRESENT,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
     m_p_command_list_->ResourceBarrier(1, &barrier);
@@ -111,7 +111,7 @@ void RenderEngine::BeginRender()
 
 void RenderEngine::EndRender()
 {
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET,
                                                         D3D12_RESOURCE_STATE_PRESENT);
     m_p_command_list_->ResourceBarrier(1, &barrier);
@@ -262,7 +262,7 @@ bool RenderEngine::CreateFence()
         m_fence_value_[i] = 0;
     }
 
-    auto hr = m_p_device_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_pFence.ReleaseAndGetAddressOf()));
+    auto hr = m_p_device_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_p_fence_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
         return false;
@@ -391,14 +391,14 @@ void RenderEngine::WaitRender()
 {
     //描画終了待ち
     const UINT64 fenceValue = m_fence_value_[m_current_back_buffer_index_];
-    m_p_queue_->Signal(m_pFence.Get(), fenceValue);
+    m_p_queue_->Signal(m_p_fence_.Get(), fenceValue);
     m_fence_value_[m_current_back_buffer_index_]++;
 
     // 次のフレームの描画準備がまだであれば待機する.
-    if (m_pFence->GetCompletedValue() < fenceValue)
+    if (m_p_fence_->GetCompletedValue() < fenceValue)
     {
         // 完了時にイベントを設定.
-        auto hr = m_pFence->SetEventOnCompletion(fenceValue, m_fence_event_);
+        auto hr = m_p_fence_->SetEventOnCompletion(fenceValue, m_fence_event_);
         if (FAILED(hr))
         {
             return;
