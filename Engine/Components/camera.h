@@ -51,7 +51,7 @@ class Camera : public Component, public IDrawCallReceiver
 
     UINT m_drawcall_count_ = 0;
 
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
 
     void SetViewProjMatrix() const;
 

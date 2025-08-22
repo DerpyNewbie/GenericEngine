@@ -9,8 +9,10 @@ class DescriptorHandle;
 
 class RenderEngine
 {
+    friend class Engine;
+
 public:
-    enum { FRAME_BUFFER_COUNT = 2 };
+    enum { kFrame_Buffer_Count = 2 };
 
 private:
     HWND m_h_wnd_ = nullptr;
@@ -22,17 +24,17 @@ private:
     ComPtr<ID3D12Device6> m_p_device_ = nullptr;
     ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
     ComPtr<IDXGISwapChain3> m_p_swap_chain_ = nullptr;
-    ComPtr<ID3D12CommandAllocator> m_p_allocator_[FRAME_BUFFER_COUNT] = {nullptr};
+    ComPtr<ID3D12CommandAllocator> m_p_allocator_[kFrame_Buffer_Count] = {nullptr};
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
     HANDLE m_fence_event_ = nullptr;
     ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
-    UINT64 m_fence_value_[FRAME_BUFFER_COUNT] = {};
+    UINT64 m_fence_value_[kFrame_Buffer_Count] = {};
     D3D12_VIEWPORT m_viewport_ = {};
     D3D12_RECT m_scissor_ = {};
 
     UINT m_rtv_descriptor_size_ = 0;
     ComPtr<ID3D12DescriptorHeap> m_p_rtv_heap_ = nullptr;
-    ComPtr<ID3D12Resource> m_p_render_targets_[FRAME_BUFFER_COUNT] = {nullptr};
+    ComPtr<ID3D12Resource> m_p_render_targets_[kFrame_Buffer_Count] = {nullptr};
 
     std::shared_ptr<engine::VertexBuffer> m_p_vert_buff_;
     std::shared_ptr<engine::IndexBuffer> m_p_index_buff_;
@@ -42,6 +44,8 @@ private:
     ComPtr<ID3D12Resource> m_p_depth_stencil_buffer_ = nullptr;
 
     ID3D12Resource *m_current_render_target_ = nullptr;
+
+    bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
 
     bool CreateDevice();
     bool CreateCommandQueue();
@@ -55,7 +59,7 @@ private:
 
 public:
     static RenderEngine *Instance();
-    bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
+
 
     void BeginRender();
     void EndRender();

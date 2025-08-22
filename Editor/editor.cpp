@@ -101,7 +101,7 @@ void Editor::Init()
         ImGui_ImplWin32_Init(Application::GetWindowHandle());
         ImGui_ImplDX12_Init(
             RenderEngine::Device(),
-            RenderEngine::FRAME_BUFFER_COUNT,
+            RenderEngine::kFrame_Buffer_Count,
             DXGI_FORMAT_R8G8B8A8_UNORM,
             DescriptorHeap::GetHeap(),
             font_cpu_desc_handle,

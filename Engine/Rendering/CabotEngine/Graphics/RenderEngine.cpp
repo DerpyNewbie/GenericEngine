@@ -187,7 +187,7 @@ bool RenderEngine::CreateSwapChain()
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-    desc.BufferCount = FRAME_BUFFER_COUNT;
+    desc.BufferCount = kFrame_Buffer_Count;
     desc.OutputWindow = m_h_wnd_;
     desc.Windowed = TRUE;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
@@ -223,7 +223,7 @@ bool RenderEngine::CreateCommandList()
 {
     // コマンドアロケーターの作成
     HRESULT hr;
-    for (size_t i = 0; i < FRAME_BUFFER_COUNT; i++)
+    for (size_t i = 0; i < kFrame_Buffer_Count; i++)
     {
         hr = m_p_device_->CreateCommandAllocator(
             D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -257,7 +257,7 @@ bool RenderEngine::CreateCommandList()
 
 bool RenderEngine::CreateFence()
 {
-    for (auto i = 0u; i < FRAME_BUFFER_COUNT; i++)
+    for (auto i = 0u; i < kFrame_Buffer_Count; i++)
     {
         m_fence_value_[i] = 0;
     }
@@ -297,7 +297,7 @@ bool RenderEngine::CreateRenderTarget()
 {
     // RTV用のディスクリプタヒープを作成する
     D3D12_DESCRIPTOR_HEAP_DESC desc = {};
-    desc.NumDescriptors = FRAME_BUFFER_COUNT;
+    desc.NumDescriptors = kFrame_Buffer_Count;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
     auto hr = m_p_device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_p_rtv_heap_.ReleaseAndGetAddressOf()));
@@ -315,7 +315,7 @@ bool RenderEngine::CreateRenderTarget()
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
-    for (UINT i = 0; i < FRAME_BUFFER_COUNT; i++)
+    for (UINT i = 0; i < kFrame_Buffer_Count; i++)
     {
         m_p_swap_chain_->GetBuffer(i, IID_PPV_ARGS(m_p_render_targets_[i].ReleaseAndGetAddressOf()));
         m_p_device_->CreateRenderTargetView(m_p_render_targets_[i].Get(), &rtvDesc, rtvHandle);
