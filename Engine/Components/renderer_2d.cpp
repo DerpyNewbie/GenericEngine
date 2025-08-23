@@ -9,9 +9,14 @@ namespace engine
 
 void Renderer2D::OnUpdate()
 {
+    if (auto canvas = m_canvas_.Lock())
+    {
+        return;
+    }
+
     m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
     auto canvas = m_canvas_.CastedLock();
-    if (!canvas)
+    if (!canvas && GameObject()->IsActiveInHierarchy())
         return;
     canvas->AddRenderer(shared_from_base<Renderer2D>());
 }

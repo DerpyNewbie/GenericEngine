@@ -66,13 +66,11 @@ void Image::Render()
 {
     const auto cmd_list = g_RenderEngine->CommandList();
     auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
-    const auto vb_view = m_vertex_buffer_[current_buffer]->View();
-    const auto ibView = m_index_buffer_->View();
 
     cmd_list->SetPipelineState(PSOManager::Get("2DBasic"));
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, &vb_view);
-    cmd_list->IASetIndexBuffer(&ibView);
+    cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_[current_buffer]->View());
+    cmd_list->IASetIndexBuffer(m_index_buffer_->View());
     if (m_texture_handle_)
         cmd_list->SetGraphicsRootDescriptorTable(kPixelSRV, m_texture_handle_->HandleGPU);
 

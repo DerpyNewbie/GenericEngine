@@ -28,19 +28,33 @@ Vector2 Canvas::CanvasSize()
 {
     return m_canvas_size_;
 }
-
-std::weak_ptr<Transform> Canvas::BoundsOrigin()
+std::shared_ptr<Transform> Canvas::BoundsOrigin()
 {
     return Camera::Main()->GameObject()->Transform();
 }
 
-void Canvas::AddRenderer(std::shared_ptr<Renderer2D> renderer)
+void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
 {
-    m_children_renderers_.emplace(renderer);
+    auto renderer_priority = renderer->GameObject()->Transform()->GetSiblingIndex();
+
+    for (auto it = m_children_renderers_.begin(); it != m_children_renderers_.end(); ++it)
+    {
+        auto current_priority = (*it)->GameObject()->Transform()->GetSiblingIndex();
+
+        if (renderer_priority < current_priority)
+        {
+            m_children_renderers_.insert(it, renderer);
+            return;
+        }
+    }
+
+    m_children_renderers_.emplace_back(renderer);
 }
 
-void Canvas::RemoveRenderer(std::shared_ptr<Renderer2D> renderer)
+void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
 {
-    m_children_renderers_.erase(renderer);
+    std::erase_if(m_children_renderers_, [renderer](const std::shared_ptr<Renderer2D> &a) {
+        return a == renderer;
+    });
 }
 }
