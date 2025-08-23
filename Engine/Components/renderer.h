@@ -8,9 +8,7 @@ class Renderer : public Component
 {
     friend class Camera;
 
-    static std::vector<std::weak_ptr<Renderer>> renderers;
-
-    static void Render();
+    static std::vector<std::weak_ptr<Renderer>> m_renderers_;
 
 protected:
     bool m_is_visible_ = false;
@@ -25,6 +23,6 @@ public:
     void OnDisabled() override;
     void OnDestroy() override;
 
-    virtual std::weak_ptr<Transform> BoundsOrigin() = 0;
+    virtual std::shared_ptr<Transform> BoundsOrigin() = 0;
 };
 }

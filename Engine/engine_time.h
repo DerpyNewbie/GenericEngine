@@ -22,7 +22,8 @@ class Time
     Instant m_time_;
     Instant m_fps_check_time_;
     Instant m_fixed_update_check_time_;
-    float m_dt_ = 0;
+    float m_fixed_delta_time_ = 0.02F;
+    float m_delta_time_ = 0;
     float m_time_scale_ = 1;
     float m_time_since_start_up_ = 0;
     int m_fps_ = 0;
@@ -58,14 +59,19 @@ public:
         return m_fps_check_time_.time_since_epoch().count();
     }
 
+    [[nodiscard]] float FixedDeltaTime() const
+    {
+        return m_fixed_delta_time_;
+    }
+
     [[nodiscard]] float DeltaTime() const
     {
-        return m_time_scale_ * m_dt_;
+        return m_time_scale_ * m_delta_time_;
     }
 
     [[nodiscard]] const float &UnscaledDeltaTime() const
     {
-        return m_dt_;
+        return m_delta_time_;
     }
 
     [[nodiscard]] const float &TimeSinceStartUp() const
@@ -117,6 +123,11 @@ public:
     {
         m_fps_target_ = target;
         m_seconds_per_frame_ = 1.0 / m_fps_target_;
+    }
+
+    void FixedDeltaTime(const float fixed_delta_time)
+    {
+        m_fixed_delta_time_ = fixed_delta_time;
     }
 
     [[nodiscard]] double CurrentFrameTime() const;

@@ -12,14 +12,16 @@
 #include "update_man_debugger.h"
 
 #include "application.h"
+#include "audio_window.h"
+#include "editor_gizmos.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
-#include "DxLib/dxlib_helper.h"
 #include "update_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
 #include "Rendering/material.h"
+#include "Physics/physics.h"
 
 #include <ranges>
 
@@ -27,8 +29,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    SetUseHookWinProcReturnValue(true);
-
     if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
         return true;
     return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -105,8 +105,6 @@ void Editor::Init()
             font_cpu_desc_handle,
             font_gpu_desc_handle
             );
-
-        SetHookWinProc(WndProc);
     }
 
     {
@@ -117,6 +115,7 @@ void Editor::Init()
         AddEditorWindow("Update Manager Debugger", std::make_shared<UpdateManDebugger>());
         AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
         AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
+        AddEditorWindow("Audio", std::make_shared<AudioWindow>());
     }
 
     {
@@ -162,11 +161,20 @@ void Editor::OnDraw()
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
-        DxLibHelper::DrawYPlaneGrid();
+        EditorGizmos::DrawYPlaneGrid();
+    if (EditorPrefs::show_physics_debug)
+        Physics::DebugDraw();
 
     for (const auto &window : m_editor_windows_ | std::views::values)
     {
         window->DrawGui();
+    }
+
+    const auto selected_obj = SelectedObject();
+    const auto selected_go = Gui::MakeCompatible<GameObject>(selected_obj);
+    if (selected_go != nullptr)
+    {
+        EditorGizmos::DrawObject(selected_go);
     }
 
     {
@@ -180,8 +188,6 @@ void Editor::OnDraw()
             ImGui::RenderPlatformWindowsDefault();
         }
     }
-
-    RefreshDxLibDirect3DSetting();
 }
 
 void Editor::Finalize()

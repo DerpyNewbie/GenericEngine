@@ -41,6 +41,7 @@
 #include <cereal/types/polymorphic.hpp>
 #include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>
+#include <cereal/types/list.hpp>
 /* === end cereal === */
 
 /* === begin windows === */

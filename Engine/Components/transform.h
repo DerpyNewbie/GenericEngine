@@ -5,9 +5,11 @@ namespace engine
 {
 class Transform : public Component
 {
-    Matrix m_matrix_ = Matrix::Identity;
-    void RenderLocalTransformGui();
-    void RenderGlobalTransformGui();
+    Matrix m_local_matrix_ = Matrix::Identity;
+    Matrix m_world_matrix_ = Matrix::Identity;
+    
+    void TransformGui(bool is_local);
+    void RecalculateWorldMatrix();
 
 protected:
     std::weak_ptr<Transform> m_parent_ = {};
@@ -32,9 +34,15 @@ public:
 
     [[nodiscard]] std::shared_ptr<Transform> Parent() const;
     [[nodiscard]] std::shared_ptr<Transform> GetChild(int i) const;
+    [[nodiscard]] int GetSiblingIndex() const;
+
     [[nodiscard]] bool IsChildOf(const std::shared_ptr<Transform> &transform, bool deep = true) const;
     [[nodiscard]] int ChildCount() const;
-    void SetParent(const std::weak_ptr<Transform> &next_parent);
+
+    void SetParent(const std::shared_ptr<Transform> &next_parent);
+    void SetSiblingIndex(int index);
+    void SetAsFirstSibling();
+    void SetAsLastSibling();
 
     void SetPosition(const Vector3 &position);
     void SetRotation(const Quaternion &rotation);
@@ -82,7 +90,7 @@ public:
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_matrix_),
+           CEREAL_NVP(m_local_matrix_),
            CEREAL_NVP(m_parent_),
            CEREAL_NVP(m_children_));
     }

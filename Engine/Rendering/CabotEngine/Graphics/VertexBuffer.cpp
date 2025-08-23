@@ -135,9 +135,9 @@ VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
     m_IsValid = true;
 }
 
-D3D12_VERTEX_BUFFER_VIEW VertexBuffer::View() const
+D3D12_VERTEX_BUFFER_VIEW *VertexBuffer::View()
 {
-    return m_View;
+    return &m_View;
 }
 
 bool VertexBuffer::IsValid()

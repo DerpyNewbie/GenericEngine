@@ -9,19 +9,22 @@ class Transform;
 
 class SkinnedMeshRenderer : public MeshRenderer
 {
-    bool m_draw_bones_ = false;
+    static bool m_draw_bones_;
+
     std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_bone_matrix_buffers_;
 
-    void DrawBones();
-    void UpdateBoneTransformsBuffer();
-    std::weak_ptr<Transform> BoundsOrigin() override;
+    Matrix WorldMatrix() override;
 
-protected:
-    void UpdateWVPBuffer() override;
+    void DrawBones() const;
+    void UpdateBoneTransformsBuffer() const;
+    std::shared_ptr<Transform> BoundsOrigin() override;
 
 public:
     constexpr static int kMaxBonesPerVertex = 4;
+
     std::vector<std::weak_ptr<Transform>> transforms;
+    std::vector<Matrix> inverted_bind_poses;
+
     AssetPtr<Transform> root_bone;
 
     void OnInspectorGui() override;
@@ -33,7 +36,10 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<MeshRenderer>(this), CEREAL_NVP(shared_mesh));
+        ar(cereal::base_class<MeshRenderer>(this),
+           CEREAL_NVP(m_shared_mesh_),
+           CEREAL_NVP(transforms),
+           CEREAL_NVP(inverted_bind_poses));
     }
 };
 }

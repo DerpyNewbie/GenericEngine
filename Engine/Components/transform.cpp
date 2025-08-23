@@ -2,26 +2,52 @@
 
 #include "transform.h"
 #include "game_object.h"
+#include "gui.h"
+#include "scene.h"
 
 namespace engine
 {
 
 void Transform::OnInspectorGui()
 {
-    RenderLocalTransformGui();
-    RenderGlobalTransformGui();
+    static int selected_tab = 0;
+
+    if (ImGui::BeginTabBar("##TRANSFORM_TAB_BAR", ImGuiTabBarFlags_DrawSelectedOverline))
+    {
+        if (ImGui::BeginTabItem("Local", nullptr, selected_tab == 0 ? ImGuiTabItemFlags_SetSelected : 0))
+        {
+            TransformGui(true);
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            selected_tab = 0;
+        }
+
+        if (ImGui::BeginTabItem("Global", nullptr, selected_tab == 1 ? ImGuiTabItemFlags_SetSelected : 0))
+        {
+            TransformGui(false);
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::IsItemClicked())
+        {
+            selected_tab = 1;
+        }
+
+        ImGui::EndTabBar();
+    }
 }
 
 Matrix Transform::LocalMatrix() const
 {
-    return m_matrix_;
+    return m_local_matrix_;
 }
 
 Matrix Transform::WorldMatrix() const
 {
-    return m_parent_.expired()
-               ? m_matrix_
-               : m_matrix_ * m_parent_.lock()->WorldMatrix();
+    return m_world_matrix_;
 }
 
 Matrix Transform::WorldToLocal() const
@@ -92,6 +118,24 @@ std::shared_ptr<Transform> Transform::GetChild(const int i) const
     return m_children_.at(i);
 }
 
+int Transform::GetSiblingIndex() const
+{
+    const auto parent = Parent();
+    if (parent == nullptr)
+    {
+        auto root_objects = GameObject()->Scene()->RootGameObjects();
+        const auto itr = std::ranges::find(root_objects, GameObject());
+        return std::distance(root_objects.begin(), itr);
+    }
+
+    auto children = parent->m_children_;
+    auto guid = Guid();
+    const auto itr = std::ranges::find_if(children, [&guid](auto &other) {
+        return other->Guid() == guid;
+    });
+    return std::distance(children.begin(), itr);
+}
+
 bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const bool deep) const
 {
     auto parent = m_parent_.lock();
@@ -112,12 +156,11 @@ int Transform::ChildCount() const
     return static_cast<int>(m_children_.size());
 }
 
-void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
+void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 {
     const auto current_parent = m_parent_.lock();
-    const auto new_parent = next_parent.lock();
 
-    if (current_parent == new_parent)
+    if (current_parent == next_parent)
         return;
 
     if (current_parent)
@@ -137,7 +180,65 @@ void Transform::SetParent(const std::weak_ptr<Transform> &next_parent)
         parent->m_children_.emplace_back(shared_from_base<Transform>());
     }
 
+    RecalculateWorldMatrix();
     GameObject()->SetAsRootObject(m_parent_.expired());
+}
+
+void Transform::SetSiblingIndex(const int index)
+{
+    const auto parent = Parent();
+    if (parent == nullptr)
+    {
+        const auto game_object = GameObject();
+        const auto scene = GameObject()->Scene();
+        auto &root_objects = scene->m_root_game_objects_;;
+        std::erase(root_objects, game_object);
+        if (index <= 0)
+        {
+            root_objects.insert(root_objects.begin(), game_object);
+            return;
+        }
+
+        if (root_objects.size() < index)
+        {
+            root_objects.emplace_back(game_object);
+            return;
+        }
+
+        root_objects.insert(root_objects.begin() + index, game_object);
+        return;
+    }
+
+    const auto transform = shared_from_base<Transform>();
+    auto &children = parent->m_children_;
+    auto guid = Guid();
+    std::erase_if(children, [&guid](auto &other) {
+        return other->Guid() == guid;
+    });
+
+    if (index <= 0)
+    {
+        children.insert(children.begin(), transform);
+        return;
+    }
+
+    if (children.size() < index)
+    {
+        children.emplace_back(transform);
+        return;
+    }
+
+    children.insert(children.begin() + index, transform);
+}
+
+void Transform::SetAsFirstSibling()
+{
+    SetSiblingIndex(0);
+}
+
+void Transform::SetAsLastSibling()
+{
+    SetSiblingIndex(INT_MAX);
 }
 
 void Transform::SetPosition(const Vector3 &position)
@@ -208,90 +309,82 @@ void Transform::SetLocalScale(const Vector3 &local_scale)
 
 void Transform::SetLocalMatrix(const Matrix &matrix)
 {
-    m_matrix_ = matrix;
+    m_local_matrix_ = matrix;
+    RecalculateWorldMatrix();
 }
 
 void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
 {
-    m_matrix_ = Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) *
-                Matrix::CreateTranslation(position);
+    SetLocalMatrix(
+        Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) * Matrix::CreateTranslation(position));
 }
 
-void Transform::RenderLocalTransformGui()
+void Transform::TransformGui(const bool is_local)
 {
-    if (!ImGui::CollapsingHeader("Local", ImGuiTreeNodeFlags_DefaultOpen))
-        return;
+    Vector3 position, rotation, scale;
 
-    ImGui::PushID("Local");
-
-    float local_pos[3], local_rot_euler[3], local_scale[3];
-    EngineUtil::ToFloat3(local_pos, LocalPosition());
-    EngineUtil::ToFloat3(local_rot_euler, LocalRotation().ToEuler() * Mathf::kRad2Deg);
-    EngineUtil::ToFloat3(local_scale, LocalScale());
-
-    if (ImGui::InputFloat3("Position", local_pos) && ImGui::IsItemDeactivatedAfterEdit())
+    if (is_local)
     {
-        Logger::Log<Transform>("New Position: %f, %f, %f", local_pos[0], local_pos[1], local_pos[2]);
-        SetLocalPosition({local_pos[0], local_pos[1], local_pos[2]});
+        position = LocalPosition();
+        rotation = LocalRotation().ToEuler() * Mathf::kRad2Deg;
+        scale = LocalScale();
+    }
+    else
+    {
+        position = Position();
+        rotation = Rotation().ToEuler() * Mathf::kRad2Deg;
+        scale = Scale();
     }
 
-    if (ImGui::InputFloat3("Rotation", local_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Position" : "Position", position))
     {
-        Logger::Log<Transform>("New Rotation: %f, %f, %f", local_rot_euler[0], local_rot_euler[1], local_rot_euler[2]);
-        SetLocalRotation(
-            Quaternion::CreateFromYawPitchRoll(
-                local_rot_euler[1] * Mathf::kDeg2Rad,
-                local_rot_euler[0] * Mathf::kDeg2Rad,
-                local_rot_euler[2] * Mathf::kDeg2Rad));
+        is_local ? SetLocalPosition(position) : SetPosition(position);
     }
 
-    if (ImGui::InputFloat3("Scale", local_scale) && ImGui::IsItemDeactivatedAfterEdit())
+    if (Gui::PropertyField(is_local ? "Local Rotation" : "Rotation", rotation))
     {
-        Logger::Log<Transform>("New Scale: %f, %f, %f", local_scale[0], local_scale[1], local_scale[2]);
-        SetLocalScale({local_scale[0], local_scale[1], local_scale[2]});
+        const auto rot_quat = Quaternion::CreateFromYawPitchRoll(rotation * Mathf::kDeg2Rad);
+        is_local ? SetLocalRotation(rot_quat) : SetRotation(rot_quat);
     }
 
-    ImGui::PopID();
+    if (!is_local)
+    {
+        ImGui::BeginDisabled();
+    }
+
+    if (Gui::PropertyField(is_local ? "Local Scale" : "Scale", scale))
+    {
+        SetLocalScale(scale);
+    }
+
+    if (!is_local)
+    {
+        ImGui::EndDisabled();
+    }
 }
 
-void Transform::RenderGlobalTransformGui()
+void Transform::RecalculateWorldMatrix()
 {
-    if (!ImGui::CollapsingHeader("Global"))
-        return;
-
-    ImGui::PushID("Global");
-
-    float global_pos[3], global_rot_euler[3], global_scale[3];
-    EngineUtil::ToFloat3(global_pos, Position());
-    EngineUtil::ToFloat3(global_rot_euler, Rotation().ToEuler() * Mathf::kRad2Deg);
-    EngineUtil::ToFloat3(global_scale, Scale());
-
-    if (ImGui::InputFloat3("Position", global_pos) && ImGui::IsItemDeactivatedAfterEdit())
+    const auto parent = m_parent_.lock();
+    if (parent == nullptr)
     {
-        Logger::Log<Transform>("New Position: %f, %f, %f", global_pos[0], global_pos[1], global_pos[2]);
-        SetPosition({global_pos[0], global_pos[1], global_pos[2]});
+        m_world_matrix_ = m_local_matrix_;
+    }
+    else
+    {
+        m_world_matrix_ = m_local_matrix_ * parent->WorldMatrix();
     }
 
-    if (ImGui::InputFloat3("Rotation", global_rot_euler) && ImGui::IsItemDeactivatedAfterEdit())
+    for (const auto child : m_children_)
     {
-        Logger::Log<Transform>("New Rotation: %f, %f, %f",
-                               global_rot_euler[0], global_rot_euler[1], global_rot_euler[2]);
-        SetRotation(Quaternion::CreateFromYawPitchRoll(
-            global_rot_euler[1] * Mathf::kDeg2Rad,
-            global_rot_euler[0] * Mathf::kDeg2Rad,
-            global_rot_euler[2] * Mathf::kDeg2Rad));
+        child->RecalculateWorldMatrix();
     }
-
-    if (ImGui::InputFloat3("Scale", global_scale) && ImGui::IsItemDeactivatedAfterEdit())
-    {
-        Logger::Error<Transform>("World scale is not implemented");
-    }
-
-    ImGui::PopID();
 }
 
 void Transform::OnDestroy()
 {
+    SetParent(nullptr);
+
     for (const auto child : m_children_)
     {
         DestroyImmediate(child->GameObject());

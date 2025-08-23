@@ -12,7 +12,9 @@
 
 #include <shobjidl.h>
 
-void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
+namespace editor
+{
+void DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 {
     if (name == "Default")
     {
@@ -34,7 +36,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
 
     if (name == "GameObject")
     {
-        DrawObjectMenu();
+        DrawObjectMenu(engine::Gui::MakeCompatible<engine::GameObject>(Editor::Instance()->SelectedObject()));
         return;
     }
 
@@ -59,7 +61,7 @@ void editor::DefaultEditorMenu::OnEditorMenuGui(const std::string name)
     throw std::runtime_error("Unknown editor menu: " + name);
 }
 
-void editor::DefaultEditorMenu::DrawDefaultMenu()
+void DefaultEditorMenu::DrawDefaultMenu()
 {
     DrawFilesMenu();
     DrawEditMenu();
@@ -67,7 +69,7 @@ void editor::DefaultEditorMenu::DrawDefaultMenu()
     DrawWindowMenu();
 }
 
-void editor::DefaultEditorMenu::DrawFilesMenu()
+void DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
     {
@@ -108,26 +110,36 @@ void editor::DefaultEditorMenu::DrawFilesMenu()
     }
 }
 
-void editor::DefaultEditorMenu::DrawEditMenu()
+void DefaultEditorMenu::DrawEditMenu()
 {
     if (ImGui::BeginMenu("Prefs"))
     {
         ImGui::MenuItem("Show Grid", nullptr, &EditorPrefs::show_grid);
+        ImGui::MenuItem("Show Physics Debug", nullptr, &EditorPrefs::show_physics_debug);
         ImGui::Combo("Theme", &EditorPrefs::theme, "Dark\0Light\0Classic\0\0");
 
         ImGui::EndMenu();
     }
 }
 
-void editor::DefaultEditorMenu::DrawObjectMenu()
+void DefaultEditorMenu::DrawObjectMenu(const std::shared_ptr<engine::GameObject> &go)
 {
     if (ImGui::MenuItem("Create Empty"))
     {
-        engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
+        const auto empty_go = engine::Object::Instantiate<engine::GameObject>("Empty GameObject");
+        if (go != nullptr)
+        {
+            empty_go->Transform()->SetParent(go->Transform());
+        }
+    }
+
+    if (ImGui::MenuItem("Delete", nullptr, false, go != nullptr))
+    {
+        go->DestroyThis();
     }
 }
 
-void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go)
+void DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObject> &go)
 {
     if (go == nullptr)
     {
@@ -147,7 +159,7 @@ void editor::DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::
     }
 }
 
-void editor::DefaultEditorMenu::DrawWindowMenu()
+void DefaultEditorMenu::DrawWindowMenu()
 {
     const auto editor = Editor::Instance();
     const auto names = editor->GetEditorWindowNames();
@@ -157,7 +169,7 @@ void editor::DefaultEditorMenu::DrawWindowMenu()
     }
 }
 
-bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
+bool DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
 {
     const auto editor = Editor::Instance();
     const auto menus = editor->GetCreateMenus();
@@ -186,4 +198,5 @@ bool editor::DefaultEditorMenu::DrawAssetMenu(const std::filesystem::path &path)
     }
 
     return false;
+}
 }

@@ -2,11 +2,8 @@
 #include "gizmos.h"
 
 #include "update_manager.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
-#include "CabotEngine/Graphics/RootSignature.h"
-#include "Components/camera.h"
 
 namespace engine
 {
@@ -19,69 +16,73 @@ void Gizmos::Init()
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
 
     m_instance_ = std::make_shared<Gizmos>();
-    m_instance_->m_constant_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix) * 2);
-    m_instance_->m_constant_buffer_->CreateBuffer();
-    m_instance_->m_desc_handle_ = m_instance_->m_constant_buffer_->UploadBuffer();
 
     UpdateManager::SubscribeDrawCall(m_instance_);
 }
 
-void Gizmos::OnDraw()
+void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
+{
+    if (m_vertices_.empty())
+    {
+        m_vertex_buffers_[current_back_buffer_idx] = nullptr;
+        m_vertices_count_[current_back_buffer_idx] = 0;
+        return;
+    }
+
+    const auto vertex_buffer = std::make_shared<VertexBuffer>(m_vertices_.size(), m_vertices_.data());
+
+    if (!vertex_buffer->IsValid())
+    {
+        Logger::Error<Gizmos>("Failed to create VertexBuffer: Invalid VertexBuffer");
+        m_vertex_buffers_[current_back_buffer_idx] = nullptr;
+        m_vertices_count_[current_back_buffer_idx] = 0;
+        m_vertices_.clear();
+        return;
+    }
+
+    // store it, then clear current vertices
+    m_instance_->m_vertex_buffers_[current_back_buffer_idx] = vertex_buffer;
+    m_instance_->m_vertices_count_[current_back_buffer_idx] = m_vertices_.size();
+    m_vertices_.clear();
+}
+
+void Gizmos::Render(const int current_back_buffer_idx, ID3D12GraphicsCommandList *command_list)
 {
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
 
-    if (m_vertices_.empty())
-        return;
-
-    const auto camera = Camera::Main();
-    if (camera == nullptr)
+    // have we created a vertex buffer for this frame? 
+    if (current_back_buffer_idx != m_last_back_buffer_idx_)
     {
-        Logger::Error<Gizmos>("Main Camera is not set!");
-        m_vertices_.clear();
+        // if not, create a new vertex buffer for this frame
+        CreateVertexBuffer(current_back_buffer_idx);
+        m_last_back_buffer_idx_ = current_back_buffer_idx;
+    }
+
+    const auto current_vertex_buffer = m_vertex_buffers_[current_back_buffer_idx];
+    const auto current_vertices_count = m_vertices_count_[current_back_buffer_idx];
+
+    // if we had nothing to render, ignore it
+    if (current_vertices_count == 0 || current_vertex_buffer == nullptr)
+    {
         return;
     }
 
-    const auto constant_buffer = m_instance_->m_constant_buffer_;
+    // render stuff
+    command_list->SetPipelineState(PSOManager::Get("Line"));
+    command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+    command_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
+    command_list->DrawInstanced(current_vertices_count, 1, 0, 0);
+}
 
-    if (!constant_buffer->IsValid())
-    {
-        Logger::Error<Gizmos>("ConstantBuffer is invalid!");
-        m_vertices_.clear();
-        return;
-    }
-
-    Matrix mat[2];
-    mat[0] = camera->GetViewMatrix();
-    mat[1] = camera->GetProjectionMatrix();
-    constant_buffer->UpdateBuffer(mat);
-
-    const auto buffer_index = g_RenderEngine->CurrentBackBufferIndex();
-    m_instance_->m_vertex_buffers_[buffer_index] = std::make_shared<VertexBuffer>(
-        m_vertices_.size(), m_vertices_.data());
-    const auto &vertex_buffer = m_instance_->m_vertex_buffers_[buffer_index];
-    if (!vertex_buffer->IsValid())
-    {
-        Logger::Error<Gizmos>("Failed to create VertexBuffer!");
-        m_vertices_.clear();
-        return;
-    }
-
-    const auto vertex_buffer_view = vertex_buffer->View();
-    const auto cmd_list = g_RenderEngine->CommandList();
-
-    cmd_list->SetPipelineState(PSOManager::Get("Line"));
-    cmd_list->SetGraphicsRootDescriptorTable(kVertexCBV, m_instance_->m_desc_handle_->HandleGPU);
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    cmd_list->IASetVertexBuffers(0, 1, &vertex_buffer_view);
-    cmd_list->DrawInstanced(m_vertices_.size(), 1, 0, 0);
-
-    m_vertices_.clear();
+void Gizmos::OnDraw()
+{
+    Render(static_cast<int>(g_RenderEngine->CurrentBackBufferIndex()), g_RenderEngine->CommandList());
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)
 {
-    Vertex vert_start{start, color};
-    Vertex vert_end{end, color};
+    Vertex vert_start{.vertex = start, .color = color};
+    Vertex vert_end{.vertex = end, .color = color};
 
     m_vertices_.emplace_back(vert_start);
     m_vertices_.emplace_back(vert_end);
