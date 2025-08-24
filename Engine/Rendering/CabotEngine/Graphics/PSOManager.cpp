@@ -48,7 +48,7 @@ void PSOManager::Initialize()
     BasicSetting.PSPath = L"x64/Debug/2DPixelShader.cso";
     Register(BasicSetting);
 
-    BasicSetting.PSOName = "SkyBox";
+    BasicSetting.PSOName = "Skybox";
     BasicSetting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
     BasicSetting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
     BasicSetting.DepthStencilDesc.DepthEnable = true;

@@ -1,26 +1,25 @@
 #pragma once
-#include "pch.h"
-#include "component.h"
 #include "renderer.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/Texture2D.h"
 #include "Rendering/CabotEngine/Graphics/TextureCube.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 
+
 namespace engine
 {
-class SkyBox : public Renderer
+class Skybox : public Renderer
 {
-    bool m_IsTextureSet = false;;
+    bool m_is_texture_set_ = false;
 
-    TextureCube m_TextureCube_;
-    std::shared_ptr<VertexBuffer> m_VertexBuffer_;
-    std::shared_ptr<IndexBuffer> m_IndexBuffer_;
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> viewproj_buffers;
-    std::shared_ptr<DescriptorHandle> m_TextureCubeHandle_;
+    TextureCube m_texture_cube_;
+    std::shared_ptr<VertexBuffer> m_vertex_buffer_;
+    std::shared_ptr<IndexBuffer> m_index_buffer_;
+    std::shared_ptr<DescriptorHandle> m_texture_cube_handle_;
+
+    void ReConstructTexCube();
 
 public:
     std::array<AssetPtr<Texture2D>, 6> textures;
