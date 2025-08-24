@@ -15,10 +15,22 @@ std::shared_ptr<PSOManager> PSOManager::Instance()
 
 void PSOManager::Initialize()
 {
+    D3D12_RASTERIZER_DESC rasterizer_desc;
+
+    rasterizer_desc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
+    rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
+    rasterizer_desc.FrontCounterClockwise = TRUE;
+
+    D3D12_DEPTH_STENCIL_DESC depth_stencil_desc;
+
+    depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+
     PSOSetting BasicSetting;
     BasicSetting.PSOName = "Basic";
     BasicSetting.InputLayout = engine::Vertex::InputLayout;
     BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    BasicSetting.RasterizerDesc = rasterizer_desc;
+    BasicSetting.DepthStencilDesc = depth_stencil_desc;
     BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
     BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
     Register(BasicSetting);
@@ -35,6 +47,16 @@ void PSOManager::Initialize()
     BasicSetting.VSPath = L"x64/Debug/2DVertShader.cso";
     BasicSetting.PSPath = L"x64/Debug/2DPixelShader.cso";
     Register(BasicSetting);
+
+    BasicSetting.PSOName = "SkyBox";
+    BasicSetting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+    BasicSetting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    BasicSetting.DepthStencilDesc.DepthEnable = true;
+    BasicSetting.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    BasicSetting.DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    BasicSetting.VSPath = L"x64/Debug/SkyboxVertShader.cso";
+    BasicSetting.PSPath = L"x64/Debug/SkyboxPixelShader.cso";
+    Register(BasicSetting);
 }
 
 bool PSOManager::Register(PSOSetting setting)
@@ -42,6 +64,8 @@ bool PSOManager::Register(PSOSetting setting)
     PipelineState *pso = new PipelineState;
     pso->SetInputLayout(setting.InputLayout);
     pso->SetPrimitiveTopologyType(setting.PrimitiveType);
+    pso->SetRasterizerState(setting.RasterizerDesc);
+    pso->SetDepthStencilState(setting.DepthStencilDesc);
     pso->SetVS(setting.VSPath);
     pso->SetPS(setting.PSPath);
     pso->Create();

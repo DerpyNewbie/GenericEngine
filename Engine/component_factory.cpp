@@ -10,6 +10,7 @@
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
+#include "Components/sky_box.h"
 #include "Components/text_asset_ref_test_component.h"
 #include "Physics/box_collider.h"
 #include "Physics/capsule_collider.h"
@@ -40,6 +41,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RigidbodyTesterComponent);
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
+    ADD_COMPONENT(SkyBox);
 #undef ADD_COMPONENT
 }
 
