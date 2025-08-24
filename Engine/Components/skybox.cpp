@@ -1,11 +1,14 @@
-#include "sky_box.h"
+#include "pch.h"
+#include "skybox.h"
 #include "camera.h"
 #include "gui.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
-void engine::SkyBox::OnConstructed()
+namespace engine
+{
+void Skybox::OnConstructed()
 {
 
     std::array<Vertex, 8> cube_vertices;
@@ -17,7 +20,7 @@ void engine::SkyBox::OnConstructed()
     cube_vertices[5] = {{1.0f, 1.0f, 1.0f}};
     cube_vertices[6] = {{1.0f, -1.0f, 1.0f}};
     cube_vertices[7] = {{-1.0f, -1.0f, 1.0f}};
-    m_VertexBuffer_ = std::make_shared<VertexBuffer>(cube_vertices.size(), cube_vertices.data());
+    m_vertex_buffer_ = std::make_shared<VertexBuffer>(cube_vertices.size(), cube_vertices.data());
 
     std::array<uint32_t, 36> cube_indices =
     {
@@ -28,15 +31,10 @@ void engine::SkyBox::OnConstructed()
         4, 5, 1, 4, 1, 0,
         3, 2, 6, 3, 6, 7,
     };
-    m_IndexBuffer_ = std::make_shared<IndexBuffer>(sizeof(uint32_t) * cube_indices.size(), cube_indices.data());
-    for (auto &vp_buffer : viewproj_buffers)
-    {
-        vp_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-        vp_buffer->CreateBuffer();
-    }
+    m_index_buffer_ = std::make_shared<IndexBuffer>(sizeof(uint32_t) * cube_indices.size(), cube_indices.data());
 }
 
-void engine::SkyBox::OnInspectorGui()
+void Skybox::OnInspectorGui()
 {
     bool changed = false;
     for (int i = 0; i < textures.size(); ++i)
@@ -62,38 +60,38 @@ void engine::SkyBox::OnInspectorGui()
 
         if (can_create)
         {
-            m_IsTextureSet = false;
+            m_is_texture_set_ = false;
             std::array<std::shared_ptr<Texture2D>, 6> shared_textures;
             for (int i = 0; i < textures.size(); ++i)
                 shared_textures[i] = textures[i].CastedLock();
-            if (m_TextureCube_.CreateTexCube(shared_textures))
+            if (m_texture_cube_.CreateTexCube(shared_textures))
             {
-                m_TextureCubeHandle_ = DescriptorHeap::Register(m_TextureCube_);
-                m_IsTextureSet = true;
+                m_texture_cube_handle_ = DescriptorHeap::Register(m_texture_cube_);
+                m_is_texture_set_ = true;
             }
         }
     }
 }
 
-void engine::SkyBox::OnDraw()
+void Skybox::OnDraw()
 {
-    if (!m_IsTextureSet)
+    if (!m_is_texture_set_)
     {
         return;
     }
 
     auto cmd_list = g_RenderEngine->CommandList();
-    auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, m_VertexBuffer_->View());
-    cmd_list->IASetIndexBuffer(m_IndexBuffer_->View());
+    cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
+    cmd_list->IASetIndexBuffer(m_index_buffer_->View());
 
     cmd_list->SetPipelineState(PSOManager::Get("SkyBox"));
-    cmd_list->SetGraphicsRootDescriptorTable(kPixelSRV, m_TextureCubeHandle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kPixelSRV, m_texture_cube_handle_->HandleGPU);
 
     cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }
-std::shared_ptr<engine::Transform> engine::SkyBox::BoundsOrigin()
+std::shared_ptr<Transform> Skybox::BoundsOrigin()
 {
     return Camera::Main()->GameObject()->Transform();
+}
 }

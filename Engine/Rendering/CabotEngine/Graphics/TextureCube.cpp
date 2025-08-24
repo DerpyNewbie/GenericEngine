@@ -1,5 +1,4 @@
-#include <directx/d3dx12_barriers.h>
-#include <directx/d3dx12_core.h>
+#include "pch.h"
 #include "TextureCube.h"
 #include "RenderEngine.h"
 
