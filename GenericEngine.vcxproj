@@ -63,6 +63,7 @@
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\skybox.cpp"/>
+        <ClCompile Include="Engine\Components\sky_box.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -218,6 +219,7 @@
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\skybox.h"/>
+        <ClInclude Include="Engine\Components\sky_box.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
