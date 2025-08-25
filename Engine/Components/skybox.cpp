@@ -24,6 +24,7 @@ void Skybox::ReConstructTexCube()
     if (!m_texture_cube_.CreateTexCube(shared_textures))
     {
         m_is_texture_set_ = false;
+        return;
     }
     m_texture_cube_handle_ = DescriptorHeap::Register(m_texture_cube_);
     m_is_texture_set_ = true;
@@ -31,7 +32,6 @@ void Skybox::ReConstructTexCube()
 
 void Skybox::OnConstructed()
 {
-
     std::array<Vertex, 8> cube_vertices;
     cube_vertices[0] = {{-1.0f, 1.0f, -1.0f}};
     cube_vertices[1] = {{1.0f, 1.0f, -1.0f}};
@@ -57,7 +57,6 @@ void Skybox::OnConstructed()
 
 void Skybox::OnInspectorGui()
 {
-    bool changed = false;
     for (int i = 0; i < textures.size(); ++i)
     {
         ImGui::PushID(i);
@@ -85,6 +84,7 @@ void Skybox::OnDraw()
 
     cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }
+
 std::shared_ptr<Transform> Skybox::BoundsOrigin()
 {
     return Camera::Main()->GameObject()->Transform();
