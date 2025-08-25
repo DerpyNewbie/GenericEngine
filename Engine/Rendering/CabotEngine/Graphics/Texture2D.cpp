@@ -11,6 +11,10 @@ using namespace DirectX;
 
 void Texture2D::OnInspectorGui()
 {
+    ImGui::Text("Texture2D");
+    ImGui::Text("Width: %d", width);
+    ImGui::Text("Height: %d", height);
+    ImGui::Text("Mip Level: %d", mip_level);
 }
 
 void Texture2D::CreateBuffer()

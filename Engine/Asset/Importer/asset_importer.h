@@ -18,12 +18,26 @@ public:
     virtual std::vector<std::string> SupportedExtensions() = 0;
 
     /// <summary>
-    /// Retrieve Object from AssetDescriptor
+    /// Check if Object can be exported with this exporter.
     /// </summary>
-    /// <param name="input_stream">An input stream containing Object in serialized form</param>
-    /// <param name="asset">A valid AssetDescriptor</param>
-    /// <returns>Object representation of a file that AssetDescriptor points to. `nullptr` if the file cannot be converted to Object.</returns>
-    virtual std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) = 0;
+    /// <param name="object">Object to check the ability to export</param>
+    /// <returns>true if the exporter supports an object, false otherwise.</returns>
+    virtual bool IsCompatibleWith(std::shared_ptr<Object> object)
+    {
+        return false;
+    }
+
+    /// <summary>
+    /// Called when importing an object
+    /// </summary>
+    virtual void OnImport(AssetDescriptor *ctx)
+    {}
+
+    /// <summary>
+    /// Called when writing an object
+    /// </summary>
+    virtual void OnExport(AssetDescriptor *ctx)
+    {}
 
     /// <summary>
     /// Add AssetImporter implementations to make impl retrievable with supported file extension.
@@ -44,6 +58,12 @@ public:
     /// <param name="file_extension">A file extension that begins with the dot '.'. E.x. ".txt"</param>
     /// <returns>AssetImporter instance if a supported instance were found. `nullptr` otherwise.</returns>
     static std::shared_ptr<AssetImporter> Get(const std::string &file_extension);
+
+    /// <summary>
+    /// Retrieve AssetImporter implementation that supports provided object.
+    /// </summary>
+    /// <returns>AssetImporter instance if a supported instance were found. `nullptr` otherwise.</returns>
+    static std::shared_ptr<AssetImporter> Get(const std::shared_ptr<Object> &object);
 
     /// <summary>
     /// Retrieve all registered AssetImporter instances.

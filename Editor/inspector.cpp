@@ -180,9 +180,9 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
     }
 
     ImGui::Separator();
-    ImGui::Text("Name: %s", asset->path_hint.filename().string().c_str());
-    ImGui::Text("Path: %s", asset->path_hint.string().c_str());
-    ImGui::Text("Guid: %s", asset->guid.str().c_str());
+    ImGui::Text("Name: %s", asset->AssetPath().filename().string().c_str());
+    ImGui::Text("Path: %s", asset->AssetPath().string().c_str());
+    ImGui::Text("Guid: %s", asset->Guid().str().c_str());
     if (asset_hierarchy->IsFile())
         ImGui::Text("File");
     if (asset_hierarchy->IsDirectory())
@@ -193,16 +193,51 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
 
     if (asset_hierarchy->IsFile())
     {
-        if (asset_hierarchy->asset->managed_object != nullptr)
+        if (asset_hierarchy->asset->MainObject() != nullptr)
         {
-            DrawObject(asset_hierarchy->asset->managed_object);
+            if (ImGui::CollapsingHeader("Main Object"))
+            {
+                ImGui::Indent();
+
+                ImGui::Text("Name: %s", asset_hierarchy->Name().c_str());
+                ImGui::Text("Guid: %s", asset_hierarchy->Guid().str().c_str());
+
+                ImGui::Separator();
+
+                DrawObject(asset_hierarchy->asset->MainObject());
+
+                ImGui::Unindent();
+            }
+
+            if (ImGui::CollapsingHeader("Objects"))
+            {
+                ImGui::Indent();
+                for (auto &object : asset_hierarchy->asset->Objects())
+                {
+                    ImGui::PushID(object.get());
+                    if (ImGui::CollapsingHeader(object->Name().c_str()))
+                    {
+                        ImGui::Indent();
+
+                        ImGui::Text("Guid: %s", object->Guid().str().c_str());
+
+                        ImGui::Separator();
+
+                        DrawObject(object);
+
+                        ImGui::Unindent();
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::Unindent();
+            }
         }
         else
         {
             ImGui::Text("Object is null!");
             if (ImGui::Button("Import"))
             {
-                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->guid);
+                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->Guid());
             }
         }
 

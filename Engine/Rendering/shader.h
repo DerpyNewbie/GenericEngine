@@ -7,14 +7,6 @@ namespace engine
 {
 class ShaderImporter;
 
-enum kShaderType
-{
-    kShaderType_Vertex,
-    kShaderType_Pixel,
-
-    kShaderType_Count
-};
-
 /// <summary>
 /// Shader object representation
 /// </summary>
@@ -29,29 +21,22 @@ class Shader : public InspectableAsset
     static std::shared_ptr<Shader> m_pDefaultShader;
 
 public:
-    enum class ShaderType
-    {
-        Vertex,
-        Pixel
-    };
-
     std::vector<std::shared_ptr<ShaderParameter>> parameters;
-
 
     void OnInspectorGui() override;
     static std::shared_ptr<Shader> GetDefault();
 
-    CD3DX12_SHADER_BYTECODE GetByteCode(const ShaderType type) const
+    CD3DX12_SHADER_BYTECODE GetByteCode(const kShaderType type) const
     {
         switch (type)
         {
-        case ShaderType::Vertex:
+        case kShaderType_Vertex:
             return m_pVSBlob.Get();
-        case ShaderType::Pixel:
+        case kShaderType_Pixel:
             return m_pPSBlob.Get();
+        default:
+            throw std::runtime_error("Invalid shader type");
         }
-
-        throw std::runtime_error("Invalid ShaderType");
     }
 };
 

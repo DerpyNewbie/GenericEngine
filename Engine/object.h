@@ -7,6 +7,7 @@ namespace engine
 class Object : public enable_shared_from_base<Object>
 {
     friend class Engine;
+    friend struct AssetDescriptor;
     friend cereal::access;
 
     static unsigned int m_last_instantiated_name_count_;
@@ -22,6 +23,8 @@ class Object : public enable_shared_from_base<Object>
     static void GarbageCollect();
     static std::string GenerateName();
     static xg::Guid GenerateGuid();
+
+    void SetGuid(xg::Guid new_guid);
 
 protected:
     Object() = default;

@@ -76,8 +76,8 @@ void PipelineState::SetGS(std::wstring filePath)
 
 void PipelineState::SetShader(std::shared_ptr<engine::Shader> shader)
 {
-    desc.VS = shader->GetByteCode(engine::Shader::ShaderType::Vertex);
-    desc.PS = shader->GetByteCode(engine::Shader::ShaderType::Pixel);
+    desc.VS = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
+    desc.PS = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
 }
 
 void PipelineState::Create()

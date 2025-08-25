@@ -9,11 +9,16 @@ std::vector<std::string> FontImporter::SupportedExtensions()
     return {".spritefont"};
 }
 
-std::shared_ptr<Object> FontImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
+bool FontImporter::IsCompatibleWith(const std::shared_ptr<Object> object)
 {
-    auto font = Object::Instantiate<FontData>(asset->guid);
-    font->LoadFont(asset->path_hint);
+    return std::dynamic_pointer_cast<FontData>(object) != nullptr;
+}
 
-    return font;
+void FontImporter::OnImport(AssetDescriptor *ctx)
+{
+    const auto font = Object::Instantiate<FontData>();
+    font->LoadFont(ctx->AssetPath());
+
+    ctx->SetMainObject(font);
 }
 }

@@ -167,17 +167,8 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload
         return nullptr;
     }
 
-    if (asset_descriptor->managed_object == nullptr)
-    {
-        asset_descriptor->Reload();
-    }
-
-    if (asset_descriptor->managed_object == nullptr)
-    {
-        return nullptr;
-    }
-
-    return asset_descriptor->managed_object;
+    asset_descriptor->Import();
+    return Object::Find(guid);
 }
 
 std::shared_ptr<Object> Gui::GetObjectDragDropTarget()

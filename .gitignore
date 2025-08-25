@@ -437,4 +437,5 @@ imgui.ini
 vcpkg_installed/
 
 # Generic-Engine Specific
-!Resources/*
+!Resources/**.meta
+!Resources/**/*.meta

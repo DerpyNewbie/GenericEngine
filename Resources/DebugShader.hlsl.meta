@@ -3,5 +3,6 @@
     "type": ".hlsl",
     "data": {
         "shader_meta": "{\"parameters\":{\"vertex\":[{\"name\":\"DebugType\",\"type\":\"int\"},{\"name\":\"WeightIndex\",\"type\":\"int\"}],\"pixel\":[{\"name\":\"Albedo\",\"type\":\"Texture2D\"}]}}"
-    }
+    },
+    "objects": []
 }
