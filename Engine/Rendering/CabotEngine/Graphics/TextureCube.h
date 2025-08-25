@@ -1,8 +1,5 @@
 #pragma once
-#include "pch.h"
-#include "ComPtr.h"
 #include "Texture2D.h"
-#include "Asset/asset_ptr.h"
 
 #include <array>
 #include <directx/d3d12.h>
