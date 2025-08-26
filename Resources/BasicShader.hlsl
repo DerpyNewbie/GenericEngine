@@ -12,11 +12,11 @@ StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
 struct VSInput
 {
-    float3 pos : POSITION; // 頂点座標
-    float4 color : COLOR; // 頂点色
-    float3 normal : NORMAL; // 法線
-    float4 tangent : TANGENT; // 接空間
-    float2 uv : TEXCOORD0; // UV
+    float3 pos : POSITION;
+    float4 color : COLOR;
+    float3 normal : NORMAL;
+    float4 tangent : TANGENT;
+    float2 uv : TEXCOORD0;
     float2 uv2 : TEXCOORD1;
     float2 uv3 : TEXCOORD2;
     float2 uv4 : TEXCOORD3;
@@ -31,9 +31,9 @@ struct VSInput
 
 struct VSOutput
 {
-    float4 svpos : SV_POSITION; // 変換された座標
+    float4 svpos : SV_POSITION;
     float3 normal: NORMAL;
-    float4 color : COLOR; // 変換された色
+    float4 color : COLOR;
     float2 uv : TEXCOORD;
 };
 
@@ -55,8 +55,8 @@ static const float4x4 identityMatrix = {
 
 VSOutput vrt(VSInput input)
 {
-    VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
-    float4 localPos = float4(input.pos, 1.0f); // 頂点座標
+    VSOutput output = (VSOutput)0;
+    float4 localPos = float4(input.pos, 1.0f);
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
@@ -74,19 +74,19 @@ VSOutput vrt(VSInput input)
     if(input.bones_per_vertex != 0)
     {    
 	      localPos = bonePos;
-        //localNormal = boneNormal;
+        localNormal = boneNormal;
     }
     
-    float4 worldPos = mul(World, localPos); // ワールド座標に変換
-    float4 viewPos = mul(View, worldPos); // ビュー座標に変換
-    float4 projPos = mul(Proj, viewPos); // 投影変換
+    float4 worldPos = mul(World, localPos);
+    float4 viewPos = mul(View, worldPos);
+    float4 projPos = mul(Proj, viewPos);
     
     float3x3 worldRot = ExtractRotation(World);
-    float3 worldNormal = mul(worldRot, localNormal); // ワールド座標に変換
+    float3 worldNormal = mul(worldRot, localNormal);
     
-    output.svpos = projPos; // 投影変換された座標をピクセルシェーダーに渡す
+    output.svpos = projPos;
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
-    output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
+    output.color = input.color;
     output.uv = input.uv;
     return output;
 }
