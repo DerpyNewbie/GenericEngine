@@ -20,6 +20,7 @@
 #include "update_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
+#include "Components/camera.h"
 #include "Rendering/material.h"
 #include "Physics/physics.h"
 
@@ -161,7 +162,7 @@ void Editor::OnDraw()
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
-        EditorGizmos::DrawYPlaneGrid();
+        EditorGizmos::DrawYPlaneGrid(Camera::Main()->GameObject()->Transform()->WorldMatrix());
     if (EditorPrefs::show_physics_debug)
         Physics::DebugDraw();
 

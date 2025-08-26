@@ -71,9 +71,11 @@ VSOutput vrt(VSInput input)
             boneNormal += mul(boneRot, localNormal) * weight;
         }
     }
-    
-	localPos = bonePos;
-    //localNormal = boneNormal;
+    if(input.bones_per_vertex != 0)
+    {    
+	      localPos = bonePos;
+        //localNormal = boneNormal;
+    }
     
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
