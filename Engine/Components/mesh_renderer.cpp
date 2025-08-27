@@ -16,7 +16,7 @@ bool MeshRenderer::m_draw_bounds_ = false;
 
 void MeshRenderer::UpdateWorldBuffer()
 {
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
     const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
     *ptr = WorldMatrix();
@@ -105,7 +105,7 @@ void MeshRenderer::OnDraw()
     auto current_material = shared_materials[0].CastedLock();
     auto current_shader = current_material->p_shared_shader.CastedLock();
 
-    const auto cmd_list = g_RenderEngine->CommandList();
+    const auto cmd_list = RenderEngine::CommandList();
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
@@ -264,9 +264,9 @@ void MeshRenderer::UpdateBuffers()
     ReconstructBuffer();
     UpdateWorldBuffer();
 
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-    const auto cmd_list = g_RenderEngine->CommandList();
+    const auto cmd_list = RenderEngine::CommandList();
 
     cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 }

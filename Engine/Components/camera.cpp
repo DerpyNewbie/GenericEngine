@@ -35,8 +35,8 @@ void CameraProperty::OnInspectorGui()
 
 void Camera::SetViewProjMatrix() const
 {
-    const auto cmd_list = g_RenderEngine->CommandList();
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto cmd_list = RenderEngine::CommandList();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
     const auto view_projection = view_projection_buffer->GetPtr<ViewProjection>();
 
@@ -99,7 +99,7 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    g_RenderEngine->SetBackGroundColor(m_property_.background_color);
+    RenderEngine::Instance()->SetBackgroundColor(m_property_.background_color);
     SetViewProjMatrix();
 
     const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);

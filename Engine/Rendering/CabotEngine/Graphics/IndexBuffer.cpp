@@ -9,7 +9,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
     D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,

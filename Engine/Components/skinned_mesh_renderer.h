@@ -11,7 +11,7 @@ class SkinnedMeshRenderer : public MeshRenderer
 {
     static bool m_draw_bones_;
 
-    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_bone_matrix_buffers_;
+    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffers_;
 
     Matrix WorldMatrix() override;
 

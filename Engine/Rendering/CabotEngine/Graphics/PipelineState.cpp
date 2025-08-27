@@ -82,7 +82,7 @@ void PipelineState::SetShader(std::shared_ptr<engine::Shader> shader)
 
 void PipelineState::Create()
 {
-    auto hr = g_RenderEngine->Device()->CreateGraphicsPipelineState(
+    auto hr = RenderEngine::Device()->CreateGraphicsPipelineState(
         &desc, IID_PPV_ARGS(m_pPipelineState.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {

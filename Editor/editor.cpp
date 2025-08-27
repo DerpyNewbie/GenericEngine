@@ -98,8 +98,8 @@ void Editor::Init()
 
         ImGui_ImplWin32_Init(Application::GetWindowHandle());
         ImGui_ImplDX12_Init(
-            g_RenderEngine->Device(),
-            RenderEngine::FRAME_BUFFER_COUNT,
+            RenderEngine::Device(),
+            RenderEngine::kFrame_Buffer_Count,
             DXGI_FORMAT_R8G8B8A8_UNORM,
             DescriptorHeap::GetHeap(),
             font_cpu_desc_handle,
@@ -180,7 +180,7 @@ void Editor::OnDraw()
     {
         ImGui::Render();
         auto draw_data = ImGui::GetDrawData();
-        auto cmd_list = g_RenderEngine->CommandList();
+        auto cmd_list = RenderEngine::CommandList();
         ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
