@@ -138,6 +138,23 @@ void RigidbodyComponent::WriteRigidbody()
 
     btVector3 inertia;
     m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
+
+    constexpr float locked_inertia = 0xFFFFFFFF;
+    if ((m_lock_axis_ & kAxisX) != 0)
+    {
+        inertia.setX(locked_inertia);
+    }
+
+    if ((m_lock_axis_ & kAxisY) != 0)
+    {
+        inertia.setY(locked_inertia);
+    }
+
+    if ((m_lock_axis_ & kAxisZ) != 0)
+    {
+        inertia.setZ(locked_inertia);
+    }
+
     m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
 
     m_use_gravity_ ? m_bt_rigidbody_->clearGravity() : m_bt_rigidbody_->setGravity(btVector3(0, 0, 0));
@@ -300,6 +317,36 @@ void RigidbodyComponent::OnInspectorGui()
         {
             SetAngularDamping(m_angular_damping_);
         }
+
+        if (ImGui::CollapsingHeader("Axis Lock"))
+        {
+            int lock_axis = m_lock_axis_;
+            bool has_changes = false;
+            if (ImGui::CheckboxFlags("X", &lock_axis, kAxisX))
+            {
+                has_changes = true;
+            }
+
+            if (ImGui::CheckboxFlags("Y", &lock_axis, kAxisY))
+            {
+                has_changes = true;
+            }
+
+            if (ImGui::CheckboxFlags("Z", &lock_axis, kAxisZ))
+            {
+                has_changes = true;
+            }
+
+            if (ImGui::CheckboxFlags("All", &lock_axis, kAxisAll))
+            {
+                has_changes = true;
+            }
+
+            if (has_changes)
+            {
+                SetLockAxis(static_cast<kLockAxis>(lock_axis));
+            }
+        }
     }
 
     if (ImGui::Button("WakeUp"))
@@ -343,6 +390,7 @@ void RigidbodyComponent::OnInspectorGui()
         ImGui::Text("Inertia     : {%.2f, %.2f, %.2f}", inertia.x(), inertia.y(), inertia.z());
         ImGui::Text("Center of Mass : {%.2f, %.2f, %.2f}", com.x(), com.y(), com.z());
         ImGui::Text("Gravity  : {%.2f, %.2f, %.2f}", gravity.x(), gravity.y(), gravity.z());
+        ImGui::Text("Lock Axis: %d", m_lock_axis_);
         ImGui::Text("Mass     : %.2f", m_bt_rigidbody_->getMass());
         ImGui::Text("Friction : %.2f", m_bt_rigidbody_->getFriction());
         ImGui::Text("Rolling Friction : %.2f", m_bt_rigidbody_->getRollingFriction());
@@ -455,6 +503,11 @@ bool RigidbodyComponent::UseGravity() const
     return m_use_gravity_;
 }
 
+kLockAxis RigidbodyComponent::LockAxis() const
+{
+    return m_lock_axis_;
+}
+
 bool RigidbodyComponent::IsKinematicOrStatic() const
 {
     return IsKinematic() || IsStatic();
@@ -554,6 +607,12 @@ void RigidbodyComponent::SetStatic(const bool next_static)
 void RigidbodyComponent::SetGravity(const bool use_gravity)
 {
     m_use_gravity_ = use_gravity;
+    m_should_write_ = true;
+}
+
+void RigidbodyComponent::SetLockAxis(kLockAxis axis)
+{
+    m_lock_axis_ = axis;
     m_should_write_ = true;
 }
 

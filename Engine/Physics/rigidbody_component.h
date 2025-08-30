@@ -10,6 +10,14 @@
 namespace engine
 {
 class Collider;
+enum kLockAxis
+{
+    kAxisX = 0x1,
+    kAxisY = 0x2,
+    kAxisZ = 0x4,
+    kAxisAll = kAxisX | kAxisY | kAxisZ
+};
+
 enum class kForceMode : unsigned char
 {
     kForce,
@@ -51,6 +59,7 @@ class RigidbodyComponent : public Component
     bool m_is_kinematic_ = true;
     bool m_is_static_ = true;
     bool m_use_gravity_ = true;
+    kLockAxis m_lock_axis_ = kAxisAll;
 
     void ConstructRigidbody();
     void RegisterToPhysics();
@@ -90,6 +99,7 @@ public:
     [[nodiscard]] bool IsKinematic() const;
     [[nodiscard]] bool IsStatic() const;
     [[nodiscard]] bool UseGravity() const;
+    [[nodiscard]] kLockAxis LockAxis() const;
     [[nodiscard]] bool IsKinematicOrStatic() const;
     [[nodiscard]] bool IsDynamic() const;
 
@@ -108,6 +118,7 @@ public:
     void SetKinematic(bool next_kinematic);
     void SetStatic(bool next_static);
     void SetGravity(bool use_gravity);
+    void SetLockAxis(kLockAxis axis);
 
     void AddForce(const Vector3 &force, kForceMode mode = kForceMode::kForce);
     void AddForceAtPosition(const Vector3 &force, const Vector3 &world_position, kForceMode mode = kForceMode::kForce);
