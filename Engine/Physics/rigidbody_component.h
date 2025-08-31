@@ -12,6 +12,7 @@ namespace engine
 class Collider;
 enum kLockAxis
 {
+    kNone = 0,
     kAxisX = 0x1,
     kAxisY = 0x2,
     kAxisZ = 0x4,
@@ -59,7 +60,7 @@ class RigidbodyComponent : public Component
     bool m_is_kinematic_ = true;
     bool m_is_static_ = true;
     bool m_use_gravity_ = true;
-    kLockAxis m_lock_axis_ = kAxisAll;
+    kLockAxis m_lock_axis_ = kNone;
 
     void ConstructRigidbody();
     void RegisterToPhysics();
