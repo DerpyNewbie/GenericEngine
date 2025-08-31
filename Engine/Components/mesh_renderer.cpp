@@ -124,7 +124,7 @@ void MeshRenderer::OnDraw()
                                      ? m_shared_mesh_->sub_meshes[0].base_index
                                      : m_shared_mesh_->indices.size();
 
-        cmd_list->DrawIndexedInstanced(index_count, 1, 0, 0, 0);
+        cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
     }
 
     // sub-meshes

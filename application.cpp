@@ -18,8 +18,8 @@
 
 std::shared_ptr<Application> Application::m_instance_;
 std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
-float Application::m_window_height_ = 1080;
-float Application::m_window_width_ = 1920;
+int Application::m_window_height_ = 1080;
+int Application::m_window_width_ = 1920;
 HWND Application::m_h_wnd_ = nullptr;
 
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -91,12 +91,12 @@ HWND Application::GetWindowHandle()
 
 int Application::AddWindowCallback(std::function<LRESULT(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)> callback)
 {
-    int handle = reinterpret_cast<int>(&callback);
+    int handle = static_cast<int>(reinterpret_cast<intptr_t>(&callback));
     m_callbacks_.emplace(handle, callback);
     return handle;
 }
 
-void Application::RemoveWindowCallback(int window_callback_handle)
+void Application::RemoveWindowCallback(const int window_callback_handle)
 {
     m_callbacks_.erase(window_callback_handle);
 }
@@ -106,18 +106,16 @@ void Application::InitWindow()
     WNDCLASSEX w = {};
 
     w.cbSize = sizeof(WNDCLASSEX);
-    w.lpfnWndProc = static_cast<WNDPROC>(WndProcedure); //コールバック関数の指定
-    w.lpszClassName = _T("GenericEngine"); //アプリケーションクラス名
-    w.hInstance = GetModuleHandle(nullptr); //ハンドルの取得
+    w.lpfnWndProc = static_cast<WNDPROC>(WndProcedure);
+    w.lpszClassName = _T("GenericEngine");
+    w.hInstance = GetModuleHandle(nullptr);
 
-    RegisterClassEx(&w); //アプリケーションクラス(ウィンドウクラスの指定をOSに伝える)
+    RegisterClassEx(&w);
 
     RECT wrc = {0, 0, static_cast<LONG>(m_window_width_), static_cast<LONG>(m_window_height_)};
 
-    //関数を使ってウィンドウのサイズを補正する
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
-    //ウィンドウオブジェクトの生成
     m_h_wnd_ = CreateWindow(w.lpszClassName,
                             _T("GenericEngine"),
                             WS_OVERLAPPEDWINDOW,
@@ -130,6 +128,5 @@ void Application::InitWindow()
                             w.hInstance,
                             nullptr);
 
-    //ウィンドウ表示
     ShowWindow(m_h_wnd_,SW_SHOW);
 }

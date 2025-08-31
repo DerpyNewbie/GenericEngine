@@ -41,7 +41,7 @@ public:
     void OnInspectorGui() override;
     static std::shared_ptr<Shader> GetDefault();
 
-    CD3DX12_SHADER_BYTECODE GetByteCode(ShaderType type) const
+    CD3DX12_SHADER_BYTECODE GetByteCode(const ShaderType type) const
     {
         switch (type)
         {
@@ -50,6 +50,8 @@ public:
         case ShaderType::Pixel:
             return m_pPSBlob.Get();
         }
+
+        throw std::runtime_error("Invalid ShaderType");
     }
 };
 

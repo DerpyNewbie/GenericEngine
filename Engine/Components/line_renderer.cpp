@@ -21,7 +21,7 @@ void LineRenderer::SetVertices(std::vector<Vertex> vertices)
 
 void LineRenderer::SetIndices(std::vector<uint32_t> indices)
 {
-    m_num_indices_ = indices.size();
+    m_num_indices_ = static_cast<unsigned int>(indices.size());
     if (m_index_buffer_)
     {
         m_index_buffer_ = nullptr;

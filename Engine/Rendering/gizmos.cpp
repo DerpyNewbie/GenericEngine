@@ -41,7 +41,7 @@ void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
 
     // store it, then clear current vertices
     m_instance_->m_vertex_buffers_[current_back_buffer_idx] = vertex_buffer;
-    m_instance_->m_vertices_count_[current_back_buffer_idx] = m_vertices_.size();
+    m_instance_->m_vertices_count_[current_back_buffer_idx] = static_cast<int>(m_vertices_.size());
     m_vertices_.clear();
 }
 

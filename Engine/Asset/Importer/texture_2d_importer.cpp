@@ -58,14 +58,14 @@ std::shared_ptr<Object> Texture2DImporter::Import(std::istream &input_stream, As
         return nullptr;
     }
 
-    texture_2d->width = meta.width;
-    texture_2d->height = meta.height;
+    texture_2d->width = static_cast<UINT>(meta.width);
+    texture_2d->height = static_cast<UINT>(meta.height);
     texture_2d->format = meta.format;
-    texture_2d->mip_level = meta.mipLevels;
+    texture_2d->mip_level = static_cast<UINT16>(meta.mipLevels);
 
-    auto img = scratch.GetImage(0, 0, 0);
+    const auto img = scratch.GetImage(0, 0, 0);
     const uint8_t *src = img->pixels;
-    size_t pixelCount = img->width * img->height;
+    const size_t pixelCount = img->width * img->height;
     texture_2d->tex_data.reserve(pixelCount);
     for (UINT i = 0; i < pixelCount; ++i)
     {

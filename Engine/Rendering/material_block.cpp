@@ -14,7 +14,7 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
         return std::make_shared<MaterialData<int>>(0, param);
     }},
     {"float", [](const ShaderParameter &param) {
-        return std::make_shared<MaterialData<float>>(0, param);
+        return std::make_shared<MaterialData<float>>(0.0F, param);
     }},
     {"vector<Matrix>", [](const ShaderParameter &param) {
         auto identity = std::vector{Matrix::Identity};

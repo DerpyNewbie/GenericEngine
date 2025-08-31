@@ -108,7 +108,7 @@ void Camera::OnDraw()
         object->OnDraw();
     }
 
-    m_drawcall_count_ = objects_in_view.size();
+    m_drawcall_count_ = static_cast<unsigned int>(objects_in_view.size());
 }
 
 void Camera::OnEnabled()

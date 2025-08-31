@@ -125,7 +125,7 @@ int Transform::GetSiblingIndex() const
     {
         auto root_objects = GameObject()->Scene()->RootGameObjects();
         const auto itr = std::ranges::find(root_objects, GameObject());
-        return std::distance(root_objects.begin(), itr);
+        return static_cast<int>(std::distance(root_objects.begin(), itr));
     }
 
     auto children = parent->m_children_;
@@ -133,7 +133,7 @@ int Transform::GetSiblingIndex() const
     const auto itr = std::ranges::find_if(children, [&guid](auto &other) {
         return other->Guid() == guid;
     });
-    return std::distance(children.begin(), itr);
+    return static_cast<int>(std::distance(children.begin(), itr));
 }
 
 bool Transform::IsChildOf(const std::shared_ptr<Transform> &transform, const bool deep) const

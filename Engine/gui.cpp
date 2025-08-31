@@ -21,7 +21,7 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
 
     if (!filters.empty())
     {
-        hr = p_file_open->SetFileTypes(filters.size(), filters.data());
+        hr = p_file_open->SetFileTypes(static_cast<UINT>(filters.size()), filters.data());
         if (FAILED(hr))
         {
             Logger::Error<Gui>("Failed to set file types");
@@ -90,7 +90,7 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
         Logger::Error<Gui>("Failed to set default name");
     }
 
-    hr = p_file_save->SetFileTypes(filters.size(), filters.data());
+    hr = p_file_save->SetFileTypes(static_cast<UINT>(filters.size()), filters.data());
     if (FAILED(hr))
     {
         Logger::Error<Gui>("Failed to set file types");
@@ -220,7 +220,7 @@ bool Gui::FloatField(const char *label, float &value)
 
 bool Gui::IntField(const char *label, int &value)
 {
-    return ImGui::DragInt(label, &value, 1.0F, 0.0F, 0.0F, "%d");
+    return ImGui::DragInt(label, &value, 1, 0, 0, "%d");
 }
 
 bool Gui::Vector2Field(const char *label, Vector2 &value)

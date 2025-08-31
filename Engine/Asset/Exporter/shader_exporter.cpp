@@ -20,17 +20,18 @@ void ShaderExporter::Export(std::ostream &output_stream, AssetDescriptor *asset)
         auto result = Value(kObjectType);
 
         auto name_value = Value{};
-        name_value.SetString(param->name.c_str(), param->name.size());
+        name_value.SetString(param->name.c_str(), static_cast<SizeType>(param->name.size()));
         result.AddMember("name", name_value, alloc);
 
         auto type_value = Value{};
-        type_value.SetString(param->type_hint.c_str(), param->type_hint.size());
+        type_value.SetString(param->type_hint.c_str(), static_cast<SizeType>(param->type_hint.size()));
         result.AddMember("type", type_value, alloc);
 
         if (!param->display_name.empty())
         {
             auto display_name_value = Value{};
-            display_name_value.SetString(param->display_name.c_str(), param->display_name.size());
+            display_name_value.SetString(param->display_name.c_str(),
+                                         static_cast<SizeType>(param->display_name.size()));
             result.AddMember("displayName", display_name_value, alloc);
         }
         return result;

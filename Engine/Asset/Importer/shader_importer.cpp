@@ -54,7 +54,7 @@ bool ShaderImporter::CompileShader(std::shared_ptr<Shader> shader, std::wstring 
         }
     }
 
-    //シェーダーの種類を追加する場合ここに追加してください
+    // Add shader variants here if you want to
     return false;
 }
 
