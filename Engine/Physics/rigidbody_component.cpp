@@ -136,26 +136,43 @@ void RigidbodyComponent::WriteRigidbody()
                                             : ISLAND_SLEEPING);
     m_bt_rigidbody_->activate();
 
-    btVector3 inertia;
-    m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
-
-    constexpr float locked_inertia = 0xFFFFFFFF;
-    if ((m_lock_axis_ & kAxisX) != 0)
+    // Update inertia
     {
-        inertia.setX(locked_inertia);
+        btVector3 inertia;
+        m_rigidbody_shape_->GetShape()->calculateLocalInertia(m_mass_, inertia);
+        m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
     }
 
-    if ((m_lock_axis_ & kAxisY) != 0)
+    // Lock axis
     {
-        inertia.setY(locked_inertia);
-    }
+        btVector3 angular_factor = {1, 1, 1};
+        btVector3 angular_velocity = m_bt_rigidbody_->getAngularVelocity();
 
-    if ((m_lock_axis_ & kAxisZ) != 0)
-    {
-        inertia.setZ(locked_inertia);
-    }
+        if (m_lock_axis_ & kAxisX)
+        {
+            angular_factor.setX(0);
+            angular_velocity.setX(0);
+        }
 
-    m_bt_rigidbody_->setMassProps(IsKinematicOrStatic() ? 0 : m_mass_, inertia);
+        if (m_lock_axis_ & kAxisY)
+        {
+            angular_factor.setY(0);
+            angular_velocity.setY(0);
+        }
+
+        if (m_lock_axis_ & kAxisZ)
+        {
+            angular_factor.setZ(0);
+            angular_velocity.setZ(0);
+        }
+
+        m_bt_rigidbody_->setAngularFactor(angular_factor);
+
+        if (m_lock_axis_ != 0)
+        {
+            m_bt_rigidbody_->setAngularVelocity(angular_velocity);
+        }
+    }
 
     m_use_gravity_ ? m_bt_rigidbody_->clearGravity() : m_bt_rigidbody_->setGravity(btVector3(0, 0, 0));
 
