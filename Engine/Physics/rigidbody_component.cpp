@@ -339,25 +339,10 @@ void RigidbodyComponent::OnInspectorGui()
         {
             int lock_axis = m_lock_axis_;
             bool has_changes = false;
-            if (ImGui::CheckboxFlags("X", &lock_axis, kAxisX))
-            {
-                has_changes = true;
-            }
-
-            if (ImGui::CheckboxFlags("Y", &lock_axis, kAxisY))
-            {
-                has_changes = true;
-            }
-
-            if (ImGui::CheckboxFlags("Z", &lock_axis, kAxisZ))
-            {
-                has_changes = true;
-            }
-
-            if (ImGui::CheckboxFlags("All", &lock_axis, kAxisAll))
-            {
-                has_changes = true;
-            }
+            has_changes |= ImGui::CheckboxFlags("X", &lock_axis, kAxisX);
+            has_changes |= ImGui::CheckboxFlags("Y", &lock_axis, kAxisY);
+            has_changes |= ImGui::CheckboxFlags("Z", &lock_axis, kAxisZ);
+            has_changes |= ImGui::CheckboxFlags("All", &lock_axis, kAxisAll);
 
             if (has_changes)
             {
