@@ -9,7 +9,7 @@ class DescriptorHandle;
 
 class RenderEngine
 {
-    friend class Engine;
+    friend class engine::Engine;
 
 public:
     enum { kFrame_Buffer_Count = 2 };
