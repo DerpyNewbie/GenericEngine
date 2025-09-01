@@ -38,12 +38,10 @@ struct IMaterialData : Inspectable
 };
 
 inline IMaterialData::IMaterialData() : parameter()
-{
-}
+{}
 
 inline IMaterialData::IMaterialData(ShaderParameter param): parameter(std::move(param))
-{
-}
+{}
 
 template <typename T>
 struct MaterialData : IMaterialData
@@ -84,19 +82,16 @@ struct MaterialData : IMaterialData
 
 template <typename T>
 MaterialData<T>::MaterialData() : MaterialData({}, {})
-{
-}
+{}
 
 template <typename T>
 MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) : MaterialData({}, new_parameter)
-{
-}
+{}
 
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
-{
-}
+{}
 
 template <typename T>
 void MaterialData<T>::OnInspectorGui()
@@ -231,7 +226,7 @@ int MaterialData<T>::Count()
 {
     if constexpr (kIsVector)
     {
-        return value.size();
+        return static_cast<int>(value.size());
     }
     else
     {

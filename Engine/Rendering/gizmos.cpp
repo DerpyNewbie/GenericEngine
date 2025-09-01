@@ -12,7 +12,6 @@ std::vector<Vertex> Gizmos::m_vertices_;
 
 void Gizmos::Init()
 {
-    assert(g_RenderEngine != nullptr && "RenderEngine is not initialized");
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
 
     m_instance_ = std::make_shared<Gizmos>();
@@ -40,7 +39,7 @@ void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
 
     // store it, then clear current vertices
     m_instance_->m_vertex_buffers_[current_back_buffer_idx] = vertex_buffer;
-    m_instance_->m_vertices_count_[current_back_buffer_idx] = m_vertices_.size();
+    m_instance_->m_vertices_count_[current_back_buffer_idx] = static_cast<int>(m_vertices_.size());
     m_vertices_.clear();
 }
 
@@ -73,6 +72,11 @@ void Gizmos::Render()
     command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     command_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
     command_list->DrawInstanced(current_vertices_count, 1, 0, 0);
+}
+
+void Gizmos::OnDraw()
+{
+    Render(static_cast<int>(RenderEngine::CurrentBackBufferIndex()), RenderEngine::CommandList());
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

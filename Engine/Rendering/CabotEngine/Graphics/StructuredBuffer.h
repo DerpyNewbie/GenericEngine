@@ -7,10 +7,11 @@ namespace engine
 class StructuredBuffer : public IBuffer
 {
 public:
-    explicit StructuredBuffer(size_t stride, size_t elem_count)
+    explicit StructuredBuffer(const size_t stride, const size_t elem_count)
     {
-        m_stride = stride;
-        m_elementCount = elem_count;
+        m_stride = static_cast<UINT>(stride);
+        m_elementCount = static_cast<UINT>(elem_count);
+        m_GpuAddress = 0;
     }
 
     void CreateBuffer() override;
@@ -31,8 +32,8 @@ private:
     ComPtr<ID3D12Resource> m_pDefaultBuffer;
     ComPtr<ID3D12Resource> m_pUploadBuffer;
     D3D12_GPU_VIRTUAL_ADDRESS m_GpuAddress;
-    size_t m_elementCount = 0;
-    size_t m_stride = 0;
+    UINT m_elementCount = 0;
+    UINT m_stride = 0;
     bool m_IsValid = false;
 };
 }

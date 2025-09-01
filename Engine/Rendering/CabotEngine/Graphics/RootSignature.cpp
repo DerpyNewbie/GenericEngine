@@ -81,7 +81,7 @@ RootSignature::RootSignature()
     }
 
     // ルートシグネチャ生成
-    hr = g_RenderEngine->Device()->CreateRootSignature(
+    hr = RenderEngine::Device()->CreateRootSignature(
         0,
         pBlob->GetBufferPointer(),
         pBlob->GetBufferSize(),

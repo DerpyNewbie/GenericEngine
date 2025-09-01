@@ -106,13 +106,14 @@ void AssetDescriptor::PopulateMetaJson()
     {
         const auto guid_str = guid.str();
         auto guid_value = Value();
-        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
+        guid_value.SetString(guid_str.c_str(), static_cast<SizeType>(guid_str.size()), a);
         m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
     }
 
     if (!m_meta_json_.HasMember(kTypeKey))
     {
-        m_meta_json_.AddMember(StringRef(kTypeKey), Value(type_hint.c_str(), type_hint.size(), a), a);
+        m_meta_json_.AddMember(StringRef(kTypeKey),
+                               Value(type_hint.c_str(), static_cast<SizeType>(type_hint.size()), a), a);
     }
 
     if (!m_meta_json_.HasMember(kDataKey))
@@ -143,13 +144,13 @@ std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
 
         auto guid_str = descriptor->guid.str();
         auto guid_value = Value();
-        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
+        guid_value.SetString(guid_str.c_str(), static_cast<SizeType>(guid_str.size()), a);
 
         descriptor->m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
 
         auto type_hint_str = descriptor->type_hint;
         auto type_hint_value = Value();
-        type_hint_value.SetString(type_hint_str.c_str(), type_hint_str.size(), a);
+        type_hint_value.SetString(type_hint_str.c_str(), static_cast<SizeType>(type_hint_str.size()), a);
 
         descriptor->m_meta_json_.AddMember(StringRef(kTypeKey), type_hint_value, a);
         descriptor->m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
@@ -235,28 +236,28 @@ void AssetDescriptor::ClearKeys()
 
 void AssetDescriptor::SetString(const std::string &key, const std::string &value)
 {
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
-    auto json_value = Value(value.c_str(), value.size(), m_meta_json_.GetAllocator());
+    auto json_key = Value(key.c_str(), static_cast<SizeType>(key.size()), m_meta_json_.GetAllocator());
+    auto json_value = Value(value.c_str(), static_cast<SizeType>(value.size()), m_meta_json_.GetAllocator());
     GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
 }
 
 void AssetDescriptor::SetInt(const std::string &key, const int value)
 {
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
+    auto json_key = Value(key.c_str(), static_cast<SizeType>(key.size()), m_meta_json_.GetAllocator());
     auto json_value = Value(value);
     GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
 }
 
 void AssetDescriptor::SetFloat(const std::string &key, const float value)
 {
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
+    auto json_key = Value(key.c_str(), static_cast<SizeType>(key.size()), m_meta_json_.GetAllocator());
     auto json_value = Value(value);
     GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
 }
 
 void AssetDescriptor::SetBool(const std::string &key, const bool value)
 {
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
+    auto json_key = Value(key.c_str(), static_cast<SizeType>(key.size()), m_meta_json_.GetAllocator());
     auto json_value = Value(value);
     GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
 }
@@ -264,7 +265,7 @@ void AssetDescriptor::SetBool(const std::string &key, const bool value)
 std::string AssetDescriptor::GetString(const std::string &key)
 {
     auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
+    const auto json_value = data.FindMember(StringRef(key.c_str(), static_cast<SizeType>(key.size())));
     if (json_value == data.MemberEnd())
     {
         return "";
@@ -276,7 +277,7 @@ std::string AssetDescriptor::GetString(const std::string &key)
 int AssetDescriptor::GetInt(const std::string &key)
 {
     auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
+    const auto json_value = data.FindMember(StringRef(key.c_str(), static_cast<SizeType>(key.size())));
     if (json_value == data.MemberEnd())
     {
         return 0;
@@ -288,7 +289,7 @@ int AssetDescriptor::GetInt(const std::string &key)
 float AssetDescriptor::GetFloat(const std::string &key)
 {
     auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
+    const auto json_value = data.FindMember(StringRef(key.c_str(), static_cast<SizeType>(key.size())));
     if (json_value == data.MemberEnd())
     {
         return 0.0f;
@@ -300,7 +301,7 @@ float AssetDescriptor::GetFloat(const std::string &key)
 bool AssetDescriptor::GetBool(const std::string &key)
 {
     auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
+    const auto json_value = data.FindMember(StringRef(key.c_str(), static_cast<SizeType>(key.size())));
     if (json_value == data.MemberEnd())
     {
         return false;

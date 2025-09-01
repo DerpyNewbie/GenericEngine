@@ -23,10 +23,10 @@ struct CameraProperty : Inspectable
     static constexpr float kMaxClippingPlane = 10000.0f;
 
     kViewMode view_mode = kViewMode::kPerspective;
-    float field_of_view = 70;
-    float near_plane = 0.1;
-    float far_plane = 1000;
-    float ortho_size = 50;
+    float field_of_view = 70.0f;
+    float near_plane = 0.1f;
+    float far_plane = 1000.0f;
+    float ortho_size = 50.0f;
     float aspect_ratio = 16.0f / 9.0f;
     Color background_color = Color(0x1A1A1AFF);
 
@@ -53,15 +53,14 @@ class Camera : public Component, public IDrawCallReceiver
     CameraProperty m_property_;
     AssetPtr<RenderTexture> m_render_texture_;
 
-    UINT m_drawcall_count_ = 0;
+    unsigned int m_drawcall_count_ = 0;
 
     void Render();
-
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
 
     void SetViewProjMatrix() const;
 
-    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
+    [[nodiscard]] std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
         const std::vector<std::weak_ptr<Renderer>> &renderers) const;
 
 public:

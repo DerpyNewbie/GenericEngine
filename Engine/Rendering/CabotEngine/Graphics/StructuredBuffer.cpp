@@ -14,7 +14,7 @@ void engine::StructuredBuffer::CreateBuffer()
 
     auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
 
-    g_RenderEngine->Device()->CreateCommittedResource(
+    RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &bufferDesc,
@@ -24,7 +24,7 @@ void engine::StructuredBuffer::CreateBuffer()
         );
 
     // アップロード用バッファ
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &heap_prop,
         D3D12_HEAP_FLAG_NONE,
         &bufferDesc,
@@ -53,21 +53,21 @@ void engine::StructuredBuffer::UpdateBuffer(void *data)
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_COPY_DEST
         );
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     void *mapped = nullptr;
     m_pUploadBuffer->Map(0, nullptr, &mapped);
     memcpy(mapped, data, m_stride * m_elementCount);
     m_pUploadBuffer->Unmap(0, nullptr);
 
-    g_RenderEngine->CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
-                                                    m_elementCount);
+    RenderEngine::CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
+                                                  m_elementCount);
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDefaultBuffer.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
         D3D12_RESOURCE_STATE_COMMON
         );
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
 std::shared_ptr<DescriptorHandle> engine::StructuredBuffer::UploadBuffer()

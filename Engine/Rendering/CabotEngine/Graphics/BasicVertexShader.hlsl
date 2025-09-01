@@ -56,7 +56,7 @@ VSOutput BasicVS(VSInput input)
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
 
-    for (int i = 0; i < input.bones_per_vertex; ++i)
+    for (uint i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)

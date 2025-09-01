@@ -43,22 +43,22 @@ public:
         tex_data = resource;
     }
 
-    UINT Width()
+    UINT Width() const
     {
         return width;
     }
 
-    UINT Height()
+    UINT Height() const
     {
         return height;
     }
 
-    UINT16 MipLevel()
+    UINT16 MipLevel() const
     {
         return mip_level;
     }
 
-    DXGI_FORMAT Format()
+    DXGI_FORMAT Format() const
     {
         return format;
     }
