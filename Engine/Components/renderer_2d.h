@@ -6,6 +6,7 @@ namespace engine
 {
 class Renderer2D : public Component
 {
+protected:
     AssetPtr<Canvas> m_canvas_;
 
 public:

@@ -1,12 +1,13 @@
 #pragma once
 #include "renderer.h"
+#include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/font_data.h"
 
 namespace engine
 {
 
-class TextRenderer : public Renderer
+class TextRenderer : public Renderer2D
 {
 public:
     Vector2 position;
@@ -15,8 +16,6 @@ public:
     Color color;
 
     void OnInspectorGui() override;
-    void OnDraw() override;
-
-    std::shared_ptr<Transform> BoundsOrigin() override;
+    void Render() override;
 };
 }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
+#include "rect_transform.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -37,23 +38,21 @@ void TextRenderer::OnInspectorGui()
         string = buf;
     }
 }
-
-void TextRenderer::OnDraw()
+void TextRenderer::Render()
 {
     if (!font_data.Lock())
     {
         return;
     }
-    auto sprite_batch = FontData::SpriteBatch();
-    auto sprite_font = font_data.CastedLock()->SpriteFont();
+
+    const auto rect_transform = GameObject()->GetComponent<RectTransform>();
+    const auto rect = rect_transform->CalculateScreenRect();
+
+    const auto sprite_batch = FontData::SpriteBatch();
+    const auto sprite_font = font_data.CastedLock()->SpriteFont();
     sprite_batch->Begin(g_RenderEngine->CommandList());
-    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
+    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position + rect.pos, color);
     sprite_batch->End();
     g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-}
-
-std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
-{
-    return GameObject()->Transform();
 }
 }
