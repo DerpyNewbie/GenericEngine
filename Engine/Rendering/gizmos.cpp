@@ -45,7 +45,7 @@ void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
 
 void Gizmos::Render()
 {
-    auto current_back_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     assert(m_instance_ != nullptr && "Gizmos is not initialized");
 
@@ -67,16 +67,11 @@ void Gizmos::Render()
     }
 
     // render stuff
-    auto command_list = g_RenderEngine->CommandList();
+    auto command_list = RenderEngine::CommandList();
     command_list->SetPipelineState(PSOManager::Get("Line"));
     command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
     command_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
     command_list->DrawInstanced(current_vertices_count, 1, 0, 0);
-}
-
-void Gizmos::OnDraw()
-{
-    Render(static_cast<int>(RenderEngine::CurrentBackBufferIndex()), RenderEngine::CommandList());
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

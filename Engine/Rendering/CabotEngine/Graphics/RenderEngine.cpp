@@ -73,19 +73,19 @@ void RenderEngine::BeginRender()
                              nullptr);
 
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pDepthStencilBuffer.Get(),
+        m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_DEPTH_WRITE
         );
-    m_pCommandList->ResourceBarrier(1, &dsBarrier);
+    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
 }
 
 void RenderEngine::SetMainRenderTarget(Color background_color)
 {
     // レンダーターゲットが使用可能になるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_currentRenderTarget, D3D12_RESOURCE_STATE_PRESENT,
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_, D3D12_RESOURCE_STATE_PRESENT,
                                                         D3D12_RESOURCE_STATE_RENDER_TARGET);
-    m_pCommandList->ResourceBarrier(1, &barrier);
+    m_p_command_list_->ResourceBarrier(1, &barrier);
 
     // ビューポートとシザー矩形を設定
     m_p_command_list_->RSSetViewports(1, &m_viewport_);
@@ -96,17 +96,17 @@ void RenderEngine::SetMainRenderTarget(Color background_color)
     auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     // レンダーターゲットを設定
-    m_pCommandList->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
+    m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
     float clearColor[] = {background_color.R(), background_color.G(), background_color.B(), background_color.A()};
-    m_pCommandList->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
+    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
-    m_pCommandList->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    g_RenderEngine->CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
+    m_p_command_list_->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    m_p_command_list_->SetGraphicsRootSignature(engine::RootSignature::Get());
     auto descriptor_heap = DescriptorHeap::GetHeap();
-    g_RenderEngine->CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
+    m_p_command_list_->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, const Color background_color) const
@@ -115,11 +115,11 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, const Color b
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // 深度ステンシルのディスクリプタヒープの開始アドレス取得
-    auto currentDsvHandle = m_pDsvHeap->GetCPUDescriptorHandleForHeapStart();
+    auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     // ビューポートとシザー矩形を設定
-    m_pCommandList->RSSetViewports(1, &m_Viewport);
-    m_pCommandList->RSSetScissorRects(1, &m_Scissor);
+    m_p_command_list_->RSSetViewports(1, &m_viewport_);
+    m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
 
     // レンダーターゲットを設定
     m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
@@ -396,7 +396,7 @@ bool RenderEngine::CreateDepthStencil()
         IID_PPV_ARGS(m_p_depth_stencil_buffer_.ReleaseAndGetAddressOf())
         );
 
-    m_pDepthStencilBuffer->SetName(L"DepthStencilBuffer");
+    m_p_depth_stencil_buffer_->SetName(L"DepthStencilBuffer");
 
     if (FAILED(hr))
     {

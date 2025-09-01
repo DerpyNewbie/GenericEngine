@@ -125,7 +125,7 @@ void Camera::OnDraw()
     }
     if (Main() == shared_from_base<Camera>())
     {
-        RenderEngine::SetMainRenderTarget(m_property_.background_color);
+        RenderEngine::Instance()->SetMainRenderTarget(m_property_.background_color);
         Render();
     }
 }

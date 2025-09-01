@@ -10,8 +10,8 @@ namespace engine
 {
 void RenderTexture::CreateBuffer()
 {
-    auto device = g_RenderEngine->Device();
-    auto res_desc = g_RenderEngine->BBuffDesc();
+    auto device = RenderEngine::Device();
+    auto res_desc = RenderEngine::BBuffDesc();
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
     D3D12_CLEAR_VALUE clearValue = {};
@@ -40,7 +40,7 @@ void RenderTexture::CreateBuffer()
     }
 
     // RTV用のディスクリプタヒープを作成する
-    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = g_RenderEngine->RTVHeapDesc();
+    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = RenderEngine::RTVHeapDesc();
     heap_desc.NumDescriptors = 1;
     hr = device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(m_RTVHeap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
@@ -64,8 +64,8 @@ void RenderTexture::BeginRender(const Color background_color)
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
-    g_RenderEngine->SetRenderTarget(m_RTVHeap_.Get(), background_color);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::Instance()->SetRenderTarget(m_RTVHeap_.Get(), background_color);
 }
 
 void RenderTexture::EndRender() const
@@ -73,7 +73,7 @@ void RenderTexture::EndRender() const
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()

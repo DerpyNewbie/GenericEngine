@@ -56,8 +56,8 @@ void BillboardRenderer::OnDraw()
     if (shared_material->IsValid())
     {
         auto shader = shared_material->p_shared_shader.CastedLock();
-        const auto cmd_list = g_RenderEngine->CommandList();
-        auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
+        const auto cmd_list = RenderEngine::CommandList();
+        auto current_buffer = RenderEngine::CurrentBackBufferIndex();
 
         PSOManager::SetPipelineState(cmd_list, shader);
         cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
