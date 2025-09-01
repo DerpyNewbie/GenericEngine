@@ -10,8 +10,7 @@ class Transform : public Component
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
-    void RenderLocalTransformGui();
-    void RenderGlobalTransformGui();
+    void TransformGui(bool is_local);
     void RecalculateWorldMatrix();
 
 public:
