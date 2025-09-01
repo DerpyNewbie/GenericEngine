@@ -151,6 +151,7 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
         aiProcess_OptimizeMeshes |
         aiProcess_PopulateArmatureData |
         aiProcess_JoinIdenticalVertices;
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 
     const auto scene = importer.ReadFile(file_path, import_settings);
     if (!scene)
