@@ -2,6 +2,7 @@
 
 #include "billboard_renderer.h"
 #include "game_object.h"
+#include "Asset/asset_database.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
@@ -38,6 +39,7 @@ void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
 void BillboardRenderer::OnConstructed()
 {
     shared_material = Instantiate<Material>();
+    shared_material->p_shared_shader = AssetDatabase::GetAsset<Shader>("Resources/BillboardShader.hlsl");
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
