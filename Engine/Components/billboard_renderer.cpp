@@ -39,7 +39,8 @@ void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
 void BillboardRenderer::OnConstructed()
 {
     shared_material = Instantiate<Material>();
-    shared_material->p_shared_shader = AssetDatabase::GetAsset<Shader>("Resources/BillboardShader.hlsl");
+    auto asset_ptr = AssetDatabase::GetAsset("BillboardShader.hlsl");
+    shared_material->p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
