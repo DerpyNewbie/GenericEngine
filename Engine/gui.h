@@ -39,11 +39,14 @@ public:
     static bool SaveFileDialog(std::string &file_path, const std::string &default_name,
                                const std::vector<FilterSpec> &filters = {});
 
-    static void SetObjectDragDropTarget(const std::shared_ptr<Object> &object);
-    static void SetObjectDragDropTarget(xg::Guid guid);
+    static bool ObjectHeader(const std::shared_ptr<Object> &object, std::string name = "");
+    static void MakeDragDropSource(const std::shared_ptr<Object> &object);
 
-    static std::shared_ptr<Object> GetObjectDragDropTarget(const ImGuiPayload *payload);
-    static std::shared_ptr<Object> GetObjectDragDropTarget();
+    static void SetDragDropPayload(const std::shared_ptr<Object> &object);
+    static void SetDragDropPayload(xg::Guid guid);
+
+    static std::shared_ptr<Object> GetDragDropPayload(const ImGuiPayload *payload);
+    static std::shared_ptr<Object> GetDragDropPayload();
 
     static std::string NameOf(const std::shared_ptr<Object> &object);
 
@@ -169,7 +172,7 @@ bool Gui::AssetDragDropTarget(IAssetPtr &asset_ptr)
         return false;
     }
 
-    const auto object = GetObjectDragDropTarget(payload);
+    const auto object = GetDragDropPayload(payload);
 
     auto casted_object = MakeCompatible<T>(object);
     if (casted_object == nullptr)

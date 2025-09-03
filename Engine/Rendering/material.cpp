@@ -49,6 +49,12 @@ void Material::CreateMaterialBlock()
     }
 
     const auto shared_shader = p_shared_shader.CastedLock();
+    if (shared_shader == nullptr)
+    {
+        Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");
+        return;
+    }
+
     p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
     p_shared_material_block->LoadShaderParameters(shared_shader->parameters);
 }

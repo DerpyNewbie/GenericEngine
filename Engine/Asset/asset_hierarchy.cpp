@@ -23,11 +23,7 @@ void AssetHierarchy::OnDestroy()
         });
     }
 
-    if (asset != nullptr && asset->managed_object != nullptr)
-    {
-        DestroyImmediate(asset->managed_object);
-        asset->managed_object = nullptr;
-    }
+    asset = nullptr;
 
     for (auto child : children)
     {

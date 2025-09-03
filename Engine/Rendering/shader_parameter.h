@@ -1,8 +1,8 @@
 #pragma once
+#include "shader_type.h"
 
 namespace engine
 {
-enum kShaderType;
 
 struct ShaderParameter
 {
@@ -15,7 +15,10 @@ struct ShaderParameter
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(name, index, shader_type, type_hint);
+        ar(CEREAL_NVP(index),
+           CEREAL_NVP(shader_type),
+           CEREAL_NVP(name), CEREAL_NVP(display_name),
+           CEREAL_NVP(type_hint));
     }
 };
 }

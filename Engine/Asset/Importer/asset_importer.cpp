@@ -23,6 +23,17 @@ std::shared_ptr<AssetImporter> AssetImporter::Get(const std::string &file_extens
     return m_importer_extension_map_[file_extension];
 }
 
+std::shared_ptr<AssetImporter> AssetImporter::Get(const std::shared_ptr<Object> &object)
+{
+    for (const auto &importer : m_importers_)
+    {
+        if (importer->IsCompatibleWith(object))
+            return importer;
+    }
+
+    return nullptr;
+}
+
 std::set<std::shared_ptr<AssetImporter>> AssetImporter::Get()
 {
     return m_importers_;
