@@ -2,10 +2,9 @@
 #include "skinned_mesh_renderer.h"
 
 #include "camera.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
-#include "Components/transform.h"
-#include "game_object.h"
 #include "Rendering/gizmos.h"
+#include "Components/transform.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine

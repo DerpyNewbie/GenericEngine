@@ -12,6 +12,21 @@
 namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
+std::weak_ptr<Camera> Camera::m_current_camera_;
+
+void Camera::Render()
+{
+    SetViewProjMatrix();
+
+    m_current_camera_ = shared_from_base<Camera>();
+
+    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
+    for (const auto object : objects_in_view)
+        object->OnDraw();
+
+    m_drawcall_count_ = objects_in_view.size();
+    Gizmos::Render();
+}
 
 void CameraProperty::OnInspectorGui()
 {
@@ -73,6 +88,11 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     return results;
 }
 
+int Camera::Order()
+{
+    return Main() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
+}
+
 void Camera::OnAwake()
 {
     if (m_main_camera_.lock() == nullptr)
@@ -93,22 +113,22 @@ void Camera::OnConstructed()
 void Camera::OnInspectorGui()
 {
     m_property_.OnInspectorGui();
-
+    Gui::PropertyField("RenderTexture", m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }
 
 void Camera::OnDraw()
 {
-    RenderEngine::Instance()->SetBackgroundColor(m_property_.background_color);
-    SetViewProjMatrix();
-
-    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-    for (const auto object : objects_in_view)
+    if (auto render_tex = m_render_texture_.CastedLock())
     {
-        object->OnDraw();
+        render_tex->BeginRender(m_property_.background_color);
+        Render();
     }
-
-    m_drawcall_count_ = static_cast<unsigned int>(objects_in_view.size());
+    if (Main() == shared_from_base<Camera>())
+    {
+        RenderEngine::Instance()->SetMainRenderTarget(m_property_.background_color);
+        Render();
+    }
 }
 
 void Camera::OnEnabled()
@@ -124,6 +144,11 @@ void Camera::OnDisabled()
 std::shared_ptr<Camera> Camera::Main()
 {
     return m_main_camera_.lock();
+}
+
+std::shared_ptr<Camera> Camera::Current()
+{
+    return m_current_camera_.lock();
 }
 
 Matrix Camera::GetViewMatrix() const

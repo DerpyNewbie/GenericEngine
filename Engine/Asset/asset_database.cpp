@@ -5,12 +5,14 @@
 #include "Asset/Importer/txt_importer.h"
 #include "Exporter/asset_exporter.h"
 #include "Exporter/material_exporter.h"
+#include "Exporter/render_texture_exporter.h"
 #include "Exporter/shader_exporter.h"
 #include "Exporter/txt_exporter.h"
 #include "Importer/audio_clip_importer.h"
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
+#include "Importer/render_texture_importer.h"
 #include "Importer/texture_2d_importer.h"
 
 namespace engine
@@ -41,6 +43,8 @@ void AssetDatabase::Init()
     AssetExporter::Register(std::make_shared<MaterialExporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
     AssetImporter::Register(std::make_shared<FontImporter>());
+    AssetImporter::Register(std::make_shared<RenderTextureImporter>());
+    AssetExporter::Register(std::make_shared<RenderTextureExporter>());
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }

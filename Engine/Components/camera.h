@@ -4,6 +4,8 @@
 #include "renderer.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Asset/asset_ptr.h"
+#include "Rendering/render_texture.h"
 
 namespace engine
 {
@@ -46,11 +48,14 @@ struct CameraProperty : Inspectable
 class Camera : public Component, public IDrawCallReceiver
 {
     static std::weak_ptr<Camera> m_main_camera_;
+    static std::weak_ptr<Camera> m_current_camera_;
 
     CameraProperty m_property_;
+    AssetPtr<RenderTexture> m_render_texture_;
 
-    unsigned int m_drawcall_count_ = 0;
+    size_t m_drawcall_count_ = 0;
 
+    void Render();
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
 
     void SetViewProjMatrix() const;
@@ -62,11 +67,13 @@ public:
     void OnAwake() override;
     void OnConstructed() override;
     void OnInspectorGui() override;
+    int Order() override;
     void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
     static std::shared_ptr<Camera> Main();
+    static std::shared_ptr<Camera> Current();
 
     [[nodiscard]] Matrix GetViewMatrix() const;
     [[nodiscard]] Matrix GetProjectionMatrix() const;

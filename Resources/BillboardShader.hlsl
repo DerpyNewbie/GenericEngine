@@ -2,14 +2,11 @@ cbuffer Transform : register(b0)
 {
     float4x4 World;
 }
-
 cbuffer Transforms : register(b1)
 {
     float4x4 View;
     float4x4 Proj;
 }
-
-StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
 struct VSInput
 {
@@ -48,27 +45,11 @@ float3x3 ExtractRotation(float4x4 m)
 }
 
 
-VSOutput BasicVS(VSInput input)
+VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0; // アウトプット構造体を定義する
     float4 localPos = float4(input.pos, 1.0f); // 頂点座標
     float3 localNormal = input.normal;
-    float4 bonePos = float4(0, 0, 0, 0);
-    float3 boneNormal = float3(0, 0, 0);
-
-    for (uint i = 0; i < input.bones_per_vertex; ++i)
-    {
-        float weight = input.bone_weight[i];
-        if (weight > 0)
-        {
-            float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
-            float3x3 boneRot = ExtractRotation(boneMatrix);
-            bonePos += mul(boneMatrix, localPos) * weight;
-            boneNormal += mul(boneRot, localNormal) * weight;
-        }
-        localPos = bonePos;
-        localNormal = boneNormal;
-    }
 
     float4 worldPos = mul(World, localPos); // ワールド座標に変換
     float4 viewPos = mul(View, worldPos); // ビュー座標に変換
@@ -89,10 +70,8 @@ Texture2D _MainTex : register(t1);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = clamp(dot(-light, input.normal), 0, 1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
+    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    return mainColor * brightness;
+    return mainColor;
 }

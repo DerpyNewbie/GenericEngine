@@ -5,6 +5,9 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
+    <FxCompile Include="Resources\2DVertShader.hlsl" />
+    <FxCompile Include="Resources\2DShader.hlsli" />
+    <FxCompile Include="Resources\2DPixelShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -18,10 +21,8 @@
     <ClCompile Include="Engine\Components\camera.cpp" />
     <ClCompile Include="Engine\Components\component.cpp" />
     <ClCompile Include="Engine\Components\controller.cpp" />
-    <ClCompile Include="Engine\Components\cube_renderer.cpp" />
     <ClCompile Include="Engine\Components\frame_meta_data.cpp" />
     <ClCompile Include="Engine\Components\mesh_renderer.cpp" />
-    <ClCompile Include="Engine\Components\mv1_renderer.cpp" />
     <ClCompile Include="Engine\Components\renderer.cpp" />
     <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp" />
     <ClCompile Include="Engine\Components\transform.cpp" />
@@ -31,7 +32,6 @@
     <ClCompile Include="Engine\game_object.cpp" />
     <ClCompile Include="Engine\Math\bounds.cpp" />
     <ClCompile Include="Engine\Rendering\bone_weight.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp" />
@@ -85,6 +85,7 @@
     <ClCompile Include="Engine\Rendering\buffers.cpp" />
     <ClCompile Include="Engine\Rendering\MaterialData.cpp" />
     <ClCompile Include="Engine\Rendering\world_view_projection.cpp" />
+    <ClCompile Include="Engine\assimp_util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -98,10 +99,8 @@
     <ClInclude Include="Engine\Components\camera.h" />
     <ClInclude Include="Engine\Components\component.h" />
     <ClInclude Include="Engine\Components\controller.h" />
-    <ClInclude Include="Engine\Components\cube_renderer.h" />
     <ClInclude Include="Engine\Components\frame_meta_data.h" />
     <ClInclude Include="Engine\Components\mesh_renderer.h" />
-    <ClInclude Include="Engine\Components\mv1_renderer.h" />
     <ClInclude Include="Engine\Components\renderer.h" />
     <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
     <ClInclude Include="Engine\Components\transform.h" />
@@ -121,7 +120,6 @@
     <ClInclude Include="Engine\object.h" />
     <ClInclude Include="Engine\Rendering\bone_weight.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\CabotEngin.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Converter\D3D12ToAssimp.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
@@ -180,5 +178,6 @@
     <ClInclude Include="Engine\Rendering\MaterialData.h" />
     <ClInclude Include="Engine\Rendering\world_view_projection.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Engine\assimp_util.h" />
   </ItemGroup>
 </Project>

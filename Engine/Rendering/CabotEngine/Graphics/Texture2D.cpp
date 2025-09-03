@@ -37,6 +37,8 @@ void Texture2D::CreateBuffer()
         return;
     }
 
+    m_pResource->SetName(L"Texture");
+
     D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
     hr = m_pResource->WriteToSubresource(0,
                                          &destRegion, // copy all
