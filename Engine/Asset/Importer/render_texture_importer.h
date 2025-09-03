@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "asset_importer.h"
 
 namespace engine

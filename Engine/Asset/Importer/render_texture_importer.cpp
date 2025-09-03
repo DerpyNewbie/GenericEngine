@@ -1,5 +1,5 @@
+#include "pch.h"
 #include "render_texture_importer.h"
-#include "object.h"
 #include "Rendering/render_texture.h"
 
 namespace engine
