@@ -96,10 +96,17 @@ AssetDescriptor::AssetDescriptor(const path &file_path) :
     m_asset_path_ = asset_file_path;
     m_type_ = file_path.extension().string();
 
+    m_meta_json_ = Document();
+
     if (!GetMetaJson(file_path, meta_json))
     {
         Logger::Log<AssetDescriptor>("No meta file `%s` found. Generating!", file_path.string().c_str());
         m_guid_ = xg::newGuid();
+        m_meta_json_.SetObject();
+        m_meta_data_store_ = PersistentDataStore{&m_meta_json_, &m_meta_json_};
+        auto data_value = Value(kObjectType);
+        m_meta_data_store_.SetValue(kDataKey, data_value);
+        m_user_data_store_ = m_meta_data_store_.GetDataStore(kDataKey);
 
         WriteMeta(meta_file_path);
 
