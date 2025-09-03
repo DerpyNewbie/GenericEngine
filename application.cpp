@@ -1,11 +1,8 @@
 #include "pch.h"
 
 #include "application.h"
-
 #include <tchar.h>
-
 #include "engine.h"
-#include "scene.h"
 #include "game_object.h"
 #include "input.h"
 #include "Audio/audio_listener_component.h"

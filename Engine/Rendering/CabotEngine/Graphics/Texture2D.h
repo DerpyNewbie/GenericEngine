@@ -11,10 +11,11 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D final : public engine::InspectableAsset, public IBuffer
+class Texture2D : public engine::InspectableAsset, public IBuffer
 {
     friend class engine::Texture2DImporter;
 
+protected:
     std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
     UINT width = 0;
     UINT height = 0;
@@ -62,8 +63,8 @@ public:
         return format;
     }
 
-    ID3D12Resource *Resource();
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
+    virtual ID3D12Resource *Resource();
+    virtual D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
 
     template <class Archive>
     void serialize(Archive &ar)

@@ -30,6 +30,8 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         return;
     }
 
+    m_pBuffer->SetName(L"VertexBuffer");
+
     // 頂点バッファビューの設定
     m_View.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
     m_View.SizeInBytes = static_cast<UINT>(size);

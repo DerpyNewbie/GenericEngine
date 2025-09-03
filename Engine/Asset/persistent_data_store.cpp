@@ -15,7 +15,7 @@ auto PersistentDataStore::Find(const std::string &key) const
 }
 void PersistentDataStore::Set(const std::string &key, Value &value) const
 {
-    auto json_key = Value(key.c_str(), key.size(), Allocator());
+    auto json_key = Value(key.c_str(), static_cast<SizeType>(key.size()), Allocator());
     const auto it = m_value_->FindMember(key.c_str());
     if (it == m_value_->MemberEnd())
     {
@@ -60,7 +60,7 @@ void PersistentDataStore::ClearKeys() const
 
 void PersistentDataStore::SetString(const std::string &key, const std::string &value) const
 {
-    auto json_value = Value(value.c_str(), value.size(), Allocator());
+    auto json_value = Value(value.c_str(), static_cast<SizeType>(value.size()), Allocator());
     Set(key, json_value);
 }
 

@@ -62,6 +62,8 @@ public:
 
 
     void BeginRender();
+    void SetMainRenderTarget(Color background_color);
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color background_color) const;
     void EndRender();
     void WaitRender();
 
@@ -88,6 +90,16 @@ public:
     static D3D12_VIEWPORT Viewport()
     {
         return Instance()->m_viewport_;
+    }
+
+    static D3D12_RESOURCE_DESC BBuffDesc()
+    {
+        return Instance()->m_p_render_targets_[Instance()->m_current_back_buffer_index_]->GetDesc();
+    }
+
+    static D3D12_DESCRIPTOR_HEAP_DESC RTVHeapDesc()
+    {
+        return Instance()->m_p_rtv_heap_->GetDesc();
     }
 
     void SetBackgroundColor(Color color);

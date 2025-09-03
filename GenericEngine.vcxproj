@@ -41,6 +41,7 @@
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\import_log.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\persistent_data_store.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
@@ -48,6 +49,7 @@
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
+        <ClCompile Include="Engine\Components\billboard_renderer.cpp"/>
         <ClCompile Include="Engine\Audio\audio.cpp"/>
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
@@ -117,6 +119,7 @@
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
             <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
         </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\billboard.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
@@ -144,6 +147,7 @@
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
+        <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
@@ -181,6 +185,7 @@
         <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\import_log.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
@@ -190,6 +195,7 @@
         <ClInclude Include="Engine\Asset\persistent_data_store.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
+        <ClInclude Include="Engine\Components\billboard_renderer.h"/>
         <ClInclude Include="Engine\Audio\audio.h"/>
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
@@ -234,6 +240,7 @@
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\billboard.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>
@@ -254,6 +261,7 @@
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
+        <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
@@ -272,9 +280,6 @@
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

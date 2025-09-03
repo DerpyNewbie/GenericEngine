@@ -8,14 +8,17 @@ using namespace DirectX;
 
 namespace engine
 {
+constexpr std::array<std::string_view, 7> kWicFormats = {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp"};
+
 Texture2DImporter::kImageFormat Texture2DImporter::GetImageFormat(const path &file_path)
 {
     auto ext = file_path.extension().string();
     std::ranges::transform(ext, ext.begin(), tolower);
-    if (ext == ".png")
+    if (std::ranges::find(kWicFormats, ext) != kWicFormats.end())
     {
         return kImageFormat::kWic;
     }
+
     if (ext == ".tga")
     {
         return kImageFormat::kTga;
@@ -48,7 +51,7 @@ IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 
 std::vector<std::string> Texture2DImporter::SupportedExtensions()
 {
-    return {".png", ".tga"};
+    return {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp", ".tga"};
 }
 
 void Texture2DImporter::OnImport(AssetDescriptor *ctx)

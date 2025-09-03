@@ -7,6 +7,7 @@
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
+#include "Importer/render_texture_importer.h"
 #include "Importer/texture_2d_importer.h"
 
 namespace engine
@@ -34,6 +35,7 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<MaterialImporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
     AssetImporter::Register(std::make_shared<FontImporter>());
+    AssetImporter::Register(std::make_shared<RenderTextureImporter>());
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
@@ -305,7 +307,7 @@ std::shared_ptr<AssetDescriptor> AssetDatabase::CreateAsset(const std::shared_pt
         descriptor = std::make_shared<AssetDescriptor>(path);
         descriptor->m_guid_ = object->Guid();
         descriptor->m_asset_path_ = path;
-        descriptor->m_type_ = AssetImporter::Get(object)->SupportedExtensions().front();
+        descriptor->m_type_ = path.extension().string();
         descriptor->SetMainObject(object);
     }
 

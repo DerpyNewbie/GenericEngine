@@ -22,6 +22,7 @@
 #include "Asset/text_asset.h"
 #include "Components/camera.h"
 #include "Rendering/material.h"
+#include "Rendering/render_texture.h"
 #include "Physics/physics.h"
 
 #include <ranges>
@@ -136,6 +137,9 @@ void Editor::Init()
 
         AddCreateMenu("Material", ".material", [] {
             return Object::Instantiate<Material>("New Material");
+        });
+        AddCreateMenu("Render Texture", ".rendertexture", [] {
+            return Object::Instantiate<RenderTexture>("New RenderTexture");
         });
     }
 }

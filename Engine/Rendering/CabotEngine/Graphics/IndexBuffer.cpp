@@ -45,6 +45,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *pInitData)
         // Clean up mapping
         m_pBuffer->Unmap(0, nullptr);
     }
+    m_pBuffer->SetName(L"IndexBuffer");
     m_IsValid = true;
 }
 

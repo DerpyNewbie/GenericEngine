@@ -197,7 +197,6 @@ void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
 
     m_objects_.emplace_back(object);
     const auto offset = m_objects_.size() - 1;
-    object->SetName(AssetPath().filename().string() + "_" + std::to_string(offset));
     if (m_sub_guids_.size() < offset)
     {
         m_sub_guids_.emplace_back(object->Guid());

@@ -124,13 +124,35 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
     return true;
 }
 
-void Gui::SetObjectDragDropTarget(const std::shared_ptr<Object> &object)
+bool Gui::ObjectHeader(const std::shared_ptr<Object> &object, std::string name)
 {
-    SetObjectDragDropTarget(object->Guid());
+    if (name.empty())
+    {
+        name = NameOf(object);
+    }
+
+    const auto result = ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+    MakeDragDropSource(object);
+
+    return result;
+}
+
+void Gui::MakeDragDropSource(const std::shared_ptr<Object> &object)
+{
+    if (ImGui::BeginDragDropSource())
+    {
+        SetDragDropPayload(object);
+        ImGui::EndDragDropSource();
+    }
+}
+
+void Gui::SetDragDropPayload(const std::shared_ptr<Object> &object)
+{
+    SetDragDropPayload(object->Guid());
     ImGui::Text("Name: %s", NameOf(object).c_str());
 }
 
-void Gui::SetObjectDragDropTarget(const xg::Guid guid)
+void Gui::SetDragDropPayload(const xg::Guid guid)
 {
     const auto guid_str = guid.str();
     ImGui::SetDragDropPayload(DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
@@ -138,7 +160,7 @@ void Gui::SetObjectDragDropTarget(const xg::Guid guid)
     ImGui::Text("Guid: %s", guid.str().c_str());
 }
 
-std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload)
+std::shared_ptr<Object> Gui::GetDragDropPayload(const ImGuiPayload *payload)
 {
     if (payload == nullptr)
     {
@@ -171,9 +193,9 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload
     return Object::Find(guid);
 }
 
-std::shared_ptr<Object> Gui::GetObjectDragDropTarget()
+std::shared_ptr<Object> Gui::GetDragDropPayload()
 {
-    return GetObjectDragDropTarget(ImGui::GetDragDropPayload());
+    return GetDragDropPayload(ImGui::GetDragDropPayload());
 }
 
 std::string Gui::NameOf(const std::shared_ptr<Object> &object)

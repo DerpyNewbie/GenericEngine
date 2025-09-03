@@ -14,6 +14,7 @@ std::string Inspector::Name()
 {
     return "Inspector";
 }
+
 void Inspector::OnEditorGui()
 {
     if (ImGui::BeginPopupContextItem("Context!"))
@@ -29,6 +30,7 @@ void Inspector::OnEditorGui()
 
     DrawObject(m_last_seen_object_.lock());
 }
+
 void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
 {
     if (object == nullptr)
@@ -75,6 +77,7 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
     ImGui::Text("Unknown object type is selected!");
     ImGui::Text("Object Name: '%s'", object->Name().c_str());
 }
+
 void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 {
     std::string buff = scene->Name();
@@ -85,6 +88,7 @@ void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
 
     ImGui::Separator();
 }
+
 void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
 {
     // game object path info
@@ -121,8 +125,7 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
         {
             ImGui::PushID(component.get());
             auto component_name = engine::EngineUtil::GetTypeName(typeid(*component).name());
-            if (ImGui::CollapsingHeader(component_name.c_str(),
-                                        ImGuiTreeNodeFlags_DefaultOpen))
+            if (engine::Gui::ObjectHeader(component, component_name.c_str()))
             {
                 if (ImGui::BeginPopupContextItem("##INSPECTOR_COMPONENT_POPUP"))
                 {
@@ -132,12 +135,6 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
                     }
 
                     ImGui::EndPopup();
-                }
-
-                if (ImGui::BeginDragDropSource())
-                {
-                    engine::Gui::SetObjectDragDropTarget(component);
-                    ImGui::EndDragDropSource();
                 }
 
                 ImGui::Indent();
@@ -160,104 +157,115 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
         ImGui::OpenPopup("##INSPECTOR_ADD_COMPONENT_POPUP");
     }
 }
+
 void Inspector::DrawComponent(const std::shared_ptr<engine::Component> &component)
 {
     component->OnInspectorGui();
 }
+
 void Inspector::DrawInspectable(const std::shared_ptr<engine::Inspectable> &inspectable)
 {
     inspectable->OnInspectorGui();
 }
-void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy, bool root)
+
+void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy, const bool root)
 {
+    if (asset_hierarchy == nullptr)
+    {
+        ImGui::Text("Select a asset to inspect...");
+        return;
+    }
+
     ImGui::PushID(asset_hierarchy.get());
-    auto asset = asset_hierarchy->asset;
-    if (asset == nullptr)
+
     {
-        ImGui::Text("Asset is null!");
-        ImGui::PopID();
-        return;
+        if (asset_hierarchy->IsFile())
+            ImGui::Text("File");
+        if (asset_hierarchy->IsDirectory())
+            ImGui::Text("Directory");
+        if (!asset_hierarchy->children.empty())
+            ImGui::Text("Children: %d", asset_hierarchy->children.size());
     }
 
-    ImGui::Separator();
-    ImGui::Text("Name: %s", asset->AssetPath().filename().string().c_str());
-    ImGui::Text("Path: %s", asset->AssetPath().string().c_str());
-    ImGui::Text("Guid: %s", asset->Guid().str().c_str());
-    if (asset_hierarchy->IsFile())
-        ImGui::Text("File");
-    if (asset_hierarchy->IsDirectory())
-        ImGui::Text("Directory");
-    if (!asset_hierarchy->children.empty())
-        ImGui::Text("Children: %d", asset_hierarchy->children.size());
-    ImGui::Separator();
-
-    if (asset_hierarchy->IsFile())
+    if (asset_hierarchy->asset != nullptr)
     {
-        if (asset_hierarchy->asset->MainObject() != nullptr)
-        {
-            if (ImGui::CollapsingHeader("Main Object"))
-            {
-                ImGui::Indent();
+        ImGui::Separator();
 
-                ImGui::Text("Name: %s", asset_hierarchy->Name().c_str());
-                ImGui::Text("Guid: %s", asset_hierarchy->Guid().str().c_str());
-
-                ImGui::Separator();
-
-                DrawObject(asset_hierarchy->asset->MainObject());
-
-                ImGui::Unindent();
-            }
-
-            if (ImGui::CollapsingHeader("Objects"))
-            {
-                ImGui::Indent();
-                for (auto &object : asset_hierarchy->asset->Objects())
-                {
-                    ImGui::PushID(object.get());
-                    if (ImGui::CollapsingHeader(object->Name().c_str()))
-                    {
-                        ImGui::Indent();
-
-                        ImGui::Text("Guid: %s", object->Guid().str().c_str());
-
-                        ImGui::Separator();
-
-                        DrawObject(object);
-
-                        ImGui::Unindent();
-                    }
-                    ImGui::PopID();
-                }
-                ImGui::Unindent();
-            }
-        }
-        else
-        {
-            ImGui::Text("Object is null!");
-            if (ImGui::Button("Import"))
-            {
-                engine::AssetDatabase::GetAsset(asset_hierarchy->asset->Guid());
-            }
-        }
-
-        ImGui::PopID();
-        return;
+        DrawAssetDescriptor(asset_hierarchy->asset);
     }
 
     if (asset_hierarchy->IsDirectory())
     {
+        ImGui::Separator();
+
         if (!root || ImGui::CollapsingHeader("Show Children"))
         {
+            ImGui::Indent();
             for (const auto &child : asset_hierarchy->children)
             {
-                ImGui::Indent();
                 DrawAssetHierarchy(child, false);
-                ImGui::Unindent();
             }
+            ImGui::Unindent();
         }
     }
 
     ImGui::PopID();
+}
+
+void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescriptor> &asset_descriptor)
+{
+    if (ImGui::CollapsingHeader("Metadata", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Indent();
+
+        ImGui::Text("Name: %s", asset_descriptor->AssetPath().filename().string().c_str());
+        ImGui::Text("Path: %s", asset_descriptor->AssetPath().string().c_str());
+        ImGui::Text("Guid: %s", asset_descriptor->Guid().str().c_str());
+
+        const auto label = std::format("SubGuids ({0})", asset_descriptor->SubGuids().size()).c_str();
+        if (ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen))
+        {
+            ImGui::Indent();
+            for (const auto &sub_guid : asset_descriptor->SubGuids())
+            {
+                ImGui::BulletText("%s", sub_guid.str().c_str());
+            }
+            ImGui::Unindent();
+        }
+
+        ImGui::Unindent();
+    }
+
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Indent();
+
+        if (asset_descriptor->Objects().empty())
+        {
+            ImGui::Text("No objects found...");
+        }
+
+        for (auto &object : asset_descriptor->Objects())
+        {
+            ImGui::PushID(object.get());
+
+            if (engine::Gui::ObjectHeader(object))
+            {
+                ImGui::Indent();
+
+                ImGui::Text("Guid: %s", object->Guid().str().c_str());
+
+                ImGui::Separator();
+
+                DrawObject(object);
+
+                ImGui::Unindent();
+            }
+
+            ImGui::PopID();
+        }
+
+        ImGui::Unindent();
+    }
 }
 }
