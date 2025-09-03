@@ -1,14 +1,14 @@
+#include "pch.h"
 #include "billboard.h"
 
 #include "game_object.h"
 #include "logger.h"
 #include "Components/camera.h"
-#include "Rendering/view_projection.h"
 using namespace DirectX::SimpleMath;
 
 void Billboard::Update()
 {
-    //create vertex buffer
+    // create vertex buffer
     if (!vertex_buffer)
     {
         std::array<engine::Vertex, 4> vertices;
@@ -30,7 +30,7 @@ void Billboard::Update()
         }
     }
 
-    //create index buffer
+    // create index buffer
     if (!index_buffer)
     {
         std::vector<uint32_t> indices =
@@ -58,20 +58,20 @@ void Billboard::Update()
     Vector3 dir_vec3 = camera_pos - obj_pos;
     DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(XMLoadFloat3(&dir_vec3));
 
-    //スケールの保持
+    // store scale
     Vector3 scale;
     DirectX::XMMATRIX world = world_matrix;
     scale.x = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[0]));
     scale.y = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[1]));
     scale.z = DirectX::XMVectorGetX(DirectX::XMVector3Length(world.r[2]));
 
-    // 回転角度を算出（XZとYZで）
+    // calculate angle on XZ and YZ
     float angle_y = std::atan2(dir_vec3.x, dir_vec3.z);
     float value = dir_vec3.y / DirectX::XMVectorGetX(DirectX::XMVector3Length(XMLoadFloat3(&dir_vec3)));
     value = std::clamp(value, -1.0f, 1.0f);
     float angle_x = -std::asin(value);
 
-    // 合成（X → Y 回転順）
+    // merge angles in X -> Y order
     auto rot_y = Matrix(DirectX::XMMatrixRotationY(angle_y));
     auto rot_x = Matrix(DirectX::XMMatrixRotationX(angle_x));
     auto scale_mat = Matrix(DirectX::XMMatrixScaling(scale.x, scale.y, scale.z));

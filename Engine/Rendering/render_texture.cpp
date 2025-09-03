@@ -39,7 +39,6 @@ void RenderTexture::CreateBuffer()
         return;
     }
 
-    // RTV用のディスクリプタヒープを作成する
     D3D12_DESCRIPTOR_HEAP_DESC heap_desc = RenderEngine::RTVHeapDesc();
     heap_desc.NumDescriptors = 1;
     hr = device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(m_RTVHeap_.ReleaseAndGetAddressOf()));

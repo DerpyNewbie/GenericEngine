@@ -53,7 +53,7 @@ class Camera : public Component, public IDrawCallReceiver
     CameraProperty m_property_;
     AssetPtr<RenderTexture> m_render_texture_;
 
-    unsigned int m_drawcall_count_ = 0;
+    size_t m_drawcall_count_ = 0;
 
     void Render();
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;

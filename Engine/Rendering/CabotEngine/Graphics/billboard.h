@@ -1,5 +1,4 @@
 #pragma once
-#include "pch.h"
 #include "ConstantBuffer.h"
 #include "IndexBuffer.h"
 #include "RenderEngine.h"

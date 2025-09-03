@@ -17,12 +17,13 @@ std::weak_ptr<Camera> Camera::m_current_camera_;
 void Camera::Render()
 {
     SetViewProjMatrix();
+
     m_current_camera_ = shared_from_base<Camera>();
-    auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-    for (auto object : objects_in_view)
-    {
+
+    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
+    for (const auto object : objects_in_view)
         object->OnDraw();
-    }
+
     m_drawcall_count_ = objects_in_view.size();
     Gizmos::Render();
 }
