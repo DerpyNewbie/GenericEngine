@@ -113,8 +113,11 @@ void RigidbodyComponent::WriteRigidbody()
     m_bt_rigidbody_->setRestitution(m_bounciness_);
     m_bt_rigidbody_->setDamping(m_linear_damping_, m_angular_damping_);
 
-    bt_transform.setOrigin({center_of_mass.x, center_of_mass.y, center_of_mass.z});
-    m_bt_rigidbody_->setCenterOfMassTransform(bt_transform);
+    auto bt_center_of_mass = btTransform::getIdentity();
+    bt_center_of_mass.setOrigin({center_of_mass.x, center_of_mass.y, center_of_mass.z});
+    bt_center_of_mass.setRotation(bt_transform.getRotation());
+
+    m_bt_rigidbody_->setCenterOfMassTransform(bt_center_of_mass);
 
     int flags = btRigidBody::CF_DYNAMIC_OBJECT;
     if (m_is_static_)
