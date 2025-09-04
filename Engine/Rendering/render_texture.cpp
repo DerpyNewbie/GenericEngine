@@ -21,8 +21,8 @@ void RenderTexture::CreateBuffer()
     clearValue.Color[2] = 0.5f;
     clearValue.Color[3] = 0.5f;
 
-    width = Application::WindowWidth();
-    height = Application::WindowHeight();
+    width = Application::Instance()->WindowWidth();
+    height = Application::Instance()->WindowHeight();
 
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,

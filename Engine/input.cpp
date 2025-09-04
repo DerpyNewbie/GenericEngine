@@ -14,7 +14,7 @@ Input::Input()
 
 void Input::Init()
 {
-    m_mouse_->SetWindow(Application::GetWindowHandle());
+    m_mouse_->SetWindow(Application::Instance()->GetWindowHandle());
     m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 }
 

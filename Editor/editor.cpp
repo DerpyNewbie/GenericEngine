@@ -73,7 +73,7 @@ void Editor::Init()
     m_instance_ = this;
 
     {
-        Application::AddWindowCallback(WndProc);
+        Application::Instance()->AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -98,7 +98,7 @@ void Editor::Init()
         D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
 
-        ImGui_ImplWin32_Init(Application::GetWindowHandle());
+        ImGui_ImplWin32_Init(Application::Instance()->GetWindowHandle());
         ImGui_ImplDX12_Init(
             RenderEngine::Device(),
             RenderEngine::kFrame_Buffer_Count,

@@ -12,12 +12,7 @@
 #include "Components/skinned_mesh_renderer.h"
 #include "Rendering/model_importer.h"
 #include "Editor/editor.h"
-
-std::shared_ptr<Application> Application::m_instance_;
-std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
-int Application::m_window_height_ = 1080;
-int Application::m_window_width_ = 1920;
-HWND Application::m_h_wnd_ = nullptr;
+#include "Physics/plane_collider.h"
 
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
@@ -25,7 +20,7 @@ LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
     {
         engine::Input::Instance()->Keyboard()->ProcessMessage(msg, wparam, lparam);
     }
-    for (auto callback : std::views::values(m_callbacks_))
+    for (const auto callback : std::views::values(Instance()->m_callbacks_))
     {
         return callback(hwnd, msg, wparam, lparam);
     }
@@ -34,7 +29,8 @@ LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpa
 
 std::shared_ptr<Application> Application::Instance()
 {
-    return m_instance_;
+    static auto instance = std::make_shared<Application>();
+    return instance;
 }
 
 void Application::StartApp()
@@ -50,20 +46,14 @@ void Application::StartApp()
         // Sample scene creation
         const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
         camera->AddComponent<engine::Camera>();
-        camera->AddComponent<engine::Controller>();
         camera->AddComponent<engine::AudioListenerComponent>();
 
-        const auto parent_obj = engine::Object::Instantiate<engine::GameObject>("Parent");
-        const auto child_obj = engine::Object::Instantiate<engine::GameObject>("Child");
-        child_obj->Transform()->SetParent(parent_obj->Transform());
+        engine::Object::Instantiate<engine::GameObject>("Floor")->AddComponent<engine::PlaneCollider>();
 
-        const auto parent_obj2 = engine::Object::Instantiate<engine::GameObject>("Parent2");
-        const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
-        child_obj2->Transform()->SetParent(parent_obj2->Transform());
-
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
-        engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+        for (auto &func : m_initial_scene_creation_)
+        {
+            func();
+        }
     }
 
     engine->MainLoop();
@@ -71,17 +61,17 @@ void Application::StartApp()
     editor->Finalize();
 }
 
-int Application::WindowWidth()
+int Application::WindowWidth() const
 {
     return m_window_width_;
 }
 
-int Application::WindowHeight()
+int Application::WindowHeight() const
 {
     return m_window_height_;
 }
 
-HWND Application::GetWindowHandle()
+HWND Application::GetWindowHandle() const
 {
     return m_h_wnd_;
 }
@@ -96,6 +86,11 @@ int Application::AddWindowCallback(std::function<LRESULT(HWND hwnd, UINT msg, WP
 void Application::RemoveWindowCallback(const int window_callback_handle)
 {
     m_callbacks_.erase(window_callback_handle);
+}
+
+void Application::AddInitialSceneCreationCallback(std::function<void()> func)
+{
+    m_initial_scene_creation_.emplace_back(func);
 }
 
 void Application::InitWindow()
