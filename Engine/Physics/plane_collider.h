@@ -7,7 +7,7 @@ namespace engine
 {
 class PlaneCollider : public Collider
 {
-    btStaticPlaneShape m_plane_ = {{0, 1, 0}, 1};
+    btStaticPlaneShape m_plane_ = {{0, 1, 0}, 0};
 
 public:
     void UpdateShape() override;
