@@ -58,10 +58,12 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     for (UINT i = 0; i < scene->mNumAnimations; ++i)
     {
         const auto animation = scene->mAnimations[i];
-        TransformAnimationCurve curve;
         auto anim_clip = Object::Instantiate<AnimationClip>();
+        anim_clip->m_length_ = animation->mDuration;
+        anim_clip->m_frame_rate_ = 1.0 / animation->mTicksPerSecond;
         for (UINT j = 0; j < animation->mNumChannels; ++j)
         {
+            TransformAnimationCurve curve;
             auto channel = animation->mChannels[j];
             std::string path = channel->mNodeName.C_Str();
 
@@ -69,25 +71,39 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
             {
                 const auto ai_pos = channel->mPositionKeys[k].mValue;
                 auto pos = Vector3(ai_pos.x, ai_pos.y, ai_pos.z);
-                curve.position_key.emplace(channel->mPositionKeys[k].mTime, pos);
+                auto time = channel->mPositionKeys[k].mTime / animation->mTicksPerSecond;
+                curve.position_key.emplace_back(time, pos);
             }
 
             for (UINT k = 0; k < channel->mNumScalingKeys; ++k)
             {
                 const auto ai_scale = channel->mScalingKeys[k].mValue;
                 auto scale = Vector3(ai_scale.x, ai_scale.y, ai_scale.z);
-                curve.scale_key.emplace(channel->mScalingKeys[k].mTime, scale);
+                auto time = channel->mPositionKeys[k].mTime / animation->mTicksPerSecond;
+                curve.scale_key.emplace_back(time, scale);
             }
 
             for (UINT k = 0; k < channel->mNumRotationKeys; ++k)
             {
-                const auto ai_rotation = channel->mRotationKeys[k].mValue;
-                auto rotation = Quaternion(ai_rotation.x, ai_rotation.y, ai_rotation.z, ai_rotation.w);
-                curve.rotation_key.emplace(channel->mRotationKeys[k].mTime, rotation);
+                auto &ai_quaternion1 = channel->mRotationKeys[k].mValue;
+                if (k != 0)
+                {
+                    auto ai_quaternion2 = channel->mRotationKeys[k - 1].mValue;
+                    if (ai_quaternion1.x * ai_quaternion2.x + ai_quaternion1.y * ai_quaternion2.y + ai_quaternion1.z *
+                        ai_quaternion2.z + ai_quaternion1.w * ai_quaternion2.w <= 0.0f)
+                    {
+                        ai_quaternion1 = aiQuaternion(-ai_quaternion1.w, -ai_quaternion1.x, -ai_quaternion1.y,
+                                                      -ai_quaternion1.z);
+                    }
+                }
+                ai_quaternion1.Normalize();
+                auto rotation = Quaternion(ai_quaternion1.x, ai_quaternion1.y, ai_quaternion1.z, ai_quaternion1.w);
+                auto time = channel->mPositionKeys[k].mTime / animation->mTicksPerSecond;
+                curve.rotation_key.emplace_back(time, rotation);
             }
             anim_clip->m_curves_.emplace(path, curve);
-            ctx->AddObject(anim_clip);
         }
+        ctx->AddObject(anim_clip);
     }
 }
 }

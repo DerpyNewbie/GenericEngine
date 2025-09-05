@@ -1,34 +1,18 @@
 #pragma once
 #include "Asset/inspectable_asset.h"
-
-#include <chrono>
+#include "Components/transform.h"
 
 namespace engine
 {
 class GameObject;
 
-struct CompareByFloat
-{
-    bool operator()(const std::pair<float, Quaternion> &lhs,
-                    const std::pair<float, Quaternion> &rhs) const
-    {
-        return lhs.first < rhs.first;
-    }
-
-    bool operator()(const std::pair<float, Vector3> &lhs,
-                    const std::pair<float, Vector3> &rhs) const
-    {
-        return lhs.first < rhs.first;
-    }
-};
-
 struct TransformAnimationCurve
 {
-    std::set<std::pair<float, Vector3>, CompareByFloat> position_key;
-    std::set<std::pair<float, Vector3>, CompareByFloat> scale_key;
-    std::set<std::pair<float, Quaternion>, CompareByFloat> rotation_key;
+    std::list<std::pair<float, Vector3>> position_key;
+    std::list<std::pair<float, Vector3>> scale_key;
+    std::list<std::pair<float, Quaternion>> rotation_key;
 
-    Matrix Evaluate(float time);
+    [[nodiscard]] Matrix Evaluate(float time) const;
 };
 
 class AnimationClip : public InspectableAsset
@@ -41,8 +25,7 @@ class AnimationClip : public InspectableAsset
 public:
     void OnInspectorGui() override;
 
-    std::vector<std::string> GetNodeNames();
-    Matrix GetSampledMatrix(float time, const std::string &path);
+    std::unordered_map<std::string, TransformAnimationCurve> GetCurves();
 
     /// <summary>
     /// Total duration of this animation clip

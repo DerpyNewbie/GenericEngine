@@ -1,26 +1,68 @@
 #include "pch.h"
 #include "animation_component.h"
+
+#include "engine_time.h"
 #include "game_object.h"
 #include "gui.h"
 #include "Components/transform.h"
 
 namespace engine
 {
+
 namespace
 {
-std::shared_ptr<Transform> FindNodeRecursive(const std::shared_ptr<Transform> node, const std::string &name)
+template <typename T>
+T CalcLinerInterpolated(float time, const std::list<std::pair<float, T>> &vector_key)
 {
-    if (node->GameObject()->Name() == name)
-        return node;
-    for (unsigned int i = 0; i < node->ChildCount(); ++i)
+    if (vector_key.size() == 1)
+        return vector_key.begin()->second;
+
+    auto next_it = vector_key.begin();
+    for (auto it = vector_key.begin(); it != vector_key.end(); ++it)
     {
-        if (auto found = FindNodeRecursive(node->GetChild(i), name))
+        if (it->first < time)
         {
-            return found;
+            continue;
         }
+        next_it = it;
+        break;
     }
-    return nullptr;
+
+    if (next_it == vector_key.begin())
+    {
+        return next_it->second;
+    }
+    if (next_it == vector_key.end())
+    {
+        return std::prev(next_it)->second;
+    }
+
+    auto prevIt = std::prev(next_it);
+
+    const float t1 = prevIt->first;
+    const float t2 = next_it->first;
+    const float delta_time = t2 - t1;
+
+    if (delta_time <= 0.0f)
+        return prevIt->second;
+
+    float factor = (time - t1) / delta_time;
+
+    const T &start = prevIt->second;
+    const T &end = next_it->second;
+
+    return start + factor * (end - start);
 }
+}
+
+void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
+{
+    m_transforms_.emplace(node->GameObject()->Name(), node);
+    for (UINT i = 0; i < node->ChildCount(); ++i)
+    {
+        auto child = node->GetChild(i);
+        AddTransform(child);
+    }
 }
 
 void AnimationComponent::OnInspectorGui()
@@ -30,7 +72,16 @@ void AnimationComponent::OnInspectorGui()
     {
         Play();
     }
+    if (ImGui::Button("Stop"))
+    {
+        Stop();
+    }
 }
+void AnimationComponent::OnStart()
+{
+    AddTransform(GameObject()->Transform());
+}
+
 void AnimationComponent::OnUpdate()
 {
     Sample();
@@ -46,7 +97,7 @@ bool AnimationComponent::Play()
     return true;
 }
 
-bool AnimationComponent::Play(const std::string &name)
+bool AnimationComponent::Play(const std::string &name) const
 {
     const auto state = m_states_.at(name);
     if (state == nullptr)
@@ -62,17 +113,11 @@ void AnimationComponent::Stop()
         state->Stop();
 }
 
-void AnimationComponent::AddClip(std::shared_ptr<AnimationClip> clip, const std::string &name)
+void AnimationComponent::AddClip(const std::shared_ptr<AnimationClip> &clip, const std::string &name)
 {
     const auto state = std::make_shared<AnimationState>();
     state->clip = AssetPtr<AnimationClip>::FromManaged(clip);
 
-    const auto node_names = clip->GetNodeNames();
-    for (auto node_name : node_names)
-    {
-        auto transform = FindNodeRecursive(GameObject()->Transform(), node_name);
-        m_transforms_.emplace(node_name, transform);
-    }
     m_states_.insert_or_assign(name, state);
 }
 
@@ -88,9 +133,52 @@ size_t AnimationComponent::ClipCount() const
 
 void AnimationComponent::Sample()
 {
-    for (auto [path, state] : m_states_)
+    if (m_states_.empty())
+        return;
+
+    std::vector<std::map<std::string, Matrix>> animations_matrices;
+    for (const auto state : m_states_ | std::views::values)
     {
-        state->clip.CastedLock()->GetSampledMatrix();
+        if (!state->enabled)
+        {
+            continue;
+        }
+        auto clip = state->clip.CastedLock();
+        auto curves = clip->GetCurves();
+
+        state->time += Time::GetDeltaTime() * state->speed;
+
+        std::map<std::string, Matrix> animation_matrices;
+        for (auto [name, curve] : curves)
+        {
+            auto position = CalcLinerInterpolated(state->time, curve.position_key);
+            auto scale = CalcLinerInterpolated(state->time, curve.scale_key);
+            auto rotation = CalcLinerInterpolated(state->time, curve.rotation_key);
+
+            auto matrix = Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) *
+                          Matrix::CreateTranslation(position);
+            animation_matrices.emplace(name, matrix);
+        }
+        animations_matrices.emplace_back(animation_matrices);
+    }
+
+    for (auto [path, transform] : m_transforms_)
+    {
+        Matrix final_matrix;
+        bool contains = false;
+        for (auto animation_matrices : animations_matrices)
+        {
+            if (animation_matrices.contains(path))
+            {
+                final_matrix *= animation_matrices[path];
+                contains = true;
+            }
+
+        }
+        if (contains)
+        {
+            transform->SetLocalMatrix(final_matrix);
+        }
     }
 }
 
