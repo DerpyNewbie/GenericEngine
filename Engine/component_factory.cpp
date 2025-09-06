@@ -18,6 +18,8 @@
 #include "Physics/rigidbody_component.h"
 #include "Physics/rigidbody_tester_component.h"
 #include "Physics/sphere_collider.h"
+#include "Components/Cinema/cinema_brain_component.h"
+#include "Components/Cinema/cinema_camera_component.h"
 
 namespace engine
 {
@@ -42,6 +44,8 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RigidbodyTesterComponent);
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
+    ADD_COMPONENT(CinemaCameraComponent);
+    ADD_COMPONENT(CinemaBrainComponent);
 #undef ADD_COMPONENT
 }
 
