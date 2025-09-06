@@ -1,25 +1,23 @@
 #include "pch.h"
 
+#include "input.h"
 #include "application.h"
 #include <tchar.h>
 #include "engine.h"
 #include "game_object.h"
-#include "input.h"
 #include "Audio/audio_listener_component.h"
 
 #include "Components/camera.h"
-#include "Components/controller.h"
 #include "Components/skinned_mesh_renderer.h"
-#include "Rendering/model_importer.h"
 #include "Editor/editor.h"
 #include "Physics/plane_collider.h"
 
+namespace engine
+{
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-    if (engine::Input::Instance()->Keyboard())
-    {
-        engine::Input::Instance()->Keyboard()->ProcessMessage(msg, wparam, lparam);
-    }
+    Input::ProcessMessage(msg, wparam, lparam);
+    
     for (const auto callback : std::views::values(Instance()->m_callbacks_))
     {
         return callback(hwnd, msg, wparam, lparam);
@@ -35,7 +33,7 @@ std::shared_ptr<Application> Application::Instance()
 
 void Application::StartApp()
 {
-    const auto engine = std::make_shared<engine::Engine>();
+    const auto engine = std::make_shared<Engine>();
     const auto editor = std::make_shared<editor::Editor>();
     InitWindow();
     engine->Init();
@@ -44,11 +42,11 @@ void Application::StartApp()
 
     {
         // Sample scene creation
-        const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
-        camera->AddComponent<engine::Camera>();
-        camera->AddComponent<engine::AudioListenerComponent>();
+        const auto camera = Object::Instantiate<GameObject>("Camera");
+        camera->AddComponent<Camera>();
+        camera->AddComponent<AudioListenerComponent>();
 
-        engine::Object::Instantiate<engine::GameObject>("Floor")->AddComponent<engine::PlaneCollider>();
+        Object::Instantiate<GameObject>("Floor")->AddComponent<PlaneCollider>();
 
         for (auto &func : m_initial_scene_creation_)
         {
@@ -121,4 +119,5 @@ void Application::InitWindow()
                             nullptr);
 
     ShowWindow(m_h_wnd_,SW_SHOW);
+}
 }

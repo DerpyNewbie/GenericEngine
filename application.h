@@ -2,12 +2,12 @@
 #include <Windows.h>
 #include <functional>
 
-
 #pragma comment(lib,"d3d12.lib")
 #pragma comment(lib,"dxgi.lib")
 
 class DescriptorHandle;
-
+namespace engine
+{
 class Application
 {
     typedef std::function<LRESULT (HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)> WindowCallback;
@@ -37,3 +37,4 @@ public:
 
     void AddInitialSceneCreationCallback(std::function<void()> func);
 };
+}
