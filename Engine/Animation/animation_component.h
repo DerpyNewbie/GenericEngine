@@ -21,6 +21,7 @@ class AnimationComponent : public Component
     bool m_is_playing_ = false;
 
     std::unordered_map<std::string, std::shared_ptr<Transform>> m_transforms_;
+    std::unordered_map<std::string, Matrix> m_default_poses_;
     std::unordered_map<std::string, std::shared_ptr<AnimationState>> m_states_;
 
     void AddTransform(const std::shared_ptr<Transform> &node);
@@ -30,7 +31,7 @@ public:
     void OnStart() override;
     void OnUpdate() override;
     bool Play();
-    bool Play(const std::string &name) const;
+    bool Play(const std::string &name);
     void Stop();
 
     void AddClip(const std::shared_ptr<AnimationClip> &clip, const std::string &name);
@@ -38,6 +39,7 @@ public:
     [[nodiscard]] size_t ClipCount() const;
 
     void Sample();
+    void Apply();
 
     [[nodiscard]] bool IsPlaying() const;
 };

@@ -59,8 +59,10 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     {
         const auto animation = scene->mAnimations[i];
         auto anim_clip = Object::Instantiate<AnimationClip>();
-        anim_clip->m_length_ = animation->mDuration;
+
+        anim_clip->m_length_ = animation->mDuration / animation->mTicksPerSecond;
         anim_clip->m_frame_rate_ = 1.0 / animation->mTicksPerSecond;
+
         for (UINT j = 0; j < animation->mNumChannels; ++j)
         {
             TransformAnimationCurve curve;

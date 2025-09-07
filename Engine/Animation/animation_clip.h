@@ -8,11 +8,13 @@ class GameObject;
 
 struct TransformAnimationCurve
 {
-    std::list<std::pair<float, Vector3>> position_key;
-    std::list<std::pair<float, Vector3>> scale_key;
-    std::list<std::pair<float, Quaternion>> rotation_key;
+    std::vector<std::pair<float, Vector3>> position_key;
+    std::vector<std::pair<float, Vector3>> scale_key;
+    std::vector<std::pair<float, Quaternion>> rotation_key;
 
-    [[nodiscard]] Matrix Evaluate(float time) const;
+    size_t position_index = 0;
+    size_t scale_index = 0;
+    size_t rotation_index = 0;
 };
 
 class AnimationClip : public InspectableAsset
@@ -25,7 +27,8 @@ class AnimationClip : public InspectableAsset
 public:
     void OnInspectorGui() override;
 
-    std::unordered_map<std::string, TransformAnimationCurve> GetCurves();
+    void Initialize();
+    TransformAnimationCurve *FindCurve(const std::string &path);
 
     /// <summary>
     /// Total duration of this animation clip

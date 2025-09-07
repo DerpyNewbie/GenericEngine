@@ -11,7 +11,7 @@ enum class kWrapMode
     kPingPong
 };
 
-struct AnimationState
+struct AnimationState : Inspectable
 {
     bool enabled = true;
     AssetPtr<AnimationClip> clip;
@@ -22,6 +22,9 @@ struct AnimationState
     float length = 0.0f;
     kWrapMode wrap_mode = kWrapMode::kOnce;
 
+    void OnInspectorGui() override;
+    void SetClip(std::shared_ptr<AnimationClip> clip);
+    void UpdateTime();
     [[nodiscard]] float NormalizedTime() const;
     [[nodiscard]] float NormalizedSpeed() const;
 
