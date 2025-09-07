@@ -81,16 +81,17 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
             {
                 const auto ai_scale = channel->mScalingKeys[k].mValue;
                 auto scale = Vector3(ai_scale.x, ai_scale.y, ai_scale.z);
-                auto time = channel->mPositionKeys[k].mTime / animation->mTicksPerSecond;
+                auto time = channel->mScalingKeys[k].mTime / animation->mTicksPerSecond;
                 curve.scale_key.emplace_back(time, scale);
             }
 
             for (UINT k = 0; k < channel->mNumRotationKeys; ++k)
             {
                 auto &ai_quaternion1 = channel->mRotationKeys[k].mValue;
-                if (k != 0)
+                ai_quaternion1.Normalize();
+                if (k > 0)
                 {
-                    auto ai_quaternion2 = channel->mRotationKeys[k - 1].mValue;
+                    const auto ai_quaternion2 = channel->mRotationKeys[k - 1].mValue;
                     if (ai_quaternion1.x * ai_quaternion2.x + ai_quaternion1.y * ai_quaternion2.y + ai_quaternion1.z *
                         ai_quaternion2.z + ai_quaternion1.w * ai_quaternion2.w <= 0.0f)
                     {

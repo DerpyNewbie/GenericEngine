@@ -147,11 +147,14 @@ bool AnimationComponent::Play()
 
 bool AnimationComponent::Play(const std::string &name)
 {
-    const auto state = m_states_.at(name);
-    if (state == nullptr)
+    const auto it = m_states_.find(name);
+    if (it == m_states_.end() || it->second == nullptr)
+    {
+        Logger::Warn<AnimationComponent>("Animation state '%s' not found", name.c_str());
         return false;
+    }
 
-    state->enabled = true;
+    it->second->enabled = true;
     m_is_playing_ = true;
     return true;
 }
