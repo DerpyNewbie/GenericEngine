@@ -9,12 +9,10 @@ namespace engine
 void AnimationState::OnInspectorGui()
 {
     Gui::PropertyField("Enabled", enabled);
-    Gui::PropertyField("Clip", clip);
     Gui::PropertyField("Name", name);
     Gui::PropertyField("Speed", speed);
     Gui::PropertyField("Time", time);
     Gui::PropertyField("Weight", weight);
-    Gui::PropertyField("Length", length);
 
     int wrap_mode_int = static_cast<int>(wrap_mode);
     if (ImGui::Combo("Wrap Mode", &wrap_mode_int, "Once\0Loop\0PingPong\0\0"))

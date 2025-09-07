@@ -11,7 +11,7 @@ enum class kWrapMode
     kPingPong
 };
 
-struct AnimationState : Inspectable
+struct AnimationState final : Inspectable
 {
     bool enabled = true;
     AssetPtr<AnimationClip> clip;

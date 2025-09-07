@@ -1,6 +1,5 @@
 #pragma once
 #include "Asset/inspectable_asset.h"
-#include "Components/transform.h"
 
 namespace engine
 {

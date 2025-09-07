@@ -11,12 +11,10 @@ namespace engine
 
 namespace
 {
-Quaternion Slerp(const Quaternion &a, const Quaternion &b, float t)
+Quaternion Slerp(const Quaternion &a, const Quaternion &b, const float t)
 {
-    // 内積を計算
     float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
 
-    // 最近接の経路を取るために符号を反転
     Quaternion end = b;
     if (dot < 0.0f)
     {
@@ -24,8 +22,7 @@ Quaternion Slerp(const Quaternion &a, const Quaternion &b, float t)
         end = Quaternion(-b.x, -b.y, -b.z, -b.w);
     }
 
-    // もしすごく近ければ Lerp で近似
-    if (dot > 0.9995f)
+    if (Mathf::Approximately(dot, 1.0F))
     {
         auto result = Quaternion(
             a.x + t * (end.x - a.x),
@@ -37,17 +34,16 @@ Quaternion Slerp(const Quaternion &a, const Quaternion &b, float t)
         return result;
     }
 
-    // 角度と補間比率を計算
-    float theta_0 = acosf(dot); // a と b の角度
-    float theta = theta_0 * t; // 補間後の角度
+    const float theta_0 = acosf(dot);
+    const float theta = theta_0 * t;
 
-    float sin_theta = sinf(theta);
-    float sin_theta_0 = sinf(theta_0);
+    const float sin_theta = sinf(theta);
+    const float sin_theta_0 = sinf(theta_0);
 
-    float s0 = cosf(theta) - dot * sin_theta / sin_theta_0;
-    float s1 = sin_theta / sin_theta_0;
+    const float s0 = cosf(theta) - dot * sin_theta / sin_theta_0;
+    const float s1 = sin_theta / sin_theta_0;
 
-    auto result = Quaternion(
+    const auto result = Quaternion(
         (a.x * s0) + (end.x * s1),
         (a.y * s0) + (end.y * s1),
         (a.z * s0) + (end.z * s1),
@@ -61,7 +57,6 @@ T Lerp(float time, const std::vector<std::pair<float, T>> &keys, size_t &last_in
 {
     size_t i = last_index;
 
-    // time が進んでいれば次に進める
     while (i + 1 < keys.size() && keys[i + 1].first < time)
         ++i;
 
@@ -75,30 +70,6 @@ T Lerp(float time, const std::vector<std::pair<float, T>> &keys, size_t &last_in
 
     float factor = (time - t1) / (t2 - t1);
     return v1 + factor * (v2 - v1);
-}
-
-Quaternion BlendRotations(const std::vector<std::pair<Quaternion, float>> &rotations)
-{
-    Quaternion result = Quaternion::Identity;
-    float totalWeight = 0.0f;
-
-    for (auto &[q, w] : rotations)
-    {
-        if (w <= 0)
-            continue;
-        if (totalWeight == 0.0f)
-        {
-            result = q;
-            totalWeight = w;
-        }
-        else
-        {
-            float t = w / (totalWeight + w);
-            result = Slerp(result, q, t);
-            totalWeight += w;
-        }
-    }
-    return result;
 }
 }
 
@@ -160,18 +131,17 @@ bool AnimationComponent::Play()
     if (clip == nullptr)
         return false;
 
-    for (auto &state : m_states_ | std::ranges::views::values)
+    m_is_playing_ = true;
+    for (const auto &state : m_states_ | std::ranges::views::values)
     {
         if (state->clip.CastedLock() == clip)
         {
             state->enabled = true;
-            m_is_playing_ = true;
             return true;
         }
     }
 
     AddClip(clip, clip->Name());
-    m_is_playing_ = true;
     return true;
 }
 
@@ -230,7 +200,7 @@ void AnimationComponent::Sample()
         return;
 
     float base_weight = 0.0f;
-    for (auto state : m_states_ | std::views::values)
+    for (const auto &state : m_states_ | std::views::values)
     {
         if (state->enabled)
         {
@@ -253,20 +223,20 @@ void AnimationComponent::Sample()
         Quaternion final_rot = default_rot;
         float total_rot_weight = base_weight;
 
-        for (auto &state : m_states_ | std::views::values)
+        for (const auto &state : m_states_ | std::views::values)
         {
             if (!state->enabled)
                 continue;
 
-            auto clip = state->clip.CastedLock();
-            auto curve = clip->FindCurve(path);
+            const auto clip = state->clip.CastedLock();
+            const auto curve = clip->FindCurve(path);
 
             if (curve == nullptr)
             {
                 final_pos += default_pos * state->weight;
                 final_scale += default_scale * state->weight;
 
-                float t = state->weight / (total_rot_weight + state->weight);
+                const float t = state->weight / (total_rot_weight + state->weight);
                 final_rot = Slerp(final_rot, default_rot, t);
                 total_rot_weight += state->weight;
                 continue;
@@ -276,7 +246,7 @@ void AnimationComponent::Sample()
             final_scale += Lerp(state->time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(state->time, curve->rotation_key, curve->rotation_index);
-            float t = state->weight / (total_rot_weight + state->weight);
+            const float t = state->weight / (total_rot_weight + state->weight);
             final_rot = Slerp(final_rot, rot, t);
             total_rot_weight += state->weight;
         }

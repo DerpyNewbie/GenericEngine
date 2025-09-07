@@ -39,7 +39,6 @@ public:
     [[nodiscard]] size_t ClipCount() const;
 
     void Sample();
-    void Apply();
 
     [[nodiscard]] bool IsPlaying() const;
 };
