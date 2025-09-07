@@ -63,7 +63,7 @@ void Application::StartApp()
 
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
         //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
-        engine::ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
+        engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
     }
 
     engine->MainLoop();
