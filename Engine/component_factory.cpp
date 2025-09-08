@@ -2,6 +2,7 @@
 
 #include "component_factory.h"
 
+#include "Animation/animation_component.h"
 #include "Audio/audio_listener_component.h"
 #include "Audio/audio_source_component.h"
 #include "Components/text_renderer.h"
@@ -42,6 +43,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RigidbodyTesterComponent);
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
+    ADD_COMPONENT(AnimationComponent);
 #undef ADD_COMPONENT
 }
 

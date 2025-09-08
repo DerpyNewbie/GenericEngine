@@ -4,6 +4,7 @@
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
 #include "Importer/audio_clip_importer.h"
+#include "Importer/fbx_importer.h"
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
@@ -37,6 +38,7 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<FontImporter>());
     AssetImporter::Register(std::make_shared<RenderTextureImporter>());
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
+    AssetImporter::Register(std::make_shared<FbxImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 

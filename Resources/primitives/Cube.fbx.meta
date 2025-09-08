@@ -1,5 +1,9 @@
 {
     "guid": "faaabe87-30d6-4ea8-9991-cfc6d0baa8ff",
     "type": ".fbx",
-    "data": []
+    "data": {},
+    "objects": [
+        "ef84b931-1d02-4bb1-bca1-25b049d0dbcd",
+        "de6cdb29-237e-4702-90ff-8ebbeaaa9107"
+    ]
 }
