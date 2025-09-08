@@ -26,12 +26,33 @@ void AnimationState::SetClip(std::shared_ptr<AnimationClip> clip)
 
 void AnimationState::UpdateTime()
 {
-    time += Time::GetDeltaTime() * speed;
+    if (wrap_mode == kWrapMode::kOnce || wrap_mode == kWrapMode::kLoop)
+    {
+        time += Time::GetDeltaTime() * speed;
+    }
+
     if (time > length && wrap_mode == kWrapMode::kLoop)
     {
         time = 0;
         clip.CastedLock()->Initialize();
+        return;
     }
+    if (wrap_mode == kWrapMode::kPingPong)
+    {
+        if (time > length)
+            time += Time::GetDeltaTime();
+        clip.CastedLock()->Initialize();
+    }
+}
+
+float AnimationState::GetTime()
+{
+    if (wrap_mode == kWrapMode::kOnce || wrap_mode == kWrapMode::kLoop)
+        return time;
+    float cycle = fmod(time, length * 2.0f);
+    if (cycle > length)
+        cycle = 2.0f * length - cycle;
+    return cycle;
 }
 
 float AnimationState::NormalizedTime() const

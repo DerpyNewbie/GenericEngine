@@ -25,6 +25,7 @@ struct AnimationState final : Inspectable
     void OnInspectorGui() override;
     void SetClip(std::shared_ptr<AnimationClip> clip);
     void UpdateTime();
+    float GetTime();
     [[nodiscard]] float NormalizedTime() const;
     [[nodiscard]] float NormalizedSpeed() const;
 

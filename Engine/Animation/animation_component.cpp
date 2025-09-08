@@ -77,7 +77,10 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
 {
     auto path = node->GameObject()->Name();
     m_transforms_.emplace(path, node);
-    m_default_poses_.emplace(path, node->LocalMatrix());
+
+    TRS trs;
+    node->LocalMatrix().Decompose(trs.scale, trs.rotation, trs.translate);
+    m_default_poses_.emplace(path, trs);
     for (UINT i = 0; i < node->ChildCount(); ++i)
     {
         auto child = node->GetChild(i);
@@ -175,7 +178,7 @@ void AnimationComponent::Stop()
     {
         m_is_playing_ = false;
         for (auto &[path, transform] : m_transforms_)
-            transform->SetLocalMatrix(m_default_poses_[path]);
+            transform->SetLocalMatrix(m_default_poses_[path].GetMatrix());
     }
 }
 
@@ -203,27 +206,29 @@ void AnimationComponent::Sample()
         return;
 
     float base_weight = 0.0f;
+    bool enabled = false;
     for (const auto &state : m_states_ | std::views::values)
     {
         if (state->enabled)
         {
             state->UpdateTime();
             base_weight += state->weight;
+            enabled = true;
         }
     }
+    if (!enabled)
+        return;
 
     base_weight = 1.0f - base_weight;
 
     for (auto &[path, transform] : m_transforms_)
     {
-        Vector3 default_pos, default_scale;
-        Quaternion default_rot;
-        m_default_poses_[path].Decompose(default_scale, default_rot, default_pos);
+        auto &default_matrix = m_default_poses_[path];
+        TRS final_trs;
+        final_trs.translate = default_matrix.translate * base_weight;
+        final_trs.scale = default_matrix.scale * base_weight;
 
-        Vector3 final_pos = default_pos * base_weight;
-        Vector3 final_scale = default_scale * base_weight;
-
-        Quaternion final_rot = default_rot;
+        final_trs.rotation = default_matrix.rotation;
         float total_rot_weight = base_weight;
 
         for (const auto &state : m_states_ | std::views::values)
@@ -236,29 +241,26 @@ void AnimationComponent::Sample()
 
             if (curve == nullptr)
             {
-                final_pos += default_pos * state->weight;
-                final_scale += default_scale * state->weight;
+                final_trs.translate += default_matrix.translate * state->weight;
+                final_trs.scale += default_matrix.scale * state->weight;
 
                 const float t = state->weight / (total_rot_weight + state->weight);
-                final_rot = Slerp(final_rot, default_rot, t);
+                final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
                 total_rot_weight += state->weight;
                 continue;
             }
 
-            final_pos += Lerp(state->time, curve->position_key, curve->position_index) * state->weight;
-            final_scale += Lerp(state->time, curve->scale_key, curve->scale_index) * state->weight;
+            auto time = state->GetTime();
+            final_trs.translate += Lerp(time, curve->position_key, curve->position_index) * state->weight;
+            final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
-            Quaternion rot = Lerp(state->time, curve->rotation_key, curve->rotation_index);
+            Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
             const float t = state->weight / (total_rot_weight + state->weight);
-            final_rot = Slerp(final_rot, rot, t);
+            final_trs.rotation = Slerp(final_trs.rotation, rot, t);
             total_rot_weight += state->weight;
         }
 
-        auto final_matrix = Matrix::CreateScale(final_scale) *
-                            Matrix::CreateFromQuaternion(final_rot) *
-                            Matrix::CreateTranslation(final_pos);
-
-        transform->SetLocalMatrix(final_matrix);
+        transform->SetLocalMatrix(final_trs.GetMatrix());
     }
 }
 

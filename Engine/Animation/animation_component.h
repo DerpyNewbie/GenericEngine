@@ -7,6 +7,20 @@
 
 namespace engine
 {
+struct TRS
+{
+    Vector3 translate;
+    Vector3 scale;
+    Quaternion rotation;
+
+    Matrix GetMatrix()
+    {
+        return Matrix::CreateScale(scale) *
+               Matrix::CreateFromQuaternion(rotation) *
+               Matrix::CreateTranslation(translate);
+    }
+};
+
 class AnimationComponent : public Component
 {
     /// <summary>
@@ -21,7 +35,7 @@ class AnimationComponent : public Component
     bool m_is_playing_ = false;
 
     std::unordered_map<std::string, std::shared_ptr<Transform>> m_transforms_;
-    std::unordered_map<std::string, Matrix> m_default_poses_;
+    std::unordered_map<std::string, TRS> m_default_poses_;
     std::unordered_map<std::string, std::shared_ptr<AnimationState>> m_states_;
 
     void AddTransform(const std::shared_ptr<Transform> &node);
