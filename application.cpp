@@ -17,7 +17,7 @@ namespace engine
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     Input::ProcessMessage(msg, wparam, lparam);
-    
+
     for (const auto callback : std::views::values(Instance()->m_callbacks_))
     {
         return callback(hwnd, msg, wparam, lparam);
@@ -38,7 +38,6 @@ void Application::StartApp()
     InitWindow();
     engine->Init();
     editor->Init();
-    editor->Attach();
 
     {
         // Sample scene creation

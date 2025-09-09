@@ -6,6 +6,7 @@
 #include "gui.h"
 #include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -20,7 +21,7 @@ void Camera::Render()
 
     m_current_camera_ = shared_from_base<Camera>();
 
-    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
+    const auto objects_in_view = FilterVisibleObjects(RenderPipeline::m_renderers_);
     for (const auto object : objects_in_view)
         object->OnDraw();
 
@@ -93,6 +94,14 @@ int Camera::Order()
     return Main() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
 }
 
+void Camera::BeginRender()
+{
+    if (const auto render_tex = m_render_texture_.CastedLock())
+    {
+        render_tex->BeginRender(m_property_.background_color);
+    }
+}
+
 void Camera::OnAwake()
 {
     if (m_main_camera_.lock() == nullptr)
@@ -119,11 +128,6 @@ void Camera::OnInspectorGui()
 
 void Camera::OnDraw()
 {
-    if (auto render_tex = m_render_texture_.CastedLock())
-    {
-        render_tex->BeginRender(m_property_.background_color);
-        Render();
-    }
     if (Main() == shared_from_base<Camera>())
     {
         RenderEngine::Instance()->SetMainRenderTarget(m_property_.background_color);
@@ -133,12 +137,12 @@ void Camera::OnDraw()
 
 void Camera::OnEnabled()
 {
-    UpdateManager::SubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::SubScribeCamera(shared_from_base<Camera>());
 }
 
 void Camera::OnDisabled()
 {
-    UpdateManager::UnsubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::UnSubScribeCamera(shared_from_base<Camera>());
 }
 
 std::shared_ptr<Camera> Camera::Main()

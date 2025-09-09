@@ -144,11 +144,6 @@ void Editor::Init()
     }
 }
 
-void Editor::Attach()
-{
-    UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
-}
-
 void Editor::OnDraw()
 {
     {

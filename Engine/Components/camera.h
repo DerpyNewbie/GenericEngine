@@ -9,6 +9,7 @@
 
 namespace engine
 {
+class RenderPipeline;
 enum class kViewMode : unsigned char
 {
     kPerspective,
@@ -47,6 +48,7 @@ struct CameraProperty : Inspectable
 
 class Camera : public Component, public IDrawCallReceiver
 {
+    friend RenderPipeline;
     static std::weak_ptr<Camera> m_main_camera_;
     static std::weak_ptr<Camera> m_current_camera_;
 
@@ -68,6 +70,7 @@ public:
     void OnConstructed() override;
     void OnInspectorGui() override;
     int Order() override;
+    void BeginRender();
     void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;

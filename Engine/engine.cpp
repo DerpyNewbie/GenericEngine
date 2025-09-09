@@ -21,6 +21,7 @@
 #include "input.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
+#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
@@ -79,7 +80,7 @@ void Engine::MainLoop() const
 
         Profiler::Begin("Draw Call");
         RenderEngine::Instance()->BeginRender();
-        UpdateManager::InvokeDrawCall();
+        RenderPipeline::InvokeDrawCall();
         RenderEngine::Instance()->EndRender();
         Profiler::End("Draw Call");
 
