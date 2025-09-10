@@ -5,13 +5,18 @@ namespace engine
 {
 class Transform : public Component
 {
+    Vector3 m_local_position_ = {};
+    Quaternion m_local_rotation_ = Quaternion::Identity;
+    Vector3 m_local_scale_ = {1, 1, 1};
+
     Matrix m_local_matrix_ = Matrix::Identity;
     Matrix m_world_matrix_ = Matrix::Identity;
     std::weak_ptr<Transform> m_parent_ = {};
     std::vector<std::shared_ptr<Transform>> m_children_;
 
     void TransformGui(bool is_local);
-    void RecalculateWorldMatrix();
+    static Matrix TRS(Vector3 translation, Quaternion rotation, Vector3 scale);
+    void RecalculateMatrices();
 
 public:
     void OnDestroy() override;
@@ -19,6 +24,7 @@ public:
 
     [[nodiscard]] Matrix LocalMatrix() const;
     [[nodiscard]] Matrix WorldMatrix() const;
+    [[nodiscard]] Matrix ParentMatrix() const;
     [[nodiscard]] Matrix LocalToWorld() const;
     [[nodiscard]] Matrix WorldToLocal() const;
 
@@ -52,7 +58,6 @@ public:
     void SetLocalScale(const Vector3 &local_scale);
 
     void SetLocalMatrix(const Matrix &matrix);
-    void SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position);
 
     [[nodiscard]] Vector3 Forward() const
     {
@@ -88,9 +93,13 @@ public:
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_local_matrix_),
+           CEREAL_NVP(m_local_position_),
+           CEREAL_NVP(m_local_rotation_),
+           CEREAL_NVP(m_local_scale_),
            CEREAL_NVP(m_parent_),
            CEREAL_NVP(m_children_));
+
+        RecalculateMatrices();
     }
 };
 }
