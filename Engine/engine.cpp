@@ -80,7 +80,7 @@ void Engine::MainLoop() const
 
         Profiler::Begin("Draw Call");
         RenderEngine::Instance()->BeginRender();
-        RenderPipeline::InvokeDrawCall();
+        RenderPipeline::Instance()->InvokeDrawCall();
         RenderEngine::Instance()->EndRender();
         Profiler::End("Draw Call");
 

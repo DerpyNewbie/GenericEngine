@@ -2,57 +2,79 @@
 #include "Components/camera.h"
 #include "Components/renderer.h"
 #include "render_pipeline.h"
-#include "Editor/editor.h"
+#include "gizmos.h"
 
 
 namespace engine
 {
-std::unordered_set<std::shared_ptr<Camera>> RenderPipeline::m_cameras_;
-std::vector<std::weak_ptr<Renderer>> RenderPipeline::m_renderers_;
-
 void RenderPipeline::InvokeDrawCall()
 {
     for (const auto camera : m_cameras_)
     {
         if (auto render_texture = camera->m_render_texture_.CastedLock())
         {
-            camera->BeginRender();
-            camera->Render();
+            render_texture->BeginRender(camera->m_property_.background_color);
+            Render(camera);
         }
     }
     const auto main_camera = Camera::Main();
     RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-    main_camera->Render();
-    editor::Editor::Instance()->OnDraw();
+    Render(main_camera);
+    for (auto draw_call : m_draw_calls_)
+        draw_call();
+}
+
+void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
+{
+    camera->SetViewProjMatrix();
+
+    Camera::SetCurrentCamera(camera);
+
+    const auto objects_in_view = camera->FilterVisibleObjects(m_renderers_);
+    for (const auto object : objects_in_view)
+        object->OnDraw();
+    Gizmos::Render();
+}
+
+RenderPipeline *RenderPipeline::Instance()
+{
+    static auto instance = new RenderPipeline;
+    return instance;
 }
 
 size_t RenderPipeline::GetRendererCount()
 {
-    return m_renderers_.size();
+    return Instance()->m_renderers_.size();
 }
 
-void RenderPipeline::SubscribeRenderer(std::shared_ptr<Renderer> renderer)
+void RenderPipeline::AddDrawCall(std::function<void()> draw_call)
 {
-    m_renderers_.emplace_back(renderer);
+    Instance()->m_draw_calls_.emplace_back(draw_call);
 }
 
-void RenderPipeline::UnSubscribeRenderer(const std::shared_ptr<Renderer> &renderer)
+void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 {
-    const auto pos = std::ranges::find_if(m_renderers_, [&](const auto &r) {
+    Instance()->m_renderers_.emplace_back(renderer);
+}
+
+void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
+{
+    auto &renderers = Instance()->m_renderers_;
+    const auto pos = std::ranges::find_if(renderers, [&](const auto &r) {
         return r.lock() == renderer;
     });
-    if (pos == m_renderers_.end())
+    if (pos == renderers.end())
         return;
-    m_renderers_.erase(pos);
+    renderers.erase(pos);
 }
 
-void RenderPipeline::SubScribeCamera(std::shared_ptr<Camera> camera)
+void RenderPipeline::AddCamera(std::shared_ptr<Camera> camera)
 {
-    m_cameras_.emplace(camera);
+    Instance()->m_cameras_.emplace(camera);
 }
 
-void RenderPipeline::UnSubScribeCamera(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::RemoveCamera(const std::shared_ptr<Camera> &camera)
 {
-    m_cameras_.erase(camera);
+    Instance()->m_cameras_.erase(camera);
 }
 }

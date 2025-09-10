@@ -46,7 +46,7 @@ struct CameraProperty : Inspectable
     }
 };
 
-class Camera : public Component, public IDrawCallReceiver
+class Camera final : public Component
 {
     friend RenderPipeline;
     static std::weak_ptr<Camera> m_main_camera_;
@@ -55,23 +55,16 @@ class Camera : public Component, public IDrawCallReceiver
     CameraProperty m_property_;
     AssetPtr<RenderTexture> m_render_texture_;
 
-    size_t m_drawcall_count_ = 0;
-
-    void Render();
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
 
     void SetViewProjMatrix() const;
-
-    [[nodiscard]] std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
+    static void SetMainCamera(const std::shared_ptr<Camera> &camera);
+    static void SetCurrentCamera(const std::shared_ptr<Camera> &camera);
 
 public:
     void OnAwake() override;
     void OnConstructed() override;
     void OnInspectorGui() override;
-    int Order() override;
-    void BeginRender();
-    void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
@@ -80,6 +73,9 @@ public:
 
     [[nodiscard]] Matrix GetViewMatrix() const;
     [[nodiscard]] Matrix GetProjectionMatrix() const;
+
+    [[nodiscard]] std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
+        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
 
     template <class Archive>
     void serialize(Archive &ar)

@@ -17,11 +17,11 @@ void Renderer::SetVisible(const bool visible)
 
     if (m_is_visible_)
     {
-        RenderPipeline::SubscribeRenderer(shared_from_base<Renderer>());
+        RenderPipeline::AddRenderer(shared_from_base<Renderer>());
     }
     else
     {
-        RenderPipeline::UnSubscribeRenderer(shared_from_base<Renderer>());
+        RenderPipeline::RemoveRenderer(shared_from_base<Renderer>());
     }
 }
 

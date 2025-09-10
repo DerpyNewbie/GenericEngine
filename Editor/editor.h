@@ -9,7 +9,7 @@ namespace editor
 class EditorMenu;
 class EditorWindow;
 
-class Editor final : public enable_shared_from_base<Editor>, public IDrawCallReceiver
+class Editor final : public enable_shared_from_base<Editor>
 {
     struct PrioritizedEditorMenu
     {
@@ -49,16 +49,9 @@ class Editor final : public enable_shared_from_base<Editor>, public IDrawCallRec
 public:
     static Editor *Instance();
 
-    int Order() override
-    {
-        // Editor will get called very last to prevent issues on drawing
-        return INT_MAX;
-    }
-
-    void OnDraw() override;
+    void OnDraw();
 
     void Init();
-    void Attach();
     void Finalize();
 
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);

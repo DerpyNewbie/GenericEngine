@@ -24,6 +24,7 @@
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
 #include "Physics/physics.h"
+#include "Rendering/render_pipeline.h"
 
 #include <ranges>
 
@@ -73,6 +74,8 @@ void Editor::Init()
     m_instance_ = this;
 
     {
+        const std::function<void()> draw_call = std::bind(&Editor::OnDraw, this);
+        RenderPipeline::AddDrawCall(draw_call);
         Application::Instance()->AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();

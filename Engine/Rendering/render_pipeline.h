@@ -8,17 +8,21 @@ class RenderPipeline
 {
     friend Engine;
     friend Camera;
-    static std::unordered_set<std::shared_ptr<Camera>> m_cameras_;
-    static std::vector<std::weak_ptr<Renderer>> m_renderers_;
+    std::unordered_set<std::shared_ptr<Camera>> m_cameras_;
+    std::vector<std::weak_ptr<Renderer>> m_renderers_;
+    std::list<std::function<void()>> m_draw_calls_;
 
-    static void InvokeDrawCall();
+    void InvokeDrawCall();
+    void Render(const std::shared_ptr<Camera> &camera);
 
 public:
+    static RenderPipeline *Instance();
     static size_t GetRendererCount();
 
-    static void SubScribeCamera(std::shared_ptr<Camera> camera);
-    static void UnSubScribeCamera(const std::shared_ptr<Camera> &camera);
-    static void SubscribeRenderer(std::shared_ptr<Renderer> renderer);
-    static void UnSubscribeRenderer(const std::shared_ptr<Renderer> &renderer);
+    static void AddDrawCall(std::function<void()> draw_call);
+    static void AddCamera(std::shared_ptr<Camera> camera);
+    static void RemoveCamera(const std::shared_ptr<Camera> &camera);
+    static void AddRenderer(std::shared_ptr<Renderer> renderer);
+    static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
 };
 }

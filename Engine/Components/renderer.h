@@ -6,7 +6,7 @@ namespace engine
 {
 class Renderer : public Component
 {
-    friend class Camera;
+    friend class RenderPipeline;
 
 protected:
     bool m_is_visible_ = false;
