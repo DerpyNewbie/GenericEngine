@@ -8,71 +8,99 @@ using namespace DirectX;
 
 namespace engine
 {
+constexpr std::array<std::string_view, 7> kWicFormats = {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp"};
+
+Texture2DImporter::kImageFormat Texture2DImporter::GetImageFormat(const path &file_path)
+{
+    auto ext = file_path.extension().string();
+    std::ranges::transform(ext, ext.begin(), tolower);
+    if (std::ranges::find(kWicFormats, ext) != kWicFormats.end())
+    {
+        return kImageFormat::kWic;
+    }
+
+    if (ext == ".tga")
+    {
+        return kImageFormat::kTga;
+    }
+
+    return kImageFormat::kUnknown;
+}
+
 IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
-    auto texture_2d = Object::Instantiate<Texture2D>();
+    const auto texture_2d = Object::Instantiate<Texture2D>();
+    constexpr auto width = 4;
+    constexpr auto height = 4;
+    constexpr auto pixel_count = width * height;
 
-    texture_2d->width = 4;
-    texture_2d->height = 4;
+    texture_2d->width = width;
+    texture_2d->height = height;
     texture_2d->format = DXGI_FORMAT_R8G8B8A8_UNORM;
     texture_2d->mip_level = 1;
+    texture_2d->tex_data.reserve(pixel_count);
 
-    size_t pixelCount = 4 * 4;
-    texture_2d->tex_data.reserve(pixelCount);
-    for (UINT i = 0; i < pixelCount; ++i)
+    for (auto i = 0; i < pixel_count; ++i)
     {
         texture_2d->tex_data.emplace_back(color);
     }
-    auto asset_ptr = IAssetPtr::FromManaged(texture_2d);
 
+    auto asset_ptr = IAssetPtr::FromManaged(texture_2d);
     return asset_ptr;
 }
 
 std::vector<std::string> Texture2DImporter::SupportedExtensions()
 {
-    return {".png", ".tga"};
+    return {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp", ".tga"};
 }
 
-std::shared_ptr<Object> Texture2DImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
+void Texture2DImporter::OnImport(AssetDescriptor *ctx)
 {
-    auto texture_2d = Object::Instantiate<Texture2D>(asset->guid);
-
-    const auto path = asset->path_hint;
+    const auto path = ctx->AssetPath();
+    const auto format = GetImageFormat(path);
     TexMetadata meta = {};
     ScratchImage scratch = {};
-    auto ext = path.extension();
+    HRESULT hr;
 
-    HRESULT hr = S_FALSE;
-    if (ext == L".png") // use WICFile when png
+    switch (format)
     {
+    case kImageFormat::kWic: {
         hr = LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &meta, scratch);
+        break;
     }
-    else if (ext == L".tga") // use TGAFile when tga
-    {
+    case kImageFormat::kTga: {
         hr = LoadFromTGAFile(path.c_str(), &meta, scratch);
+        break;
+    }
+    default: {
+        ctx->LogImportError("Unsupported image format");
+        return;
+    }
     }
 
     if (FAILED(hr))
     {
-        Logger::Error<Texture2DImporter>("Failed load texture");
-        return nullptr;
+        ctx->LogImportError("Failed load texture");
+        return;
     }
 
-    texture_2d->width = meta.width;
-    texture_2d->height = meta.height;
-    texture_2d->format = meta.format;
-    texture_2d->mip_level = meta.mipLevels;
-
-    auto img = scratch.GetImage(0, 0, 0);
+    const auto img = scratch.GetImage(0, 0, 0);
     const uint8_t *src = img->pixels;
-    size_t pixelCount = img->width * img->height;
-    texture_2d->tex_data.reserve(pixelCount);
-    for (UINT i = 0; i < pixelCount; ++i)
+    const size_t pixel_count = img->width * img->height;
+    const auto texture_2d = Object::Instantiate<Texture2D>();
+
+    texture_2d->width = static_cast<UINT>(meta.width);
+    texture_2d->height = static_cast<UINT>(meta.height);
+    texture_2d->format = meta.format;
+    texture_2d->mip_level = static_cast<UINT16>(meta.mipLevels);
+    texture_2d->tex_data.reserve(pixel_count);
+
+    for (UINT i = 0; i < pixel_count; ++i)
     {
-        uint8_t r = src[i * 4 + 0];
-        uint8_t g = src[i * 4 + 1];
-        uint8_t b = src[i * 4 + 2];
-        uint8_t a = src[i * 4 + 3];
+        const uint8_t r = src[i * 4 + 0];
+        const uint8_t g = src[i * 4 + 1];
+        const uint8_t b = src[i * 4 + 2];
+        const uint8_t a = src[i * 4 + 3];
 
         PackedVector::XMCOLOR color;
         color.b = r;
@@ -83,6 +111,6 @@ std::shared_ptr<Object> Texture2DImporter::Import(std::istream &input_stream, As
         texture_2d->tex_data.emplace_back(color);
     }
 
-    return texture_2d;
+    ctx->SetMainObject(texture_2d);
 }
 }

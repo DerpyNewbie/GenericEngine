@@ -5,7 +5,7 @@ namespace engine
 {
 class Controller : public Component
 {
-    float m_movement_speed_ = 100.0f;
+    float m_movement_speed_ = 1.0f;
     float m_rotation_speed_ = 2.0f;
 
     Vector3 m_rotation_ = {};

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
+#include "Components/camera.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -46,14 +47,16 @@ void TextRenderer::OnDraw()
     }
     auto sprite_batch = FontData::SpriteBatch();
     auto sprite_font = font_data.CastedLock()->SpriteFont();
-    sprite_batch->Begin(g_RenderEngine->CommandList());
+    sprite_batch->Begin(RenderEngine::CommandList());
     sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
     sprite_batch->End();
-    g_RenderEngine->CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+    RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
 }
 
 std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return Camera::Current()->GameObject()->Transform();
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::TextRenderer)

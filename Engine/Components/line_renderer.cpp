@@ -21,7 +21,7 @@ void LineRenderer::SetVertices(std::vector<Vertex> vertices)
 
 void LineRenderer::SetIndices(std::vector<uint32_t> indices)
 {
-    m_num_indices_ = indices.size();
+    m_num_indices_ = static_cast<unsigned int>(indices.size());
     if (m_index_buffer_)
     {
         m_index_buffer_ = nullptr;
@@ -44,13 +44,13 @@ void LineRenderer::OnDraw()
     const Matrix view = camera->GetViewMatrix();
     const Matrix proj = camera->GetProjectionMatrix();
 
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto &view_projection_buffer = m_view_projection_buffers_[current_buffer_idx];
     const auto view_projection = view_projection_buffer->GetPtr<Matrix>();
     view_projection[0] = view;
     view_projection[1] = proj;
 
-    const auto cmd_list = g_RenderEngine->CommandList();
+    const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetPipelineState(PSOManager::Get("Line"));
     cmd_list->SetGraphicsRootConstantBufferView(0, view_projection_buffer->GetAddress());
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINESTRIP);

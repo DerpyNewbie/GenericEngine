@@ -166,12 +166,12 @@ void Physics::ProcessCollisions()
             auto rb_1 = static_cast<RigidbodyComponent *>(body_1->getUserPointer());
             auto contact_pair = std::minmax(rb_0, rb_1);
             auto normal = CalculateNormalFromManifold(manifold);
-            auto first_is_zero = contact_pair.first == rb_0;
+            const auto first_is_zero = contact_pair.first == rb_0;
             auto collision_pair = std::make_pair(
-                Collision{first_is_zero ? rb_0->GameObject().get() : rb_1->GameObject().get(),
-                          first_is_zero ? normal * -1 : normal},
                 Collision{first_is_zero ? rb_1->GameObject().get() : rb_0->GameObject().get(),
-                          first_is_zero ? normal : normal * -1});
+                          first_is_zero ? normal : normal * -1},
+                Collision{first_is_zero ? rb_0->GameObject().get() : rb_1->GameObject().get(),
+                          first_is_zero ? normal * -1 : normal});
 
             m_current_contacts_.emplace(contact_pair, collision_pair);
 

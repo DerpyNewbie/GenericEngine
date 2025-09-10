@@ -205,12 +205,12 @@ void Mesh::Append(Mesh other)
     max_bones_in_vertex = max(max_bones_in_vertex, other.max_bones_in_vertex);
 }
 
-std::vector<Vector2> *Mesh::GetUV(const int index)
+std::vector<Vector2> *Mesh::GetUV(const size_t index)
 {
     return &uvs[index];
 }
 
-bool Mesh::HasUV(const int index) const
+bool Mesh::HasUV(const size_t index) const
 {
     return !uvs[index].empty();
 }

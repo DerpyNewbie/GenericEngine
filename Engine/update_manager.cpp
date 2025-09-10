@@ -7,12 +7,10 @@ namespace engine
 
 std::vector<std::weak_ptr<IUpdateReceiver>> UpdateManager::m_update_receivers_;
 std::vector<std::weak_ptr<IFixedUpdateReceiver>> UpdateManager::m_fixed_update_receivers_;
-std::vector<std::weak_ptr<IDrawCallReceiver>> UpdateManager::m_draw_call_receivers_;
 std::queue<std::function<void()>> UpdateManager::m_in_cycle_buffer_;
 
 bool UpdateManager::m_in_update_cycle_ = false;
 bool UpdateManager::m_in_fixed_update_cycle_ = false;
-bool UpdateManager::m_in_draw_call_cycle_ = false;
 
 namespace
 {
@@ -65,6 +63,7 @@ void UpdateManager::InvokeUpdate()
     m_in_update_cycle_ = false;
     PostFix();
 }
+
 void UpdateManager::InvokeFixedUpdate()
 {
     m_in_fixed_update_cycle_ = true;
@@ -74,15 +73,7 @@ void UpdateManager::InvokeFixedUpdate()
     m_in_fixed_update_cycle_ = false;
     PostFix();
 }
-void UpdateManager::InvokeDrawCall()
-{
-    m_in_draw_call_cycle_ = true;
-    Update(m_draw_call_receivers_, [&](const auto &receiver) {
-        receiver->OnDraw();
-    });
-    m_in_draw_call_cycle_ = false;
-    PostFix();
-}
+
 void UpdateManager::PostFix()
 {
     while (!m_in_cycle_buffer_.empty())
@@ -92,6 +83,7 @@ void UpdateManager::PostFix()
         m_in_cycle_buffer_.pop();
     }
 }
+
 void UpdateManager::SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver)
 {
     if (InUpdateCycle())
@@ -104,6 +96,7 @@ void UpdateManager::SubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &rece
 
     Subscribe(m_update_receivers_, receiver);
 }
+
 void UpdateManager::UnsubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &receiver)
 {
     if (InUpdateCycle())
@@ -116,6 +109,7 @@ void UpdateManager::UnsubscribeUpdate(const std::shared_ptr<IUpdateReceiver> &re
 
     Erase(m_update_receivers_, receiver);
 }
+
 void UpdateManager::SubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver)
 {
     if (InFixedUpdateCycle())
@@ -128,6 +122,7 @@ void UpdateManager::SubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateRecei
 
     Subscribe(m_fixed_update_receivers_, receiver);
 }
+
 void UpdateManager::UnsubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateReceiver> &receiver)
 {
     if (InFixedUpdateCycle())
@@ -140,30 +135,7 @@ void UpdateManager::UnsubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateRec
 
     Erase(m_fixed_update_receivers_, receiver);
 }
-void UpdateManager::SubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &receiver)
-{
-    if (InDrawCallCycle())
-    {
-        m_in_cycle_buffer_.emplace([receiver] {
-            SubscribeDrawCall(receiver);
-        });
-        return;
-    }
 
-    Subscribe(m_draw_call_receivers_, receiver);
-}
-void UpdateManager::UnsubscribeDrawCall(const std::shared_ptr<IDrawCallReceiver> &receiver)
-{
-    if (InDrawCallCycle())
-    {
-        m_in_cycle_buffer_.emplace([receiver] {
-            UnsubscribeDrawCall(receiver);
-        });
-        return;
-    }
-
-    Erase(m_draw_call_receivers_, receiver);
-}
 bool UpdateManager::InUpdateCycle()
 {
     return m_in_update_cycle_;
@@ -171,9 +143,5 @@ bool UpdateManager::InUpdateCycle()
 bool UpdateManager::InFixedUpdateCycle()
 {
     return m_in_fixed_update_cycle_;
-}
-bool UpdateManager::InDrawCallCycle()
-{
-    return m_in_draw_call_cycle_;
 }
 }

@@ -11,6 +11,10 @@ using namespace DirectX;
 
 void Texture2D::OnInspectorGui()
 {
+    ImGui::Text("Texture2D");
+    ImGui::Text("Width: %d", width);
+    ImGui::Text("Height: %d", height);
+    ImGui::Text("Mip Level: %d", mip_level);
 }
 
 void Texture2D::CreateBuffer()
@@ -23,7 +27,7 @@ void Texture2D::CreateBuffer()
 
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -36,6 +40,8 @@ void Texture2D::CreateBuffer()
     {
         return;
     }
+
+    m_pResource->SetName(L"Texture");
 
     D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
     hr = m_pResource->WriteToSubresource(0,

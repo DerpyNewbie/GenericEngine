@@ -20,8 +20,11 @@
 #include "update_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
+#include "Components/camera.h"
 #include "Rendering/material.h"
+#include "Rendering/render_texture.h"
 #include "Physics/physics.h"
+#include "Rendering/render_pipeline.h"
 
 #include <ranges>
 
@@ -71,7 +74,9 @@ void Editor::Init()
     m_instance_ = this;
 
     {
-        Application::AddWindowCallback(WndProc);
+        const std::function<void()> draw_call = std::bind(&Editor::OnDraw, this);
+        RenderPipeline::AddDrawCall(draw_call);
+        Application::Instance()->AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -96,10 +101,10 @@ void Editor::Init()
         D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
 
-        ImGui_ImplWin32_Init(Application::GetWindowHandle());
+        ImGui_ImplWin32_Init(Application::Instance()->GetWindowHandle());
         ImGui_ImplDX12_Init(
-            g_RenderEngine->Device(),
-            RenderEngine::FRAME_BUFFER_COUNT,
+            RenderEngine::Device(),
+            RenderEngine::kFrame_Buffer_Count,
             DXGI_FORMAT_R8G8B8A8_UNORM,
             DescriptorHeap::GetHeap(),
             font_cpu_desc_handle,
@@ -136,12 +141,10 @@ void Editor::Init()
         AddCreateMenu("Material", ".material", [] {
             return Object::Instantiate<Material>("New Material");
         });
+        AddCreateMenu("Render Texture", ".rendertexture", [] {
+            return Object::Instantiate<RenderTexture>("New RenderTexture");
+        });
     }
-}
-
-void Editor::Attach()
-{
-    UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
 }
 
 void Editor::OnDraw()
@@ -161,7 +164,10 @@ void Editor::OnDraw()
     if (EditorPrefs::theme != m_last_editor_style_)
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
-        EditorGizmos::DrawYPlaneGrid();
+    {
+        if (const auto camera = Camera::Main())
+            EditorGizmos::DrawYPlaneGrid(camera->GameObject()->Transform()->WorldMatrix());
+    }
     if (EditorPrefs::show_physics_debug)
         Physics::DebugDraw();
 
@@ -180,7 +186,7 @@ void Editor::OnDraw()
     {
         ImGui::Render();
         auto draw_data = ImGui::GetDrawData();
-        auto cmd_list = g_RenderEngine->CommandList();
+        auto cmd_list = RenderEngine::CommandList();
         ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {

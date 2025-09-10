@@ -85,7 +85,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         meshes.emplace_back(Mesh::CreateFromAiMesh(current_mesh));
         materials.emplace_back(AssetPtr<Material>::FromManaged(Object::Instantiate<Material>()));
 
-        //create bone info
+        // create bone info
         auto bone_names = AssimpUtil::CreateBoneNamesList(current_mesh);
         meshes[i]->bind_poses = AssimpUtil::GetBindPoses(bone_names, current_mesh);
 
@@ -100,7 +100,7 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
         }
         if (current_mesh->mNumBones)
         {
-            //適当なボーンからルートボーンをたどっていく
+            // trace root bone from a random bone
             auto root_node = AssimpUtil::GetRootBone(bone_names, current_mesh->mBones[0]);
             root_bone = node_map[reinterpret_cast<std::uintptr_t>(root_node)]->Transform();
         }
@@ -151,6 +151,7 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
         aiProcess_OptimizeMeshes |
         aiProcess_PopulateArmatureData |
         aiProcess_JoinIdenticalVertices;
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
 
     const auto scene = importer.ReadFile(file_path, import_settings);
     if (!scene)

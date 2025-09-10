@@ -3,14 +3,12 @@
 
 #include "Asset/Importer/asset_importer.h"
 #include "Asset/Importer/txt_importer.h"
-#include "Exporter/asset_exporter.h"
-#include "Exporter/material_exporter.h"
-#include "Exporter/shader_exporter.h"
-#include "Exporter/txt_exporter.h"
 #include "Importer/audio_clip_importer.h"
+#include "Importer/fbx_importer.h"
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
+#include "Importer/render_texture_importer.h"
 #include "Importer/texture_2d_importer.h"
 
 namespace engine
@@ -34,14 +32,13 @@ static std::vector<std::string> GetSplitPath(path path)
 void AssetDatabase::Init()
 {
     AssetImporter::Register(std::make_shared<TxtImporter>());
-    AssetExporter::Register(std::make_shared<TxtExporter>());
     AssetImporter::Register(std::make_shared<ShaderImporter>());
-    AssetExporter::Register(std::make_shared<ShaderExporter>());
     AssetImporter::Register(std::make_shared<MaterialImporter>());
-    AssetExporter::Register(std::make_shared<MaterialExporter>());
     AssetImporter::Register(std::make_shared<Texture2DImporter>());
     AssetImporter::Register(std::make_shared<FontImporter>());
+    AssetImporter::Register(std::make_shared<RenderTextureImporter>());
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
+    AssetImporter::Register(std::make_shared<FbxImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 
@@ -87,13 +84,19 @@ void AssetDatabase::Import(const path &path)
                 auto next = Object::Instantiate<AssetHierarchy>(node);
                 if (depth < split_rel_path.size())
                     next->m_is_directory_ = true;
-                next->asset = AssetDescriptor::Read(current_node_path);
+                next->asset = std::make_shared<AssetDescriptor>(current_node_path);
                 next->parent = current_node;
                 current_node->children.emplace_back(next);
                 current_node = next;
 
-                m_assets_by_guid_map_[next->asset->guid] = next->asset;
-                m_assets_map_by_type_[next->asset->type_hint].emplace_back(next->asset);
+                next->asset->Import();
+
+                m_assets_by_guid_map_[next->asset->m_guid_] = next->asset;
+                m_assets_map_by_type_[next->asset->m_type_].emplace_back(next->asset);
+
+                for (auto guid : next->asset->SubGuids())
+                    m_assets_by_guid_map_[guid] = next->asset;
+
                 continue;
             }
 
@@ -111,8 +114,8 @@ void AssetDatabase::Import(const path &path)
 
 void AssetDatabase::ImportInternal(const std::shared_ptr<AssetDescriptor> &descriptor)
 {
-    descriptor->path_hint = AssetDescriptor::kInternalAssetPath;
-    m_assets_by_guid_map_[descriptor->guid] = descriptor;
+    descriptor->m_asset_path_ = AssetDescriptor::kInternalAssetPath;
+    m_assets_by_guid_map_[descriptor->m_guid_] = descriptor;
 }
 
 void AssetDatabase::ImportAll()
@@ -165,7 +168,7 @@ std::shared_ptr<AssetHierarchy> AssetDatabase::GetAssetHierarchy(const path &pat
     return current_node;
 }
 
-void AssetDatabase::ReloadAsset(const xg::Guid &guid)
+void AssetDatabase::Reimport(const xg::Guid &guid)
 {
     const auto asset_desc_it = m_assets_by_guid_map_.find(guid);
     if (asset_desc_it == m_assets_by_guid_map_.end())
@@ -174,7 +177,7 @@ void AssetDatabase::ReloadAsset(const xg::Guid &guid)
         return;
     }
 
-    asset_desc_it->second->Reload();
+    asset_desc_it->second->Import();
 }
 
 std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const xg::Guid &guid)
@@ -186,8 +189,8 @@ std::shared_ptr<AssetDescriptor> AssetDatabase::GetAssetDescriptor(const xg::Gui
 
 IAssetPtr AssetDatabase::GetAsset(const path &path)
 {
-    const auto peek = AssetDescriptor::Read(path);
-    const auto guid = peek->guid;
+    const auto peek = AssetDescriptor(path);
+    const auto guid = peek.m_guid_;
     auto asset_desc_it = m_assets_by_guid_map_.find(guid);
     if (asset_desc_it == m_assets_by_guid_map_.end())
     {
@@ -241,28 +244,19 @@ void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
 {
     if (asset_descriptor->IsInternalAsset())
     {
-        Logger::Warn<AssetDatabase>("Cannot write internal asset '%s'", asset_descriptor->guid.str().c_str());
+        Logger::Warn<AssetDatabase>("Cannot write internal asset '%s'", asset_descriptor->m_guid_.str().c_str());
         return;
     }
 
-    const auto exporter = AssetExporter::Get(asset_descriptor->type_hint);
-    if (exporter == nullptr)
+    const auto importer = AssetImporter::Get(asset_descriptor->m_type_);
+    if (importer == nullptr)
     {
-        Logger::Warn<AssetDatabase>("Asset exporter for type '%s' not found! Will ignore file '%s'",
-                                    asset_descriptor->type_hint.c_str(), asset_descriptor->path_hint.c_str());
+        Logger::Warn<AssetDatabase>("AssetImporter for type '%s' not found! Will ignore file '%s'",
+                                    asset_descriptor->m_type_.c_str(), asset_descriptor->AssetPath().c_str());
         return;
     }
 
-    std::stringstream ss;
-    std::ifstream input_stream(asset_descriptor->path_hint);
-    ss << input_stream.rdbuf();
-    input_stream.close();
-
-    std::ofstream output_stream(asset_descriptor->path_hint);
-    output_stream << ss.str();
-
-    exporter->Export(output_stream, asset_descriptor);
-    output_stream.close();
+    importer->OnExport(asset_descriptor);
     asset_descriptor->Save();
 }
 
@@ -307,16 +301,16 @@ std::shared_ptr<AssetDescriptor> AssetDatabase::CreateAsset(const std::shared_pt
             return nullptr;
         }
 
-        descriptor->managed_object = object;
-        descriptor->path_hint = path;
+        descriptor->SetMainObject(object);
+        descriptor->m_asset_path_ = path;
     }
     else
     {
-        descriptor = std::make_shared<AssetDescriptor>();
-        descriptor->guid = object->Guid();
-        descriptor->path_hint = path;
-        descriptor->managed_object = object;
-        descriptor->type_hint = AssetExporter::Get(object)->SupportedExtensions().front();
+        descriptor = std::make_shared<AssetDescriptor>(path);
+        descriptor->m_guid_ = object->Guid();
+        descriptor->m_asset_path_ = path;
+        descriptor->m_type_ = path.extension().string();
+        descriptor->SetMainObject(object);
     }
 
     WriteAsset(descriptor.get());
@@ -340,7 +334,7 @@ void AssetDatabase::DeleteAsset(const path &path)
     }
 
     std::filesystem::remove(absolute_path);
-    std::filesystem::remove(AssetDescriptor::GetMetaFilePath(absolute_path));
+    std::filesystem::remove(AssetDescriptor::MetaFilePath(absolute_path));
     Object::Destroy(GetAssetHierarchy(absolute_path));
 }
 }

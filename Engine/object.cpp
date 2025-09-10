@@ -53,6 +53,18 @@ xg::Guid Object::GenerateGuid()
     return guid;
 }
 
+void Object::SetGuid(const xg::Guid new_guid)
+{
+    const auto pos = m_objects_.find(m_guid_);
+    if (pos->second.get() == this)
+    {
+        m_objects_.erase(pos);
+    }
+
+    m_guid_ = new_guid;
+    m_objects_.emplace(m_guid_, shared_from_this());
+}
+
 xg::Guid Object::Guid() const
 {
     return m_guid_;
@@ -86,7 +98,7 @@ void Object::Destroy(const std::shared_ptr<Object> &obj)
 
 void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
 {
-    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle() || UpdateManager::InDrawCallCycle())
+    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle())
     {
         Logger::Warn<Object>(
             "Cannot immediately destroy object during UpdateManager cycle. Use Object::Destroy instead.");

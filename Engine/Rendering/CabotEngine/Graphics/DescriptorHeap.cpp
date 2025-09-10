@@ -32,7 +32,7 @@ DescriptorHeap::DescriptorHeap()
     desc.NumDescriptors = kHandleMax;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-    auto device = g_RenderEngine->Device();
+    auto device = RenderEngine::Device();
 
     // ディスクリプタヒープを生成
     auto hr = device->CreateDescriptorHeap(
@@ -58,7 +58,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Textu
 {
     auto pHandle = Instance()->Allocate();
 
-    auto device = g_RenderEngine->Device();
+    auto device = RenderEngine::Device();
     auto resource = texture->Resource();
     auto desc = texture->ViewDesc();
     device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
@@ -70,7 +70,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuf
 {
     auto pHandle = Instance()->Allocate();
 
-    auto device = g_RenderEngine->Device();
+    auto device = RenderEngine::Device();
     auto resource = structured_buffer.Resource();
     auto desc = structured_buffer.ViewDesc();
     device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
@@ -83,7 +83,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
     auto pHandle = Instance()->Allocate();
 
     auto view_desc = constant_buffer.ViewDesc();
-    g_RenderEngine->Device()->CreateConstantBufferView(&view_desc, pHandle->HandleCPU);
+    RenderEngine::Device()->CreateConstantBufferView(&view_desc, pHandle->HandleCPU);
 
     return pHandle;
 }

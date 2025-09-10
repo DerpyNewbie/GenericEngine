@@ -26,7 +26,7 @@ void ConstantBuffer::CreateBuffer()
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_SizeAligned); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -49,6 +49,8 @@ void ConstantBuffer::CreateBuffer()
     m_Desc = {};
     m_Desc.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
     m_Desc.SizeInBytes = UINT(m_SizeAligned);
+
+    m_pBuffer->SetName(L"ConstantBuffer");
 
     m_IsValid = true;
 }

@@ -21,6 +21,7 @@
 #include "input.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
+#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
@@ -31,8 +32,9 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-    g_RenderEngine = new RenderEngine();
-    if (!g_RenderEngine->Init(Application::GetWindowHandle(), Application::WindowWidth(), Application::WindowHeight()))
+    if (!RenderEngine::Instance()->Init(Application::Instance()->GetWindowHandle(),
+                                        Application::Instance()->WindowWidth(),
+                                        Application::Instance()->WindowHeight()))
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
@@ -77,9 +79,9 @@ void Engine::MainLoop() const
         Profiler::End("Update");
 
         Profiler::Begin("Draw Call");
-        g_RenderEngine->BeginRender();
-        UpdateManager::InvokeDrawCall();
-        g_RenderEngine->EndRender();
+        RenderEngine::Instance()->BeginRender();
+        RenderPipeline::Instance()->InvokeDrawCall();
+        RenderEngine::Instance()->EndRender();
         Profiler::End("Draw Call");
 
         Profiler::Begin("Cleanup Objects");

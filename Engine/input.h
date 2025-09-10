@@ -4,8 +4,15 @@
 
 namespace engine
 {
+enum class kMouseMode
+{
+    kNormal,
+    kLocked
+};
+
 class Input
 {
+    friend class Application;
     friend class Engine;
 
     DirectX::Keyboard::State m_keyboard_state_;
@@ -14,17 +21,18 @@ class Input
     std::unique_ptr<DirectX::Mouse> m_mouse_;
     DirectX::Mouse::State m_mouse_state_;
     DirectX::Mouse::ButtonStateTracker m_mouse_tracker_;
+    kMouseMode m_mouse_mode_;
+    Vector2 m_mouse_position_;
+    Vector2 m_mouse_delta_;
 
     void Init();
     void Update();
 
-    [[nodiscard]] static std::shared_ptr<Input> m_instance_;
-
 public:
     static std::shared_ptr<Input> Instance();
+    static void ProcessMessage(UINT msg, WPARAM w_param, LPARAM l_param);
 
     Input();
-    DirectX::Keyboard *Keyboard() const;
 
     [[nodiscard]] static bool GetKey(DirectX::Keyboard::Keys key);
     [[nodiscard]] static bool GetKeyDown(DirectX::Keyboard::Keys key);
@@ -37,5 +45,10 @@ public:
     [[nodiscard]] static bool GetMouseRightDown();
     [[nodiscard]] static bool GetMouseRightUp();
     [[nodiscard]] static Vector2 MousePosition();
+    [[nodiscard]] static Vector2 MouseDelta();
+    [[nodiscard]] static kMouseMode MouseMode();
+
+    static void SetMouseMode(kMouseMode mode);
+    static void SetCursorVisible(bool is_visible);
 };
 }

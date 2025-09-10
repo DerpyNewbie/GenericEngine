@@ -12,8 +12,21 @@ std::vector<std::string> AudioClipImporter::SupportedExtensions()
     return {".wav"};
 }
 
-std::shared_ptr<Object> AudioClipImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
+bool AudioClipImporter::IsCompatibleWith(const std::shared_ptr<Object> object)
 {
-    return Audio::Instance()->LoadAudioClip(asset->guid, asset->path_hint);
+    return std::dynamic_pointer_cast<AudioClip>(object) != nullptr;
 }
+
+void AudioClipImporter::OnImport(AssetDescriptor *ctx)
+{
+    const auto audio = Audio::Instance();
+    if (audio == nullptr)
+    {
+        ctx->LogImportError("Audio not initialized");
+        return;
+    }
+
+    ctx->SetMainObject(audio->LoadAudioClip(xg::newGuid(), ctx->AssetPath()));
+}
+
 }

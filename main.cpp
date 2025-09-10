@@ -4,5 +4,5 @@
 
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
-    Application::Instance()->StartApp();
+    engine::Application::Instance()->StartApp();
 }
