@@ -192,7 +192,7 @@ std::shared_ptr<AnimationState> AnimationComponent::AddClip(const std::shared_pt
     return state;
 }
 
-std::shared_ptr<AnimationState> AnimationComponent::FindClip(const std::string &name)
+std::shared_ptr<AnimationState> AnimationComponent::FindClip(const std::string &name) const
 {
     const auto it = m_states_.find(name);
     if (it == m_states_.end())
