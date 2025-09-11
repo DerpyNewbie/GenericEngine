@@ -311,7 +311,14 @@ void Transform::SetLocalScale(const Vector3 &local_scale)
 void Transform::SetLocalMatrix(const Matrix &matrix)
 {
     auto mat = matrix;
-    mat.Decompose(m_local_scale_, m_local_rotation_, m_local_position_);
+    if (!mat.Decompose(m_local_scale_, m_local_rotation_, m_local_position_))
+    {
+        Logger::Warn<Transform>("Failed to decompose matrix. resetting to zero");
+        m_local_position_ = Vector3::Zero;
+        m_local_rotation_ = Quaternion::Identity;
+        m_local_scale_ = Vector3::One;
+    }
+
     RecalculateMatrices();
 }
 
