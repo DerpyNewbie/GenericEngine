@@ -7,6 +7,10 @@ namespace engine
 class Renderer : public Component
 {
     friend class RenderPipeline;
+    friend class Camera;
+    friend class CameraComponent;
+
+    static std::vector<std::weak_ptr<Renderer>> m_renderers_;
 
 protected:
     bool m_is_visible_ = false;

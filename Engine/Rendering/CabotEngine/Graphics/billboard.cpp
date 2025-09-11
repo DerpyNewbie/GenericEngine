@@ -3,7 +3,8 @@
 
 #include "game_object.h"
 #include "logger.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
+#include "Rendering/view_projection.h"
 using namespace DirectX::SimpleMath;
 
 void Billboard::Update()
@@ -53,10 +54,9 @@ void Billboard::Update()
     }
 
     auto obj_pos = world_matrix.Translation();
-    auto camera_transform = camera->GameObject()->Transform()->WorldMatrix();
+    auto camera_transform = camera->GetTransform()->WorldMatrix();
     auto camera_pos = camera_transform.Translation();
     Vector3 dir_vec3 = camera_pos - obj_pos;
-    DirectX::XMVECTOR dir = DirectX::XMVector3Normalize(XMLoadFloat3(&dir_vec3));
 
     // store scale
     Vector3 scale;

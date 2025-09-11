@@ -7,13 +7,19 @@
 #include "game_object.h"
 #include "Audio/audio_listener_component.h"
 
-#include "Components/camera.h"
+#include "Components/camera_component.h"
+#include "Components/controller.h"
+#include "Components/rotator_component.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Editor/editor.h"
 #include "Physics/plane_collider.h"
 
-namespace engine
-{
+std::shared_ptr<Application> Application::m_instance_;
+std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
+float Application::m_window_height_ = 1080;
+float Application::m_window_width_ = 1920;
+HWND Application::m_h_wnd_ = nullptr;
+
 LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     Input::ProcessMessage(msg, wparam, lparam);
@@ -42,7 +48,7 @@ void Application::StartApp()
     {
         // Sample scene creation
         const auto camera = Object::Instantiate<GameObject>("Camera");
-        camera->AddComponent<Camera>();
+        camera->AddComponent<CameraComponent>();
         camera->AddComponent<AudioListenerComponent>();
 
         Object::Instantiate<GameObject>("Floor")->AddComponent<PlaneCollider>();
@@ -58,7 +64,7 @@ void Application::StartApp()
     editor->Finalize();
 }
 
-int Application::WindowWidth() const
+int Application::WindowWidth()
 {
     return m_window_width_;
 }

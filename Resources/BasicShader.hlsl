@@ -7,6 +7,10 @@ cbuffer Transforms : register(b1)
     float4x4 View;
     float4x4 Proj;
 }
+cbuffer LightCount : register(b2)
+{
+    int directional_count;
+}
 
 StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
@@ -91,14 +95,27 @@ VSOutput vrt(VSInput input)
     return output;
 }
 
+struct DirectionalLight
+{
+    float4 color;
+    float intensity;
+    float3 direction;
+};
+
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t1);
+StructuredBuffer<DirectionalLight> DirectionalLights : register(t1);
+Texture2D _MainTex : register(t2);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float3 light = normalize(float3(0.9, 0.3, -0.8));
-    float brightness = clamp(dot(-light,input.normal),0,1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
+    float3 light_dir = (0,0,1);
+    for(int i = 0; i < directional_count; ++i)
+    {
+        light_dir = DirectionalLights[i].direction;
+    }
+    float3 light = normalize(light_dir);
+    float brightness = clamp(dot(-light, input.normal), 0, 1);
+    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
     return mainColor * brightness;

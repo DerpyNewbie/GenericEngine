@@ -75,6 +75,11 @@ void RenderTexture::EndRender() const
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
+ID3D12DescriptorHeap *RenderTexture::GetHeap()
+{
+    return m_RTVHeap_.Get();
+}
+
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};

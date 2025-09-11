@@ -27,8 +27,8 @@ void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
                 continue;
             }
 
-            // +3 for engine pre-defined shader variables
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 3;
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i +
+                                       RootSignature::kPreDefinedVariableCount;
             const auto itr = material_block->Begin(shader_type, param_type);
             const auto desc_handle = itr->handle->HandleGPU;
             cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);

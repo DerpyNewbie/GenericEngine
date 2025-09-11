@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -55,7 +55,7 @@ void TextRenderer::OnDraw()
 
 std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
 {
-    return Camera::Current()->GameObject()->Transform();
+    return Camera::Current()->GetTransform();
 }
 }
 

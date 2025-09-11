@@ -1,11 +1,11 @@
 #pragma once
-#include "component.h"
-#include "event_receivers.h"
-#include "renderer.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "depth_texture.h"
+#include "inspectable.h"
+#include "render_texture.h"
 #include "Asset/asset_ptr.h"
-#include "Rendering/render_texture.h"
+#include "CabotEngine/Graphics/ConstantBuffer.h"
+#include "CabotEngine/Graphics/RenderEngine.h"
+#include "Components/renderer.h"
 
 namespace engine
 {
@@ -46,42 +46,39 @@ struct CameraProperty : Inspectable
     }
 };
 
-class Camera final : public Component
+class Camera : public std::enable_shared_from_this<Camera>
 {
-    friend RenderPipeline;
+    friend CameraComponent;
     static std::weak_ptr<Camera> m_main_camera_;
     static std::weak_ptr<Camera> m_current_camera_;
 
     CameraProperty m_property_;
-    AssetPtr<RenderTexture> m_render_texture_;
 
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
+    std::shared_ptr<Transform> m_transform_;
+
+    std::shared_ptr<DepthTexture> m_depth_texture_;
+    AssetPtr<RenderTexture> m_render_texture_;
 
     void SetViewProjMatrix() const;
     static void SetMainCamera(const std::shared_ptr<Camera> &camera);
     static void SetCurrentCamera(const std::shared_ptr<Camera> &camera);
 
 public:
-    void OnAwake() override;
-    void OnConstructed() override;
-    void OnInspectorGui() override;
-    void OnEnabled() override;
-    void OnDisabled() override;
+    CameraProperty m_property_;
+
+    static void SetMainCamera(const std::weak_ptr<Camera> &camera);
 
     static std::shared_ptr<Camera> Main();
     static std::shared_ptr<Camera> Current();
 
-    [[nodiscard]] Matrix GetViewMatrix() const;
-    [[nodiscard]] Matrix GetProjectionMatrix() const;
+    Camera();
 
-    [[nodiscard]] std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
+    void Render(const std::vector<std::shared_ptr<Renderer>> &renderers);
 
-    template <class Archive>
-    void serialize(Archive &ar)
-    {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_property_));
-    }
+    std::shared_ptr<Transform> GetTransform();
+    Matrix ViewMatrix() const;
+    Matrix ProjectionMatrix() const;
+    void SetTransform(const std::shared_ptr<Transform> &transform);
 };
 }
