@@ -7,7 +7,7 @@
 
 namespace engine
 {
-class Skybox : public Renderer
+class Skybox : public Component
 {
     bool m_is_texture_set_ = false;
 
@@ -21,10 +21,9 @@ class Skybox : public Renderer
 public:
     std::array<AssetPtr<Texture2D>, 6> textures;
 
-    void OnConstructed() override;
+    static Skybox *Instance();
+    static void Initialize();
     void OnInspectorGui() override;
-    void OnDraw() override;
-
-    std::shared_ptr<Transform> BoundsOrigin() override;
+    static void Render();
 };
 }

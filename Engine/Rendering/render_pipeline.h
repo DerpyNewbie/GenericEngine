@@ -17,6 +17,7 @@ class RenderPipeline
 
 public:
     static RenderPipeline *Instance();
+    static void Init();
     static size_t GetRendererCount();
 
     static void AddDrawCall(std::function<void()> draw_call);

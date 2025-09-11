@@ -4,7 +4,7 @@
 
 bool TextureCube::CreateTexCube(const std::array<std::shared_ptr<Texture2D>, 6> &textures)
 {
-    auto cmd_list = g_RenderEngine->CommandList();
+    auto cmd_list = RenderEngine::CommandList();
 
     //check textures are the same size
     auto size = textures[0]->Width() * textures[0]->Height();
@@ -20,7 +20,7 @@ bool TextureCube::CreateTexCube(const std::array<std::shared_ptr<Texture2D>, 6> 
     cube_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &cube_desc,

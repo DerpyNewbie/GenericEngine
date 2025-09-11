@@ -94,7 +94,7 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(TextureCube &texture_
 
     auto resource = texture_cube.Resource();
     auto view_desc = texture_cube.ViewDesc();
-    g_RenderEngine->Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
+    RenderEngine::Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
     return pHandle;
 }
 

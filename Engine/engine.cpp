@@ -44,6 +44,7 @@ bool Engine::Init()
     Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
+    RenderPipeline::Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     SceneManager::CreateScene("Default Scene");
