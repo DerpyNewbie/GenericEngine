@@ -68,20 +68,25 @@ Matrix Transform::LocalToWorld() const
 
 Vector3 Transform::Position() const
 {
-    return Vector3::Transform(m_local_position_, ParentMatrix());
+    return m_world_matrix_.Translation();
 }
 
 Quaternion Transform::Rotation() const
 {
-    return Quaternion::CreateFromRotationMatrix(ParentMatrix()) * m_local_rotation_;
+    auto world = m_world_matrix_;
+    Vector3 scale, translation;
+    Quaternion rotation;
+    world.Decompose(scale, rotation, translation);
+    return rotation;
 }
 
 Vector3 Transform::Scale() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    ParentMatrix().Decompose(sca, rot, pos);
-    return m_local_scale_ + sca;
+    auto world = m_world_matrix_;
+    Vector3 scale, translation;
+    Quaternion rotation;
+    world.Decompose(scale, rotation, translation);
+    return scale;
 }
 
 Vector3 Transform::LocalPosition() const
@@ -366,6 +371,7 @@ Matrix Transform::TRS(const Vector3 translation, const Quaternion rotation, cons
 
 void Transform::RecalculateMatrices()
 {
+    m_local_rotation_.Normalize();
     m_local_matrix_ = TRS(m_local_position_, m_local_rotation_, m_local_scale_);
 
     const auto parent = m_parent_.lock();

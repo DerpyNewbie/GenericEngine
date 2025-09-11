@@ -98,8 +98,6 @@ public:
            CEREAL_NVP(m_local_scale_),
            CEREAL_NVP(m_parent_),
            CEREAL_NVP(m_children_));
-
-        RecalculateMatrices();
     }
 };
 }
