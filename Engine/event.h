@@ -5,27 +5,31 @@ namespace engine
 template <class... ArgTypes>
 class Event
 {
-    std::list<std::function<void(ArgTypes...)>> m_listeners_;
+    using ListenerToken = size_t;
+    std::unordered_map<ListenerToken, std::function<void(ArgTypes...)>> m_listeners_;
+    ListenerToken m_next_listener_token_ = 0;
 
 public:
-    void AddListener(std::function<void(ArgTypes...)> callback)
+    ListenerToken AddListener(std::function<void(ArgTypes...)> callback)
     {
-        m_listeners_.push_back(callback);
+        auto token = ++m_next_listener_token_;
+        m_listeners_.emplace(token, callback);
+        return token;
     }
 
-    void RemoveListener(std::function<void(ArgTypes...)> callback)
+    void RemoveListener(ListenerToken token)
     {
-        m_listeners_.remove(callback);
+        m_listeners_.erase(token);
     }
 
-    std::list<std::function<void(ArgTypes...)>> Listeners()
+    std::unordered_map<ListenerToken, std::function<void(ArgTypes...)>> Listeners()
     {
         return m_listeners_;
     }
 
     void Invoke(ArgTypes... args)
     {
-        for (auto &callback : m_listeners_)
+        for (auto &callback : m_listeners_ | std::views::values)
             callback(args...);
     }
 
