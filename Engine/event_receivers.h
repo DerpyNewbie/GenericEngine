@@ -21,9 +21,3 @@ class IFixedUpdateReceiver : public IOrderable
 public:
     virtual void OnFixedUpdate() = 0;
 };
-
-class IDrawCallReceiver : public IOrderable
-{
-public:
-    virtual void OnDraw() = 0;
-};
