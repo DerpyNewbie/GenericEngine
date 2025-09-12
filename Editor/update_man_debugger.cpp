@@ -53,12 +53,5 @@ void UpdateManDebugger::OnEditorGui()
         const auto &fixed_update_receivers = engine::UpdateManager::GetFixedUpdateReceivers();
         DrawBulletText(fixed_update_receivers);
     }
-
-    if (ImGui::CollapsingHeader(
-        ("Draw Call Receivers: " + std::to_string(engine::UpdateManager::DrawCallCount())).c_str()))
-    {
-        const auto &draw_call_receivers = engine::UpdateManager::GetDrawCallReceivers();
-        DrawBulletText(draw_call_receivers);
-    }
 }
 }

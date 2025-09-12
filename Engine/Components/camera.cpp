@@ -4,8 +4,8 @@
 #include "application.h"
 #include "game_object.h"
 #include "gui.h"
-#include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -13,20 +13,6 @@ namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
 std::weak_ptr<Camera> Camera::m_current_camera_;
-
-void Camera::Render()
-{
-    SetViewProjMatrix();
-
-    m_current_camera_ = shared_from_base<Camera>();
-
-    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-    for (const auto object : objects_in_view)
-        object->OnDraw();
-
-    m_drawcall_count_ = objects_in_view.size();
-    Gizmos::Render();
-}
 
 void CameraProperty::OnInspectorGui()
 {
@@ -60,6 +46,15 @@ void Camera::SetViewProjMatrix() const
 
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
+void Camera::SetMainCamera(const std::shared_ptr<Camera> &camera)
+{
+    m_main_camera_ = camera;
+}
+
+void Camera::SetCurrentCamera(const std::shared_ptr<Camera> &camera)
+{
+    m_current_camera_ = camera;
+}
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     const std::vector<std::weak_ptr<Renderer>> &renderers) const
@@ -88,11 +83,6 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     return results;
 }
 
-int Camera::Order()
-{
-    return Main() == shared_from_base<Camera>() ? INT_MAX - 20000 : INT_MAX - 30000;
-}
-
 void Camera::OnAwake()
 {
     if (m_main_camera_.lock() == nullptr)
@@ -114,31 +104,16 @@ void Camera::OnInspectorGui()
 {
     m_property_.OnInspectorGui();
     Gui::PropertyField("RenderTexture", m_render_texture_);
-    ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
-}
-
-void Camera::OnDraw()
-{
-    if (auto render_tex = m_render_texture_.CastedLock())
-    {
-        render_tex->BeginRender(m_property_.background_color);
-        Render();
-    }
-    if (Main() == shared_from_base<Camera>())
-    {
-        RenderEngine::Instance()->SetMainRenderTarget(m_property_.background_color);
-        Render();
-    }
 }
 
 void Camera::OnEnabled()
 {
-    UpdateManager::SubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::AddCamera(shared_from_base<Camera>());
 }
 
 void Camera::OnDisabled()
 {
-    UpdateManager::UnsubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::RemoveCamera(shared_from_base<Camera>());
 }
 
 std::shared_ptr<Camera> Camera::Main()

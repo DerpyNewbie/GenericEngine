@@ -20,6 +20,7 @@
 #include "input.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
+#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
@@ -76,11 +77,11 @@ void Engine::Tick()
     UpdateManager::InvokeUpdate();
     Profiler::End("Update");
 
-    Profiler::Begin("Draw Call");
-    RenderEngine::Instance()->BeginRender();
-    UpdateManager::InvokeDrawCall();
-    RenderEngine::Instance()->EndRender();
-    Profiler::End("Draw Call");
+        Profiler::Begin("Draw Call");
+        RenderEngine::Instance()->BeginRender();
+        RenderPipeline::Instance()->InvokeDrawCall();
+        RenderEngine::Instance()->EndRender();
+        Profiler::End("Draw Call");
 
     Profiler::Begin("Cleanup Objects");
     Object::GarbageCollect();

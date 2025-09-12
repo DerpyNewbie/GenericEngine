@@ -25,6 +25,7 @@
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
 #include "Physics/physics.h"
+#include "Rendering/render_pipeline.h"
 
 #include <ranges>
 
@@ -136,7 +137,10 @@ void Editor::Attach()
 {
     Engine::on_init.AddListener([this] {
         Init();
-        UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    });
+
+    RenderPipeline::Instance()->on_rendering.AddListener([this] {
+        OnDraw();
     });
 
     Engine::on_finalize.AddListener([this] {

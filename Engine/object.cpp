@@ -98,7 +98,7 @@ void Object::Destroy(const std::shared_ptr<Object> &obj)
 
 void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
 {
-    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle() || UpdateManager::InDrawCallCycle())
+    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle())
     {
         Logger::Warn<Object>(
             "Cannot immediately destroy object during UpdateManager cycle. Use Object::Destroy instead.");

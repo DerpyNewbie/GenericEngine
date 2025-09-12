@@ -72,15 +72,15 @@ void RenderEngine::BeginRender()
     m_p_command_list_->Reset(m_p_allocator_[m_current_back_buffer_index_].Get(),
                              nullptr);
 
-    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+    const auto ds_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_DEPTH_WRITE
         );
-    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
+    m_p_command_list_->ResourceBarrier(1, &ds_barrier);
 }
 
-void RenderEngine::SetMainRenderTarget(Color background_color)
+void RenderEngine::SetMainRenderTarget(const Color background_color)
 {
     // レンダーターゲットが使用可能になるまで待つ
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_, D3D12_RESOURCE_STATE_PRESENT,
