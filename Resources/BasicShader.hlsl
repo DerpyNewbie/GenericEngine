@@ -96,7 +96,7 @@ Texture2D _MainTex : register(t1);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float3 light = normalize(float3(0.9, 0.3, -0.8));
+    float3 light = normalize(float3(0.9, -0.3, -0.8));
     float brightness = clamp(dot(-light,input.normal),0,1);
     float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);

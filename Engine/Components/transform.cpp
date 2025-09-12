@@ -50,6 +50,12 @@ Matrix Transform::WorldMatrix() const
     return m_world_matrix_;
 }
 
+Matrix Transform::ParentMatrix() const
+{
+    const auto parent = Parent();
+    return parent == nullptr ? Matrix::Identity : parent->WorldMatrix();
+}
+
 Matrix Transform::WorldToLocal() const
 {
     return WorldMatrix().Invert();
@@ -62,50 +68,40 @@ Matrix Transform::LocalToWorld() const
 
 Vector3 Transform::Position() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalToWorld().Decompose(sca, rot, pos);
-    return pos;
+    return m_world_matrix_.Translation();
 }
 
 Quaternion Transform::Rotation() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalToWorld().Decompose(sca, rot, pos);
-    return rot;
+    auto world = m_world_matrix_;
+    Vector3 scale, translation;
+    Quaternion rotation;
+    world.Decompose(scale, rotation, translation);
+    return rotation;
 }
 
 Vector3 Transform::Scale() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalToWorld().Decompose(sca, rot, pos);
-    return sca;
+    auto world = m_world_matrix_;
+    Vector3 scale, translation;
+    Quaternion rotation;
+    world.Decompose(scale, rotation, translation);
+    return scale;
 }
 
 Vector3 Transform::LocalPosition() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalMatrix().Decompose(sca, rot, pos);
-    return pos;
+    return m_local_position_;
 }
 
 Quaternion Transform::LocalRotation() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalMatrix().Decompose(sca, rot, pos);
-    return rot;
+    return m_local_rotation_;
 }
 
 Vector3 Transform::LocalScale() const
 {
-    Vector3 pos, sca;
-    Quaternion rot;
-    LocalMatrix().Decompose(sca, rot, pos);
-    return sca;
+    return m_local_scale_;
 }
 
 std::shared_ptr<Transform> Transform::Parent() const
@@ -180,7 +176,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
         parent->m_children_.emplace_back(shared_from_base<Transform>());
     }
 
-    RecalculateWorldMatrix();
+    RecalculateMatrices();
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
 
@@ -289,34 +285,41 @@ void Transform::SetPositionAndRotation(const Vector3 &position, const Quaternion
 
 void Transform::SetLocalPosition(const Vector3 &local_position)
 {
-    SetTRS(LocalScale(), LocalRotation(), local_position);
+    m_local_position_ = local_position;
+    RecalculateMatrices();
 }
 
 void Transform::SetLocalRotation(const Quaternion &local_rotation)
 {
-    SetTRS(LocalScale(), local_rotation, LocalPosition());
+    m_local_rotation_ = local_rotation;
+    RecalculateMatrices();
 }
 
 void Transform::SetLocalPositionAndRotation(const Vector3 &local_position, const Quaternion &local_rotation)
 {
-    SetTRS(LocalScale(), local_rotation, local_position);
+    m_local_position_ = local_position;
+    m_local_rotation_ = local_rotation;
+    RecalculateMatrices();
 }
 
 void Transform::SetLocalScale(const Vector3 &local_scale)
 {
-    SetTRS(local_scale, LocalRotation(), LocalPosition());
+    m_local_scale_ = local_scale;
+    RecalculateMatrices();
 }
 
 void Transform::SetLocalMatrix(const Matrix &matrix)
 {
-    m_local_matrix_ = matrix;
-    RecalculateWorldMatrix();
-}
+    auto mat = matrix;
+    if (!mat.Decompose(m_local_scale_, m_local_rotation_, m_local_position_))
+    {
+        Logger::Warn<Transform>("Failed to decompose matrix. resetting to zero");
+        m_local_position_ = Vector3::Zero;
+        m_local_rotation_ = Quaternion::Identity;
+        m_local_scale_ = Vector3::One;
+    }
 
-void Transform::SetTRS(const Vector3 &scale, const Quaternion &rotation, const Vector3 &position)
-{
-    SetLocalMatrix(
-        Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) * Matrix::CreateTranslation(position));
+    RecalculateMatrices();
 }
 
 void Transform::TransformGui(const bool is_local)
@@ -361,10 +364,23 @@ void Transform::TransformGui(const bool is_local)
     {
         ImGui::EndDisabled();
     }
+
+    if (ImGui::Button("Recalculate Matrices"))
+    {
+        RecalculateMatrices();
+    }
 }
 
-void Transform::RecalculateWorldMatrix()
+Matrix Transform::TRS(const Vector3 translation, const Quaternion rotation, const Vector3 scale)
 {
+    return Matrix::CreateScale(scale) * Matrix::CreateFromQuaternion(rotation) * Matrix::CreateTranslation(translation);
+}
+
+void Transform::RecalculateMatrices()
+{
+    m_local_rotation_.Normalize();
+    m_local_matrix_ = TRS(m_local_position_, m_local_rotation_, m_local_scale_);
+
     const auto parent = m_parent_.lock();
     if (parent == nullptr)
     {
@@ -377,7 +393,7 @@ void Transform::RecalculateWorldMatrix()
 
     for (const auto child : m_children_)
     {
-        child->RecalculateWorldMatrix();
+        child->RecalculateMatrices();
     }
 }
 
