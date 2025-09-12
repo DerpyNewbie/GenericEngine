@@ -14,6 +14,7 @@
 #include "application.h"
 #include "audio_window.h"
 #include "editor_gizmos.h"
+#include "engine.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -27,20 +28,9 @@
 
 #include <ranges>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
-        return true;
-    return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
 namespace editor
 {
 using namespace engine;
-
-Editor *Editor::m_instance_ = nullptr;
 
 void Editor::SetEditorStyle(const int i)
 {
@@ -63,17 +53,9 @@ void Editor::SetEditorStyle(const int i)
     m_last_editor_style_ = i;
 }
 
-Editor *Editor::Instance()
-{
-    return m_instance_;
-}
-
 void Editor::Init()
 {
-    m_instance_ = this;
-
     {
-        Application::Instance()->AddWindowCallback(WndProc);
         // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -98,7 +80,7 @@ void Editor::Init()
         D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
         D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
 
-        ImGui_ImplWin32_Init(Application::Instance()->GetWindowHandle());
+        ImGui_ImplWin32_Init(Application::Instance()->WindowHandle());
         ImGui_ImplDX12_Init(
             RenderEngine::Device(),
             RenderEngine::kFrame_Buffer_Count,
@@ -144,9 +126,22 @@ void Editor::Init()
     }
 }
 
+std::shared_ptr<Editor> Editor::Instance()
+{
+    static auto instance = std::make_shared<Editor>();
+    return instance;
+}
+
 void Editor::Attach()
 {
-    UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    Engine::on_init.AddListener([this] {
+        Init();
+        UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    });
+
+    Engine::on_finalize.AddListener([this] {
+        Finalize();
+    });
 }
 
 void Editor::OnDraw()

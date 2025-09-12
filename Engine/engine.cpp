@@ -17,13 +17,17 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "application.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "input.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
 
 namespace engine
 {
+Event<> Engine::on_init;
+Event<> Engine::on_default_scene_creation;
+Event<> Engine::on_tick;
+Event<> Engine::on_finalize;
+
 bool Engine::Init()
 {
 #ifdef _DEBUG
@@ -31,7 +35,7 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-    if (!RenderEngine::Instance()->Init(Application::Instance()->GetWindowHandle(),
+    if (!RenderEngine::Instance()->Init(Application::Instance()->WindowHandle(),
                                         Application::Instance()->WindowWidth(),
                                         Application::Instance()->WindowHeight()))
     {
@@ -45,48 +49,46 @@ bool Engine::Init()
     Input::Instance()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
-    SceneManager::CreateScene("Default Scene");
+    on_init.Invoke();
 
+    SceneManager::CreateScene("Default Scene");
+    on_default_scene_creation.Invoke();
     return true;
 }
 
-void Engine::MainLoop() const
+void Engine::Tick()
 {
-    MSG msg = {};
-    while (WM_QUIT != msg.message)
+    Profiler::NewFrame();
+    Time::Get()->IncrementFrame();
+
+    on_tick.Invoke();
+
+    Profiler::Begin("Fixed Update");
+    const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
+    for (int i = 0; i < fixed_update_count; i++)
     {
-        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE == TRUE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-            continue;
-        }
-        Profiler::NewFrame();
-        Time::Get()->IncrementFrame();
-
-        Profiler::Begin("Fixed Update");
-        const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
-        for (int i = 0; i < fixed_update_count; i++)
-        {
-            UpdateManager::InvokeFixedUpdate();
-        }
-        Profiler::End("Fixed Update");
-
-        Profiler::Begin("Update");
-        Input::Instance()->Update();
-        UpdateManager::InvokeUpdate();
-        Profiler::End("Update");
-
-        Profiler::Begin("Draw Call");
-        RenderEngine::Instance()->BeginRender();
-        UpdateManager::InvokeDrawCall();
-        RenderEngine::Instance()->EndRender();
-        Profiler::End("Draw Call");
-
-        Profiler::Begin("Cleanup Objects");
-        Object::GarbageCollect();
-        Profiler::End("Cleanup Objects");
-
+        UpdateManager::InvokeFixedUpdate();
     }
+    Profiler::End("Fixed Update");
+
+    Profiler::Begin("Update");
+    Input::Instance()->Update();
+    UpdateManager::InvokeUpdate();
+    Profiler::End("Update");
+
+    Profiler::Begin("Draw Call");
+    RenderEngine::Instance()->BeginRender();
+    UpdateManager::InvokeDrawCall();
+    RenderEngine::Instance()->EndRender();
+    Profiler::End("Draw Call");
+
+    Profiler::Begin("Cleanup Objects");
+    Object::GarbageCollect();
+    Profiler::End("Cleanup Objects");
+}
+
+void Engine::Finalize()
+{
+    on_finalize.Invoke();
 }
 }

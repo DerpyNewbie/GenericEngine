@@ -10,9 +10,9 @@ Input::Input()
     m_mouse_ = std::make_unique<DirectX::Mouse>();
 }
 
-void Input::Init()
+void Input::Init() const
 {
-    m_mouse_->SetWindow(Application::Instance()->GetWindowHandle());
+    m_mouse_->SetWindow(Application::Instance()->WindowHandle());
     m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 }
 

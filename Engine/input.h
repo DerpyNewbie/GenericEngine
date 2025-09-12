@@ -25,7 +25,7 @@ class Input
     Vector2 m_mouse_position_;
     Vector2 m_mouse_delta_;
 
-    void Init();
+    void Init() const;
     void Update();
 
 public:
