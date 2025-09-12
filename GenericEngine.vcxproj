@@ -71,6 +71,7 @@
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\component_factory.cpp"/>
+        <ClCompile Include="Engine\default_scene_generator.cpp"/>
         <ClCompile Include="Engine\engine.cpp"/>
         <ClCompile Include="Engine\engine_profiler.cpp"/>
         <ClCompile Include="Engine\engine_util.cpp"/>
@@ -222,6 +223,7 @@
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
+        <ClInclude Include="Engine\default_scene_generator.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
         <ClInclude Include="Engine\engine_profiler.h"/>
