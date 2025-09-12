@@ -205,6 +205,7 @@ void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
 
     const auto it = std::next(m_sub_guids_.begin(), offset - 1);
     object->SetGuid(*it);
+    object->SetName(object->Name() + " (" + AssetPath().filename().string() + ")");
 }
 
 void AssetDescriptor::LogImportError(const std::string &message)
