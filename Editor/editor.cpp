@@ -57,9 +57,7 @@ void Editor::SetEditorStyle(const int i)
 void Editor::Init()
 {
     {
-        const std::function<void()> draw_call = std::bind(&Editor::OnDraw, this);
-        RenderPipeline::AddDrawCall(draw_call);
-       // imgui init
+        // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImPlot::CreateContext();
@@ -139,7 +137,10 @@ void Editor::Attach()
 {
     Engine::on_init.AddListener([this] {
         Init();
-        UpdateManager::SubscribeDrawCall(shared_from_base<Editor>());
+    });
+
+    RenderPipeline::Instance()->draw_calls.AddListener([this] {
+        OnDraw();
     });
 
     Engine::on_finalize.AddListener([this] {
