@@ -63,7 +63,8 @@ public:
 
     void BeginRender();
     void SetMainRenderTarget(Color background_color);
-    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color background_color) const;
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
+                         Color background_color) const;
     void EndRender();
     void WaitRender();
 

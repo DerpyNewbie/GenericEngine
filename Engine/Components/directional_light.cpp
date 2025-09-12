@@ -17,7 +17,7 @@ void DirectionalLight::SetDescHandle()
     UpdateBuffer();
     if (m_directional_lights_buffer_ == nullptr)
         return;
-    auto cmd_list = g_RenderEngine->CommandList();
+    auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootShaderResourceView(kDirectionalLightSRV, m_directional_lights_buffer_->GetAddress());
 }
 

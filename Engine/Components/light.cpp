@@ -28,7 +28,7 @@ void Light::SetLightCountBuffer()
     if (m_light_count_buffer_ == nullptr)
         return;
     UpdateLightCountBuffer();
-    auto cmd_list = g_RenderEngine->CommandList();
+    auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
 }
 

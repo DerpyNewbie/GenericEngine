@@ -1,8 +1,9 @@
 #include "pch.h"
-#include "Components/camera.h"
+#include "camera.h"
 #include "Components/renderer.h"
 #include "render_pipeline.h"
 #include "gizmos.h"
+#include "Components/light.h"
 #include "Components/skybox.h"
 
 
@@ -12,10 +13,35 @@ void RenderPipeline::InvokeDrawCall()
 {
     for (const auto camera : m_cameras_)
     {
-        if (auto render_texture = camera->m_render_texture_.CastedLock())
+        ID3D12DescriptorHeap *rtv_heap = nullptr;
+        ID3D12DescriptorHeap *dsv_heap = nullptr;
+        auto render_tex = camera->m_render_texture_.CastedLock();
+        if (render_tex)
         {
-            render_texture->BeginRender(camera->m_property_.background_color);
+            render_tex->BeginRender(camera->m_property_.background_color);
+            rtv_heap = render_tex->GetHeap();
+        }
+
+        if (camera->m_depth_texture_)
+        {
+            camera->m_depth_texture_->BeginRender();
+            dsv_heap = camera->m_depth_texture_->GetHeap();
+        }
+
+        if (rtv_heap != nullptr || dsv_heap != nullptr)
+        {
+            RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
             Render(camera);
+        }
+
+        if (render_tex)
+        {
+            render_tex->EndRender();
+        }
+
+        if (camera->m_depth_texture_)
+        {
+            camera->m_depth_texture_->EndRender();
         }
     }
     const auto main_camera = Camera::Main();
@@ -27,13 +53,13 @@ void RenderPipeline::InvokeDrawCall()
 
 void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
 {
-    Camera::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
-    Skybox::Render();
-
-    const auto objects_in_view = camera->FilterVisibleObjects(m_renderers_);
-    for (const auto object : objects_in_view)
-        object->OnDraw();
+    Light::SetLightBuffers();
+    auto renderers = camera->FilterVisibleObjects(m_renderers_);
+    for (auto renderer : renderers)
+    {
+        renderer->OnDraw();
+    }
     Gizmos::Render();
 }
 

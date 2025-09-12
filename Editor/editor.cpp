@@ -14,13 +14,11 @@
 #include "application.h"
 #include "audio_window.h"
 #include "editor_gizmos.h"
-
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
-#include "update_manager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Asset/text_asset.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
 #include "Physics/physics.h"
@@ -166,7 +164,7 @@ void Editor::OnDraw()
     if (EditorPrefs::show_grid)
     {
         if (const auto camera = Camera::Main())
-            EditorGizmos::DrawYPlaneGrid(camera->GameObject()->Transform()->WorldMatrix());
+            EditorGizmos::DrawYPlaneGrid(camera->GetTransform()->WorldMatrix());
     }
     if (EditorPrefs::show_physics_debug)
         Physics::DebugDraw();

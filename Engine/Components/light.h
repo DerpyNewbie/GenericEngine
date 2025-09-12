@@ -21,6 +21,7 @@ enum kLightKind
 class Light : public Component
 {
     friend Camera;
+    friend RenderPipeline;
     static std::shared_ptr<ConstantBuffer> m_light_count_buffer_;
 
     static void CreateLightCountBuffer();

@@ -64,7 +64,7 @@ void RenderTexture::BeginRender(const Color background_color)
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
-    RenderEngine::Instance()->SetRenderTarget(m_RTVHeap_.Get(), background_color);
+    RenderEngine::Instance()->SetRenderTarget(m_RTVHeap_.Get(), nullptr, background_color);
 }
 
 void RenderTexture::EndRender() const

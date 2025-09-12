@@ -49,10 +49,9 @@ struct CameraProperty : Inspectable
 class Camera : public std::enable_shared_from_this<Camera>
 {
     friend CameraComponent;
+    friend RenderPipeline;
     static std::weak_ptr<Camera> m_main_camera_;
     static std::weak_ptr<Camera> m_current_camera_;
-
-    CameraProperty m_property_;
 
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
     std::shared_ptr<Transform> m_transform_;
@@ -61,19 +60,20 @@ class Camera : public std::enable_shared_from_this<Camera>
     AssetPtr<RenderTexture> m_render_texture_;
 
     void SetViewProjMatrix() const;
-    static void SetMainCamera(const std::shared_ptr<Camera> &camera);
-    static void SetCurrentCamera(const std::shared_ptr<Camera> &camera);
 
 public:
-    CameraProperty m_property_;
-
     static void SetMainCamera(const std::weak_ptr<Camera> &camera);
+    static void SetCurrentCamera(const std::weak_ptr<Camera> &camera);
+
+    CameraProperty m_property_;
 
     static std::shared_ptr<Camera> Main();
     static std::shared_ptr<Camera> Current();
 
     Camera();
 
+    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
+        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
     void Render(const std::vector<std::shared_ptr<Renderer>> &renderers);
 
     std::shared_ptr<Transform> GetTransform();

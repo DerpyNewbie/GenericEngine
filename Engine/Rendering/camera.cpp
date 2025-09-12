@@ -32,58 +32,6 @@ void CameraProperty::OnInspectorGui()
     Gui::PropertyField("Background Color", background_color);
 }
 
-void Camera::Render(const std::vector<std::shared_ptr<Renderer>> &renderers)
-{
-    ID3D12DescriptorHeap *rtv_heap = nullptr;
-    ID3D12DescriptorHeap *dsv_heap = nullptr;
-    auto render_tex = m_render_texture_.CastedLock();
-    if (render_tex)
-    {
-        render_tex->BeginRender();
-        rtv_heap = render_tex->GetHeap();
-    }
-
-    if (m_depth_texture_)
-    {
-        m_depth_texture_->BeginRender();
-        dsv_heap = m_depth_texture_->GetHeap();
-    }
-
-    if (rtv_heap != nullptr || dsv_heap != nullptr)
-    {
-        g_RenderEngine->SetRenderTarget(rtv_heap, dsv_heap, m_property_.background_color);
-        SetViewProjMatrix();
-        Light::SetLightBuffers();
-        for (auto renderer : renderers)
-        {
-            renderer->OnDraw();
-        }
-        Gizmos::Render();
-    }
-
-    if (render_tex)
-    {
-        render_tex->EndRender();
-    }
-
-    if (m_depth_texture_)
-    {
-        m_depth_texture_->EndRender();
-    }
-    
-    if (Main() == shared_from_this())
-    {
-        g_RenderEngine->SetMainRenderTarget(m_property_.background_color);
-        SetViewProjMatrix();
-        Light::SetLightBuffers();
-        for (auto renderer : renderers)
-        {
-            renderer->OnDraw();
-        }
-        Gizmos::Render();
-    }
-}
-
 std::shared_ptr<Transform> Camera::GetTransform()
 {
     return m_transform_;
@@ -96,8 +44,8 @@ void Camera::SetTransform(const std::shared_ptr<Transform> &transform)
 
 void Camera::SetViewProjMatrix() const
 {
-    const auto cmd_list = g_RenderEngine->CommandList();
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto cmd_list = RenderEngine::CommandList();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
     const auto view_projection = view_projection_buffer->GetPtr<ViewProjection>();
 
@@ -134,6 +82,33 @@ Camera::Camera()
         view_proj_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
         view_proj_matrix_buffer->CreateBuffer();
     }
+}
+
+std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
+    const std::vector<std::weak_ptr<Renderer>> &renderers) const
+{
+    Matrix view_matrix = ViewMatrix();
+    Matrix proj_matrix = ProjectionMatrix();
+
+    DirectX::BoundingFrustum frustum;
+    DirectX::BoundingFrustum::CreateFromMatrix(frustum, proj_matrix, true);
+    frustum.Transform(frustum, view_matrix.Invert());
+
+    std::vector<std::shared_ptr<Renderer>> results;
+    for (auto weak_renderer : renderers)
+    {
+        auto renderer = weak_renderer.lock();
+        auto world_matrix = renderer->BoundsOrigin()->WorldMatrix();
+
+        DirectX::BoundingBox world_bounds;
+        renderer->bounds.Transform(world_bounds, world_matrix);
+
+        if (frustum.Intersects(world_bounds))
+        {
+            results.emplace_back(renderer);
+        }
+    }
+    return results;
 }
 
 Matrix Camera::ViewMatrix() const

@@ -116,9 +116,8 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
     auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // 深度ステンシルのディスクリプタヒープの開始アドレス取得
-    auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     D3D12_CPU_DESCRIPTOR_HANDLE currentDsvHandle = dsv_heap == nullptr
-                                                       ? m_pDsvHeap->GetCPUDescriptorHandleForHeapStart()
+                                                       ? m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart()
                                                        : dsv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // ビューポートとシザー矩形を設定
@@ -129,7 +128,7 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
     m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, m_background_color_, 0,
+    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, background_color, 0,
                                              nullptr);
 
     // 深度ステンシルビューをクリア
@@ -173,14 +172,15 @@ void RenderEngine::EndRender()
     m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
-void RenderEngine::SetBackgroundColor(Color color)
+void RenderEngine::SetBackgroundColor(const Color color)
 {
     m_background_color_ = color;
 }
 
 bool RenderEngine::CreateDevice()
 {
-    auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf()));
+    const auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0,
+                                      IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf()));
     return SUCCEEDED(hr);
 }
 

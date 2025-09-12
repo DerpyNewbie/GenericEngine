@@ -8,10 +8,10 @@ namespace engine
 {
 void DepthTexture::CreateBuffer()
 {
-    auto device = g_RenderEngine->Device();
+    auto device = RenderEngine::Device();
 
-    width = Application::WindowWidth();
-    height = Application::WindowHeight();
+    width = Application::Instance()->WindowWidth();
+    height = Application::Instance()->WindowHeight();
 
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
     heapDesc.NumDescriptors = 1;
@@ -58,7 +58,7 @@ void DepthTexture::BeginRender()
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
 }
 
@@ -67,7 +67,7 @@ void DepthTexture::EndRender()
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pResource.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
 ID3D12DescriptorHeap *DepthTexture::GetHeap()

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "skybox.h"
-#include "camera.h"
+#include "camera_component.h"
 #include "gui.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"

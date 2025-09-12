@@ -12,7 +12,7 @@ class RenderTexture : public Texture2D
 
 public:
     void CreateBuffer() override;
-    void BeginRender();
+    void BeginRender(Color background_color);
     void EndRender() const;
     ID3D12DescriptorHeap *GetHeap();
 
