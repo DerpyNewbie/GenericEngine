@@ -11,17 +11,18 @@ void RenderPipeline::InvokeDrawCall()
 {
     for (const auto camera : m_cameras_)
     {
-        if (auto render_texture = camera->m_render_texture_.CastedLock())
+        if (const auto render_texture = camera->m_render_texture_.CastedLock())
         {
             render_texture->BeginRender(camera->m_property_.background_color);
             Render(camera);
         }
     }
+
     if (const auto main_camera = Camera::Main())
     {
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
         Render(main_camera);
-        draw_calls.Invoke();
+        on_rendering.Invoke();
     }
 }
 

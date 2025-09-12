@@ -16,7 +16,7 @@ class RenderPipeline
     void Render(const std::shared_ptr<Camera> &camera);
 
 public:
-    Event<> draw_calls;
+    Event<> on_rendering;
 
     static RenderPipeline *Instance();
     static size_t GetRendererCount();

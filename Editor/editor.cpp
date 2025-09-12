@@ -139,7 +139,7 @@ void Editor::Attach()
         Init();
     });
 
-    RenderPipeline::Instance()->draw_calls.AddListener([this] {
+    RenderPipeline::Instance()->on_rendering.AddListener([this] {
         OnDraw();
     });
 
