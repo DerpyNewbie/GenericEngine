@@ -71,9 +71,11 @@
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\component_factory.cpp"/>
+        <ClCompile Include="Engine\default_scene_generator.cpp"/>
         <ClCompile Include="Engine\engine.cpp"/>
         <ClCompile Include="Engine\engine_profiler.cpp"/>
         <ClCompile Include="Engine\engine_util.cpp"/>
+        <ClCompile Include="Engine\event.cpp"/>
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
@@ -223,11 +225,13 @@
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
+        <ClInclude Include="Engine\default_scene_generator.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
         <ClInclude Include="Engine\engine_profiler.h"/>
         <ClInclude Include="Engine\engine_traits.h"/>
         <ClInclude Include="Engine\engine_util.h"/>
+        <ClInclude Include="Engine\event.h"/>
         <ClInclude Include="Engine\event_receivers.h"/>
         <ClInclude Include="Engine\game_object.h"/>
         <ClInclude Include="Engine\gui.h"/>
