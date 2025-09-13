@@ -12,17 +12,19 @@ void RenderPipeline::InvokeDrawCall()
 {
     for (const auto camera : m_cameras_)
     {
-        if (auto render_texture = camera->m_render_texture_.CastedLock())
+        if (const auto render_texture = camera->m_render_texture_.CastedLock())
         {
             render_texture->BeginRender(camera->m_property_.background_color);
             Render(camera);
         }
     }
-    const auto main_camera = Camera::Main();
-    RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-    Render(main_camera);
-    for (auto draw_call : m_draw_calls_)
-        draw_call();
+
+    if (const auto main_camera = Camera::Main())
+    {
+        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
+        Render(main_camera);
+        on_rendering.Invoke();
+    }
 }
 
 void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
@@ -51,11 +53,6 @@ void RenderPipeline::Init()
 size_t RenderPipeline::GetRendererCount()
 {
     return Instance()->m_renderers_.size();
-}
-
-void RenderPipeline::AddDrawCall(std::function<void()> draw_call)
-{
-    Instance()->m_draw_calls_.emplace_back(draw_call);
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
