@@ -16,7 +16,7 @@ class Skybox : public Component
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_cube_handle_;
 
-    void ReConstructTexCube();
+    bool ReconstructTextureCube();
 
 public:
     std::array<AssetPtr<Texture2D>, 6> textures;

@@ -8,27 +8,33 @@
 
 namespace engine
 {
-void Skybox::ReConstructTexCube()
+bool Skybox::ReconstructTextureCube()
 {
     auto instance = Instance();
     for (auto texture : instance->textures)
     {
         if (texture.Lock() == nullptr)
         {
-            return;
+            return false;
         }
     }
 
     std::array<std::shared_ptr<Texture2D>, 6> shared_textures;
     for (int i = 0; i < instance->textures.size(); ++i)
+    {
         shared_textures[i] = instance->textures[i].CastedLock();
+        if (shared_textures[i] == nullptr)
+            return false;
+    }
     if (!instance->m_texture_cube_.CreateTexCube(shared_textures))
     {
         instance->m_is_texture_set_ = false;
-        return;
+        return false;
     }
+
     instance->m_texture_cube_handle_ = DescriptorHeap::Register(instance->m_texture_cube_);
     instance->m_is_texture_set_ = true;
+    return true;
 }
 
 Skybox *Skybox::Instance()
@@ -67,18 +73,35 @@ void Skybox::Initialize()
 void Skybox::OnInspectorGui()
 {
     const auto &instance = Instance();
-    for (int i = 0; i < instance->textures.size(); ++i)
+    if (Gui::PropertyField("Right", instance->textures[0]))
     {
-        ImGui::PushID(i);
-        if (Gui::PropertyField("Texture", instance->textures[i]))
-        {
-            if (instance->textures[i].CastedLock() != nullptr)
-            {
-                instance->textures[i].CastedLock()->CreateBuffer();
-                ReConstructTexCube();
-            }
-        }
-        ImGui::PopID();
+        instance->textures[0].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
+    }
+    if (Gui::PropertyField("Left", instance->textures[1]))
+    {
+        instance->textures[1].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
+    }
+    if (Gui::PropertyField("Up", instance->textures[2]))
+    {
+        instance->textures[2].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
+    }
+    if (Gui::PropertyField("Down", instance->textures[3]))
+    {
+        instance->textures[3].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
+    }
+    if (Gui::PropertyField("Forward", instance->textures[4]))
+    {
+        instance->textures[4].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
+    }
+    if (Gui::PropertyField("Back", instance->textures[5]))
+    {
+        instance->textures[5].CastedLock()->CreateBuffer();
+        ReconstructTextureCube();
     }
 }
 
