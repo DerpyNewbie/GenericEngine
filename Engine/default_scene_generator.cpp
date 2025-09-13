@@ -22,6 +22,8 @@ void SampleSceneGenerator::CreateDefaultCamera()
     const auto camera = Object::Instantiate<GameObject>("Camera");
     camera->AddComponent<Camera>();
     camera->AddComponent<AudioListenerComponent>();
+
+    camera->Transform()->SetLocalPosition({0.0f, 0.85f, 1.5f});
 }
 
 void SampleSceneGenerator::CreateDefaultFloor()
