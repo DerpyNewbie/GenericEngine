@@ -249,13 +249,13 @@ void AnimationComponent::Sample()
             const auto clip = state->clip.CastedLock();
             const auto curve = clip->FindCurve(path);
 
+            total_rot_weight += state->weight;
+            const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
             if (curve == nullptr)
             {
                 final_trs.translate += default_matrix.translate * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
-                total_rot_weight += state->weight;
-                const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
                 final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
                 continue;
             }
@@ -265,8 +265,6 @@ void AnimationComponent::Sample()
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            total_rot_weight += state->weight;
-            const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
             final_trs.rotation = Slerp(final_trs.rotation, rot, t);
 
         }
