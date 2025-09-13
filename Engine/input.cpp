@@ -10,17 +10,16 @@ Input::Input()
     m_mouse_ = std::make_unique<DirectX::Mouse>();
 }
 
-void Input::Init()
+void Input::Init() const
 {
-    m_mouse_->SetWindow(Application::Instance()->GetWindowHandle());
+    m_mouse_->SetWindow(Application::Instance()->WindowHandle());
     m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
 }
 
 void Input::ProcessMessage(const UINT msg, const WPARAM w_param, const LPARAM l_param)
 {
-    auto instance = Instance();
-    instance->m_keyboard_->ProcessMessage(msg, w_param, l_param);
-    instance->m_mouse_->ProcessMessage(msg, w_param, l_param);
+    DirectX::Keyboard::ProcessMessage(msg, w_param, l_param);
+    DirectX::Mouse::ProcessMessage(msg, w_param, l_param);
 }
 
 void Input::Update()
@@ -40,6 +39,22 @@ void Input::Update()
     else
     {
         m_mouse_delta_ = MousePosition();
+    }
+
+    if (m_mouse_mode_ == kMouseMode::kLocked && GetKeyDown(DirectX::Keyboard::Keys::Escape))
+    {
+        const auto next_mode = m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE
+                                   ? DirectX::Mouse::MODE_RELATIVE
+                                   : DirectX::Mouse::MODE_ABSOLUTE;
+
+        Logger::Log<Input>("Mouse Lock Interrupt! %d", next_mode);
+        m_mouse_->SetMode(next_mode);
+        m_mouse_->SetVisible(next_mode != DirectX::Mouse::MODE_ABSOLUTE);
+    }
+
+    if (m_mouse_mode_ == kMouseMode::kLocked && m_mouse_->IsVisible())
+    {
+        m_mouse_delta_ = Vector2::Zero;
     }
 }
 

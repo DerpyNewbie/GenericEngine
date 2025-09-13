@@ -33,10 +33,7 @@ class Editor final : public enable_shared_from_base<Editor>
         std::function<std::shared_ptr<engine::Object>()> factory;
         int priority;
     };
-
-
-    static Editor *m_instance_;
-
+    
     int m_last_editor_style_ = -1;
     std::weak_ptr<engine::Object> m_selected_object_;
     std::filesystem::path m_selected_directory_ = "";
@@ -45,13 +42,14 @@ class Editor final : public enable_shared_from_base<Editor>
     std::vector<PrioritizedCreateMenu> m_create_menus_;
 
     void SetEditorStyle(int i);
+    void Init();
 
 public:
-    static Editor *Instance();
+    static std::shared_ptr<Editor> Instance();
 
     void OnDraw();
 
-    void Init();
+    void Attach();
     void Finalize();
 
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);

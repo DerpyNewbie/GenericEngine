@@ -4,16 +4,20 @@
 #else
 #pragma comment(lib, "assimp-vc143-mt")
 #endif
+#include "event.h"
 
 namespace engine
 {
 class Engine
 {
 public:
-    bool should_exit = false;
+    static Event<> on_init;
+    static Event<> on_default_scene_creation;
+    static Event<> on_tick;
+    static Event<> on_finalize;
 
-    bool Init();
-
-    void MainLoop() const;
+    static bool Init();
+    static void Tick();
+    static void Finalize();
 };
 }
