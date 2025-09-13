@@ -129,24 +129,23 @@ std::shared_ptr<Camera> Camera::Current()
 Matrix Camera::GetViewMatrix() const
 {
     const auto transform = GameObject()->Transform();
-    return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
-                                     transform->Up());
+
+    return Matrix::CreateLookAt(transform->Position(), transform->Position() + transform->Forward(), transform->Up());
 }
 
 Matrix Camera::GetProjectionMatrix() const
 {
+
     switch (m_property_.view_mode)
     {
     case kViewMode::kPerspective:
-        return DirectX::XMMatrixPerspectiveFovRH(
-            m_property_.field_of_view * Mathf::kDeg2Rad,
-            m_property_.aspect_ratio,
-            m_property_.near_plane, m_property_.far_plane);
+        return Matrix::CreatePerspectiveFieldOfView(m_property_.field_of_view * Mathf::kDeg2Rad,
+                                                    m_property_.aspect_ratio, m_property_.near_plane,
+                                                    m_property_.far_plane);
     case kViewMode::kOrthographic:
-        return DirectX::XMMatrixOrthographicRH(
-            m_property_.ortho_size * m_property_.aspect_ratio,
-            m_property_.ortho_size,
-            m_property_.near_plane, m_property_.far_plane);
+        return Matrix::CreateOrthographic(m_property_.ortho_size * m_property_.aspect_ratio,
+                                          m_property_.ortho_size,
+                                          m_property_.near_plane, m_property_.far_plane);
     default:
         assert(false && "Invalid ViewMode");
         return Matrix::Identity;

@@ -112,7 +112,7 @@ public:
     }
 
     template <typename T>
-    std::vector<std::shared_ptr<T>> GetComponentInChildren()
+    std::shared_ptr<T> GetComponentInChildren()
     {
         auto result = GetComponent<T>();
         if (result != nullptr)
