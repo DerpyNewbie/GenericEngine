@@ -64,7 +64,7 @@ VSOutput vrt(VSInput input)
     float3 localNormal = input.normal;
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
-   for (int i = 0; i < input.bones_per_vertex; ++i)
+    for (int i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)
@@ -75,19 +75,19 @@ VSOutput vrt(VSInput input)
             boneNormal += mul(boneRot, localNormal) * weight;
         }
     }
-    if(input.bones_per_vertex != 0)
-    {    
-	      localPos = bonePos;
+    if (input.bones_per_vertex != 0)
+    {
+        localPos = bonePos;
         localNormal = boneNormal;
     }
-    
+
     float4 worldPos = mul(World, localPos);
     float4 viewPos = mul(View, worldPos);
     float4 projPos = mul(Proj, viewPos);
-    
+
     float3x3 worldRot = ExtractRotation(World);
     float3 worldNormal = mul(worldRot, localNormal);
-    
+
     output.svpos = projPos;
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color;
@@ -108,15 +108,20 @@ Texture2D _MainTex : register(t2);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float3 light_dir = (0,0,1);
-    for(int i = 0; i < directional_count; ++i)
+    float3 N = normalize(input.normal);
+
+    float3 brightness = float3(0,0,0);
+
+    for (int i = 0; i < directional_count; ++i)
     {
-        light_dir = DirectionalLights[i].direction;
+        float3 L = normalize(-DirectionalLights[i].direction);
+        float NdotL = saturate(dot(N, L));
+
+        brightness += NdotL * DirectionalLights[i].color.rgb * DirectionalLights[i].intensity;
     }
-    float3 light = normalize(light_dir);
-    float brightness = clamp(dot(-light, input.normal), 0, 1);
-    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
+
+    float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    return mainColor * brightness;
+    return float4(mainColor.rgb * brightness, mainColor.a);
 }

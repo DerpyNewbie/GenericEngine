@@ -44,12 +44,22 @@ void DirectionalLight::UpdateBuffer()
     m_directional_lights_buffer_->UpdateBuffer(properties.data());
 }
 
+float DirectionalLight::GetIntencity()
+{
+    return m_property_.m_intensity_;
+}
+
+void DirectionalLight::SetIntensity(const float intensity)
+{
+    m_property_.m_intensity_ = intensity;
+}
+
 Color DirectionalLight::GetColor()
 {
     return m_property_.color;
 }
 
-void DirectionalLight::SetColor(Color color)
+void DirectionalLight::SetColor(const Color color)
 {
     m_property_.color = color;
 }

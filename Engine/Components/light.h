@@ -34,6 +34,9 @@ protected:
 
 public:
     void OnInspectorGui() override;
+
+    virtual float GetIntencity() = 0;
+    virtual void SetIntensity(float intensity) = 0;
     virtual Color GetColor() = 0;
     virtual void SetColor(Color color) = 0;
 };

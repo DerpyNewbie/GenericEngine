@@ -3,8 +3,9 @@
 
 #include "game_object.h"
 #include "Audio/audio_listener_component.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Physics/plane_collider.h"
+#include "Rendering/model_importer.h"
 
 namespace engine
 {
@@ -12,13 +13,14 @@ void SampleSceneGenerator::CreateDefaultScene()
 {
     CreateDefaultCamera();
     CreateDefaultFloor();
+    ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
 }
 
 void SampleSceneGenerator::CreateDefaultCamera()
 {
     // Sample scene creation
     const auto camera = Object::Instantiate<GameObject>("Camera");
-    camera->AddComponent<Camera>();
+    camera->AddComponent<CameraComponent>();
     camera->AddComponent<AudioListenerComponent>();
 }
 

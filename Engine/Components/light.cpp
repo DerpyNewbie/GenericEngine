@@ -45,7 +45,13 @@ void Light::SetLightBuffers()
 
 void Light::OnInspectorGui()
 {
-    Color color;
+    float intensity = GetIntencity();
+    if (Gui::PropertyField("Intensity", intensity))
+    {
+        SetIntensity(intensity);
+    }
+
+    Color color = GetColor();
     if (Gui::ColorField("LightColor", color))
     {
         SetColor(color);

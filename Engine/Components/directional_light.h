@@ -26,6 +26,8 @@ public:
     static int LightCount();
     static void UpdateBuffer();
 
+    float GetIntencity() override;
+    void SetIntensity(float intensity) override;
     Color GetColor() override;
     void SetColor(Color color) override;
 };
