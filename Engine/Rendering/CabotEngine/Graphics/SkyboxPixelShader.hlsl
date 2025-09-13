@@ -9,5 +9,5 @@ struct VSOutput
 
 float4 pix(VSOutput input) : SV_Target
 {
-    return skyboxTexture.Sample(linearSampler, normalize(input.dir));
+    return skyboxTexture.Sample(linearSampler, normalize(float3(input.dir.x, input.dir.y, -input.dir.z)));
 }
