@@ -254,20 +254,21 @@ void AnimationComponent::Sample()
                 final_trs.translate += default_matrix.translate * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
-                const float t = state->weight / (total_rot_weight + state->weight);
-                final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
                 total_rot_weight += state->weight;
+                const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
+                final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
                 continue;
             }
 
-            auto time = state->GetTime();
+            const auto time = state->GetTime();
             final_trs.translate += Lerp(time, curve->position_key, curve->position_index) * state->weight;
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            const float t = state->weight / (total_rot_weight + state->weight);
-            final_trs.rotation = Slerp(final_trs.rotation, rot, t);
             total_rot_weight += state->weight;
+            const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
+            final_trs.rotation = Slerp(final_trs.rotation, rot, t);
+
         }
 
         transform->SetLocalMatrix(final_trs.GetMatrix());
