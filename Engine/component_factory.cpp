@@ -12,7 +12,6 @@
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/skinned_mesh_renderer.h"
-#include "Components/skybox.h"
 #include "Components/text_asset_ref_test_component.h"
 #include "Physics/box_collider.h"
 #include "Physics/capsule_collider.h"
@@ -20,6 +19,7 @@
 #include "Physics/rigidbody_component.h"
 #include "Physics/rigidbody_tester_component.h"
 #include "Physics/sphere_collider.h"
+#include "Rendering/rendering_settings_component.h"
 
 namespace engine
 {
@@ -45,7 +45,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
     ADD_COMPONENT(AnimationComponent);
-    ADD_COMPONENT(Skybox);
+    ADD_COMPONENT(RenderingSettingsComponent);
 #undef ADD_COMPONENT
 }
 

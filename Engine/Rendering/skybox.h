@@ -1,5 +1,4 @@
 #pragma once
-#include "renderer.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/TextureCube.h"
@@ -7,23 +6,33 @@
 
 namespace engine
 {
-class Skybox : public Component
+enum class kCubeFace
 {
-    bool m_is_texture_set_ = false;
+    kRight,
+    kLeft,
+    kTop,
+    kBottom,
+    kFront,
+    kBack,
+};
 
-    TextureCube m_texture_cube_;
+class Skybox
+{
+    std::shared_ptr<TextureCube> m_texture_cube_;
     std::shared_ptr<VertexBuffer> m_vertex_buffer_;
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_cube_handle_;
 
+    Skybox();
     bool ReconstructTextureCube();
 
 public:
-    std::array<AssetPtr<Texture2D>, 6> textures;
+    static std::shared_ptr<Skybox> Instance();
 
-    static Skybox *Instance();
-    static void Initialize();
-    void OnInspectorGui() override;
-    static void Render();
+    void Render();
+
+    [[nodiscard]] std::shared_ptr<TextureCube> TextureCube() const;
+
+    void SetTextureCube(const std::shared_ptr<class TextureCube> &texture_cube);
 };
 }

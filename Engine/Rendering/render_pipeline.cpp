@@ -3,7 +3,7 @@
 #include "Components/renderer.h"
 #include "render_pipeline.h"
 #include "gizmos.h"
-#include "Components/skybox.h"
+#include "skybox.h"
 
 
 namespace engine
@@ -31,7 +31,7 @@ void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
 {
     Camera::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
-    Skybox::Render();
+    Skybox::Instance()->Render();
 
     const auto objects_in_view = camera->FilterVisibleObjects(m_renderers_);
     for (const auto object : objects_in_view)
@@ -46,9 +46,7 @@ RenderPipeline *RenderPipeline::Instance()
 }
 
 void RenderPipeline::Init()
-{
-    Skybox::Initialize();
-}
+{}
 
 size_t RenderPipeline::GetRendererCount()
 {

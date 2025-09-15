@@ -1,13 +1,32 @@
 #pragma once
 #include "Texture2D.h"
+#include "Asset/asset_ptr.h"
 
-class TextureCube
+namespace engine
 {
+class TextureCube final : public InspectableAsset, public IBuffer
+{
+    std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_p_resource_;
+    bool m_is_valid_ = false;
 
 public:
-    bool CreateTexCube(const std::array<std::shared_ptr<Texture2D>, 6> &textures);
+    void OnInspectorGui() override;
+    void CreateBuffer() override;
+    void UpdateBuffer(void *data) override;
+    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    bool CanUpdate() override;
+    bool IsValid() override;
 
-    ID3D12Resource *Resource();
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
+    bool SetTextures(std::array<AssetPtr<Texture2D>, 6> textures);
+
+    [[nodiscard]] ID3D12Resource *Resource() const;
+    [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() const;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(m_textures_);
+    }
 };
+}
