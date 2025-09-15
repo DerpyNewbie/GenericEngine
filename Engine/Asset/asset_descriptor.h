@@ -44,6 +44,7 @@ public:
     [[nodiscard]] std::list<std::shared_ptr<Object>> Objects() const;
     [[nodiscard]] PersistentDataStore &DataStore();
     [[nodiscard]] std::list<ImportLog> ImportLogs() const;
+    [[nodiscard]] bool HasImportError() const;
 
     void SetMainObject(std::shared_ptr<Object> object);
     void AddObject(std::shared_ptr<Object> object);

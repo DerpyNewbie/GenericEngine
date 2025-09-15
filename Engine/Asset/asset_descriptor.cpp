@@ -173,6 +173,13 @@ std::list<ImportLog> AssetDescriptor::ImportLogs() const
     return m_import_logs_;
 }
 
+bool AssetDescriptor::HasImportError() const
+{
+    return std::ranges::any_of(m_import_logs_, [](const auto &log) {
+        return log.type == ImportLog::kLogType::kError;
+    });
+}
+
 void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
 {
     m_main_object_ = object;
@@ -231,8 +238,21 @@ void AssetDescriptor::Import()
         return;
     }
 
-    asset_importer->OnImport(this);
-    Save();
+    try
+    {
+        asset_importer->OnImport(this);
+        if (HasImportError())
+            throw std::runtime_error("Contains import error. Will not proceed to save!");
+
+        Save();
+    }
+    catch (...)
+    {
+        Logger::Error<AssetDescriptor>(
+            "Failed to import asset '%s'!",
+            AssetPath().string().c_str());
+        DebugBreak();
+    }
 }
 
 void AssetDescriptor::Save()
