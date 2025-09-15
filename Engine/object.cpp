@@ -56,7 +56,7 @@ xg::Guid Object::GenerateGuid()
 void Object::SetGuid(const xg::Guid new_guid)
 {
     const auto pos = m_objects_.find(m_guid_);
-    if (pos->second.get() == this)
+    if (pos != m_objects_.end() && pos->second.get() == this)
     {
         m_objects_.erase(pos);
     }
