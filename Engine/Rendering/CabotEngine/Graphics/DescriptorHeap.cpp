@@ -88,14 +88,15 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
     return pHandle;
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(TextureCube &texture_cube)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(const std::shared_ptr<engine::TextureCube> &texture_cube)
 {
-    auto pHandle = Allocate();
+    // FIXME: completely exact piece of code from Texture2D and StructuredBuffer. please fix.
+    auto p_handle = Allocate();
 
-    auto resource = texture_cube.Resource();
-    auto view_desc = texture_cube.ViewDesc();
-    RenderEngine::Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
-    return pHandle;
+    const auto resource = texture_cube->Resource();
+    const auto view_desc = texture_cube->ViewDesc();
+    RenderEngine::Device()->CreateShaderResourceView(resource, &view_desc, p_handle->HandleCPU);
+    return p_handle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()

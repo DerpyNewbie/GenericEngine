@@ -39,7 +39,7 @@ public:
     static std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
     static std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer &structured_buffer);
     static std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
-    static std::shared_ptr<DescriptorHandle> Register(TextureCube &texture_cube);
+    static std::shared_ptr<DescriptorHandle> Register(const std::shared_ptr<engine::TextureCube> &texture_cube);
 
     static std::shared_ptr<DescriptorHandle> Allocate();
     static void Free(std::shared_ptr<DescriptorHandle> handle);
