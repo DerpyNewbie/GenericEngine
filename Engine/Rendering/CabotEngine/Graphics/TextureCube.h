@@ -19,8 +19,8 @@ public:
     bool CanUpdate() override;
     bool IsValid() override;
 
-    [[nodiscard]] ID3D12Resource *Resource() override;
-    [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    ID3D12Resource *Resource() override;
+    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
     bool SetTextures(std::array<AssetPtr<Texture2D>, 6> textures);
 
