@@ -45,9 +45,6 @@ RenderPipeline *RenderPipeline::Instance()
     return instance;
 }
 
-void RenderPipeline::Init()
-{}
-
 size_t RenderPipeline::GetRendererCount()
 {
     return Instance()->m_renderers_.size();

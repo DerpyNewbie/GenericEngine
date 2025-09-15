@@ -19,7 +19,6 @@ public:
     Event<> on_rendering;
 
     static RenderPipeline *Instance();
-    static void Init();
     static size_t GetRendererCount();
 
     static void AddCamera(std::shared_ptr<Camera> camera);
