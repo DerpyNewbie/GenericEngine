@@ -29,7 +29,7 @@ void TextureCube::CreateBuffer()
         locked_textures[i] = m_textures_[i].CastedLock();
         if (locked_textures[i] == nullptr)
         {
-            Logger::Error<TextureCube>("Texture at index %d was invalid");
+            Logger::Error<TextureCube>("Texture at index %d was invalid", i);
             m_is_valid_ = false;
             return;
         }
@@ -37,7 +37,7 @@ void TextureCube::CreateBuffer()
         if (locked_textures[0]->Width() != locked_textures[i]->Width() ||
             locked_textures[0]->Height() != locked_textures[i]->Height())
         {
-            Logger::Error<TextureCube>("Texture at index %d was not the same size as the first texture");
+            Logger::Error<TextureCube>("Texture at index %d was not the same size as the first texture", i);
             m_is_valid_ = false;
             return;
         }
