@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "Asset/inspectable_asset.h"
-#include "Rendering/ibuffer.h"
+#include "Rendering/shader_resource.h"
 
 namespace engine
 {
@@ -11,7 +11,7 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D : public engine::InspectableAsset, public IBuffer
+class Texture2D : public engine::InspectableAsset, public engine::ShaderResource
 {
     friend class engine::Texture2DImporter;
 
@@ -32,6 +32,9 @@ public:
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     bool CanUpdate() override;
     bool IsValid() override;
+
+    ID3D12Resource *Resource() override;
+    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
     std::vector<DirectX::PackedVector::XMCOLOR> GetTexData()
     {
@@ -62,9 +65,6 @@ public:
     {
         return format;
     }
-
-    virtual ID3D12Resource *Resource();
-    virtual D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
 
     template <class Archive>
     void serialize(Archive &ar)

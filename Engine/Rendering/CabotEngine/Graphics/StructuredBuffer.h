@@ -1,10 +1,10 @@
 ﻿#pragma once
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
-#include "Engine/Rendering/ibuffer.h"
+#include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class StructuredBuffer : public IBuffer
+class StructuredBuffer : public ShaderResource
 {
 public:
     explicit StructuredBuffer(const size_t stride, const size_t elem_count)
@@ -23,10 +23,12 @@ public:
         return true;
     }
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
-    D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;
-    ID3D12Resource *Resource();
     bool IsValid() override;
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    ID3D12Resource *Resource() override;
+
+    D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;
 
 private:
     ComPtr<ID3D12Resource> m_pDefaultBuffer;

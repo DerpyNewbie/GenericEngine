@@ -40,7 +40,7 @@ bool Skybox::ReconstructTextureCube()
     if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
         return false;
 
-    m_texture_cube_handle_ = DescriptorHeap::Register(m_texture_cube_);
+    m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
     return true;
 }
 

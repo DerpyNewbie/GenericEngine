@@ -169,6 +169,7 @@
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
+        <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
@@ -294,6 +295,7 @@
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
+        <ClInclude Include="Engine\Rendering\shader_resource.h"/>
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>

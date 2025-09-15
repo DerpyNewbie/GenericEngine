@@ -66,7 +66,17 @@ void Texture2D::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
 {
-    return DescriptorHeap::Register(std::static_pointer_cast<Texture2D>(shared_from_this()));
+    return DescriptorHeap::Register(this);
+}
+
+bool Texture2D::CanUpdate()
+{
+    return false;
+}
+
+bool Texture2D::IsValid()
+{
+    return m_IsValid;
 }
 
 ID3D12Resource *Texture2D::Resource()
@@ -87,14 +97,4 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
     desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
     desc.Texture2D.MipLevels = 1; // no mipmaps
     return desc;
-}
-
-bool Texture2D::CanUpdate()
-{
-    return false;
-}
-
-bool Texture2D::IsValid()
-{
-    return m_IsValid;
 }

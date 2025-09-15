@@ -3,7 +3,9 @@
 
 #include "RenderEngine.h"
 
-void engine::StructuredBuffer::CreateBuffer()
+namespace engine
+{
+void StructuredBuffer::CreateBuffer()
 {
     size_t totalSize = m_stride * m_elementCount;
 
@@ -46,7 +48,7 @@ void engine::StructuredBuffer::CreateBuffer()
     m_IsValid = true;
 }
 
-void engine::StructuredBuffer::UpdateBuffer(void *data)
+void StructuredBuffer::UpdateBuffer(void *data)
 {
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_pDefaultBuffer.Get(),
@@ -70,13 +72,18 @@ void engine::StructuredBuffer::UpdateBuffer(void *data)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-std::shared_ptr<DescriptorHandle> engine::StructuredBuffer::UploadBuffer()
+std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
 {
-    auto pHandle = DescriptorHeap::Register(*this);
+    auto pHandle = DescriptorHeap::Register(this);
     return pHandle;
 }
 
-D3D12_SHADER_RESOURCE_VIEW_DESC engine::StructuredBuffer::ViewDesc()
+bool StructuredBuffer::IsValid()
+{
+    return m_IsValid;
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC StructuredBuffer::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
@@ -89,17 +96,13 @@ D3D12_SHADER_RESOURCE_VIEW_DESC engine::StructuredBuffer::ViewDesc()
     return srvDesc;
 }
 
-D3D12_GPU_VIRTUAL_ADDRESS engine::StructuredBuffer::GetAddress() const
-{
-    return m_GpuAddress;
-}
-
-ID3D12Resource *engine::StructuredBuffer::Resource()
+ID3D12Resource *StructuredBuffer::Resource()
 {
     return m_pUploadBuffer.Get();
 }
 
-bool engine::StructuredBuffer::IsValid()
+D3D12_GPU_VIRTUAL_ADDRESS StructuredBuffer::GetAddress() const
 {
-    return m_IsValid;
+    return m_GpuAddress;
+}
 }

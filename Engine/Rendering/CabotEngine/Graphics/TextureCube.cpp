@@ -106,7 +106,7 @@ void TextureCube::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
 {
-    return DescriptorHeap::Register(shared_from_base<TextureCube>());
+    return DescriptorHeap::Register(this);
 }
 
 bool TextureCube::CanUpdate()
@@ -119,20 +119,12 @@ bool TextureCube::IsValid()
     return m_is_valid_;
 }
 
-bool TextureCube::SetTextures(std::array<AssetPtr<Texture2D>, 6> textures)
-{
-    m_textures_ = textures;
-    m_is_valid_ = false;
-    CreateBuffer();
-    return m_is_valid_;
-}
-
-ID3D12Resource *TextureCube::Resource() const
+ID3D12Resource *TextureCube::Resource()
 {
     return m_p_resource_.Get();
 }
 
-D3D12_SHADER_RESOURCE_VIEW_DESC TextureCube::ViewDesc() const
+D3D12_SHADER_RESOURCE_VIEW_DESC TextureCube::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC view_desc;
     view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
@@ -142,5 +134,13 @@ D3D12_SHADER_RESOURCE_VIEW_DESC TextureCube::ViewDesc() const
     view_desc.TextureCube.MostDetailedMip = 0;
 
     return view_desc;
+}
+
+bool TextureCube::SetTextures(std::array<AssetPtr<Texture2D>, 6> textures)
+{
+    m_textures_ = textures;
+    m_is_valid_ = false;
+    CreateBuffer();
+    return m_is_valid_;
 }
 }
