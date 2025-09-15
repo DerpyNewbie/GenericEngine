@@ -73,19 +73,6 @@ void TextureCube::CreateBuffer()
         return;
     }
 
-    for (int i = 0; i < 6; ++i)
-    {
-        D3D12_TEXTURE_COPY_LOCATION src_loc = {};
-        src_loc.pResource = locked_textures[i]->Resource();
-        src_loc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-        src_loc.SubresourceIndex = 0;
-
-        D3D12_TEXTURE_COPY_LOCATION dst_loc = {};
-        dst_loc.pResource = m_p_resource_.Get();
-        dst_loc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
-        dst_loc.SubresourceIndex = D3D12CalcSubresource(0, i, 0, 1, 6);
-    }
-
     const auto cmd_list = RenderEngine::CommandList();
     for (int i = 0; i < 6; ++i)
     {
