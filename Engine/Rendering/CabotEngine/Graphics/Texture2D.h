@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "Asset/inspectable_asset.h"
+#include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
@@ -11,7 +12,7 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D : public engine::InspectableAsset, public engine::ShaderResource
+class Texture2D : public engine::InspectableAsset, public IBuffer, public engine::ShaderResource
 {
     friend class engine::Texture2DImporter;
 

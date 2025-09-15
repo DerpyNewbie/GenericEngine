@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
+#include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class StructuredBuffer : public ShaderResource
+class StructuredBuffer : public IBuffer, public ShaderResource
 {
 public:
     explicit StructuredBuffer(const size_t stride, const size_t elem_count)

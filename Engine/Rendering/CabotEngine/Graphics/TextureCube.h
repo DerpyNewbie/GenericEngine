@@ -1,10 +1,11 @@
 #pragma once
 #include "Texture2D.h"
+#include "Rendering/ibuffer.h"
 #include "Asset/asset_ptr.h"
 
 namespace engine
 {
-class TextureCube final : public InspectableAsset, public ShaderResource
+class TextureCube final : public InspectableAsset, public IBuffer, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_p_resource_;
