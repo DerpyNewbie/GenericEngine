@@ -1,21 +1,10 @@
 #pragma once
-#include "Asset/asset_ptr.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/TextureCube.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 
 namespace engine
 {
-enum class kCubeFace
-{
-    kRight,
-    kLeft,
-    kTop,
-    kBottom,
-    kFront,
-    kBack,
-};
-
 class Skybox
 {
     std::shared_ptr<TextureCube> m_texture_cube_;
