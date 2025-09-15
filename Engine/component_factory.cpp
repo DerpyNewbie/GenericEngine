@@ -19,6 +19,7 @@
 #include "Physics/rigidbody_component.h"
 #include "Physics/rigidbody_tester_component.h"
 #include "Physics/sphere_collider.h"
+#include "Rendering/rendering_settings_component.h"
 
 namespace engine
 {
@@ -44,6 +45,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
     ADD_COMPONENT(AnimationComponent);
+    ADD_COMPONENT(RenderingSettingsComponent);
 #undef ADD_COMPONENT
 }
 

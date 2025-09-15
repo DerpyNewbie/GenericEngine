@@ -48,6 +48,7 @@
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp"/>
         <ClCompile Include="Engine\Asset\persistent_data_store.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
@@ -91,7 +92,17 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
-        <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+        </FxCompile>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl">
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vert</EntryPointName>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+        </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
             <ObjectFileOutput>C:\Projects\team\x64\Debug\2DPixelShader.cso</ObjectFileOutput>
             <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
@@ -159,6 +170,8 @@
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
+        <ClCompile Include="Engine\Rendering\skybox.cpp"/>
+        <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
@@ -200,6 +213,7 @@
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
@@ -253,7 +267,7 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
-        <ClInclude Include="Engine\Rendering\ibuffer.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\billboard.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
@@ -281,6 +295,8 @@
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
+        <ClInclude Include="Engine\Rendering\skybox.h"/>
+        <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>

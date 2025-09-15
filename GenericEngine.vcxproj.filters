@@ -5,6 +5,10 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl" />
     <FxCompile Include="Resources\2DVertShader.hlsl" />
     <FxCompile Include="Resources\2DShader.hlsli" />
     <FxCompile Include="Resources\2DPixelShader.hlsl" />
@@ -30,17 +34,14 @@
     <ClCompile Include="Engine\engine_profiler.cpp" />
     <ClCompile Include="Engine\engine_util.cpp" />
     <ClCompile Include="Engine\game_object.cpp" />
-    <ClCompile Include="Engine\Math\bounds.cpp" />
     <ClCompile Include="Engine\Rendering\bone_weight.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignature.cpp" />
-    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RootSignatureManager.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\StructuredBuffer.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2D.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp" />
@@ -58,14 +59,12 @@
     <ClCompile Include="Engine\update_manager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Engine\Rendering\line_renderer.cpp" />
     <ClCompile Include="Editor\asset_browser.cpp" />
     <ClCompile Include="Editor\default_editor_menus.cpp" />
     <ClCompile Include="Editor\editor_menu.cpp" />
     <ClCompile Include="Engine\Asset\asset_database.cpp" />
     <ClCompile Include="Engine\Asset\asset_hierarchy.cpp" />
     <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp" />
-    <ClCompile Include="Engine\Asset\Importer\ShaderImporter.cpp" />
     <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp" />
     <ClCompile Include="Engine\Asset\text_asset.cpp" />
     <ClCompile Include="Engine\Components\line_renderer.cpp" />
@@ -104,9 +103,6 @@
     <ClInclude Include="Engine\Components\renderer.h" />
     <ClInclude Include="Engine\Components\skinned_mesh_renderer.h" />
     <ClInclude Include="Engine\Components\transform.h" />
-    <ClInclude Include="Engine\DxLib\dxlib_converter.h" />
-    <ClInclude Include="Engine\DxLib\dxlib_helper.h" />
-    <ClInclude Include="Engine\DxLib\dxlib_serializer.h" />
     <ClInclude Include="Engine\enable_shared_from_base.h" />
     <ClInclude Include="Engine\engine.h" />
     <ClInclude Include="Engine\engine_profiler.h" />
@@ -114,7 +110,6 @@
     <ClInclude Include="Engine\event_receivers.h" />
     <ClInclude Include="Engine\game_object.h" />
     <ClInclude Include="Engine\logger.h" />
-    <ClInclude Include="Engine\Math\bounds.h" />
     <ClInclude Include="Engine\Math\mathf.h" />
     <ClInclude Include="Engine\Math\math_serializer.h" />
     <ClInclude Include="Engine\object.h" />
@@ -123,7 +118,6 @@
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h" />
-    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeapManager.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h" />
@@ -147,7 +141,6 @@
     <ClInclude Include="Engine\engine_time.h" />
     <ClInclude Include="Engine\str_util.h" />
     <ClInclude Include="Engine\update_manager.h" />
-    <ClInclude Include="Engine\Rendering\line_renderer.h" />
     <ClInclude Include="Editor\asset_browser.h" />
     <ClInclude Include="Editor\default_editor_menus.h" />
     <ClInclude Include="Editor\editor_menu.h" />
@@ -155,7 +148,6 @@
     <ClInclude Include="Engine\Asset\asset_descriptor.h" />
     <ClInclude Include="Engine\Asset\asset_hierarchy.h" />
     <ClInclude Include="Engine\Asset\Importer\asset_importer.h" />
-    <ClInclude Include="Engine\Asset\Importer\ShaderImporter.h" />
     <ClInclude Include="Engine\Asset\Importer\txt_importer.h" />
     <ClInclude Include="Engine\Asset\inspectable_asset.h" />
     <ClInclude Include="Engine\Asset\text_asset.h" />
@@ -174,9 +166,6 @@
     <ClInclude Include="Engine\engine_traits.h" />
     <ClInclude Include="Engine\gui.h" />
     <ClInclude Include="Engine\guid_serializer.h" />
-    <ClInclude Include="Engine\Rendering\buffers.h" />
-    <ClInclude Include="Engine\Rendering\MaterialData.h" />
-    <ClInclude Include="Engine\Rendering\world_view_projection.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Engine\assimp_util.h" />
   </ItemGroup>
