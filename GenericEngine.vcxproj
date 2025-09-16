@@ -48,6 +48,7 @@
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp"/>
         <ClCompile Include="Engine\Asset\persistent_data_store.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
@@ -183,7 +184,10 @@
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
+        <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
+        <ClCompile Include="Engine\Rendering\skybox.cpp"/>
+        <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
@@ -225,6 +229,7 @@
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h"/>
         <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
@@ -312,7 +317,10 @@
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
+        <ClInclude Include="Engine\Rendering\shader_resource.h"/>
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
+        <ClInclude Include="Engine\Rendering\skybox.h"/>
+        <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>

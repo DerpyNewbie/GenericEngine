@@ -23,7 +23,6 @@ public:
     Event<> on_rendering;
 
     static RenderPipeline *Instance();
-    static void Init();
     static size_t GetRendererCount();
 
     static void AddLight(std::shared_ptr<Light> light);

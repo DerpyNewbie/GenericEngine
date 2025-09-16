@@ -54,28 +54,16 @@ ID3D12DescriptorHeap *DescriptorHeap::GetHeap()
     return Instance()->m_pHeap_.Get();
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(std::shared_ptr<Texture2D> texture)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::ShaderResource *shader_resource)
 {
-    auto pHandle = Instance()->Allocate();
+    auto desc_handle = Instance()->Allocate();
 
-    auto device = RenderEngine::Device();
-    auto resource = texture->Resource();
-    auto desc = texture->ViewDesc();
-    device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
+    const auto device = RenderEngine::Device();
+    const auto resource = shader_resource->Resource();
+    const auto desc = shader_resource->ViewDesc();
+    device->CreateShaderResourceView(resource, &desc, desc_handle->HandleCPU);
 
-    return pHandle;
-}
-
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::StructuredBuffer &structured_buffer)
-{
-    auto pHandle = Instance()->Allocate();
-
-    auto device = RenderEngine::Device();
-    auto resource = structured_buffer.Resource();
-    auto desc = structured_buffer.ViewDesc();
-    device->CreateShaderResourceView(resource, &desc, pHandle->HandleCPU); // シェーダーリソースビュー作成
-
-    return pHandle; // ハンドルを返す
+    return desc_handle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &constant_buffer)
@@ -85,16 +73,6 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
     auto view_desc = constant_buffer.ViewDesc();
     RenderEngine::Device()->CreateConstantBufferView(&view_desc, pHandle->HandleCPU);
 
-    return pHandle;
-}
-
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(TextureCube &texture_cube)
-{
-    auto pHandle = Allocate();
-
-    auto resource = texture_cube.Resource();
-    auto view_desc = texture_cube.ViewDesc();
-    RenderEngine::Device()->CreateShaderResourceView(resource, &view_desc, pHandle->HandleCPU);
     return pHandle;
 }
 

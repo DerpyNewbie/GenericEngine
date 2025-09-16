@@ -13,7 +13,7 @@ void SampleSceneGenerator::CreateDefaultScene()
 {
     CreateDefaultCamera();
     CreateDefaultFloor();
-    ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
+    CreateHackadoll();
 }
 
 void SampleSceneGenerator::CreateDefaultCamera()
@@ -22,10 +22,18 @@ void SampleSceneGenerator::CreateDefaultCamera()
     const auto camera = Object::Instantiate<GameObject>("Camera");
     camera->AddComponent<CameraComponent>();
     camera->AddComponent<AudioListenerComponent>();
+
+    camera->Transform()->SetLocalPosition({0.0f, 0.85f, 1.5f});
 }
 
 void SampleSceneGenerator::CreateDefaultFloor()
 {
     Object::Instantiate<GameObject>("Floor")->AddComponent<PlaneCollider>();
+}
+
+void SampleSceneGenerator::CreateHackadoll()
+{
+    auto go = ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+    go->Transform()->SetLocalScale({0.01f, 0.01f, 0.01f});
 }
 }

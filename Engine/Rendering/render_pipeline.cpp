@@ -6,9 +6,9 @@
 #include "game_object.h"
 #include "CabotEngine/Graphics/DescriptorHeap.h"
 #include "gizmos.h"
+#include "skybox.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/light.h"
-#include "Components/skybox.h"
 
 
 namespace engine
@@ -80,7 +80,9 @@ void RenderPipeline::InvokeDrawCall()
 
 void RenderPipeline::Render(const std::shared_ptr<Camera> &camera) const
 {
+    Camera::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
+    Skybox::Instance()->Render();
     Light::SetBuffers();
     auto renderers = camera->FilterVisibleObjects(m_renderers_);
     for (auto renderer : renderers)
@@ -107,11 +109,6 @@ RenderPipeline *RenderPipeline::Instance()
 {
     static auto instance = new RenderPipeline;
     return instance;
-}
-
-void RenderPipeline::Init()
-{
-    Skybox::Initialize();
 }
 
 size_t RenderPipeline::GetRendererCount()

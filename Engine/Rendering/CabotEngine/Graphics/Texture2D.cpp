@@ -66,22 +66,7 @@ void Texture2D::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
 {
-    return DescriptorHeap::Register(std::static_pointer_cast<Texture2D>(shared_from_this()));
-}
-
-ID3D12Resource *Texture2D::Resource()
-{
-    return m_pResource.Get();
-}
-
-D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
-{
-    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-    desc.Format = m_pResource->GetDesc().Format;
-    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
-    desc.Texture2D.MipLevels = 1; // no mipmaps
-    return desc;
+    return DescriptorHeap::Register(this);
 }
 
 bool Texture2D::CanUpdate()
@@ -92,4 +77,24 @@ bool Texture2D::CanUpdate()
 bool Texture2D::IsValid()
 {
     return m_IsValid;
+}
+
+ID3D12Resource *Texture2D::Resource()
+{
+    if (m_pResource == nullptr)
+    {
+        CreateBuffer();
+    }
+
+    return m_pResource != nullptr ? m_pResource.Get() : nullptr;
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
+{
+    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+    desc.Format = Resource()->GetDesc().Format;
+    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
+    desc.Texture2D.MipLevels = 1; // no mipmaps
+    return desc;
 }

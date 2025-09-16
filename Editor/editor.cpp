@@ -120,8 +120,13 @@ void Editor::Init()
         AddCreateMenu("Material", ".material", [] {
             return Object::Instantiate<Material>("New Material");
         });
+
         AddCreateMenu("Render Texture", ".rendertexture", [] {
             return Object::Instantiate<RenderTexture>("New RenderTexture");
+        });
+
+        AddCreateMenu("Texture Cube", ".cubemap", [] {
+            return Object::Instantiate<TextureCube>("New TextureCube");
         });
     }
 }
