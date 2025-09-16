@@ -25,38 +25,45 @@ void PSOManager::Initialize()
 
     depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
-    PSOSetting BasicSetting;
-    BasicSetting.PSOName = "Basic";
-    BasicSetting.InputLayout = engine::Vertex::InputLayout;
-    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    BasicSetting.RasterizerDesc = rasterizer_desc;
-    BasicSetting.DepthStencilDesc = depth_stencil_desc;
-    BasicSetting.VSPath = L"x64/Debug/BasicVertexShader.cso";
-    BasicSetting.PSPath = L"x64/Debug/BasicPixelShader.cso";
-    Register(BasicSetting);
+    PSOSetting setting;
+    setting.PSOName = "Basic";
+    setting.InputLayout = engine::Vertex::InputLayout;
+    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    setting.RasterizerDesc = rasterizer_desc;
+    setting.DepthStencilDesc = depth_stencil_desc;
+    setting.VSPath = L"x64/Debug/BasicVertexShader.cso";
+    setting.PSPath = L"x64/Debug/BasicPixelShader.cso";
+    setting.NumRenderTarget = 1;
+    Register(setting);
+
+    setting.PSOName = "Depth";
+    setting.NumRenderTarget = 0;
+    setting.VSPath = L"x64/Debug/BasicVertexShader.cso";
+    Register(setting);
 
     //設定の一部が一緒なので使いまわす
-    BasicSetting.PSOName = "Line";
-    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-    BasicSetting.VSPath = L"x64/Debug/LineVertexShader.cso";
-    BasicSetting.PSPath = L"x64/Debug/LinePixelShader.cso";
-    Register(BasicSetting);
+    setting.PSOName = "Line";
+    setting.NumRenderTarget = 1;
+    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+    setting.VSPath = L"x64/Debug/LineVertexShader.cso";
+    setting.PSPath = L"x64/Debug/LinePixelShader.cso";
+    Register(setting);
 
-    BasicSetting.PSOName = "2DBasic";
-    BasicSetting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    BasicSetting.VSPath = L"x64/Debug/2DVertShader.cso";
-    BasicSetting.PSPath = L"x64/Debug/2DPixelShader.cso";
-    Register(BasicSetting);
+    setting.PSOName = "2DBasic";
+    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    setting.VSPath = L"x64/Debug/2DVertShader.cso";
+    setting.PSPath = L"x64/Debug/2DPixelShader.cso";
+    Register(setting);
 
-    BasicSetting.PSOName = "Skybox";
-    BasicSetting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-    BasicSetting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    BasicSetting.DepthStencilDesc.DepthEnable = true;
-    BasicSetting.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    BasicSetting.DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    BasicSetting.VSPath = L"x64/Debug/SkyboxVertShader.cso";
-    BasicSetting.PSPath = L"x64/Debug/SkyboxPixelShader.cso";
-    Register(BasicSetting);
+    setting.PSOName = "Skybox";
+    setting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+    setting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+    setting.DepthStencilDesc.DepthEnable = true;
+    setting.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+    setting.DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+    setting.VSPath = L"x64/Debug/SkyboxVertShader.cso";
+    setting.PSPath = L"x64/Debug/SkyboxPixelShader.cso";
+    Register(setting);
 }
 
 bool PSOManager::Register(PSOSetting setting)
@@ -66,8 +73,12 @@ bool PSOManager::Register(PSOSetting setting)
     pso->SetPrimitiveTopologyType(setting.PrimitiveType);
     pso->SetRasterizerState(setting.RasterizerDesc);
     pso->SetDepthStencilState(setting.DepthStencilDesc);
+    pso->SetNumRenderTarget(setting.NumRenderTarget);
     pso->SetVS(setting.VSPath);
-    pso->SetPS(setting.PSPath);
+    if (!setting.PSPath.empty())
+    {
+        pso->SetPS(setting.PSPath);
+    }
     pso->Create();
 
     if (!pso->IsValid())

@@ -67,12 +67,21 @@ void SkinnedMeshRenderer::OnInspectorGui()
         }
     }
 }
-
-void SkinnedMeshRenderer::OnDraw()
+void SkinnedMeshRenderer::UpdateBuffer()
 {
-    UpdateBuffers();
+    MeshRenderer::UpdateBuffer();
+    UpdateBoneTransformsBuffer();
 
-    MeshRenderer::OnDraw();
+    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
+    const auto bone_matrix_buffer = m_bone_matrix_buffers_[current_buffer]->GetAddress();
+    const auto cmd_list = RenderEngine::CommandList();
+
+    cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffer);
+}
+
+void SkinnedMeshRenderer::Render()
+{
+    MeshRenderer::Render();
 
     if (m_draw_bones_)
         DrawBones();
@@ -90,18 +99,6 @@ void SkinnedMeshRenderer::ReconstructBuffer()
             bone_matrices_buffer->CreateBuffer();
         }
     }
-}
-
-void SkinnedMeshRenderer::UpdateBuffers()
-{
-    MeshRenderer::UpdateBuffers();
-    UpdateBoneTransformsBuffer();
-
-    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
-    const auto bone_matrix_buffer = m_bone_matrix_buffers_[current_buffer]->GetAddress();
-    const auto cmd_list = RenderEngine::CommandList();
-
-    cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffer);
 }
 }
 

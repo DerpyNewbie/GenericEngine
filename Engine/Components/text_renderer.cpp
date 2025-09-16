@@ -39,7 +39,7 @@ void TextRenderer::OnInspectorGui()
     }
 }
 
-void TextRenderer::OnDraw()
+void TextRenderer::Render()
 {
     if (!font_data.Lock())
     {

@@ -8,7 +8,7 @@ enum kRootParameterIndex
     kViewProjCBV,
     kLightCountCBV,
     kBoneSRV,
-    kDirectionalLightSRV,
+    kLightSRV,
     kVertexCBV,
     kVertexSRV,
     kVertexUAV,

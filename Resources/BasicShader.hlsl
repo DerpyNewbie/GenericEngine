@@ -95,15 +95,22 @@ VSOutput vrt(VSInput input)
     return output;
 }
 
-struct DirectionalLight
+struct Light
 {
+    int type;
+    int cast_shadow;
+    float3 pos;
+    float3 direction;
     float4 color;
     float intensity;
-    float3 direction;
+    float range;
+    float inner_cos;
+    float outer_cos;
+    float4x4 view_proj;
 };
 
 SamplerState smp : register(s0);
-StructuredBuffer<DirectionalLight> DirectionalLights : register(t1);
+StructuredBuffer<Light> Lights : register(t1);
 Texture2D _MainTex : register(t2);
 
 float4 pix(VSOutput input) : SV_TARGET
@@ -114,10 +121,10 @@ float4 pix(VSOutput input) : SV_TARGET
 
     for (int i = 0; i < directional_count; ++i)
     {
-        float3 L = normalize(-DirectionalLights[i].direction);
+        float3 L = normalize(-Lights[i].direction);
         float NdotL = saturate(dot(N, L));
 
-        brightness += NdotL * DirectionalLights[i].color.rgb * DirectionalLights[i].intensity;
+        brightness += NdotL * Lights[i].color.rgb * Lights[i].intensity;
     }
 
     float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);

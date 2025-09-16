@@ -29,7 +29,7 @@ RootSignature::RootSignature()
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kLightCountCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kBoneSRV].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kDirectionalLightSRV].InitAsShaderResourceView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kLightSRV].InitAsShaderResourceView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
 
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};

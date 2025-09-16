@@ -10,6 +10,7 @@ struct PSOSetting
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
     D3D12_RASTERIZER_DESC RasterizerDesc;
     D3D12_DEPTH_STENCIL_DESC DepthStencilDesc;
+    UINT NumRenderTarget;
 };
 
 class PSOManager

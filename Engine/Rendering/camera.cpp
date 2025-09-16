@@ -85,7 +85,7 @@ Camera::Camera()
 }
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
-    const std::vector<std::weak_ptr<Renderer>> &renderers) const
+    const std::vector<std::shared_ptr<Renderer>> &renderers) const
 {
     Matrix view_matrix = ViewMatrix();
     Matrix proj_matrix = ProjectionMatrix();
@@ -95,9 +95,8 @@ std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
     frustum.Transform(frustum, view_matrix.Invert());
 
     std::vector<std::shared_ptr<Renderer>> results;
-    for (auto weak_renderer : renderers)
+    for (auto renderer : renderers)
     {
-        auto renderer = weak_renderer.lock();
         auto world_matrix = renderer->BoundsOrigin()->WorldMatrix();
 
         DirectX::BoundingBox world_bounds;

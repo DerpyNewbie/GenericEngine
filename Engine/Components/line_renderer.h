@@ -22,7 +22,7 @@ public:
 
     void OnInspectorGui() override;
 
-    void OnDraw() override;
+    void Render() override;
 
 };
 }

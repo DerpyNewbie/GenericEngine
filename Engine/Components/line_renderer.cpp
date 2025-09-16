@@ -38,7 +38,7 @@ void LineRenderer::OnInspectorGui()
     Renderer::OnInspectorGui();
 }
 
-void LineRenderer::OnDraw()
+void LineRenderer::Render()
 {
     const auto camera = Camera::Main();
     const Matrix view = camera->ViewMatrix();

@@ -13,6 +13,7 @@ void SampleSceneGenerator::CreateDefaultScene()
 {
     CreateDefaultCamera();
     CreateDefaultFloor();
+    ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
 }
 
 void SampleSceneGenerator::CreateDefaultCamera()

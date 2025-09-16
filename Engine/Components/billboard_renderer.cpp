@@ -49,13 +49,16 @@ void BillboardRenderer::OnInspectorGui()
     shared_material->OnInspectorGui();
 }
 
-void BillboardRenderer::OnDraw()
+void BillboardRenderer::UpdateBuffer()
 {
     m_billboard_.world_matrix = GameObject()->Transform()->WorldMatrix();
     m_billboard_.Update();
 
     shared_material->p_shared_material_block->UpdateBuffer();
+}
 
+void BillboardRenderer::Render()
+{
     if (shared_material->IsValid())
     {
         auto shader = shared_material->p_shared_shader.CastedLock();

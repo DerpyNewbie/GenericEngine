@@ -7,54 +7,77 @@
 
 namespace engine
 {
+int Light::m_last_light_count_;
 std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
-
-void Light::CreateLightCountBuffer()
-{
-    m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(int) * kLightKindCount);
-    m_light_count_buffer_->CreateBuffer();
-}
+std::vector<std::shared_ptr<Light>> Light::m_lights_;
+std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
 
 void Light::UpdateLightCountBuffer()
 {
-    int light_count[kLightKindCount];
-    light_count[kDirectional] = DirectionalLight::LightCount();
+    if (m_lights_.empty())
+        return;
+    int light_count = m_lights_.size();
 
-    m_light_count_buffer_->UpdateBuffer(light_count);
+    m_light_count_buffer_->UpdateBuffer(&light_count);
+}
+
+void Light::UpdateLightBuffer()
+{
+    m_last_light_count_ = m_lights_.size();
+    if (m_lights_.empty())
+        return;
+
+    if (m_lights_buffer_ == nullptr)
+    {
+        m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
+                                                              kMaxLightCount);
+        m_lights_buffer_->CreateBuffer();
+    }
+
+    std::vector<LightData> properties;
+    for (const auto light : m_lights_)
+        properties.emplace_back(light->m_light_data_);
+    m_lights_buffer_->UpdateBuffer(properties.data());
 }
 
 void Light::SetLightCountBuffer()
 {
     if (m_light_count_buffer_ == nullptr)
-        return;
+    {
+        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(int));
+        m_light_count_buffer_->CreateBuffer();
+    }
+
     UpdateLightCountBuffer();
-    auto cmd_list = RenderEngine::CommandList();
+    const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
 }
 
-void Light::SetLightBuffers()
+void Light::SetLightBuffer()
 {
-    if (m_light_count_buffer_ == nullptr)
-    {
-        CreateLightCountBuffer();
-    }
+    UpdateLightBuffer();
 
+    if (m_lights_buffer_ == nullptr)
+        return;
+
+    const auto cmd_list = RenderEngine::CommandList();
+    cmd_list->SetGraphicsRootShaderResourceView(kLightSRV, m_lights_buffer_->GetAddress());
+}
+
+void Light::SetBuffers()
+{
     SetLightCountBuffer();
-    DirectionalLight::SetDescHandle();
+    SetLightBuffer();
 }
 
 void Light::OnInspectorGui()
 {
-    float intensity = GetIntencity();
-    if (Gui::PropertyField("Intensity", intensity))
-    {
-        SetIntensity(intensity);
-    }
+    Gui::PropertyField("Intensity", m_light_data_.intensity);
+    Gui::ColorField("LightColor", m_light_data_.color);
+}
 
-    Color color = GetColor();
-    if (Gui::ColorField("LightColor", color))
-    {
-        SetColor(color);
-    }
+void Light::OnUpdate()
+{
+    m_light_data_.view_proj = m_camera_->ProjectionMatrix() * m_camera_->ViewMatrix();
 }
 }

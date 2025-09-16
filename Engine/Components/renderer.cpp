@@ -6,6 +6,12 @@
 
 namespace engine
 {
+void Renderer::UpdateBuffer()
+{}
+
+void Renderer::DepthRender()
+{}
+
 void Renderer::SetVisible(const bool visible)
 {
     if (m_is_visible_ == visible)

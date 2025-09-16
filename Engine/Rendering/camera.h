@@ -73,7 +73,7 @@ public:
     Camera();
 
     std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
+        const std::vector<std::shared_ptr<Renderer>> &renderers) const;
     void Render(const std::vector<std::shared_ptr<Renderer>> &renderers);
 
     std::shared_ptr<Transform> GetTransform();

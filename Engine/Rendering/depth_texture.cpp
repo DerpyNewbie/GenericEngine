@@ -59,7 +59,6 @@ void DepthTexture::BeginRender()
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
-
 }
 
 void DepthTexture::EndRender()

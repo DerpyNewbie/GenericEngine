@@ -104,9 +104,6 @@ void RenderEngine::SetMainRenderTarget(const Color background_color)
 
     // 深度ステンシルビューをクリア
     m_p_command_list_->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-    m_p_command_list_->SetGraphicsRootSignature(engine::RootSignature::Get());
-    auto descriptor_heap = DescriptorHeap::GetHeap();
-    m_p_command_list_->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
@@ -134,10 +131,6 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
     // 深度ステンシルビューをクリア
     m_p_command_list_->
         ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-    CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
-    auto descriptor_heap = DescriptorHeap::GetHeap();
-    CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 void RenderEngine::EndRender()

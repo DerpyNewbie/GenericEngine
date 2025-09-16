@@ -97,10 +97,20 @@ void MeshRenderer::OnInspectorGui()
         ImGui::Unindent();
     }
 }
-
-void MeshRenderer::OnDraw()
+void MeshRenderer::UpdateBuffer()
 {
-    UpdateBuffers();
+    ReconstructBuffer();
+    UpdateWorldBuffer();
+
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
+    const auto cmd_list = RenderEngine::CommandList();
+
+    cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
+}
+
+void MeshRenderer::Render()
+{
 
     auto current_material = shared_materials[0].CastedLock();
     auto current_shader = current_material->p_shared_shader.CastedLock();
@@ -150,6 +160,32 @@ void MeshRenderer::OnDraw()
 
     if (m_draw_bounds_)
         DrawBounds();
+}
+void MeshRenderer::DepthRender()
+{
+    auto cmd_list = RenderEngine::CommandList();
+    cmd_list->SetPipelineState(PSOManager::Get("Depth"));
+
+    cmd_list->IASetIndexBuffer(m_index_buffers_[0]->View());
+    SetDescriptorTable(cmd_list, 0);
+
+    const auto index_count = m_shared_mesh_->HasSubMeshes()
+                                 ? m_shared_mesh_->sub_meshes[0].base_index
+                                 : m_shared_mesh_->indices.size();
+
+    cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
+
+    // sub-meshes
+    for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
+    {
+        cmd_list->SetPipelineState(PSOManager::Get("Depth"));
+
+        cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
+        SetDescriptorTable(cmd_list, i + 1);
+
+        const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
+        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+    }
 }
 
 void MeshRenderer::SetSharedMesh(const std::shared_ptr<Mesh> &mesh)
@@ -257,18 +293,6 @@ void MeshRenderer::ReconstructMeshesBuffer()
 
         m_index_buffers_.emplace_back(sub_index_buffer);
     }
-}
-
-void MeshRenderer::UpdateBuffers()
-{
-    ReconstructBuffer();
-    UpdateWorldBuffer();
-
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-    const auto cmd_list = RenderEngine::CommandList();
-
-    cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 }
 
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, const int material_idx)

@@ -29,9 +29,9 @@ public:
 
     void OnInspectorGui() override;
 
-    void OnDraw() override;
+    void UpdateBuffer() override;
+    void Render() override;
     void ReconstructBuffer() override;
-    void UpdateBuffers() override;
 
     template <class Archive>
     void serialize(Archive &ar)
