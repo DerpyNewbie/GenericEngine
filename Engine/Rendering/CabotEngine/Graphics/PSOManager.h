@@ -15,7 +15,7 @@ struct PSOSetting
 
 class PSOManager
 {
-    std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_PSOCache_;
+    std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_pso_cache_;
 
     static std::shared_ptr<PSOManager> m_instance_;
 
@@ -28,7 +28,7 @@ public:
 
     static ID3D12PipelineState *Get(const std::string &id)
     {
-        return Instance()->m_PSOCache_[id]->Get();
+        return Instance()->m_pso_cache_[id]->Get();
     }
 
     static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader);

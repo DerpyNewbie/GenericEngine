@@ -66,7 +66,7 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t2);
+Texture2D _MainTex : register(t3);
 
 float4 pix(VSOutput input) : SV_TARGET
 {

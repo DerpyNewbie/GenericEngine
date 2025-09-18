@@ -173,13 +173,14 @@ void MeshRenderer::DepthRender()
                                  ? m_shared_mesh_->sub_meshes[0].base_index
                                  : m_shared_mesh_->indices.size();
 
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
 
     // sub-meshes
     for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
     {
         cmd_list->SetPipelineState(PSOManager::Get("Depth"));
-
+        cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
         cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
         SetDescriptorTable(cmd_list, i + 1);
 

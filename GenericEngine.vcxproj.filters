@@ -10,6 +10,7 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl" />
     <FxCompile Include="Depth.hlsl" />
+    <FxCompile Include="Resources\BasicShader.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -125,6 +126,11 @@
     <ClCompile Include="Engine\Rendering\shader_parameter.cpp" />
     <ClCompile Include="Engine\Rendering\shader_type.cpp" />
     <ClCompile Include="Engine\Rendering\view_projection.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp" />
+    <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp" />
+    <ClCompile Include="Engine\Rendering\shader_resource.cpp" />
+    <ClCompile Include="Engine\Rendering\skybox.cpp" />
+    <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -253,5 +259,10 @@
     <ClInclude Include="Engine\Rendering\shader_parameter.h" />
     <ClInclude Include="Engine\Rendering\shader_type.h" />
     <ClInclude Include="Engine\Rendering\view_projection.h" />
+    <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h" />
+    <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h" />
+    <ClInclude Include="Engine\Rendering\shader_resource.h" />
+    <ClInclude Include="Engine\Rendering\skybox.h" />
+    <ClInclude Include="Engine\Rendering\rendering_settings_component.h" />
   </ItemGroup>
 </Project>

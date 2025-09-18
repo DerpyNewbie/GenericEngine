@@ -86,7 +86,7 @@ bool PSOManager::Register(PSOSetting setting)
         return false;
     }
 
-    Instance()->m_PSOCache_.emplace(setting.PSOName, pso);
+    Instance()->m_pso_cache_.emplace(setting.PSOName, pso);
 
     return true;
 }
@@ -96,6 +96,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
     auto pso = new PipelineState;
     pso->SetInputLayout(engine::Vertex::InputLayout);
     pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+    pso->SetNumRenderTarget(1);
     pso->SetShader(shader);
     pso->Create();
 
@@ -104,7 +105,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
         return false;
     }
 
-    Instance()->m_PSOCache_.emplace(pso_name, pso);
+    Instance()->m_pso_cache_.emplace(pso_name, pso);
     return true;
 }
 
@@ -112,8 +113,8 @@ bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std
 {
     //PSO name is the same as the shader name.
     std::string pso_name = shader->Name();
-    auto it = Instance()->m_PSOCache_.find(pso_name);
-    if (it != Instance()->m_PSOCache_.end())
+    auto it = Instance()->m_pso_cache_.find(pso_name);
+    if (it != Instance()->m_pso_cache_.end())
     {
         cmd_list->SetPipelineState(Get(shader->Name()));
         return true;

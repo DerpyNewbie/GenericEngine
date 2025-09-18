@@ -7,10 +7,6 @@ cbuffer Transforms : register(b1)
     float4x4 View;
     float4x4 Proj;
 }
-cbuffer LightCount : register(b2)
-{
-    int directional_count;
-}
 
 StructuredBuffer<float4x4> BoneMatrices : register(t0);
 
@@ -38,7 +34,8 @@ struct VSOutput
     float4 svpos : SV_POSITION;
     float3 normal: NORMAL;
     float4 color : COLOR;
-    float2 uv : TEXCOORD;
+    float2 uv : TEXCOORD0;
+    float3 worldpos : TEXCOORD1;
 };
 
 float3x3 ExtractRotation(float4x4 m)
@@ -92,6 +89,7 @@ VSOutput vrt(VSInput input)
     output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
     output.color = input.color;
     output.uv = input.uv;
+    output.worldpos = worldPos.xyz;
     return output;
 }
 
@@ -99,36 +97,71 @@ struct Light
 {
     int type;
     int cast_shadow;
-    float3 pos;
-    float3 direction;
-    float4 color;
     float intensity;
     float range;
+
+    float4 pos;
+    float4 direction;
+    float4 color;
+
     float inner_cos;
     float outer_cos;
+    float2 padding;
+
     float4x4 view_proj;
 };
 
-SamplerState smp : register(s0);
+cbuffer LightCount : register(b2)
+{
+    int light_count;
+    int a[63];
+}
+
 StructuredBuffer<Light> Lights : register(t1);
-Texture2D _MainTex : register(t2);
+Texture2DArray ShadowMaps : register(t2);
+Texture2D _MainTex : register(t3);
+SamplerState smp : register(s0);
+SamplerComparisonState shadowSampler : register(s1);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
     float3 N = normalize(input.normal);
+    float3 brightness = float3(0, 0, 0);
 
-    float3 brightness = float3(0,0,0);
+    if(light_count == 0)
+    {
+        float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
+        float4 mainColor = _MainTex.Sample(smp, flippedUV);
+        return float4(mainColor.rgb, mainColor.a);
+    }
 
-    for (int i = 0; i < directional_count; ++i)
+    for (int i = 0; i < light_count; ++i)
     {
         float3 L = normalize(-Lights[i].direction);
         float NdotL = saturate(dot(N, L));
 
-        brightness += NdotL * Lights[i].color.rgb * Lights[i].intensity;
+        float4 worldPos = float4(input.worldpos, 1);
+        float4 lightClip = mul(Lights[i].view_proj, worldPos);
+
+        float3 shadowCoord;
+        shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
+        shadowCoord.z = (lightClip.z / lightClip.w) * 0.5f + 0.5f;
+
+        float shadow = ShadowMaps.SampleCmpLevelZero(
+            shadowSampler,
+            float3(shadowCoord.xy, i),
+            shadowCoord.z
+            );
+
+        brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
+        float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
+        float4 mainColor = _MainTex.Sample(smp, flippedUV);
+
+        return float4(Lights[i].intensity, 0, 0, 1);
     }
 
     float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    return float4(mainColor.rgb * brightness, mainColor.a);
+    return float4(mainColor.rgb, mainColor.a);
 }

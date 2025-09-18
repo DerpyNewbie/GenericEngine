@@ -20,7 +20,6 @@ void RenderPipeline::InvokeDrawCall()
     for (const auto camera : m_lights_ | std::views::values)
     {
         camera->m_depth_texture_->BeginRender();
-        camera->SetViewProjMatrix();
         RenderEngine::Instance()->SetRenderTarget(nullptr, camera->m_depth_texture_->GetHeap(),
                                                   camera->m_property_.background_color);
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
@@ -78,8 +77,9 @@ void RenderPipeline::InvokeDrawCall()
     }
 }
 
-void RenderPipeline::Render(const std::shared_ptr<Camera> &camera) const
+void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
 {
+    SetShadowMap();
     Camera::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
     Skybox::Instance()->Render();
@@ -105,6 +105,18 @@ void RenderPipeline::DepthRender(const std::shared_ptr<Camera> &camera) const
     }
 }
 
+void RenderPipeline::SetShadowMap()
+{
+    if (m_depth_textures_ == nullptr)
+    {
+        m_depth_textures_ = std::make_shared<Texture2DArray>();
+    }
+    const auto cmd_list = RenderEngine::CommandList();
+    if (m_depth_textures_->IsValid())
+        cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
+                                                 m_shadowmap_handle_->HandleGPU);
+}
+
 RenderPipeline *RenderPipeline::Instance()
 {
     static auto instance = new RenderPipeline;
@@ -119,13 +131,22 @@ size_t RenderPipeline::GetRendererCount()
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 {
     auto camera = std::make_shared<Camera>();
+    light->m_camera_ = camera;
+    camera->m_depth_texture_ = std::make_shared<DepthTexture>();
+    camera->m_depth_texture_->CreateBuffer();
+    m_depth_textures_->AddTexture(AssetPtr<Texture2D>::FromManaged(camera->m_depth_texture_));
+    m_depth_textures_->CreateBuffer();
+    m_shadowmap_handle_ = m_depth_textures_->UploadBuffer();
     camera->SetTransform(light->GameObject()->Transform());
-    Instance()->m_lights_.emplace(light, camera);
+    m_lights_.emplace(light, camera);
+
 }
 
 void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
 {
-    Instance()->m_lights_.erase(light);
+    auto depth_texture = m_lights_[light]->m_depth_texture_;
+    m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(depth_texture));
+    m_lights_.erase(light);
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)

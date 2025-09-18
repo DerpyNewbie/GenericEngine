@@ -11,6 +11,9 @@ void DirectionalLight::OnAwake()
 }
 void DirectionalLight::OnUpdate()
 {
-    m_light_data_.direction = GameObject()->Transform()->Forward();
+    Vector3 forward = GameObject()->Transform()->Forward();
+    m_light_data_.direction.x = forward.x;
+    m_light_data_.direction.y = forward.y;
+    m_light_data_.direction.z = forward.z;
 }
 }

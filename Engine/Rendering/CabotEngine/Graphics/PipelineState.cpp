@@ -16,7 +16,8 @@ PipelineState::PipelineState()
     m_desc_.SampleMask = UINT_MAX;
     m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
     m_desc_.NumRenderTargets = 1;
-    m_desc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    for (auto &RTVFormat : m_desc_.RTVFormats)
+        RTVFormat = DXGI_FORMAT_UNKNOWN;
     m_desc_.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     m_desc_.SampleDesc.Count = 1;
     m_desc_.SampleDesc.Quality = 0;
@@ -51,6 +52,10 @@ void PipelineState::SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC &depth_s
 void PipelineState::SetNumRenderTarget(const UINT num_render_target)
 {
     m_desc_.NumRenderTargets = num_render_target;
+    for (int i = 0; i < num_render_target; ++i)
+    {
+        m_desc_.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    }
 }
 
 void PipelineState::SetVS(const std::wstring &file_path)

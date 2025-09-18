@@ -13,5 +13,6 @@ public:
     void EndRender();
 
     ID3D12DescriptorHeap *GetHeap();
+    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 };
 }

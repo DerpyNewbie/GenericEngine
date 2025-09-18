@@ -2,6 +2,7 @@
 #include "light.h"
 #include "directional_light.h"
 #include "gui.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -11,14 +12,14 @@ int Light::m_last_light_count_;
 std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
 std::vector<std::shared_ptr<Light>> Light::m_lights_;
 std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
+std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
 
 void Light::UpdateLightCountBuffer()
 {
-    if (m_lights_.empty())
-        return;
-    int light_count = m_lights_.size();
+    std::array<LightCountBuffer, 1> light_count_buffer;
+    light_count_buffer[0].count = m_lights_.size();
 
-    m_light_count_buffer_->UpdateBuffer(&light_count);
+    m_light_count_buffer_->UpdateBuffer(light_count_buffer.data());
 }
 
 void Light::UpdateLightBuffer()
@@ -32,11 +33,17 @@ void Light::UpdateLightBuffer()
         m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
                                                               kMaxLightCount);
         m_lights_buffer_->CreateBuffer();
+        m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
     }
 
-    std::vector<LightData> properties;
     for (const auto light : m_lights_)
-        properties.emplace_back(light->m_light_data_);
+    {
+        light->SetMatrix();
+    }
+
+    std::array<LightData, kMaxLightCount> properties;
+    for (int i = 0; i < m_lights_.size(); ++i)
+        properties[i] = m_lights_[i]->m_light_data_;
     m_lights_buffer_->UpdateBuffer(properties.data());
 }
 
@@ -61,7 +68,7 @@ void Light::SetLightBuffer()
         return;
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootShaderResourceView(kLightSRV, m_lights_buffer_->GetAddress());
+    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->HandleGPU);
 }
 
 void Light::SetBuffers()
@@ -70,10 +77,19 @@ void Light::SetBuffers()
     SetLightBuffer();
 }
 
+void Light::SetMatrix()
+{
+    m_light_data_.view_proj = m_camera_->ProjectionMatrix() * m_camera_->ViewMatrix();
+}
+
 void Light::OnInspectorGui()
 {
     Gui::PropertyField("Intensity", m_light_data_.intensity);
     Gui::ColorField("LightColor", m_light_data_.color);
+}
+void Light::OnEnabled()
+{
+    RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
 }
 
 void Light::OnUpdate()

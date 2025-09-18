@@ -29,7 +29,13 @@ RootSignature::RootSignature()
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kLightCountCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kBoneSRV].InitAsShaderResourceView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kLightSRV].InitAsShaderResourceView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
+    CD3DX12_DESCRIPTOR_RANGE tableRangeLight = {};
+    tableRangeLight.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
+    rootParam[kLightSRV].InitAsDescriptorTable(1, &tableRangeLight, D3D12_SHADER_VISIBILITY_ALL);
+
+    CD3DX12_DESCRIPTOR_RANGE tableRangeShadowMap = {};
+    tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
+    rootParam[kShadowMapSRV].InitAsDescriptorTable(1, &tableRangeShadowMap, D3D12_SHADER_VISIBILITY_ALL);
 
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
@@ -39,10 +45,10 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
     tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 3);
-    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 2);
+    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3);
     tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
     tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 3);
-    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 2);
+    tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3);
     tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
 
     rootParam[kVertexCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_VERTEX);
@@ -57,9 +63,8 @@ RootSignature::RootSignature()
     sampler[0] = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
     sampler[1] = CD3DX12_STATIC_SAMPLER_DESC(1, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
-    sampler[1].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    sampler[1].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
-    sampler[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler[1].AddressU = sampler[1].AddressV = sampler[1].AddressW = D3D12_TEXTURE_ADDRESS_MODE_BORDER;
+    sampler[1].ComparisonFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
     D3D12_ROOT_SIGNATURE_DESC desc = {};
     desc.NumParameters = static_cast<UINT>(std::size(rootParam));

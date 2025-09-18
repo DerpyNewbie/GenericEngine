@@ -110,7 +110,14 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
                                    const Color background_color) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
-    auto currentRtvHandle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+    int num_render_target = 0;
+    D3D12_CPU_DESCRIPTOR_HANDLE *currentRtvHandle = nullptr;
+    if (rtv_heap != nullptr)
+    {
+        num_render_target = 1;
+        auto rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+        currentRtvHandle = &rtv_handle;
+    }
 
     // 深度ステンシルのディスクリプタヒープの開始アドレス取得
     D3D12_CPU_DESCRIPTOR_HANDLE currentDsvHandle = dsv_heap == nullptr
@@ -122,11 +129,12 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
     m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
 
     // レンダーターゲットを設定
-    m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
+    m_p_command_list_->OMSetRenderTargets(num_render_target, currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, background_color, 0,
-                                             nullptr);
+    if (currentRtvHandle != nullptr)
+        m_p_command_list_->ClearRenderTargetView(*currentRtvHandle, background_color, 0,
+                                                 nullptr);
 
     // 深度ステンシルビューをクリア
     m_p_command_list_->
