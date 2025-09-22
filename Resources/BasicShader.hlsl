@@ -1,17 +1,14 @@
-cbuffer Transform : 
-register (b0)
+cbuffer Transform : register (b0)
 {
     float4x4 World;
 }
-cbuffer Transforms : 
-register (b1)
+cbuffer Transforms : register (b1)
 {
     float4x4 View;
     float4x4 Proj;
 }
 
-StructuredBuffer<float4x4> BoneMatrices : 
-register (t0);
+StructuredBuffer<float4x4> BoneMatrices : register (t0);
 
 struct VSInput
 {
@@ -60,36 +57,35 @@ static const float4x4 identityMatrix = {
 VSOutput vrt(VSInput input)
 {
     VSOutput output = (VSOutput)0;
+
     float4 localPos = float4(input.pos, 1.0f);
     float3 localNormal = input.normal;
-    float4 bonePos = float4(0, 0, 0, 0);
-    float3 boneNormal = float3(0, 0, 0);
-    for (int i = 0; i < input.bones_per_vertex; ++i)
+
+    float4 skinnedPos = 0;
+    float3 skinnedNormal = 0;
+
+    [unroll]
+    for (int i = 0; i < 4; ++i)
     {
-        float weight = input.bone_weight[i];
-        if (weight > 0)
+        float w = input.bone_weight[i];
+        if (w > 0)
         {
             float4x4 boneMatrix = BoneMatrices[input.bone_id[i]];
-            float3x3 boneRot = ExtractRotation(boneMatrix);
-            bonePos += mul(boneMatrix, localPos) * weight;
-            boneNormal += mul(boneRot, localNormal) * weight;
+            skinnedPos += mul(boneMatrix, localPos) * w;
+            skinnedNormal += mul((float3x3)boneMatrix, localNormal) * w;
         }
     }
-    if (input.bones_per_vertex != 0)
-    {
-        localPos = bonePos;
-        localNormal = boneNormal;
-    }
+
+    localPos = skinnedPos;
+    localNormal = skinnedNormal;
 
     float4 worldPos = mul(World, localPos);
-    float4 viewPos = mul(View, worldPos);
-    float4 projPos = mul(Proj, viewPos);
+    float4 projPos = mul(Proj, mul(View, worldPos));
 
-    float3x3 worldRot = ExtractRotation(World);
-    float3 worldNormal = mul(worldRot, localNormal);
+    float3 worldNormal = mul((float3x3)World, localNormal);
 
     output.svpos = projPos;
-    output.normal = normalize(float3(worldNormal.x, worldNormal.y, worldNormal.z));
+    output.normal = normalize(worldNormal);
     output.color = input.color;
     output.uv = input.uv;
     output.worldpos = worldPos.xyz;
@@ -115,23 +111,17 @@ struct Light
     float4x4 proj;
 };
 
-cbuffer LightCount : 
-register (b2)
+cbuffer LightCount : register (b2)
 {
     int light_count;
     int a[63];
 }
 
-StructuredBuffer<Light> Lights : 
-register (t1);
-Texture2DArray ShadowMaps : 
-register (t2);
-Texture2D _MainTex : 
-register (t3);
-SamplerState smp : 
-register (s0);
-SamplerComparisonState shadowSampler : 
-register (s1);
+StructuredBuffer<Light> Lights : register (t1);
+Texture2DArray ShadowMaps : register (t2);
+Texture2D _MainTex : register (t3);
+SamplerState smp : register (s0);
+SamplerComparisonState shadowSampler : register (s1);
 
 float SampleShadowPCF(float3 shadowCoord, int lightIndex)
 {

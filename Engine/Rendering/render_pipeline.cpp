@@ -37,6 +37,7 @@ void RenderPipeline::InvokeDrawCall()
         if (render_tex)
         {
             render_tex->BeginRender(camera->m_property_.background_color);
+            rtv_heap = render_tex->GetHeap();
         }
 
         if (camera->m_depth_texture_)

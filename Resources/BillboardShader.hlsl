@@ -66,21 +66,12 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2DArray<float> ShadowMaps : register(t2);
 Texture2D _MainTex : register(t3);
-
-float LinearizeDepth(float depth, float nearZ, float farZ)
-{
-    return nearZ * farZ / (farZ - depth * (farZ - nearZ));
-}
 
 float4 pix(VSOutput input) : SV_TARGET
 {
     float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
-    float depth = ShadowMaps.Sample(smp, float3(flippedUV.xy, 1));
-    float linearDepth = LinearizeDepth(depth, 0.1f, 5.0f);
+    float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    // [0,1] に正規化して可視化
-    float normalized = saturate(linearDepth / 5.0f);
-    return float4(normalized, normalized, normalized, 1);
+    return mainColor;
 }
