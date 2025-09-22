@@ -84,6 +84,35 @@ void DepthTexture::EndRender()
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
+void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_array)
+{
+    D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+    heapDesc.NumDescriptors = 1;
+    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+
+    const auto device = RenderEngine::Device();
+    const auto hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_dsv_heap_));
+    if (FAILED(hr))
+    {
+        Logger::Error<DepthTexture>("Failed To Create DSV Heap for DepthTexture");
+    }
+
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
+    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
+    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
+    dsvDesc.Texture2DArray.FirstArraySlice = texture_array->FreeIndex();
+    dsvDesc.Texture2DArray.ArraySize = 1;
+    dsvDesc.Texture2DArray.MipSlice = 0;
+
+    const D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle =
+        m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
+    device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
+
+    texture_array->PushFreeIndex();
+    m_pResource = texture_array->Resource();
+}
+
 ID3D12DescriptorHeap *DepthTexture::GetHeap()
 {
     return m_dsv_heap_.Get();

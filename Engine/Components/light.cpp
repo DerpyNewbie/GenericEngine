@@ -10,7 +10,7 @@ namespace engine
 {
 int Light::m_last_light_count_;
 std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
-std::vector<std::shared_ptr<Light>> Light::m_lights_;
+std::vector<std::weak_ptr<Light>> Light::m_lights_;
 std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
 std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
 
@@ -36,14 +36,9 @@ void Light::UpdateLightBuffer()
         m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
     }
 
-    for (const auto light : m_lights_)
-    {
-        light->SetMatrix();
-    }
-
     std::array<LightData, kMaxLightCount> properties;
     for (int i = 0; i < m_lights_.size(); ++i)
-        properties[i] = m_lights_[i]->m_light_data_;
+        properties[i] = m_lights_[i].lock()->m_light_data_;
     m_lights_buffer_->UpdateBuffer(properties.data());
 }
 
@@ -51,7 +46,7 @@ void Light::SetLightCountBuffer()
 {
     if (m_light_count_buffer_ == nullptr)
     {
-        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(int));
+        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
         m_light_count_buffer_->CreateBuffer();
     }
 
@@ -77,23 +72,36 @@ void Light::SetBuffers()
     SetLightBuffer();
 }
 
-void Light::SetMatrix()
-{
-    m_light_data_.view_proj = m_camera_->ProjectionMatrix() * m_camera_->ViewMatrix();
-}
-
 void Light::OnInspectorGui()
 {
     Gui::PropertyField("Intensity", m_light_data_.intensity);
     Gui::ColorField("LightColor", m_light_data_.color);
 }
+
+void Light::SetCamera(const std::shared_ptr<Camera> camera)
+{
+    camera->m_property_.far_plane = 20;
+    camera->m_property_.view_mode = kViewMode::kOrthographic;
+    m_camera_ = camera;
+}
+
 void Light::OnEnabled()
 {
     RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
+    m_lights_.emplace_back(shared_from_base<Light>());
+}
+void Light::OnDisabled()
+{
+    RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
+    auto this_light = shared_from_base<Light>();
+    std::erase_if(m_lights_, [this_light](const std::weak_ptr<Light> &light) {
+        return this_light == light.lock();
+    });
 }
 
 void Light::OnUpdate()
 {
-    m_light_data_.view_proj = m_camera_->ProjectionMatrix() * m_camera_->ViewMatrix();
+    m_light_data_.view = m_camera_->ViewMatrix();
+    m_light_data_.proj = m_camera_->ProjectionMatrix();
 }
 }

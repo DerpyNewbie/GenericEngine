@@ -4,41 +4,14 @@
 #include "DescriptorHeap.h"
 #include "RenderEngine.h"
 
-void Texture2DArray::CreateBuffer()
+void Texture2DArray::CopyResource()
 {
-    auto texture = m_textures_[0].CastedLock();
-    D3D12_RESOURCE_DESC array_desc = {};
-    array_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
-    array_desc.Width = texture->Width();
-    array_desc.Height = texture->Height();
-    array_desc.DepthOrArraySize = m_textures_.size();
-    array_desc.MipLevels = texture->MipLevel();
-    array_desc.Format = texture->Format();
-    array_desc.SampleDesc.Count = 1;
-    array_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
-    array_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+    const auto texture = m_textures_[0].CastedLock();
+    const auto texture_size = Vector2(texture->Width(), texture->Height());
 
-    const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-    auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &array_desc,
-        D3D12_RESOURCE_STATE_COPY_DEST,
-        nullptr,
-        IID_PPV_ARGS(&m_p_resource_)
-        );
-
-    if (FAILED(hr))
+    if (!CreateResource(texture_size, m_textures_.size(), texture->MipLevel(), texture->Format()))
     {
-        m_is_valid_ = false;
         return;
-    }
-
-    hr = m_p_resource_->SetName(L"TextureArray");
-    if (FAILED(hr))
-    {
-        m_is_valid_ = false;
     }
 
     const auto cmd_list = RenderEngine::CommandList();
@@ -78,6 +51,7 @@ void Texture2DArray::CreateBuffer()
         cmd_list->ResourceBarrier(1, &barrier1);
     }
 
+    m_free_index_ = -1;
     m_is_valid_ = true;
 
     const CD3DX12_RESOURCE_BARRIER barrier =
@@ -86,17 +60,57 @@ void Texture2DArray::CreateBuffer()
                                              D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     cmd_list->ResourceBarrier(1, &barrier);
 }
-void Texture2DArray::UpdateBuffer(void *data)
-{}
+
+bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count, const UINT16 mip_level,
+                                    const DXGI_FORMAT format, const D3D12_RESOURCE_FLAGS flags,
+                                    D3D12_CLEAR_VALUE *clear_value)
+{
+    m_element_count_ = elem_count;
+    m_format_ = format;
+    m_mip_level_ = mip_level;
+    m_free_index_ = 0;
+
+    D3D12_RESOURCE_DESC array_desc = {};
+    array_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+    array_desc.Width = static_cast<UINT64>(size.x);
+    array_desc.Height = static_cast<UINT64>(size.y);
+    array_desc.DepthOrArraySize = elem_count;
+    array_desc.MipLevels = mip_level;
+    array_desc.Format = format;
+    array_desc.SampleDesc.Count = 1;
+    array_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
+    array_desc.Flags = flags;
+
+    const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
+        &prop,
+        D3D12_HEAP_FLAG_NONE,
+        &array_desc,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        clear_value,
+        IID_PPV_ARGS(&m_p_resource_)
+        );
+
+    if (FAILED(hr))
+    {
+        m_is_valid_ = false;
+        return false;
+    }
+
+    hr = m_p_resource_->SetName(L"TextureArray");
+    if (FAILED(hr))
+    {
+        m_is_valid_ = false;
+    }
+
+    m_is_valid_ = true;
+    return true;
+}
 
 std::shared_ptr<DescriptorHandle> Texture2DArray::UploadBuffer()
 {
     return DescriptorHeap::Register(this);
-}
-
-bool Texture2DArray::CanUpdate()
-{
-    return false;
 }
 
 bool Texture2DArray::IsValid()
@@ -113,19 +127,20 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2DArray::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC view_desc = {};
     view_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    view_desc.Format = m_p_resource_->GetDesc().Format;
+    view_desc.Format = m_format_;
     view_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DARRAY;
-    view_desc.Texture2DArray.MipLevels = m_textures_.begin()->CastedLock()->MipLevel();
+    view_desc.Texture2DArray.MipLevels = m_mip_level_;
     view_desc.Texture2DArray.FirstArraySlice = 0;
-    view_desc.Texture2DArray.ArraySize = m_textures_.size();
+    view_desc.Texture2DArray.ArraySize = m_element_count_;
 
     return view_desc;
 }
 
 void Texture2DArray::AddTexture(engine::AssetPtr<Texture2D> texture)
 {
+    ++m_element_count_;
     m_textures_.emplace_back(texture);
-    CreateBuffer();
+    CopyResource();
 }
 
 void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
@@ -138,5 +153,27 @@ void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
         m_is_valid_ = false;
         return;
     }
-    CreateBuffer();
+    PopFreeIndex();
+    --m_element_count_;
+    CopyResource();
+}
+
+UINT Texture2DArray::FreeIndex() const
+{
+    return m_free_index_;
+}
+
+void Texture2DArray::PushFreeIndex()
+{
+    if (m_free_index_ < -1 || m_free_index_ > m_element_count_)
+        ++m_free_index_;
+}
+
+void Texture2DArray::PopFreeIndex()
+{
+    --m_free_index_;
+}
+void Texture2DArray::SetFormat(const DXGI_FORMAT format)
+{
+    m_format_ = format;
 }

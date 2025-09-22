@@ -1,14 +1,17 @@
-cbuffer Transform : register(b0)
+cbuffer Transform : 
+register (b0)
 {
     float4x4 World;
 }
-cbuffer Transforms : register(b1)
+cbuffer Transforms : 
+register (b1)
 {
     float4x4 View;
     float4x4 Proj;
 }
 
-StructuredBuffer<float4x4> BoneMatrices : register(t0);
+StructuredBuffer<float4x4> BoneMatrices : 
+register (t0);
 
 struct VSInput
 {
@@ -32,7 +35,7 @@ struct VSInput
 struct VSOutput
 {
     float4 svpos : SV_POSITION;
-    float3 normal: NORMAL;
+    float3 normal : NORMAL;
     float4 color : COLOR;
     float2 uv : TEXCOORD0;
     float3 worldpos : TEXCOORD1;
@@ -108,60 +111,94 @@ struct Light
     float outer_cos;
     float2 padding;
 
-    float4x4 view_proj;
+    float4x4 view;
+    float4x4 proj;
 };
 
-cbuffer LightCount : register(b2)
+cbuffer LightCount : 
+register (b2)
 {
     int light_count;
     int a[63];
 }
 
-StructuredBuffer<Light> Lights : register(t1);
-Texture2DArray ShadowMaps : register(t2);
-Texture2D _MainTex : register(t3);
-SamplerState smp : register(s0);
-SamplerComparisonState shadowSampler : register(s1);
+StructuredBuffer<Light> Lights : 
+register (t1);
+Texture2DArray ShadowMaps : 
+register (t2);
+Texture2D _MainTex : 
+register (t3);
+SamplerState smp : 
+register (s0);
+SamplerComparisonState shadowSampler : 
+register (s1);
+
+float SampleShadowPCF(float3 shadowCoord, int lightIndex)
+{
+    float shadow = 0.0;
+    const float2 texelSize = 1.0 / float2(1920, 1065);
+
+    [unroll]
+    for (int x = -1; x <= 1; x++)
+    {
+        [unroll]
+        for (int y = -1; y <= 1; y++)
+        {
+            float2 offset = float2(x, y) * texelSize;
+            shadow += ShadowMaps.SampleCmpLevelZero(
+                shadowSampler,
+                float3(shadowCoord.xy + offset, lightIndex),
+                shadowCoord.z
+            );
+        }
+    }
+
+    shadow /= 9.0;
+    return shadow;
+}
 
 float4 pix(VSOutput input) : SV_TARGET
-{
+    {
     float3 N = normalize(input.normal);
     float3 brightness = float3(0, 0, 0);
 
-    if(light_count == 0)
-    {
+    if (light_count == 0)
+        {
         float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
         float4 mainColor = _MainTex.Sample(smp, flippedUV);
         return float4(mainColor.rgb, mainColor.a);
-    }
+        }
 
     for (int i = 0; i < light_count; ++i)
-    {
+        {
         float3 L = normalize(-Lights[i].direction);
         float NdotL = saturate(dot(N, L));
 
         float4 worldPos = float4(input.worldpos, 1);
-        float4 lightClip = mul(Lights[i].view_proj, worldPos);
-
+        float4 viewPos = mul(Lights[i].view, worldPos);
+        float4 lightClip = mul(Lights[i].proj, viewPos);
         float3 shadowCoord;
-        shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
-        shadowCoord.z = (lightClip.z / lightClip.w) * 0.5f + 0.5f;
+            shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
+            shadowCoord.z = lightClip.z / lightClip.w;
+        
+        float shadow = 0;
+        if (shadowCoord.x < 0 || shadowCoord.x > 1 ||
+            shadowCoord.y < 0 || shadowCoord.y > 1)
+            {
+                shadow = 1.0f;
+            }
+        else
+        {
+            shadowCoord.y = 1 - shadowCoord.y;
 
-        float shadow = ShadowMaps.SampleCmpLevelZero(
-            shadowSampler,
-            float3(shadowCoord.xy, i),
-            shadowCoord.z
-            );
+            shadow = SampleShadowPCF(shadowCoord, i);
+        }
 
-        brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
-        float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
-        float4 mainColor = _MainTex.Sample(smp, flippedUV);
-
-        return float4(Lights[i].intensity, 0, 0, 1);
-    }
+            brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
+        }
 
     float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
     float4 mainColor = _MainTex.Sample(smp, flippedUV);
 
-    return float4(mainColor.rgb, mainColor.a);
-}
+    return float4(mainColor.rgb * brightness, mainColor.a);
+    }

@@ -7,9 +7,7 @@ namespace engine
 {
 class DirectionalLight : public Light
 {
-
 public:
-    void OnAwake() override;
     void OnUpdate() override;
 };
 }

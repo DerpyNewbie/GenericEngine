@@ -77,30 +77,40 @@ void RenderPipeline::InvokeDrawCall()
     }
 }
 
-void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::UpdateBuffer(const std::shared_ptr<Camera> &camera)
 {
     SetShadowMap();
     Camera::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
     Skybox::Instance()->Render();
     Light::SetBuffers();
+    if (m_is_updated_)
+    {
+        return;
+    }
+    for (const auto renderer : m_renderers_)
+    {
+        renderer->UpdateBuffer();
+    }
+}
+
+void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
+{
+    UpdateBuffer(camera);
     auto renderers = camera->FilterVisibleObjects(m_renderers_);
     for (auto renderer : renderers)
     {
-        renderer->UpdateBuffer();
         renderer->Render();
     }
     Gizmos::Render();
 }
 
-void RenderPipeline::DepthRender(const std::shared_ptr<Camera> &camera) const
+void RenderPipeline::DepthRender(const std::shared_ptr<Camera> &camera)
 {
-    camera->SetViewProjMatrix();
-    Light::SetBuffers();
+    UpdateBuffer(camera);
     const auto renderers = camera->FilterVisibleObjects(m_renderers_);
     for (const auto renderer : renderers)
     {
-        renderer->UpdateBuffer();
         renderer->DepthRender();
     }
 }
@@ -110,9 +120,17 @@ void RenderPipeline::SetShadowMap()
     if (m_depth_textures_ == nullptr)
     {
         m_depth_textures_ = std::make_shared<Texture2DArray>();
+        D3D12_CLEAR_VALUE clear_value = {};
+        clear_value.Format = DXGI_FORMAT_D32_FLOAT;
+        clear_value.DepthStencil.Depth = 1.0f;
+        clear_value.DepthStencil.Stencil = 0;
+        m_depth_textures_->CreateResource(shadow_map_size, Light::kMaxLightCount, 1, DXGI_FORMAT_R32_TYPELESS,
+                                          D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clear_value);
+        m_depth_textures_->SetFormat(DXGI_FORMAT_R32_FLOAT);
+        m_shadowmap_handle_ = m_depth_textures_->UploadBuffer();
     }
     const auto cmd_list = RenderEngine::CommandList();
-    if (m_depth_textures_->IsValid())
+    if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
                                                  m_shadowmap_handle_->HandleGPU);
 }
@@ -131,15 +149,11 @@ size_t RenderPipeline::GetRendererCount()
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 {
     auto camera = std::make_shared<Camera>();
-    light->m_camera_ = camera;
+    light->SetCamera(camera);
     camera->m_depth_texture_ = std::make_shared<DepthTexture>();
-    camera->m_depth_texture_->CreateBuffer();
-    m_depth_textures_->AddTexture(AssetPtr<Texture2D>::FromManaged(camera->m_depth_texture_));
-    m_depth_textures_->CreateBuffer();
-    m_shadowmap_handle_ = m_depth_textures_->UploadBuffer();
+    camera->m_depth_texture_->SetResource(m_depth_textures_);
     camera->SetTransform(light->GameObject()->Transform());
     m_lights_.emplace(light, camera);
-
 }
 
 void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)

@@ -21,9 +21,9 @@ struct alignas(16) LightData
     float outer_cos;
     float padding[2]; // ★ HLSL の float2 padding と対応させる
 
-    DirectX::XMFLOAT4X4 view_proj;
+    Matrix view;
+    Matrix proj;
 };
-static_assert(sizeof(LightData) == 144, "LightData size mismatch");
 
 
 struct alignas(256) LightCountBuffer
@@ -48,16 +48,16 @@ class Light : public Component
     static void SetLightBuffer();
     static void SetBuffers();
 
-    void SetMatrix();
-
 protected:
-    static std::vector<std::shared_ptr<Light>> m_lights_;
+    static std::vector<std::weak_ptr<Light>> m_lights_;
     LightData m_light_data_;
     std::shared_ptr<Camera> m_camera_;
 
 public:
     void OnInspectorGui() override;
+    virtual void SetCamera(std::shared_ptr<Camera> camera);
     void OnEnabled() override;
+    void OnDisabled() override;
     void OnUpdate() override;
 };
 }

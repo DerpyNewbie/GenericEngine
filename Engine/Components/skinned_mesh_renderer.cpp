@@ -73,10 +73,9 @@ void SkinnedMeshRenderer::UpdateBuffer()
     UpdateBoneTransformsBuffer();
 
     const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
-    const auto bone_matrix_buffer = m_bone_matrix_buffers_[current_buffer]->GetAddress();
     const auto cmd_list = RenderEngine::CommandList();
 
-    cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffer);
+    cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->HandleGPU);
 }
 
 void SkinnedMeshRenderer::Render()
@@ -91,12 +90,13 @@ void SkinnedMeshRenderer::ReconstructBuffer()
 {
     MeshRenderer::ReconstructBuffer();
 
-    for (auto &bone_matrices_buffer : m_bone_matrix_buffers_)
+    for (int i = 0; i < m_bone_matrix_buffers_.size(); ++i)
     {
-        if (!bone_matrices_buffer)
+        if (!m_bone_matrix_buffers_[i])
         {
-            bone_matrices_buffer = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
-            bone_matrices_buffer->CreateBuffer();
+            m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
+            m_bone_matrix_buffers_[i]->CreateBuffer();
+            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
         }
     }
 }

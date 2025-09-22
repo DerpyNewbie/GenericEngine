@@ -12,15 +12,18 @@ class RenderPipeline
 {
     friend Engine;
     friend Camera;
+    static constexpr Vector2 shadow_map_size = {1920, 1065};
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::unordered_set<std::shared_ptr<Camera>> m_cameras_;
     std::unordered_map<std::shared_ptr<Light>, std::shared_ptr<Camera>> m_lights_;
     std::shared_ptr<Texture2DArray> m_depth_textures_;
     std::shared_ptr<DescriptorHandle> m_shadowmap_handle_;
+    bool m_is_updated_ = false;
 
     void InvokeDrawCall();
+    void UpdateBuffer(const std::shared_ptr<Camera> &camera);
     void Render(const std::shared_ptr<Camera> &camera);
-    void DepthRender(const std::shared_ptr<Camera> &camera) const;
+    void DepthRender(const std::shared_ptr<Camera> &camera);
 
     void SetShadowMap();
 
