@@ -246,12 +246,25 @@ void AssetDescriptor::Import()
 
         Save();
     }
+    catch (const std::runtime_error &e)
+    {
+        Logger::Error<AssetDescriptor>(
+            "Failed to import asset '%s': %s",
+            AssetPath().string().c_str(), e.what());
+
+#if defined(DEBUG) || defined(_DEBUG)
+        DebugBreak();
+#endif
+    }
     catch (...)
     {
         Logger::Error<AssetDescriptor>(
-            "Failed to import asset '%s'!",
+            "Failed to import asset '%s' due to an unknown exception!",
             AssetPath().string().c_str());
+
+#if defined(DEBUG) || defined(_DEBUG)
         DebugBreak();
+#endif
     }
 }
 
