@@ -40,7 +40,7 @@ void LineRenderer::OnInspectorGui()
 
 void LineRenderer::Render()
 {
-    const auto camera = Camera::Main();
+    const auto camera = CameraComponent::Main();
     const Matrix view = camera->ViewMatrix();
     const Matrix proj = camera->ProjectionMatrix();
 

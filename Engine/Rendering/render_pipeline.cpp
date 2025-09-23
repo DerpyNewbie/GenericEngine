@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "camera.h"
+#include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "render_pipeline.h"
 
@@ -67,7 +67,7 @@ void RenderPipeline::InvokeDrawCall()
         }
     }
 
-    if (const auto main_camera = Camera::Main())
+    if (const auto main_camera = CameraComponent::Main())
     {
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
@@ -78,10 +78,10 @@ void RenderPipeline::InvokeDrawCall()
     }
 }
 
-void RenderPipeline::UpdateBuffer(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera)
 {
     SetShadowMap();
-    Camera::SetCurrentCamera(camera);
+    CameraComponent::SetCurrentCamera(camera);
     camera->SetViewProjMatrix();
     Skybox::Instance()->Render();
     Light::SetBuffers();
@@ -95,7 +95,7 @@ void RenderPipeline::UpdateBuffer(const std::shared_ptr<Camera> &camera)
     }
 }
 
-void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
 {
     UpdateBuffer(camera);
     auto renderers = camera->FilterVisibleObjects(m_renderers_);
@@ -106,7 +106,7 @@ void RenderPipeline::Render(const std::shared_ptr<Camera> &camera)
     Gizmos::Render();
 }
 
-void RenderPipeline::DepthRender(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::DepthRender(const std::shared_ptr<CameraComponent> &camera)
 {
     UpdateBuffer(camera);
     const auto renderers = camera->FilterVisibleObjects(m_renderers_);
@@ -149,11 +149,11 @@ size_t RenderPipeline::GetRendererCount()
 
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 {
-    auto camera = std::make_shared<Camera>();
+    auto go = light->GameObject();
+    auto camera = go->AddComponent<CameraComponent>();
     light->SetCamera(camera);
     camera->m_depth_texture_ = std::make_shared<DepthTexture>();
     camera->m_depth_texture_->SetResource(m_depth_textures_);
-    camera->SetTransform(light->GameObject()->Transform());
     m_lights_.emplace(light, camera);
 }
 
@@ -180,12 +180,12 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
     renderers.erase(pos);
 }
 
-void RenderPipeline::AddCamera(std::shared_ptr<Camera> camera)
+void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
 {
     Instance()->m_cameras_.emplace(camera);
 }
 
-void RenderPipeline::RemoveCamera(const std::shared_ptr<Camera> &camera)
+void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
 {
     Instance()->m_cameras_.erase(camera);
 }

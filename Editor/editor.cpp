@@ -170,8 +170,8 @@ void Editor::OnDraw()
         SetEditorStyle(EditorPrefs::theme);
     if (EditorPrefs::show_grid)
     {
-        if (const auto camera = Camera::Main())
-            EditorGizmos::DrawYPlaneGrid(camera->GetTransform()->WorldMatrix());
+        if (const auto camera = CameraComponent::Main())
+            EditorGizmos::DrawYPlaneGrid(camera->GameObject()->Transform()->WorldMatrix());
     }
     if (EditorPrefs::show_physics_debug)
         Physics::DebugDraw();

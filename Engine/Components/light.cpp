@@ -16,10 +16,9 @@ std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
 
 void Light::UpdateLightCountBuffer()
 {
-    std::array<LightCountBuffer, 1> light_count_buffer;
-    light_count_buffer[0].count = m_lights_.size();
+    LightCountBuffer lcb(m_lights_.size());
 
-    m_light_count_buffer_->UpdateBuffer(light_count_buffer.data());
+    m_light_count_buffer_->UpdateBuffer(&lcb);
 }
 
 void Light::UpdateLightBuffer()
@@ -78,7 +77,7 @@ void Light::OnInspectorGui()
     Gui::ColorField("LightColor", m_light_data_.color);
 }
 
-void Light::SetCamera(const std::shared_ptr<Camera> camera)
+void Light::SetCamera(const std::shared_ptr<CameraComponent> camera)
 {
     camera->m_property_.far_plane = 20;
     camera->m_property_.view_mode = kViewMode::kOrthographic;

@@ -46,7 +46,7 @@ void Billboard::Update()
         }
     }
 
-    const auto camera = engine::Camera::Main();
+    const auto camera = engine::CameraComponent::Main();
     if (camera == nullptr)
     {
         engine::Logger::Error<Billboard>("Main Camera is not set!");
@@ -54,7 +54,7 @@ void Billboard::Update()
     }
 
     auto obj_pos = world_matrix.Translation();
-    auto camera_transform = camera->GetTransform()->WorldMatrix();
+    auto camera_transform = camera->GameObject()->Transform()->WorldMatrix();
     auto camera_pos = camera_transform.Translation();
     Vector3 dir_vec3 = camera_pos - obj_pos;
 

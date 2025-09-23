@@ -55,7 +55,7 @@ void TextRenderer::Render()
 
 std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
 {
-    return Camera::Current()->GetTransform();
+    return CameraComponent::Current()->GameObject()->Transform();
 }
 }
 

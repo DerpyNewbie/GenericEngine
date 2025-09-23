@@ -1,6 +1,6 @@
 #pragma once
 #include "component.h"
-#include "Rendering/camera.h"
+#include "Components/camera_component.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
 
@@ -28,12 +28,13 @@ struct alignas(16) LightData
 
 struct alignas(256) LightCountBuffer
 {
+    ~LightCountBuffer() = default;
     uint32_t count;
 };
 
 class Light : public Component
 {
-    friend Camera;
+    friend CameraComponent;
     friend RenderPipeline;
 
     constexpr static int kMaxLightCount = 10;
@@ -51,11 +52,11 @@ class Light : public Component
 protected:
     static std::vector<std::weak_ptr<Light>> m_lights_;
     LightData m_light_data_;
-    std::shared_ptr<Camera> m_camera_;
+    std::shared_ptr<CameraComponent> m_camera_;
 
 public:
     void OnInspectorGui() override;
-    virtual void SetCamera(std::shared_ptr<Camera> camera);
+    virtual void SetCamera(std::shared_ptr<CameraComponent> camera);
     void OnEnabled() override;
     void OnDisabled() override;
     void OnUpdate() override;

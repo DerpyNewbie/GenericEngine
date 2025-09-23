@@ -71,7 +71,6 @@
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
-        <ClCompile Include="Engine\Components\skybox.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -97,7 +96,6 @@
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
-        <ClCompile Include="Engine\Rendering\camera.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <FxCompile Include="Depth.hlsl">
             <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
@@ -255,7 +253,6 @@
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
-        <ClInclude Include="Engine\Components\skybox.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
@@ -290,7 +287,6 @@
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
-        <ClInclude Include="Engine\Rendering\camera.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
