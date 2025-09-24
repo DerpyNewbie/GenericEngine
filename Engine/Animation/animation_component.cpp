@@ -250,7 +250,9 @@ void AnimationComponent::Sample()
             const auto curve = clip->FindCurve(path);
 
             total_rot_weight += state->weight;
-            const float t = total_rot_weight == 0 ? state->weight : state->weight / total_rot_weight;
+            const float t = Mathf::Approximately(total_rot_weight, 0)
+                                ? state->weight
+                                : state->weight / total_rot_weight;
             if (curve == nullptr)
             {
                 final_trs.translate += default_matrix.translate * state->weight;
