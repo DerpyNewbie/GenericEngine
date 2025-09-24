@@ -1,13 +1,14 @@
 #pragma once
-#include "component.h"
 #include "light.h"
-#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace engine
 {
 class DirectionalLight : public Light
 {
+    float m_cover_size_ = 10.0f;
+
 public:
+    void OnInspectorGui() override;
     void OnUpdate() override;
 };
 }
