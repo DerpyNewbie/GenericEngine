@@ -19,7 +19,7 @@ struct alignas(16) LightData
 
     float inner_cos;
     float outer_cos;
-    float padding[2]; // ★ HLSL の float2 padding と対応させる
+    float padding[2];
 
     Matrix view;
     Matrix proj;

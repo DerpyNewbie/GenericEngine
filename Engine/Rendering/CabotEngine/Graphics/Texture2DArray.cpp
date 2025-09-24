@@ -153,7 +153,6 @@ void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
         m_is_valid_ = false;
         return;
     }
-    PopFreeIndex();
     --m_element_count_;
     CopyResource();
 }
