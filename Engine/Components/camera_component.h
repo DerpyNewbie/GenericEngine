@@ -77,5 +77,12 @@ public:
 
     Matrix ViewMatrix() const;
     Matrix ProjectionMatrix() const;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_property_));
+    }
 };
 }
