@@ -8,7 +8,6 @@
 
 namespace engine
 {
-int Light::m_last_light_count_;
 std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
 std::vector<std::weak_ptr<Light>> Light::m_lights_;
 std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
@@ -23,7 +22,6 @@ void Light::UpdateLightCountBuffer()
 
 void Light::UpdateLightBuffer()
 {
-    m_last_light_count_ = m_lights_.size();
     if (m_lights_.empty())
         return;
 

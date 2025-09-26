@@ -38,7 +38,6 @@ class Light : public Component
     friend RenderPipeline;
 
     constexpr static int kMaxLightCount = 10;
-    static int m_last_light_count_;
     static std::shared_ptr<StructuredBuffer> m_lights_buffer_;
     static std::shared_ptr<ConstantBuffer> m_light_count_buffer_;
     static std::shared_ptr<DescriptorHandle> m_lights_buffer_handle_;
