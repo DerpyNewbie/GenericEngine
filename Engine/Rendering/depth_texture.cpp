@@ -84,7 +84,7 @@ void DepthTexture::EndRender()
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_array)
+void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_array, int index)
 {
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
     heapDesc.NumDescriptors = 1;
@@ -101,7 +101,7 @@ void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_ar
     D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
     dsvDesc.Format = DXGI_FORMAT_D32_FLOAT;
     dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2DARRAY;
-    dsvDesc.Texture2DArray.FirstArraySlice = texture_array->FreeIndex();
+    dsvDesc.Texture2DArray.FirstArraySlice = index;
     dsvDesc.Texture2DArray.ArraySize = 1;
     dsvDesc.Texture2DArray.MipSlice = 0;
 
@@ -109,7 +109,6 @@ void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_ar
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
 
-    texture_array->PushFreeIndex();
     m_pResource = texture_array->Resource();
 }
 

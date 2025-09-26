@@ -12,7 +12,6 @@ class Texture2DArray : public engine::ShaderResource
     DXGI_FORMAT m_format_;
     UINT m_mip_level_ = 1;
     UINT16 m_element_count_ = 0;
-    UINT m_free_index_ = -1;
     bool m_is_valid_ = false;
 
     void CopyResource();
@@ -30,10 +29,6 @@ public:
 
     void AddTexture(engine::AssetPtr<Texture2D> texture);
     void RemoveTexture(engine::AssetPtr<Texture2D> texture);
-
-    UINT FreeIndex() const;
-    void PushFreeIndex();
-    void PopFreeIndex();
 
     void SetFormat(DXGI_FORMAT format);
 

@@ -11,11 +11,12 @@ class RenderPipeline
 {
     friend Engine;
     friend CameraComponent;
-    static constexpr Vector2 shadow_map_size = {1920, 1065};
+    static constexpr Vector2 kShadowMapSize = {1920, 1065};
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::unordered_set<std::shared_ptr<CameraComponent>> m_cameras_;
     std::unordered_map<std::shared_ptr<Light>, std::shared_ptr<CameraComponent>> m_lights_;
     std::shared_ptr<Texture2DArray> m_depth_textures_;
+    std::set<int> m_free_depth_texture_handles_;
     std::shared_ptr<DescriptorHandle> m_shadowmap_handle_;
     bool m_is_updated_ = false;
 

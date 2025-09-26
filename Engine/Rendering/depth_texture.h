@@ -13,7 +13,7 @@ public:
     void BeginRender();
     void EndRender();
 
-    void SetResource(const std::shared_ptr<Texture2DArray> &texture_array);
+    void SetResource(const std::shared_ptr<Texture2DArray> &texture_array, int index);
 
     ID3D12DescriptorHeap *GetHeap();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;

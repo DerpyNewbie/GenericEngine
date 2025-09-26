@@ -127,10 +127,16 @@ void RenderPipeline::SetShadowMap()
         clear_value.Format = DXGI_FORMAT_D32_FLOAT;
         clear_value.DepthStencil.Depth = 1.0f;
         clear_value.DepthStencil.Stencil = 0;
-        m_depth_textures_->CreateResource(shadow_map_size, Light::kMaxLightCount, 1, DXGI_FORMAT_R32_TYPELESS,
+        m_depth_textures_->CreateResource(kShadowMapSize, Light::kMaxLightCount, 1, DXGI_FORMAT_R32_TYPELESS,
                                           D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clear_value);
         m_depth_textures_->SetFormat(DXGI_FORMAT_R32_FLOAT);
         m_shadowmap_handle_ = m_depth_textures_->UploadBuffer();
+
+        m_free_depth_texture_handles_.clear();
+        for (int i = 0; i < Light::kMaxLightCount; i++)
+        {
+            m_free_depth_texture_handles_.emplace(i);
+        }
     }
     const auto cmd_list = RenderEngine::CommandList();
     if (!m_lights_.empty())
@@ -151,11 +157,24 @@ size_t RenderPipeline::GetRendererCount()
 
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 {
-    auto go = light->GameObject();
+    const auto go = light->GameObject();
     auto camera = go->AddComponent<CameraComponent>();
     light->SetCamera(camera);
     camera->m_depth_texture_ = std::make_shared<DepthTexture>();
-    camera->m_depth_texture_->SetResource(m_depth_textures_);
+
+    auto i = m_free_depth_texture_handles_.begin();
+    if (i == m_free_depth_texture_handles_.end())
+    {
+        Logger::Error<RenderPipeline>("Could not retrieve depth texture: Pool is empty");
+        return;
+    }
+
+    auto index = *i;
+    m_free_depth_texture_handles_.erase(i);
+
+    light->m_depth_texture_handle_ = index;
+    camera->m_depth_texture_->SetResource(m_depth_textures_, index);
+
     m_lights_.emplace(light, camera);
 }
 
@@ -164,6 +183,10 @@ void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
     auto depth_texture = m_lights_[light]->m_depth_texture_;
     m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(depth_texture));
     m_lights_.erase(light);
+
+    light->m_camera_->m_depth_texture_.reset();
+
+    m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_);
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)

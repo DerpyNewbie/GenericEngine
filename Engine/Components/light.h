@@ -66,6 +66,7 @@ class Light : public Component
 
 protected:
     static std::vector<std::weak_ptr<Light>> m_lights_;
+    int m_depth_texture_handle_;
     LightData m_light_data_;
     std::shared_ptr<CameraComponent> m_camera_;
 
