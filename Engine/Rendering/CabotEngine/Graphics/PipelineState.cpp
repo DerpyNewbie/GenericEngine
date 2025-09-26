@@ -51,8 +51,14 @@ void PipelineState::SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC &depth_s
 
 void PipelineState::SetNumRenderTarget(const UINT num_render_target)
 {
+    //RTVの数の上限を超えてたら上限数に抑える
+    if (num_render_target > 8)
+    {
+        m_desc_.NumRenderTargets = 8;
+        engine::Logger::Warn<PipelineState>("NumRenderTarget exceeds 8");
+    }
     m_desc_.NumRenderTargets = num_render_target;
-    for (int i = 0; i < num_render_target; ++i)
+    for (int i = 0; i < m_desc_.NumRenderTargets; ++i)
     {
         m_desc_.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
     }
