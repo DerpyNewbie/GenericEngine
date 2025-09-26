@@ -307,29 +307,8 @@ void MeshRenderer::ReconstructMeshesBuffer()
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, const int material_idx)
 {
     const auto material = shared_materials[material_idx].CastedLock();
-    const auto material_block = material->p_shared_material_block;
 
-    material->UpdateBuffer();
-
-    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
-    {
-        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
-        {
-            const auto shader_type = static_cast<kShaderType>(shader_i);
-            const auto param_type = static_cast<kParameterBufferType>(param_i);
-
-            if (material_block->Empty(shader_type, param_type))
-            {
-                continue;
-            }
-
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i +
-                                       RootSignature::kPreDefinedVariableCount;
-            const auto itr = material_block->Begin(shader_type, param_type);
-            const auto desc_handle = itr->handle->HandleGPU;
-            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
-        }
-    }
+    material->SetDescriptorTable();
 }
 }
 

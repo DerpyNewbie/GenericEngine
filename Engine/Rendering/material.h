@@ -26,6 +26,8 @@ public:
     bool IsDirty() const;
     bool IsValid() const;
 
+    void SetDescriptorTable();
+
     template <class Archive>
     void serialize(Archive &ar)
     {
