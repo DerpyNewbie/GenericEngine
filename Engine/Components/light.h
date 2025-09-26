@@ -60,5 +60,12 @@ public:
     void OnEnabled() override;
     void OnDisabled() override;
     void OnUpdate() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_light_data_));
+    }
 };
 }

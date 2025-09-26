@@ -11,5 +11,12 @@ class RotatorComponent : public Component
 public:
     void OnUpdate() override;
     void OnInspectorGui() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_rotating_axis_), CEREAL_NVP(m_speed_));
+    }
 };
 }

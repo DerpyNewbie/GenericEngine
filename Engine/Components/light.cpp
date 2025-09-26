@@ -104,3 +104,5 @@ void Light::OnUpdate()
     m_light_data_.proj = m_camera_->ProjectionMatrix();
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::CameraComponent)
