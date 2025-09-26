@@ -14,10 +14,6 @@ void SampleSceneGenerator::CreateDefaultScene()
     CreateDefaultCamera();
     CreateDefaultFloor();
     CreateHackadoll();
-    const auto floor_cube = ModelImporter::LoadModelFromFBX("Resources/Cube.fbx");
-    const auto floor_transform = floor_cube->Transform();
-    floor_transform->SetLocalPosition({0, -0.5f, 0});
-    floor_transform->SetLocalScale({10, 0.25f, 10});
 }
 
 void SampleSceneGenerator::CreateDefaultCamera()
@@ -33,6 +29,10 @@ void SampleSceneGenerator::CreateDefaultCamera()
 void SampleSceneGenerator::CreateDefaultFloor()
 {
     Object::Instantiate<GameObject>("Floor")->AddComponent<PlaneCollider>();
+    const auto floor_cube = ModelImporter::LoadModelFromFBX("Resources/Cube.fbx");
+    const auto floor_transform = floor_cube->Transform();
+    floor_transform->SetLocalPosition({0, -0.5f, 0});
+    floor_transform->SetLocalScale({10, 0.25f, 10});
 }
 
 void SampleSceneGenerator::CreateHackadoll()
