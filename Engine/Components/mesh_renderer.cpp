@@ -149,10 +149,6 @@ void MeshRenderer::Render()
 
             cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
             SetDescriptorTable(cmd_list, i + 1);
-            const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-            const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-
-            cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 
             const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
             cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
@@ -169,10 +165,8 @@ void MeshRenderer::DepthRender()
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
 
-    cmd_list->SetPipelineState(PSOManager::Get("Depth"));
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-
     cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 
     cmd_list->IASetIndexBuffer(m_index_buffers_[0]->View());
@@ -186,8 +180,6 @@ void MeshRenderer::DepthRender()
     // sub-meshes
     for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
     {
-        cmd_list->SetPipelineState(PSOManager::Get("Depth"));
-
         cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 
         cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
