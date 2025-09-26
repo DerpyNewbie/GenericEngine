@@ -7,6 +7,7 @@
 #include "CabotEngine/Graphics/DescriptorHeap.h"
 #include "gizmos.h"
 #include "skybox.h"
+#include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/light.h"
 
@@ -24,6 +25,7 @@ void RenderPipeline::InvokeDrawCall()
                                                   camera->m_property_.background_color);
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
         auto descriptor_heap = DescriptorHeap::GetHeap();
+        cmd_list->SetPipelineState(PSOManager::Get("Depth"));
         cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
         DepthRender(camera);
         camera->m_depth_texture_->EndRender();
