@@ -22,3 +22,5 @@ void RotatorComponent::OnInspectorGui()
     Gui::PropertyField("Speed", m_speed_);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::RotatorComponent)
