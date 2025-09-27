@@ -227,11 +227,7 @@ void MaterialBlock::UpdateBuffer()
             }
             else
             {
-                if (handle != nullptr)
-                {
-                    DescriptorHeap::Free(handle);
-                    handle = nullptr;
-                }
+                handle = data->DescriptorHandle();
             }
 
             data->is_dirty = false;
@@ -239,7 +235,7 @@ void MaterialBlock::UpdateBuffer()
 
         if (handle == nullptr)
         {
-            handle = data->UploadBuffer();
+            handle = data->DescriptorHandle();
         }
     }
 }

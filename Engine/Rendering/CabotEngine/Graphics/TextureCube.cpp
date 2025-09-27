@@ -104,7 +104,7 @@ void TextureCube::UpdateBuffer(void *data)
     Logger::Error<TextureCube>("UpdateBuffer is not supported");
 }
 
-std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
+std::shared_ptr<DescriptorHandle> TextureCube::DescriptorHandle()
 {
     return DescriptorHeap::Register(this);
 }

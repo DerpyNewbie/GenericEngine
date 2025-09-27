@@ -1,57 +1,50 @@
 ﻿#include "pch.h"
 
 #include "DescriptorHeap.h"
-#include "Texture2D.h"
 #include "RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
-std::shared_ptr<DescriptorHeap> DescriptorHeap::m_instance_;
+DescriptorHandle::~DescriptorHandle()
+{}
 
 std::shared_ptr<DescriptorHeap> DescriptorHeap::Instance()
 {
-    if (!m_instance_)
-    {
-        m_instance_ = std::make_shared<DescriptorHeap>();
-    }
-    return m_instance_;
+    static auto instance = std::make_shared<DescriptorHeap>();
+    return instance;
 }
 
 DescriptorHeap::DescriptorHeap()
 {
-    m_FreeIndices_.reserve(kHandleMax);
+    m_free_handles_.reserve(kHandleMax);
     for (UINT i = 0; i < kHandleMax; ++i)
-        m_FreeIndices_.emplace_back(i);
+        m_free_handles_.emplace_back(i);
 
-    m_pHandles_.clear();
-    m_pHandles_.reserve(kHandleMax);
+    m_handles_.fill({});
 
-    D3D12_DESCRIPTOR_HEAP_DESC desc{};
+    D3D12_DESCRIPTOR_HEAP_DESC desc;
     desc.NodeMask = 1;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
     desc.NumDescriptors = kHandleMax;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 
-    auto device = RenderEngine::Device();
+    const auto device = RenderEngine::Device();
 
     // ディスクリプタヒープを生成
-    auto hr = device->CreateDescriptorHeap(
-        &desc,
-
-        IID_PPV_ARGS(m_pHeap_.ReleaseAndGetAddressOf()));
+    auto hr = device->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_heap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
-        m_IsValid_ = false;
+        m_is_valid_ = false;
         return;
     }
 
-    m_IncrementSize_ = device->GetDescriptorHandleIncrementSize(desc.Type); // ディスクリプタヒープ1個のメモリサイズを返す
-    m_IsValid_ = true;
+    m_increment_size_ = device->GetDescriptorHandleIncrementSize(desc.Type); // ディスクリプタヒープ1個のメモリサイズを返す
+    m_is_valid_ = true;
 }
 
 ID3D12DescriptorHeap *DescriptorHeap::GetHeap()
 {
-    return Instance()->m_pHeap_.Get();
+    return Instance()->m_heap_.Get();
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::ShaderResource *shader_resource)
@@ -78,59 +71,62 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &const
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
 {
-    auto instance = Instance();
+    const auto instance = Instance();
     UINT index;
 
-    if (!m_instance_->m_FreeIndices_.empty())
+    const auto pos = std::ranges::find_if(instance->m_handles_, [](auto ptr) {
+        return ptr == nullptr;
+    });
+
+    if (pos != instance->m_handles_.end())
     {
-        // 再利用できるスロットがある
-        index = m_instance_->m_FreeIndices_.front();
-        instance->m_FreeIndices_.erase(instance->m_FreeIndices_.begin());
+        index = static_cast<UINT>(std::distance(instance->m_handles_.begin(), pos));
     }
     else
     {
-        if (instance->m_pHandles_.size() >= kHandleMax)
+        if (instance->m_handles_.size() >= kHandleMax)
+        {
+            engine::Logger::Error<DescriptorHeap>("DescriptorHeap is full!");
             return nullptr;
+        }
 
-        index = static_cast<UINT>(Instance()->m_pHandles_.size());
+        index = static_cast<UINT>(instance->m_handles_.size());
     }
 
-    std::shared_ptr<DescriptorHandle> pHandle = std::make_shared<DescriptorHandle>();
-    pHandle->index = index;
+    auto handle = std::make_shared<DescriptorHandle>();
 
-    auto handleCPU = instance->m_pHeap_->GetCPUDescriptorHandleForHeapStart();
-    handleCPU.ptr += instance->m_IncrementSize_ * index;
+    auto handle_cpu = instance->m_heap_->GetCPUDescriptorHandleForHeapStart();
+    handle_cpu.ptr += instance->m_increment_size_ * index;
 
-    auto handleGPU = instance->m_pHeap_->GetGPUDescriptorHandleForHeapStart();
-    handleGPU.ptr += instance->m_IncrementSize_ * index;
+    auto handle_gpu = instance->m_heap_->GetGPUDescriptorHandleForHeapStart();
+    handle_gpu.ptr += instance->m_increment_size_ * index;
 
-    pHandle->HandleCPU = handleCPU;
-    pHandle->HandleGPU = handleGPU;
+    handle->HandleCPU = handle_cpu;
+    handle->HandleGPU = handle_gpu;
 
-    if (index < instance->m_pHandles_.size())
+    if (index < instance->m_handles_.size())
     {
-        instance->m_pHandles_[index] = pHandle;
+        instance->m_handles_[index] = handle;
     }
     else
     {
-        m_instance_->m_pHandles_.push_back(pHandle);
+        instance->m_handles_.push_back(handle);
     }
 
-    return pHandle;
+    return handle;
 }
 
-void DescriptorHeap::Free(std::shared_ptr<DescriptorHandle> handle)
+void DescriptorHeap::Free(const std::shared_ptr<DescriptorHandle> &handle)
 {
-    if (!handle || handle->index >= m_instance_->m_pHandles_.size())
+    auto instance = Instance();
+    if (!handle || handle->index >= instance->m_handles_.size())
         return;
 
-    m_instance_->m_pHandles_[handle->index] = nullptr; // スロットを無効化
-    m_instance_->m_FreeIndices_.push_back(handle->index); // 空きとして登録
+    instance->m_handles_[handle->index] = nullptr; // スロットを無効化
 }
 
 void DescriptorHeap::Release()
 {
     auto instance = Instance();
-    instance->m_pHandles_.clear();
-    instance->m_FreeIndices_.clear();
+    instance->m_handles_.clear();
 }

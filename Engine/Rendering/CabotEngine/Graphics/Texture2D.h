@@ -30,7 +30,7 @@ public:
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    std::shared_ptr<class DescriptorHandle> DescriptorHandle() override;
     bool CanUpdate() override;
     bool IsValid() override;
 

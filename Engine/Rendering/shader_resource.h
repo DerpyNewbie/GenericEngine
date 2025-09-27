@@ -1,4 +1,5 @@
 #pragma once
+#include "CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace engine
 {
