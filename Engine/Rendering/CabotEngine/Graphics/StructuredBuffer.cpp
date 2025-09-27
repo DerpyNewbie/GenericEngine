@@ -89,7 +89,7 @@ void StructuredBuffer::UpdateBuffer(void *data)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
+std::shared_ptr<DescriptorHandle> StructuredBuffer::DescriptorHandle()
 {
     return DescriptorHeap::Register(this);
 }

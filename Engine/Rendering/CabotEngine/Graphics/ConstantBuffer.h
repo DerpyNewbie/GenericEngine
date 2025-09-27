@@ -10,7 +10,7 @@ public:
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    std::shared_ptr<class DescriptorHandle> DescriptorHandle() override;
     bool IsValid() override;
 
     bool CanUpdate() override;

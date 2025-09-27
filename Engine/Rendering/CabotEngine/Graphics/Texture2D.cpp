@@ -15,6 +15,7 @@ void Texture2D::OnInspectorGui()
     ImGui::Text("Width: %d", width);
     ImGui::Text("Height: %d", height);
     ImGui::Text("Mip Level: %d", mip_level);
+    ImGui::Image(reinterpret_cast<ImTextureID>(Resource()), ImVec2(width, height));
 }
 
 void Texture2D::CreateBuffer()
@@ -64,7 +65,7 @@ void Texture2D::UpdateBuffer(void *data)
     engine::Logger::Error("Can not Update Texture2D");
 }
 
-std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
+std::shared_ptr<DescriptorHandle> Texture2D::DescriptorHandle()
 {
     return DescriptorHeap::Register(this);
 }
