@@ -7,15 +7,19 @@
 using namespace engine;
 using namespace editor;
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, const LPSTR lpCmdLine, int)
 {
-    Engine::on_init.AddListener([] {
-        Editor::Instance()->Attach();
-    });
+    auto args = std::string(lpCmdLine);
 
-    Engine::on_default_scene_creation.AddListener([] {
-        SampleSceneGenerator::CreateDefaultScene();
-    });
+    if (args.find("-no-editor") == std::string::npos && args.find("--ne") == std::string::npos)
+    {
+        Editor::Instance()->Attach();
+    }
+
+    if (args.find("-no-default-scene") == std::string::npos && args.find("--ns") == std::string::npos)
+    {
+        Engine::on_default_scene_creation.AddListener(SampleSceneGenerator::CreateDefaultScene);
+    }
 
     Application::Instance()->StartApp();
 }
