@@ -10,13 +10,13 @@
 
 namespace engine
 {
-GameObject::GameObject() :
-    Object()
+GameObject::GameObject() : Object()
 {}
 void GameObject::OnConstructed()
 {
     Object::OnConstructed();
-    AddComponent<engine::Transform>();
+    if (Transform() == nullptr)
+        AddComponent<engine::Transform>();
     SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
 }
 void GameObject::OnDestroy()
@@ -290,7 +290,7 @@ void GameObject::SetAsRootObject(const bool is_root_object)
     const auto scene = m_scene_.lock();
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
-    *root_objects,
+        *root_objects,
     [&shared_this](const std::shared_ptr<GameObject> &other) {
         return shared_this == other;
     });
@@ -310,8 +310,9 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 template <class Archive>
 void GameObject::serialize(Archive &ar)
 {
-    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_is_active_self_),
-       CEREAL_NVP(m_components_));
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_is_active_self_), CEREAL_NVP(m_components_));
+    if (m_scene_.expired())
+        m_scene_ = SceneManager::GetActiveScene();
 }
 }
 

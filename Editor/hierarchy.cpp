@@ -156,6 +156,12 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
                                                                        ImGuiDragDropFlags_AcceptBeforeDelivery))
         {
             const auto payload_object = engine::Gui::GetDragDropPayload(payload);
+            if (payload_object == nullptr)
+            {
+                engine::Logger::Log<Hierarchy>("Cannot drag and drop object as payload is null");
+                return false;
+            }
+
             const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
             if (payload_go != nullptr)
             {
