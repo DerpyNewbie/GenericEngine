@@ -50,7 +50,9 @@ void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const s
 
     if (const auto prev_scene = go->m_scene_.lock())
     {
-        prev_scene->m_all_game_objects_.erase(std::ranges::find(prev_scene->m_all_game_objects_, go));
+        const auto pos = std::ranges::find(prev_scene->m_all_game_objects_, go);
+        if (pos != prev_scene->m_all_game_objects_.end())
+            prev_scene->m_all_game_objects_.erase(pos);
     }
 
     go->m_scene_ = scene;

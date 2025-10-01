@@ -84,6 +84,7 @@
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
+        <ClCompile Include="Engine\object_util.cpp"/>
         <ClCompile Include="Engine\Physics\bullet_debug_drawer.cpp"/>
         <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
         <ClCompile Include="Engine\Physics\collider.cpp"/>
@@ -267,6 +268,7 @@
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
         <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\object_util.h"/>
         <ClInclude Include="Engine\Physics\bullet_debug_drawer.h"/>
         <ClInclude Include="Engine\Physics\capsule_collider.h"/>
         <ClInclude Include="Engine\Physics\collider.h"/>

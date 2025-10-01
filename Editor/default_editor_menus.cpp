@@ -133,9 +133,30 @@ void DefaultEditorMenu::DrawObjectMenu(const std::shared_ptr<engine::GameObject>
         }
     }
 
+    if (ImGui::MenuItem("Duplicate"))
+    {
+        auto cloned_object = engine::Object::Instantiate(go);
+        engine::Logger::Log<DefaultEditorMenu>("Cloned %s", cloned_object->Name().c_str());
+    }
+
     if (ImGui::MenuItem("Delete", nullptr, false, go != nullptr))
     {
         go->DestroyThis();
+    }
+
+    if (EditorPrefs::show_editor_debug)
+    {
+        if (ImGui::MenuItem("Debug: Inspect"))
+        {
+            std::stringstream ss;
+            {
+                engine::Serializer serializer;
+                serializer.Save(ss, go);
+            }
+
+            const std::string serialized_object(ss.view());
+            engine::Logger::Log(serialized_object.c_str());
+        }
     }
 }
 
