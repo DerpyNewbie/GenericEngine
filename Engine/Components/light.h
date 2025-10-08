@@ -14,8 +14,8 @@ struct alignas(16) LightData
     float intensity = 1;
     float range = 1;
 
-    DirectX::XMFLOAT4 pos;
-    DirectX::XMFLOAT4 direction;
+    Vector4 pos;
+    Vector4 direction;
     Color color;
 
     float inner_cos;
