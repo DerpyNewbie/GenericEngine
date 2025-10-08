@@ -51,7 +51,6 @@ void Texture2DArray::CopyResource()
         cmd_list->ResourceBarrier(1, &barrier1);
     }
 
-    m_free_index_ = -1;
     m_is_valid_ = true;
 
     const CD3DX12_RESOURCE_BARRIER barrier =
@@ -68,7 +67,6 @@ bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count,
     m_element_count_ = elem_count;
     m_format_ = format;
     m_mip_level_ = mip_level;
-    m_free_index_ = 0;
 
     D3D12_RESOURCE_DESC array_desc = {};
     array_desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
@@ -155,22 +153,6 @@ void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
     }
     --m_element_count_;
     CopyResource();
-}
-
-UINT Texture2DArray::FreeIndex() const
-{
-    return m_free_index_;
-}
-
-void Texture2DArray::PushFreeIndex()
-{
-    if (m_free_index_ < -1 || m_free_index_ > m_element_count_)
-        ++m_free_index_;
-}
-
-void Texture2DArray::PopFreeIndex()
-{
-    --m_free_index_;
 }
 void Texture2DArray::SetFormat(const DXGI_FORMAT format)
 {

@@ -116,6 +116,7 @@ ID3D12DescriptorHeap *DepthTexture::GetHeap()
 {
     return m_dsv_heap_.Get();
 }
+
 D3D12_SHADER_RESOURCE_VIEW_DESC DepthTexture::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC view_desc = {};

@@ -13,7 +13,7 @@ void SampleSceneGenerator::CreateDefaultScene()
 {
     CreateDefaultCamera();
     CreateDefaultFloor();
-    CreateHackadoll();
+    CreateYBot();
 }
 
 void SampleSceneGenerator::CreateDefaultCamera()
@@ -38,6 +38,12 @@ void SampleSceneGenerator::CreateDefaultFloor()
 void SampleSceneGenerator::CreateHackadoll()
 {
     auto go = ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+    go->Transform()->SetLocalScale({0.01f, 0.01f, 0.01f});
+}
+
+void SampleSceneGenerator::CreateYBot()
+{
+    auto go = ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
     go->Transform()->SetLocalScale({0.01f, 0.01f, 0.01f});
 }
 }

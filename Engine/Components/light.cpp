@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "light.h"
-#include "directional_light.h"
 #include "gui.h"
 #include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
@@ -9,33 +8,32 @@
 namespace engine
 {
 std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
-std::vector<std::weak_ptr<Light>> Light::m_lights_;
 std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
 std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
 
 void Light::UpdateLightCountBuffer()
 {
-    LightCountBuffer lcb(m_lights_.size());
+    LightCountBuffer lcb(RenderPipeline::Instance()->m_lights_.size());
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
 }
 
 void Light::UpdateLightBuffer()
 {
-    if (m_lights_.empty())
+    if (RenderPipeline::Instance()->m_lights_.empty())
         return;
 
     if (m_lights_buffer_ == nullptr)
     {
         m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
-                                                              kMaxLightCount);
+                                                              RenderPipeline::kMaxLightCount);
         m_lights_buffer_->CreateBuffer();
         m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
     }
 
-    std::array<LightData, kMaxLightCount> properties;
-    for (int i = 0; i < m_lights_.size(); ++i)
-        properties[i] = m_lights_[i].lock()->m_light_data_;
+    std::array<LightData, RenderPipeline::kMaxLightCount> properties;
+    for (int i = 0; i < RenderPipeline::Instance()->m_lights_.size(); ++i)
+        properties[i] = RenderPipeline::Instance()->m_lights_[i]->m_light_data_;
     m_lights_buffer_->UpdateBuffer(properties.data());
 }
 
@@ -75,32 +73,20 @@ void Light::OnInspectorGui()
     Gui::ColorField("LightColor", m_light_data_.color);
 }
 
-void Light::SetCamera(const std::shared_ptr<CameraComponent> camera)
-{
-    camera->m_property_.far_plane = 20;
-    camera->m_property_.view_mode = kViewMode::kOrthographic;
-    m_camera_ = camera;
-}
-
 void Light::OnEnabled()
 {
     RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
-    m_lights_.emplace_back(shared_from_base<Light>());
 }
+
 void Light::OnDisabled()
 {
     RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
-    auto this_light = shared_from_base<Light>();
-    std::erase_if(m_lights_, [this_light](const std::weak_ptr<Light> &light) {
-        return this_light == light.lock();
-    });
 }
 
-void Light::OnUpdate()
+void Light::OnDestroy()
 {
-    m_light_data_.view = m_camera_->ViewMatrix();
-    m_light_data_.proj = m_camera_->ProjectionMatrix();
+    RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
 }
 }
 
-CEREAL_REGISTER_TYPE(engine::CameraComponent)
+CEREAL_REGISTER_TYPE(engine::Light)

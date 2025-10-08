@@ -14,8 +14,6 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         debugController->EnableDebugLayer();
     }
 
-    m_frame_buffer_width_ = windowWidth;
-    m_frame_buffer_height_ = windowHeight;
     m_h_wnd_ = hwnd;
 
     if (!CreateDevice())
@@ -210,8 +208,8 @@ bool RenderEngine::CreateSwapChain()
 
     // スワップチェインの生成
     DXGI_SWAP_CHAIN_DESC desc = {};
-    desc.BufferDesc.Width = m_frame_buffer_width_;
-    desc.BufferDesc.Height = m_frame_buffer_height_;
+    desc.BufferDesc.Width = engine::Application::WindowWidth();
+    desc.BufferDesc.Height = engine::Application::WindowHeight();
     desc.BufferDesc.RefreshRate.Numerator = 60;
     desc.BufferDesc.RefreshRate.Denominator = 1;
     desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -312,8 +310,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = static_cast<float>(m_frame_buffer_width_);
-    m_viewport_.Height = static_cast<float>(m_frame_buffer_height_);
+    m_viewport_.Width = engine::Application::Instance()->WindowWidth();
+    m_viewport_.Height = engine::Application::Instance()->WindowHeight();
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }
@@ -321,9 +319,9 @@ void RenderEngine::CreateViewPort()
 void RenderEngine::CreateScissorRect()
 {
     m_scissor_.left = 0;
-    m_scissor_.right = m_frame_buffer_width_;
+    m_scissor_.right = engine::Application::Instance()->WindowWidth();
     m_scissor_.top = 0;
-    m_scissor_.bottom = m_frame_buffer_height_;
+    m_scissor_.bottom = engine::Application::Instance()->WindowHeight();
 }
 
 bool RenderEngine::CreateRenderTarget()
@@ -383,8 +381,8 @@ bool RenderEngine::CreateDepthStencil()
     CD3DX12_RESOURCE_DESC resourceDesc(
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
-        m_frame_buffer_width_,
-        m_frame_buffer_height_,
+        engine::Application::WindowWidth(),
+        engine::Application::WindowHeight(),
         1,
         1,
         DXGI_FORMAT_D32_FLOAT,

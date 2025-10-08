@@ -1,7 +1,6 @@
 #pragma once
 #include "Texture2D.h"
 #include "Asset/asset_ptr.h"
-#include "Asset/inspectable_asset.h"
 #include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 

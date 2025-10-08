@@ -1,30 +1,57 @@
 #pragma once
 #include "event.h"
-#include "object.h"
+#include "rendering_settings_component.h"
+#include "CabotEngine/Graphics/RenderEngine.h"
+#include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2DArray.h"
-#include "Components/directional_light.h"
-#include "Components/light.h"
 
 namespace engine
 {
+
+struct CameraProperty;
+class Renderer;
+class DepthTexture;
+
 class RenderPipeline
 {
-    friend Engine;
-    friend CameraComponent;
+    friend class Light;
+    friend class Engine;
+    friend class CameraComponent;
+
+
+    constexpr static int kMaxLightCount = 10;
     static constexpr Vector2 kShadowMapSize = {1920, 1065};
+    static constexpr UINT kMaxShadowmapCount = 10;
+
+    //ライト関係
+    std::vector<std::shared_ptr<Light>> m_lights_;
+    std::array<Matrix, kMaxShadowmapCount> m_light_view_proj_matrices_;
+    std::shared_ptr<StructuredBuffer> m_light_view_proj_matrices_buffer_;
+    std::shared_ptr<DescriptorHandle> m_light_view_proj_handle_;
+
+    //深度テクスチャ関係
+    std::vector<std::shared_ptr<DepthTexture>> m_shadow_maps_;
+    std::shared_ptr<Texture2DArray> m_depth_textures_;
+    std::shared_ptr<DescriptorHandle> m_shadowmap_handle_;
+    std::array<std::shared_ptr<ConstantBuffer>, kMaxShadowmapCount> m_current_shadowmap_index_buffer_;
+    std::set<int> m_free_depth_texture_handles_;
+    std::shared_ptr<ConstantBuffer> m_cascade_sprits_buffer_;
+
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::unordered_set<std::shared_ptr<CameraComponent>> m_cameras_;
-    std::unordered_map<std::shared_ptr<Light>, std::shared_ptr<CameraComponent>> m_lights_;
-    std::shared_ptr<Texture2DArray> m_depth_textures_;
-    std::set<int> m_free_depth_texture_handles_;
-    std::shared_ptr<DescriptorHandle> m_shadowmap_handle_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
     bool m_is_updated_ = false;
 
     void InvokeDrawCall();
-    void UpdateBuffer(const std::shared_ptr<CameraComponent> &camera);
-    void Render(const std::shared_ptr<CameraComponent> &camera);
-    void DepthRender(const std::shared_ptr<CameraComponent> &camera);
+    void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
+    void UpdateBuffer(const Matrix &view, const Matrix &proj);
+    void Render(const Matrix &view, const CameraProperty &camera_property);
+    void DepthRender();
 
+    void SetCurrentShadowmapIndex(int shadowmap_index); //この処理はInstanceIDの実装により消されます
+    void UpdateLightsViewProjMatrixBuffer();
+    void SetCascadeSpritBuffer();
+    void SetLightsViewProjMatrix() const;
     void SetShadowMap();
 
 public:
@@ -39,5 +66,8 @@ public:
     static void RemoveCamera(const std::shared_ptr<CameraComponent> &camera);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
+
+    static void SetCascadeSprits(
+        std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits);
 };
 }

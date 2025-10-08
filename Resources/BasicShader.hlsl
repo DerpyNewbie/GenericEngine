@@ -1,3 +1,5 @@
+#define SHADOW_CASCADE_COUNT 3
+
 cbuffer Transform : register (b0)
 {
     float4x4 World;
@@ -76,8 +78,11 @@ VSOutput vrt(VSInput input)
         }
     }
 
-    localPos = skinnedPos;
-    localNormal = skinnedNormal;
+    if (input.bones_per_vertex != 0)
+    {
+        localPos = skinnedPos;
+        localNormal = skinnedNormal;
+    }
 
     float4 worldPos = mul(World, localPos);
     float4 projPos = mul(Proj, mul(View, worldPos));
@@ -106,20 +111,23 @@ struct Light
     float inner_cos;
     float outer_cos;
     float2 padding;
-
-    float4x4 view;
-    float4x4 proj;
 };
 
-cbuffer LightCount : register (b2)
+cbuffer ShadowCascadeSprits : register(b2)
+{
+    float cascade_sprits[SHADOW_CASCADE_COUNT];
+}
+
+cbuffer LightCount : register (b3)
 {
     int light_count;
     int a[63];
 }
 
-StructuredBuffer<Light> Lights : register (t1);
-Texture2DArray ShadowMaps : register (t2);
-Texture2D _MainTex : register (t3);
+StructuredBuffer<float4x4> LightViewProj : register(t1);
+StructuredBuffer<Light> Lights : register (t2);
+Texture2DArray ShadowMaps : register (t3);
+Texture2D _MainTex : register (t4);
 SamplerState smp : register (s0);
 SamplerComparisonState shadowSampler : register (s1);
 
@@ -139,7 +147,7 @@ float SampleShadowPCF(float3 shadowCoord, int lightIndex)
                 shadowSampler,
                 float3(shadowCoord.xy + offset, lightIndex),
                 shadowCoord.z
-            );
+                );
         }
     }
 
@@ -148,47 +156,55 @@ float SampleShadowPCF(float3 shadowCoord, int lightIndex)
 }
 
 float4 pix(VSOutput input) : SV_TARGET
-    {
+{
     float3 N = normalize(input.normal);
     float3 brightness = float3(0, 0, 0);
 
     if (light_count == 0)
-        {
+    {
         float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
         float4 mainColor = _MainTex.Sample(smp, flippedUV);
         return float4(mainColor.rgb, mainColor.a);
-        }
+    }
+
+    float4 viewPos = mul(View, float4(input.worldpos, 1.0));
+    float depth = abs(viewPos.z);
+
+    int cascade_index = 0;
+    for (int i = 0; i < SHADOW_CASCADE_COUNT; ++i)
+    {
+        if (depth < cascade_sprits[i])
+            cascade_index = i;
+    }
 
     for (int i = 0; i < light_count; ++i)
-        {
+    {
+        int itr = i * SHADOW_CASCADE_COUNT + cascade_index;
         float3 L = normalize(-Lights[i].direction);
         float NdotL = saturate(dot(N, L));
 
         float4 worldPos = float4(input.worldpos, 1);
-        float4 viewPos = mul(Lights[i].view, worldPos);
-        float4 lightClip = mul(Lights[i].proj, viewPos);
+        float4 lightClip = mul(LightViewProj[itr], worldPos);
         float3 shadowCoord;
-            shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
-            shadowCoord.z = lightClip.z / lightClip.w;
-        
+        shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
+        shadowCoord.z = lightClip.z / lightClip.w;
+
         float shadow = 0;
         if (shadowCoord.x < 0 || shadowCoord.x > 1 ||
             shadowCoord.y < 0 || shadowCoord.y > 1)
-            {
-                shadow = 1.0f;
-            }
+        {
+            shadow = 1.0f;
+        }
         else
         {
             shadowCoord.y = 1 - shadowCoord.y;
-
-            shadow = SampleShadowPCF(shadowCoord, i);
+            shadow = SampleShadowPCF(shadowCoord, itr);
         }
 
-            brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
-        }
+        brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
+    }
 
-    float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
-    float4 mainColor = _MainTex.Sample(smp, flippedUV);
+    float4 mainColor = _MainTex.Sample(smp, input.uv);
 
     return float4(mainColor.rgb * brightness, mainColor.a);
-    }
+}

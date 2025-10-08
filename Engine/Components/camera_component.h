@@ -2,8 +2,6 @@
 #include "renderer.h"
 #include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
@@ -30,6 +28,7 @@ struct CameraProperty : Inspectable
     Color background_color = Color(0x1A1A1AFF);
 
     void OnInspectorGui() override;
+    Matrix ProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)
@@ -50,13 +49,9 @@ class CameraComponent : public Component
     static std::weak_ptr<CameraComponent> m_main_camera_;
     static std::weak_ptr<CameraComponent> m_current_camera_;
 
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
-
     std::shared_ptr<DepthTexture> m_depth_texture_;
     AssetPtr<RenderTexture> m_render_texture_;
     UINT m_drawcall_count_;
-
-    void SetViewProjMatrix() const;
 
 public:
     void OnAwake() override;
@@ -72,11 +67,7 @@ public:
     static std::shared_ptr<CameraComponent> Main();
     static std::shared_ptr<CameraComponent> Current();
 
-    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::shared_ptr<Renderer>> &renderers) const;
-
     Matrix ViewMatrix() const;
-    Matrix ProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)
