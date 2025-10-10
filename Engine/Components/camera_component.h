@@ -49,7 +49,7 @@ class CameraComponent : public Component
     static std::weak_ptr<CameraComponent> m_main_camera_;
     static std::weak_ptr<CameraComponent> m_current_camera_;
 
-    std::shared_ptr<DepthTexture> m_depth_texture_;
+    AssetPtr<DepthTexture> m_depth_texture_;
     AssetPtr<RenderTexture> m_render_texture_;
     UINT m_drawcall_count_;
 
