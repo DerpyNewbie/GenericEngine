@@ -352,13 +352,9 @@ void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 
 void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
 {
-    for (int i = 0; i < m_lights_.size(); ++i)
-    {
-        if (light == m_lights_[i])
-        {
-            erase(m_lights_, m_lights_[i]);
-        }
-    }
+    std::erase_if(m_lights_, [light](const std::shared_ptr<Light> &this_light) {
+        return light == this_light;
+    });
 
     const auto shadowmap_count = light->ShadowMapCount();
     for (int si = 0; shadowmap_count < si; ++si)
@@ -378,12 +374,9 @@ void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 {
     auto &renderers = Instance()->m_renderers_;
-    const auto pos = std::ranges::find_if(renderers, [&](const auto &r) {
+    std::erase_if(renderers, [&](const auto &r) {
         return r == renderer;
     });
-    if (pos == renderers.end())
-        return;
-    renderers.erase(pos);
 }
 
 void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
