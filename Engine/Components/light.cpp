@@ -13,6 +13,12 @@ std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
 
 void Light::UpdateLightCountBuffer()
 {
+    if (m_light_count_buffer_ == nullptr)
+    {
+        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
+        m_light_count_buffer_->CreateBuffer();
+    }
+
     LightCountBuffer lcb(RenderPipeline::Instance()->m_lights_.size());
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
@@ -39,12 +45,6 @@ void Light::UpdateLightBuffer()
 
 void Light::SetLightCountBuffer()
 {
-    if (m_light_count_buffer_ == nullptr)
-    {
-        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
-        m_light_count_buffer_->CreateBuffer();
-    }
-
     UpdateLightCountBuffer();
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
