@@ -150,7 +150,7 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     SetViewProjMatrix(view, proj);
     SetLightsViewProjMatrix();
     SetShadowMap();
-    SetCascadeSpritBuffer();
+    SetCascadeSlicesBuffer();
     Skybox::Instance()->Render();
     Light::SetBuffers();
     if (m_is_updated_)
@@ -177,7 +177,7 @@ void RenderPipeline::Render(const Matrix &view, const CameraProperty &camera_pro
 
 void RenderPipeline::DepthRender()
 {
-    auto current_shadowmap_count = 0;
+    auto current_shadow_map_count = 0;
     for (const auto light : m_lights_)
     {
         const auto cmd_list = RenderEngine::CommandList();
@@ -187,13 +187,13 @@ void RenderPipeline::DepthRender()
 
         for (int i = 0; i < shadow_map_count_in_light; ++i)
         {
-            m_shadow_maps_[current_shadowmap_count]->BeginRender();
+            m_shadow_maps_[current_shadow_map_count]->BeginRender();
             RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[i]->GetHeap(),
                                                       Color());
 
             SetViewProjMatrix(m_light_view_proj_matrices_[i], Matrix::Identity);
             SetLightsViewProjMatrix();
-            SetCurrentShadowmapIndex(i);
+            SetCurrentShadowMapIndex(i);
             if (!m_is_updated_)
             {
                 for (const auto renderer : m_renderers_)
@@ -206,7 +206,7 @@ void RenderPipeline::DepthRender()
                 renderer->DepthRender();
             }
             m_shadow_maps_[i]->EndRender();
-            ++current_shadowmap_count;
+            ++current_shadow_map_count;
         }
     }
 }
@@ -216,14 +216,14 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     int current_matrices_index = 0;
     for (const auto light : m_lights_)
     {
-        const auto shadowmap_count = light->ShadowMapCount();
+        const auto shadow_map_count = light->ShadowMapCount();
         const auto camera = CameraComponent::Current();
         const auto camera_property = camera->m_property_;
 
         auto frustum_corners = CalcFrustumCorners(camera->ViewMatrix(), camera->m_property_.ProjectionMatrix());
         auto matrices = light->CalcViewProj(frustum_corners);
 
-        for (int i = 0; i < shadowmap_count; ++i)
+        for (int i = 0; i < shadow_map_count; ++i)
         {
             m_light_view_proj_matrices_[current_matrices_index] = matrices[i];
             ++current_matrices_index;
@@ -233,7 +233,7 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     if (m_light_view_proj_matrices_buffer_ == nullptr)
     {
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(
-            sizeof(Matrix), kMaxShadowmapCount);
+            sizeof(Matrix), kMaxShadowMapCount);
         m_light_view_proj_matrices_buffer_->CreateBuffer();
         m_light_view_proj_handle_ = m_light_view_proj_matrices_buffer_->UploadBuffer();
     }
@@ -241,30 +241,30 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     m_light_view_proj_matrices_buffer_->UpdateBuffer(m_light_view_proj_matrices_.data());
 }
 
-void RenderPipeline::SetCurrentShadowmapIndex(int shadowmap_index)
+void RenderPipeline::SetCurrentShadowMapIndex(int shadow_map_index)
 {
-    if (m_current_shadowmap_index_buffer_[0] == nullptr)
+    if (m_current_shadow_map_index_buffer_[0] == nullptr)
     {
-        for (int i = 0; i < m_current_shadowmap_index_buffer_.size(); ++i)
+        for (int i = 0; i < m_current_shadow_map_index_buffer_.size(); ++i)
         {
-            m_current_shadowmap_index_buffer_[i] = std::make_shared<ConstantBuffer>(sizeof(int));
-            m_current_shadowmap_index_buffer_[i]->CreateBuffer();
-            m_current_shadowmap_index_buffer_[i]->UpdateBuffer(&i);
+            m_current_shadow_map_index_buffer_[i] = std::make_shared<ConstantBuffer>(sizeof(int));
+            m_current_shadow_map_index_buffer_[i]->CreateBuffer();
+            m_current_shadow_map_index_buffer_[i]->UpdateBuffer(&i);
         }
     }
 
     auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV,
-                                                m_current_shadowmap_index_buffer_[shadowmap_index]->GetAddress());
+                                                m_current_shadow_map_index_buffer_[shadow_map_index]->GetAddress());
 }
 
-void RenderPipeline::SetCascadeSprits(
+void RenderPipeline::SetCascadeSlices(
     std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits)
 {
     Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_sprits.data());
 }
 
-void RenderPipeline::SetCascadeSpritBuffer()
+void RenderPipeline::SetCascadeSlicesBuffer()
 {
     if (m_cascade_slices_buffer_ == nullptr)
     {
@@ -274,7 +274,7 @@ void RenderPipeline::SetCascadeSpritBuffer()
     }
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kCascadeSpritCBV, m_cascade_slices_buffer_->GetAddress());
+    cmd_list->SetGraphicsRootConstantBufferView(kCascadeSlicesCBV, m_cascade_slices_buffer_->GetAddress());
 }
 
 void RenderPipeline::SetLightsViewProjMatrix() const
@@ -293,14 +293,14 @@ void RenderPipeline::SetShadowMap()
         clear_value.Format = DXGI_FORMAT_D32_FLOAT;
         clear_value.DepthStencil.Depth = 1.0f;
         clear_value.DepthStencil.Stencil = 0;
-        m_depth_textures_->CreateResource(kShadowMapSize, kMaxShadowmapCount, 1,
+        m_depth_textures_->CreateResource(kShadowMapSize, kMaxShadowMapCount, 1,
                                           DXGI_FORMAT_R32_TYPELESS,
                                           D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clear_value);
         m_depth_textures_->SetFormat(DXGI_FORMAT_R32_FLOAT);
-        m_shadowmap_handle_ = m_depth_textures_->UploadBuffer();
+        m_shadow_map_handle_ = m_depth_textures_->UploadBuffer();
 
         m_free_depth_texture_handles_.clear();
-        for (int i = 0; i < kMaxShadowmapCount; i++)
+        for (int i = 0; i < kMaxShadowMapCount; i++)
         {
             m_free_depth_texture_handles_.emplace(i);
         }
@@ -308,7 +308,7 @@ void RenderPipeline::SetShadowMap()
     const auto cmd_list = RenderEngine::CommandList();
     if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
-                                                 m_shadowmap_handle_->HandleGPU);
+                                                 m_shadow_map_handle_->HandleGPU);
 }
 
 RenderPipeline *RenderPipeline::Instance()

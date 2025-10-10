@@ -6,7 +6,7 @@ enum kRootParameterIndex
 {
     kWorldCBV,
     kViewProjCBV,
-    kCascadeSpritCBV,
+    kCascadeSlicesCBV,
     kLightCountCBV,
     kBoneSRV,
     kLightSRV,
