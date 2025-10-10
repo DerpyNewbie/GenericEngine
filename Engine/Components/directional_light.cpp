@@ -2,24 +2,25 @@
 #include "directional_light.h"
 #include "game_object.h"
 
-std::array<float, engine::RenderingSettingsComponent::kShadowCascadeCount> engine::DirectionalLight::m_cascade_sprits_;
+std::array<float, engine::RenderingSettingsComponent::kShadowCascadeCount> engine::DirectionalLight::m_cascade_slices_;
 
 using namespace DirectX;
 
 namespace engine
 {
-std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> &DirectionalLight::CascadeFrustum(
-    const std::array<Vector3, 8> &frustum)
+
+void DirectionalLight::CascadeFrustum(const std::array<Vector3, 8> &frustum,
+                                      std::array<std::array<Vector3, 8>,
+                                                 RenderingSettingsComponent::kShadowCascadeCount> &dst)
 {
-    std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> cascaded_frustums;
     for (int i = 0; i < RenderingSettingsComponent::kShadowCascadeCount; ++i)
     {
         const auto camera = CameraComponent::Current();
         const auto camera_near = camera->m_property_.near_plane;
         const auto camera_far = camera->m_property_.far_plane;
 
-        auto cascade_near = i == 0 ? camera_near : m_cascade_sprits_[i - 1];
-        auto cascade_far = m_cascade_sprits_[i];
+        auto cascade_near = i == 0 ? camera_near : m_cascade_slices_[i - 1];
+        auto cascade_far = m_cascade_slices_[i];
         const float t_near = (cascade_near - camera_near) / (camera_far - camera_near);
         const float t_far = (cascade_far - camera_near) / (camera_far - camera_near);
 
@@ -28,18 +29,16 @@ std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCou
             Vector3 near_corner = frustum[j];
             Vector3 far_corner = frustum[j + 4];
 
-            cascaded_frustums[i][j] = XMVectorLerp(near_corner, far_corner, t_near);
-            cascaded_frustums[i][j + 4] = XMVectorLerp(near_corner, far_corner, t_far);
+            dst[i][j] = XMVectorLerp(near_corner, far_corner, t_near);
+            dst[i][j + 4] = XMVectorLerp(near_corner, far_corner, t_far);
         }
     }
-
-    return cascaded_frustums;
 }
 
 void DirectionalLight::SetCascadeSprits(
     const std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits)
 {
-    m_cascade_sprits_ = shadow_cascade_sprits;
+    m_cascade_slices_ = shadow_cascade_sprits;
 }
 
 void DirectionalLight::OnInspectorGui()
@@ -69,7 +68,8 @@ int DirectionalLight::ShadowMapCount()
 std::vector<Matrix> DirectionalLight::CalcViewProj(const std::array<Vector3, 8> &frustum_corners)
 {
     std::vector<Matrix> view_proj_matrices;
-    auto cascade_frustums = CascadeFrustum(frustum_corners);
+    std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> cascade_frustums;
+    CascadeFrustum(frustum_corners, cascade_frustums);
     for (int i = 0; i < cascade_frustums.size(); ++i)
     {
         auto light_dir = Vector3(m_light_data_.direction.x, m_light_data_.direction.y, m_light_data_.direction.z);

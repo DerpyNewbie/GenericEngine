@@ -9,8 +9,9 @@ class DirectionalLight : public Light
     friend class RenderPipeline;
     static std::array<float, RenderingSettingsComponent::kShadowCascadeCount> m_cascade_slices_;
 
-    static std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> &CascadeFrustum(
-        const std::array<Vector3, 8> &frustum);
+    static void CascadeFrustum(const std::array<Vector3, 8> &frustum,
+                               std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> &
+                               dst);
 
 public:
     static void SetCascadeSprits(
