@@ -86,10 +86,10 @@ void RenderPipeline::InvokeDrawCall()
             rtv_heap = render_tex->GetHeap();
         }
 
-        if (camera->m_depth_texture_)
+        if (auto depth_texture = camera->m_depth_texture_.CastedLock())
         {
-            camera->m_depth_texture_->BeginRender();
-            dsv_heap = camera->m_depth_texture_->GetHeap();
+            depth_texture->BeginRender();
+            dsv_heap = depth_texture->GetHeap();
         }
 
         if (rtv_heap != nullptr || dsv_heap != nullptr)
@@ -104,8 +104,8 @@ void RenderPipeline::InvokeDrawCall()
         if (render_tex)
             render_tex->EndRender();
 
-        if (camera->m_depth_texture_)
-            camera->m_depth_texture_->EndRender();
+        if (const auto depth_texture = camera->m_depth_texture_.CastedLock())
+            depth_texture->EndRender();
     }
 
     if (const auto main_camera = CameraComponent::Main())
