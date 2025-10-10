@@ -35,7 +35,7 @@ class RenderPipeline
     std::shared_ptr<DescriptorHandle> m_shadowmap_handle_;
     std::array<std::shared_ptr<ConstantBuffer>, kMaxShadowmapCount> m_current_shadowmap_index_buffer_;
     std::set<int> m_free_depth_texture_handles_;
-    std::shared_ptr<ConstantBuffer> m_cascade_sprits_buffer_;
+    std::shared_ptr<ConstantBuffer> m_cascade_slices_buffer_;
 
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::unordered_set<std::shared_ptr<CameraComponent>> m_cameras_;

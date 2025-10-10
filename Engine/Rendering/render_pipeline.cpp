@@ -261,20 +261,20 @@ void RenderPipeline::SetCurrentShadowmapIndex(int shadowmap_index)
 void RenderPipeline::SetCascadeSprits(
     std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits)
 {
-    Instance()->m_cascade_sprits_buffer_->UpdateBuffer(shadow_cascade_sprits.data());
+    Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_sprits.data());
 }
 
 void RenderPipeline::SetCascadeSpritBuffer()
 {
-    if (m_cascade_sprits_buffer_ == nullptr)
+    if (m_cascade_slices_buffer_ == nullptr)
     {
-        m_cascade_sprits_buffer_ = std::make_shared<ConstantBuffer>(
+        m_cascade_slices_buffer_ = std::make_shared<ConstantBuffer>(
             sizeof(float) * RenderingSettingsComponent::kShadowCascadeCount);
-        m_cascade_sprits_buffer_->CreateBuffer();
+        m_cascade_slices_buffer_->CreateBuffer();
     }
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kCascadeSpritCBV, m_cascade_sprits_buffer_->GetAddress());
+    cmd_list->SetGraphicsRootConstantBufferView(kCascadeSpritCBV, m_cascade_slices_buffer_->GetAddress());
 }
 
 void RenderPipeline::SetLightsViewProjMatrix() const

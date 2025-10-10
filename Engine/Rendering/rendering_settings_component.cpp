@@ -9,9 +9,9 @@ namespace engine
 {
 bool RenderingSettingsComponent::ShadowCascadeInspector()
 {
-    return Gui::PropertyField("Cascade near", m_cascade_splits_[0]) ||
-           Gui::PropertyField("Cascade mid", m_cascade_splits_[1]) ||
-           Gui::PropertyField("Cascade far", m_cascade_splits_[2]);
+    return Gui::PropertyField("Cascade near", m_cascade_slices_[0]) ||
+           Gui::PropertyField("Cascade mid", m_cascade_slices_[1]) ||
+           Gui::PropertyField("Cascade far", m_cascade_slices_[2]);
 }
 
 void RenderingSettingsComponent::OnInspectorGui()
@@ -32,7 +32,7 @@ void RenderingSettingsComponent::OnStart()
 void RenderingSettingsComponent::ApplySettings()
 {
     Skybox::Instance()->SetTextureCube(m_skybox_cube_.CastedLock());
-    RenderPipeline::SetCascadeSprits(m_cascade_splits_);
-    DirectionalLight::SetCascadeSprits(m_cascade_splits_);
+    RenderPipeline::SetCascadeSprits(m_cascade_slices_);
+    DirectionalLight::SetCascadeSprits(m_cascade_slices_);
 }
 }

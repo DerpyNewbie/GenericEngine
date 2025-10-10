@@ -11,7 +11,7 @@ public:
 
 private:
     AssetPtr<TextureCube> m_skybox_cube_;
-    std::array<float, kShadowCascadeCount> m_cascade_splits_ = {10.0f, 200.0f, 1000.0f};
+    std::array<float, kShadowCascadeCount> m_cascade_slices_ = {10.0f, 200.0f, 1000.0f};
 
     bool ShadowCascadeInspector();
 
