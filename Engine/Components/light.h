@@ -15,7 +15,7 @@ struct alignas(16) LightData
     float range = 1;
 
     Vector4 pos;
-    Vector4 direction;
+    Quaternion direction;
     Color color;
 
     float inner_cos;
