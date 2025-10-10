@@ -16,11 +16,11 @@ bool RenderingSettingsComponent::ShadowCascadeInspector()
 
 void RenderingSettingsComponent::OnInspectorGui()
 {
-    bool is_changed = false;
-    is_changed |= Gui::PropertyField("Skybox Cube", m_skybox_cube_);
-    is_changed |= ShadowCascadeInspector();
+    bool has_changed = false;
+    has_changed |= Gui::PropertyField("Skybox Cube", m_skybox_cube_);
+    has_changed |= ShadowCascadeInspector();
 
-    if (is_changed)
+    if (has_changed)
         ApplySettings();
 }
 
