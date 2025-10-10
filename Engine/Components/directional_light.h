@@ -7,7 +7,7 @@ namespace engine
 class DirectionalLight : public Light
 {
     friend class RenderPipeline;
-    static std::array<float, RenderingSettingsComponent::kShadowCascadeCount> m_cascade_sprits_;
+    static std::array<float, RenderingSettingsComponent::kShadowCascadeCount> m_cascade_slices_;
 
     static std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> &CascadeFrustum(
         const std::array<Vector3, 8> &frustum);
