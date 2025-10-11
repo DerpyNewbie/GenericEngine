@@ -9,8 +9,7 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl" />
-    <FxCompile Include="Depth.hlsl" />
-    <FxCompile Include="Resources\BasicShader.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -99,7 +98,6 @@
     <ClCompile Include="Engine\Components\directional_light.cpp" />
     <ClCompile Include="Engine\Components\light.cpp" />
     <ClCompile Include="Engine\Components\rotator_component.cpp" />
-    <ClCompile Include="Engine\Components\skybox.cpp" />
     <ClCompile Include="Engine\Components\text_renderer.cpp" />
     <ClCompile Include="Engine\default_scene_generator.cpp" />
     <ClCompile Include="Engine\event.cpp" />
@@ -114,7 +112,6 @@
     <ClCompile Include="Engine\Physics\rigidbody_component.cpp" />
     <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp" />
     <ClCompile Include="Engine\Physics\sphere_collider.cpp" />
-    <ClCompile Include="Engine\Rendering\camera.cpp" />
     <ClCompile Include="Engine\Rendering\depth_texture.cpp" />
     <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp" />
     <ClCompile Include="Engine\Rendering\ibuffer.cpp" />
@@ -231,7 +228,6 @@
     <ClInclude Include="Engine\Components\directional_light.h" />
     <ClInclude Include="Engine\Components\light.h" />
     <ClInclude Include="Engine\Components\rotator_component.h" />
-    <ClInclude Include="Engine\Components\skybox.h" />
     <ClInclude Include="Engine\Components\text_renderer.h" />
     <ClInclude Include="Engine\default_scene_generator.h" />
     <ClInclude Include="Engine\event.h" />
@@ -247,7 +243,6 @@
     <ClInclude Include="Engine\Physics\rigidbody_tester_component.h" />
     <ClInclude Include="Engine\Physics\sphere_collider.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h" />
-    <ClInclude Include="Engine\Rendering\camera.h" />
     <ClInclude Include="Engine\Rendering\depth_texture.h" />
     <ClInclude Include="Engine\Rendering\ibuffer.h" />
     <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli" />
