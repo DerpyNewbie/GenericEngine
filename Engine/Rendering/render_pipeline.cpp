@@ -16,25 +16,18 @@ namespace
 {
 std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &cam_proj)
 {
-    std::array<Vector3, 8> corners;
-
-    Vector3 ndc_corners[8] =
+    const Vector3 ndc_corners[8] =
     {
         {-1, -1, 0}, {-1, 1, 0}, {1, 1, 0}, {1, -1, 0},
         {-1, -1, 1}, {-1, 1, 1}, {1, 1, 1}, {1, -1, 1}
     };
 
-    Matrix inv_view_proj = (cam_view * cam_proj).Invert();
-
-    std::array<Vector3, 8> fullFrustum;
+    const Matrix inv_view_proj = (cam_view * cam_proj).Invert();
+    std::array<Vector3, 8> corners;
     for (int i = 0; i < 8; i++)
-    {
-        Vector3 corner = XMVectorSet(ndc_corners[i].x, ndc_corners[i].y, ndc_corners[i].z, 1.0f);
-        corner = XMVector3TransformCoord(corner, inv_view_proj);
-        fullFrustum[i] = corner;
-    }
+        corners[i] = Vector3::Transform(ndc_corners[i], inv_view_proj);
 
-    return fullFrustum;
+    return corners;
 }
 
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
@@ -79,6 +72,7 @@ void RenderPipeline::InvokeDrawCall()
 
         ID3D12DescriptorHeap *rtv_heap = nullptr;
         ID3D12DescriptorHeap *dsv_heap = nullptr;
+
         auto render_tex = camera->m_render_texture_.CastedLock();
         if (render_tex)
         {
@@ -86,10 +80,11 @@ void RenderPipeline::InvokeDrawCall()
             rtv_heap = render_tex->GetHeap();
         }
 
-        if (auto depth_texture = camera->m_depth_texture_.CastedLock())
+        auto depth_tex = camera->m_depth_texture_.CastedLock();
+        if (depth_tex)
         {
-            depth_texture->BeginRender();
-            dsv_heap = depth_texture->GetHeap();
+            depth_tex->BeginRender();
+            dsv_heap = depth_tex->GetHeap();
         }
 
         if (rtv_heap != nullptr || dsv_heap != nullptr)
@@ -104,8 +99,8 @@ void RenderPipeline::InvokeDrawCall()
         if (render_tex)
             render_tex->EndRender();
 
-        if (const auto depth_texture = camera->m_depth_texture_.CastedLock())
-            depth_texture->EndRender();
+        if (depth_tex)
+            depth_tex->EndRender();
     }
 
     if (const auto main_camera = CameraComponent::Main())
@@ -153,10 +148,7 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     SetCascadeSlicesBuffer();
     Skybox::Instance()->Render();
     Light::SetBuffers();
-    if (m_is_updated_)
-    {
-        return;
-    }
+
     for (const auto renderer : m_renderers_)
     {
         renderer->UpdateBuffer();
@@ -167,25 +159,32 @@ void RenderPipeline::Render(const Matrix &view, const CameraProperty &camera_pro
 {
     const auto proj = camera_property.ProjectionMatrix();
     UpdateBuffer(view, proj);
-    auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
-    for (auto renderer : renderers)
+
+    const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    for (const auto renderer : renderers)
     {
         renderer->Render();
     }
+
     Gizmos::Render();
 }
 
 void RenderPipeline::DepthRender()
 {
+    const auto cmd_list = RenderEngine::CommandList();
+    cmd_list->SetPipelineState(PSOManager::Get("Depth"));
+
+    // FIXME: update buffer call may not be needed if it has been called before in a frame
+    for (const auto renderer : m_renderers_)
+    {
+        renderer->UpdateBuffer();
+    }
+
     auto current_shadow_map_count = 0;
     for (const auto light : m_lights_)
     {
-        const auto cmd_list = RenderEngine::CommandList();
-        cmd_list->SetPipelineState(PSOManager::Get("Depth"));
-
-        const auto shadow_map_count_in_light = light->ShadowMapCount();
-
-        for (int i = 0; i < shadow_map_count_in_light; ++i)
+        const auto shadow_map_count = light->ShadowMapCount();
+        for (int i = 0; i < shadow_map_count; ++i)
         {
             m_shadow_maps_[current_shadow_map_count]->BeginRender();
             RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[i]->GetHeap(),
@@ -194,18 +193,13 @@ void RenderPipeline::DepthRender()
             SetViewProjMatrix(m_light_view_proj_matrices_[i], Matrix::Identity);
             SetLightsViewProjMatrix();
             SetCurrentShadowMapIndex(i);
-            if (!m_is_updated_)
-            {
-                for (const auto renderer : m_renderers_)
-                {
-                    renderer->UpdateBuffer();
-                }
-            }
+
             for (const auto renderer : m_renderers_)
             {
                 renderer->DepthRender();
             }
-            m_shadow_maps_[i]->EndRender();
+
+            m_shadow_maps_[current_shadow_map_count]->EndRender();
             ++current_shadow_map_count;
         }
     }
@@ -213,7 +207,7 @@ void RenderPipeline::DepthRender()
 
 void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
 {
-    int current_matrices_index = 0;
+    int light_vp_idx = 0;
     for (const auto light : m_lights_)
     {
         const auto shadow_map_count = light->ShadowMapCount();
@@ -221,12 +215,12 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
         const auto camera_property = camera->m_property_;
 
         auto frustum_corners = CalcFrustumCorners(camera->ViewMatrix(), camera->m_property_.ProjectionMatrix());
-        auto matrices = light->CalcViewProj(frustum_corners);
+        auto light_vp = light->CalcViewProj(frustum_corners);
 
         for (int i = 0; i < shadow_map_count; ++i)
         {
-            m_light_view_proj_matrices_[current_matrices_index] = matrices[i];
-            ++current_matrices_index;
+            m_light_view_proj_matrices_[light_vp_idx] = light_vp[i];
+            ++light_vp_idx;
         }
     }
 
@@ -241,19 +235,19 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     m_light_view_proj_matrices_buffer_->UpdateBuffer(m_light_view_proj_matrices_.data());
 }
 
-void RenderPipeline::SetCurrentShadowMapIndex(int shadow_map_index)
+void RenderPipeline::SetCurrentShadowMapIndex(const int shadow_map_index)
 {
     if (m_current_shadow_map_index_buffer_[0] == nullptr)
     {
         for (int i = 0; i < m_current_shadow_map_index_buffer_.size(); ++i)
         {
-            m_current_shadow_map_index_buffer_[i] = std::make_shared<ConstantBuffer>(sizeof(int));
-            m_current_shadow_map_index_buffer_[i]->CreateBuffer();
-            m_current_shadow_map_index_buffer_[i]->UpdateBuffer(&i);
+            const auto cb = m_current_shadow_map_index_buffer_[i] = std::make_shared<ConstantBuffer>(sizeof(int));
+            cb->CreateBuffer();
+            cb->UpdateBuffer(&i);
         }
     }
 
-    auto cmd_list = RenderEngine::CommandList();
+    const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV,
                                                 m_current_shadow_map_index_buffer_[shadow_map_index]->GetAddress());
 }
@@ -268,7 +262,8 @@ void RenderPipeline::SetCascadeSlices(
             sizeof(float) * RenderingSettingsComponent::kShadowCascadeCount);
         cascade_slices_buffer->CreateBuffer();
     }
-    Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_slices.data());
+
+    cascade_slices_buffer->UpdateBuffer(shadow_cascade_slices.data());
 }
 
 void RenderPipeline::SetCascadeSlicesBuffer()
@@ -296,7 +291,7 @@ void RenderPipeline::SetShadowMap()
     if (m_depth_textures_ == nullptr)
     {
         m_depth_textures_ = std::make_shared<Texture2DArray>();
-        D3D12_CLEAR_VALUE clear_value = {};
+        D3D12_CLEAR_VALUE clear_value;
         clear_value.Format = DXGI_FORMAT_D32_FLOAT;
         clear_value.DepthStencil.Depth = 1.0f;
         clear_value.DepthStencil.Stencil = 0;
@@ -307,7 +302,7 @@ void RenderPipeline::SetShadowMap()
         m_shadow_map_handle_ = m_depth_textures_->UploadBuffer();
 
         m_free_depth_texture_handles_.clear();
-        for (int i = 0; i < kMaxShadowMapCount; i++)
+        for (UINT i = 0; i < kMaxShadowMapCount; i++)
         {
             m_free_depth_texture_handles_.emplace(i);
         }
@@ -332,29 +327,27 @@ size_t RenderPipeline::GetRendererCount()
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 {
     const auto go = light->GameObject();
-    auto shadow_map_count = light->ShadowMapCount();
+    const auto shadow_map_count = light->ShadowMapCount();
 
-    for (int si = 0; si < shadow_map_count; ++si)
+    for (int i = 0; i < shadow_map_count; ++i)
     {
-        std::shared_ptr<DepthTexture> depth_texture;
-        depth_texture = std::make_shared<DepthTexture>();
-
-        auto i = m_free_depth_texture_handles_.begin();
-        if (i == m_free_depth_texture_handles_.end())
+        auto handle_it = m_free_depth_texture_handles_.begin();
+        if (handle_it == m_free_depth_texture_handles_.end())
         {
             Logger::Error<RenderPipeline>("Could not retrieve depth texture: Pool is empty");
             return;
         }
 
-        const auto index = *i;
-        m_free_depth_texture_handles_.erase(i);
+        const auto handle = *handle_it;
+        m_free_depth_texture_handles_.erase(handle_it);
+        light->m_depth_texture_handle_.emplace_back(handle);
 
-        light->m_depth_texture_handle_.emplace_back(index);
-        depth_texture->SetResource(m_depth_textures_, index);
+        auto depth_texture = std::make_shared<DepthTexture>();
+        depth_texture->SetResource(m_depth_textures_, handle);
         m_shadow_maps_.emplace_back(depth_texture);
     }
-    m_lights_.emplace_back(light);
 
+    m_lights_.emplace_back(light);
 }
 
 void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
@@ -363,13 +356,13 @@ void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
         return light == this_light;
     });
 
-    const auto shadowmap_count = light->ShadowMapCount();
-    for (int si = 0; shadowmap_count < si; ++si)
+    const auto shadow_map_count = light->ShadowMapCount();
+    for (int i = 0; shadow_map_count < i; ++i)
     {
-        m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[si]));
+        m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[i]));
 
-        m_shadow_maps_[si].reset();
-        m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[si]);
+        m_shadow_maps_[i].reset();
+        m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[i]);
     }
 }
 

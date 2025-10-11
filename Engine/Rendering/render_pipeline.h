@@ -40,7 +40,6 @@ class RenderPipeline
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::unordered_set<std::shared_ptr<CameraComponent>> m_cameras_;
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
-    bool m_is_updated_ = false;
 
     void InvokeDrawCall();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
