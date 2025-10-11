@@ -68,6 +68,6 @@ public:
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
 
     static void SetCascadeSlices(
-        std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits);
+        std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_slices);
 };
 }

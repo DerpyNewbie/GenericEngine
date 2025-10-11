@@ -259,9 +259,9 @@ void RenderPipeline::SetCurrentShadowMapIndex(int shadow_map_index)
 }
 
 void RenderPipeline::SetCascadeSlices(
-    std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits)
+    std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_slices)
 {
-    Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_sprits.data());
+    Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_slices.data());
 }
 
 void RenderPipeline::SetCascadeSlicesBuffer()
