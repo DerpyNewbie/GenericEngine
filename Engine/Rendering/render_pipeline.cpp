@@ -261,6 +261,13 @@ void RenderPipeline::SetCurrentShadowMapIndex(int shadow_map_index)
 void RenderPipeline::SetCascadeSlices(
     std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_slices)
 {
+    auto &cascade_slices_buffer = Instance()->m_cascade_slices_buffer_;
+    if (cascade_slices_buffer == nullptr)
+    {
+        cascade_slices_buffer = std::make_shared<ConstantBuffer>(
+            sizeof(float) * RenderingSettingsComponent::kShadowCascadeCount);
+        cascade_slices_buffer->CreateBuffer();
+    }
     Instance()->m_cascade_slices_buffer_->UpdateBuffer(shadow_cascade_slices.data());
 }
 

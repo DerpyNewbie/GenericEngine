@@ -10,5 +10,6 @@ public:
     static void CreateDefaultFloor();
     static void CreateHackadoll();
     static void CreateYBot();
+    static void CreateRenderingSettings();
 };
 }
