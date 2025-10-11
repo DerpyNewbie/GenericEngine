@@ -95,21 +95,13 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vrt</EntryPointName>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
-            <ObjectFileOutput>C:\Projects\team\x64\Debug\%(Filename).cso</ObjectFileOutput>
-            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
-            <EntryPointName>main</EntryPointName>
-            <SuppressStartupBanner>true</SuppressStartupBanner>
-            <ShaderModel>4.0_level_9_3</ShaderModel>
-            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-            <DisableOptimizations>true</DisableOptimizations>
-            <EnableDebuggingInformation>true</EnableDebuggingInformation>
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vrt</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-        </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
             <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
             <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
