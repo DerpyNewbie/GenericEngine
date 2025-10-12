@@ -1,4 +1,5 @@
 #pragma once
+#include "RenderingConstants.h"
 #include "CabotEngine/Graphics/TextureCube.h"
 #include "Components/component.h"
 
@@ -6,12 +7,8 @@ namespace engine
 {
 class RenderingSettingsComponent final : public Component
 {
-public:
-    static constexpr int kShadowCascadeCount = 3;
-
-private:
     AssetPtr<TextureCube> m_skybox_cube_;
-    std::array<float, kShadowCascadeCount> m_cascade_slices_ = {10.0f, 200.0f, 1000.0f};
+    std::array<float, RenderingConstants::kShadowCascadeCount> m_cascade_slices_ = {10.0f, 200.0f, 1000.0f};
 
     bool ShadowCascadeInspector();
 

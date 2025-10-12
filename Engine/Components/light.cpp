@@ -32,12 +32,12 @@ void Light::UpdateLightBuffer()
     if (m_lights_buffer_ == nullptr)
     {
         m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
-                                                              RenderPipeline::kMaxLightCount);
+                                                              RenderingConstants::kMaxLightCount);
         m_lights_buffer_->CreateBuffer();
         m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
     }
 
-    std::array<LightData, RenderPipeline::kMaxLightCount> properties;
+    std::array<LightData, RenderingConstants::kMaxLightCount> properties;
     for (int i = 0; i < RenderPipeline::Instance()->m_lights_.size(); ++i)
         properties[i] = RenderPipeline::Instance()->m_lights_[i]->m_light_data_;
     m_lights_buffer_->UpdateBuffer(properties.data());

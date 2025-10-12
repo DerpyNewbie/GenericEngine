@@ -176,6 +176,7 @@
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
+        <ClCompile Include="Engine\Rendering\RenderingConstants.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
@@ -307,6 +308,7 @@
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
+        <ClInclude Include="Engine\Rendering\RenderingConstants.h"/>
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>

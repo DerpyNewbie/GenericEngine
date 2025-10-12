@@ -1,4 +1,5 @@
 #pragma once
+#include "RenderingConstants.h"
 #include "event.h"
 #include "rendering_settings_component.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
@@ -18,14 +19,9 @@ class RenderPipeline
     friend class Engine;
     friend class CameraComponent;
 
-
-    constexpr static int kMaxLightCount = 10;
-    static constexpr Vector2 kShadowMapSize = {1920, 1065};
-    static constexpr UINT kMaxShadowMapCount = 10;
-
     //ライト関係
     std::vector<std::shared_ptr<Light>> m_lights_;
-    std::array<Matrix, kMaxShadowMapCount> m_light_view_proj_matrices_;
+    std::array<Matrix, RenderingConstants::kMaxShadowMapCount> m_light_view_proj_matrices_;
     std::shared_ptr<StructuredBuffer> m_light_view_proj_matrices_buffer_;
     std::shared_ptr<DescriptorHandle> m_light_view_proj_handle_;
 
@@ -33,7 +29,8 @@ class RenderPipeline
     std::vector<std::shared_ptr<DepthTexture>> m_shadow_maps_;
     std::shared_ptr<Texture2DArray> m_depth_textures_;
     std::shared_ptr<DescriptorHandle> m_shadow_map_handle_;
-    std::array<std::shared_ptr<ConstantBuffer>, kMaxShadowMapCount> m_current_shadow_map_index_buffer_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderingConstants::kMaxShadowMapCount>
+    m_current_shadow_map_index_buffer_;
     std::set<int> m_free_depth_texture_handles_;
     std::shared_ptr<ConstantBuffer> m_cascade_slices_buffer_;
 
@@ -67,6 +64,6 @@ public:
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
 
     static void SetCascadeSlices(
-        std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_slices);
+        std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices);
 };
 }

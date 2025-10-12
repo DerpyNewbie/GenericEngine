@@ -2,7 +2,7 @@
 #include "directional_light.h"
 #include "game_object.h"
 
-std::array<float, engine::RenderingSettingsComponent::kShadowCascadeCount> engine::DirectionalLight::m_cascade_slices_;
+std::array<float, engine::RenderingConstants::kShadowCascadeCount> engine::DirectionalLight::m_cascade_slices_;
 
 using namespace DirectX;
 
@@ -11,9 +11,9 @@ namespace engine
 
 void DirectionalLight::CascadeFrustum(const std::array<Vector3, 8> &frustum,
                                       std::array<std::array<Vector3, 8>,
-                                                 RenderingSettingsComponent::kShadowCascadeCount> &dst)
+                                                 RenderingConstants::kShadowCascadeCount> &dst)
 {
-    for (int i = 0; i < RenderingSettingsComponent::kShadowCascadeCount; ++i)
+    for (int i = 0; i < RenderingConstants::kShadowCascadeCount; ++i)
     {
         const auto camera = CameraComponent::Current();
         const auto camera_near = camera->m_property_.near_plane;
@@ -36,7 +36,7 @@ void DirectionalLight::CascadeFrustum(const std::array<Vector3, 8> &frustum,
 }
 
 void DirectionalLight::SetCascadeSlices(
-    const std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_sprits)
+    const std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_sprits)
 {
     m_cascade_slices_ = shadow_cascade_sprits;
 }
@@ -68,7 +68,7 @@ int DirectionalLight::ShadowMapCount()
 std::vector<Matrix> DirectionalLight::CalcViewProj(const std::array<Vector3, 8> &frustum_corners)
 {
     std::vector<Matrix> view_proj_matrices;
-    std::array<std::array<Vector3, 8>, RenderingSettingsComponent::kShadowCascadeCount> cascade_frustums;
+    std::array<std::array<Vector3, 8>, RenderingConstants::kShadowCascadeCount> cascade_frustums;
     CascadeFrustum(frustum_corners, cascade_frustums);
     for (int i = 0; i < cascade_frustums.size(); ++i)
     {

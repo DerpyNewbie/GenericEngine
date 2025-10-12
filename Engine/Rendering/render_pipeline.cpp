@@ -227,7 +227,7 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     if (m_light_view_proj_matrices_buffer_ == nullptr)
     {
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(
-            sizeof(Matrix), kMaxShadowMapCount);
+            sizeof(Matrix), RenderingConstants::kMaxShadowMapCount);
         m_light_view_proj_matrices_buffer_->CreateBuffer();
         m_light_view_proj_handle_ = m_light_view_proj_matrices_buffer_->UploadBuffer();
     }
@@ -253,13 +253,13 @@ void RenderPipeline::SetCurrentShadowMapIndex(const int shadow_map_index)
 }
 
 void RenderPipeline::SetCascadeSlices(
-    std::array<float, RenderingSettingsComponent::kShadowCascadeCount> shadow_cascade_slices)
+    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices)
 {
     auto &cascade_slices_buffer = Instance()->m_cascade_slices_buffer_;
     if (cascade_slices_buffer == nullptr)
     {
         cascade_slices_buffer = std::make_shared<ConstantBuffer>(
-            sizeof(float) * RenderingSettingsComponent::kShadowCascadeCount);
+            sizeof(float) * RenderingConstants::kShadowCascadeCount);
         cascade_slices_buffer->CreateBuffer();
     }
 
@@ -271,7 +271,7 @@ void RenderPipeline::SetCascadeSlicesBuffer()
     if (m_cascade_slices_buffer_ == nullptr)
     {
         m_cascade_slices_buffer_ = std::make_shared<ConstantBuffer>(
-            sizeof(float) * RenderingSettingsComponent::kShadowCascadeCount);
+            sizeof(float) * RenderingConstants::kShadowCascadeCount);
         m_cascade_slices_buffer_->CreateBuffer();
     }
 
@@ -295,14 +295,14 @@ void RenderPipeline::SetShadowMap()
         clear_value.Format = DXGI_FORMAT_D32_FLOAT;
         clear_value.DepthStencil.Depth = 1.0f;
         clear_value.DepthStencil.Stencil = 0;
-        m_depth_textures_->CreateResource(kShadowMapSize, kMaxShadowMapCount, 1,
+        m_depth_textures_->CreateResource(RenderingConstants::kShadowMapSize, RenderingConstants::kMaxShadowMapCount, 1,
                                           DXGI_FORMAT_R32_TYPELESS,
                                           D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clear_value);
         m_depth_textures_->SetFormat(DXGI_FORMAT_R32_FLOAT);
         m_shadow_map_handle_ = m_depth_textures_->UploadBuffer();
 
         m_free_depth_texture_handles_.clear();
-        for (UINT i = 0; i < kMaxShadowMapCount; i++)
+        for (UINT i = 0; i < RenderingConstants::kMaxShadowMapCount; i++)
         {
             m_free_depth_texture_handles_.emplace(i);
         }
