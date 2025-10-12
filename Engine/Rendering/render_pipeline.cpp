@@ -187,12 +187,12 @@ void RenderPipeline::DepthRender()
         for (int i = 0; i < shadow_map_count; ++i)
         {
             m_shadow_maps_[current_shadow_map_count]->BeginRender();
-            RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[i]->GetHeap(),
+            RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[current_shadow_map_count]->GetHeap(),
                                                       Color());
 
             SetViewProjMatrix(m_light_view_proj_matrices_[i], Matrix::Identity);
             SetLightsViewProjMatrix();
-            SetCurrentShadowMapIndex(i);
+            SetCurrentShadowMapIndex(current_shadow_map_count);
 
             for (const auto renderer : m_renderers_)
             {

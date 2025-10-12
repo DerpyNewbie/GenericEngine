@@ -62,7 +62,7 @@ bool DirectionalLight::InCameraView(const std::array<Vector3, 8> &frustum)
 
 int DirectionalLight::ShadowMapCount()
 {
-    return 2;
+    return 3;
 }
 
 std::vector<Matrix> DirectionalLight::CalcViewProj(const std::array<Vector3, 8> &frustum_corners)
