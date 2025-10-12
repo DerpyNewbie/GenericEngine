@@ -136,6 +136,8 @@ float SampleShadowPCF(float3 shadowCoord, int lightIndex)
     float shadow = 0.0;
     const float2 texelSize = 1.0 / float2(1920, 1065);
 
+    shadowCoord.z -= 0.005f;
+
     [unroll]
     for (int x = -1; x <= 1; x++)
     {
@@ -147,7 +149,7 @@ float SampleShadowPCF(float3 shadowCoord, int lightIndex)
                 shadowSampler,
                 float3(shadowCoord.xy + offset, lightIndex),
                 shadowCoord.z
-                );
+            );
         }
     }
 
@@ -174,7 +176,7 @@ float4 pix(VSOutput input) : SV_TARGET
     for (int i = 0; i < SHADOW_CASCADE_COUNT; ++i)
     {
         if (depth < cascade_sprits[i])
-            cascade_index = i;
+            cascade_index = 0;
     }
 
     for (int i = 0; i < light_count; ++i)
@@ -187,18 +189,22 @@ float4 pix(VSOutput input) : SV_TARGET
         float4 lightClip = mul(LightViewProj[itr], worldPos);
         float3 shadowCoord;
         shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
-        shadowCoord.z = lightClip.z / lightClip.w;
+				shadowCoord.y = 1 - shadowCoord.y;
+        shadowCoord.z = lightClip.z;
 
         float shadow = 0;
         if (shadowCoord.x < 0 || shadowCoord.x > 1 ||
-            shadowCoord.y < 0 || shadowCoord.y > 1)
+            shadowCoord.y < 0 || shadowCoord.y > 1 || shadowCoord.z >= 1.0f)
         {
             shadow = 1.0f;
         }
         else
         {
-            shadowCoord.y = 1 - shadowCoord.y;
-            shadow = SampleShadowPCF(shadowCoord, itr);
+						shadowCoord.z -= 0.01f;
+            shadow = ShadowMaps.SampleCmpLevelZero(
+                shadowSampler,
+                float3(shadowCoord.xy, itr),
+                shadowCoord.z);
         }
 
         brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;

@@ -36,17 +36,8 @@ void PSOManager::Initialize()
     setting.NumRenderTarget = 1;
     Register(setting);
 
-    D3D12_RASTERIZER_DESC depth_rast = {};
-    depth_rast.FillMode = D3D12_FILL_MODE_SOLID;
-    depth_rast.CullMode = D3D12_CULL_MODE_BACK;
-    depth_rast.DepthClipEnable = TRUE;
-
-    depth_rast.DepthBias = 100;
-    depth_rast.SlopeScaledDepthBias = 1.0f;
-    depth_rast.DepthBiasClamp = 0.0f;
-
     setting.PSOName = "Depth";
-    setting.RasterizerDesc = depth_rast;
+    setting.RasterizerDesc = rasterizer_desc;
     setting.NumRenderTarget = 0;
     setting.VSPath = L"x64/Debug/Depth.cso";
     setting.PSPath = L"";
