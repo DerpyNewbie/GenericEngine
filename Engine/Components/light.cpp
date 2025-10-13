@@ -19,7 +19,8 @@ void Light::UpdateLightCountBuffer()
         m_light_count_buffer_->CreateBuffer();
     }
 
-    LightCountBuffer lcb(RenderPipeline::Instance()->m_lights_.size());
+    auto render_pipeline = RenderPipeline::Instance();
+    LightCountBuffer lcb(render_pipeline->m_lights_.size());
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
 }
@@ -71,11 +72,24 @@ void Light::OnInspectorGui()
 {
     Gui::PropertyField("Intensity", m_light_data_.intensity);
     Gui::ColorField("LightColor", m_light_data_.color);
+
+    bool cast_shadow = m_light_data_.cast_shadow;
+    if (Gui::BoolField("CastShadow", cast_shadow))
+    {
+        m_light_data_.cast_shadow = cast_shadow;
+        if (cast_shadow == false)
+            RenderPipeline::Instance()->RemoveShadow(shared_from_base<Light>());
+        else
+            m_light_data_.cast_shadow = RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
+    }
 }
 
 void Light::OnEnabled()
 {
+
     RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
+    if (m_light_data_.cast_shadow)
+        m_light_data_.cast_shadow = RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
 }
 
 void Light::OnDisabled()

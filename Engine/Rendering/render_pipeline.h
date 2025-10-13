@@ -56,6 +56,8 @@ public:
     static RenderPipeline *Instance();
     static size_t GetRendererCount();
 
+    bool TryApplyShadow(std::shared_ptr<Light> light);
+    void RemoveShadow(const std::shared_ptr<Light> &light);
     void AddLight(std::shared_ptr<Light> light);
     void RemoveLight(const std::shared_ptr<Light> &light);
     static void AddCamera(std::shared_ptr<CameraComponent> camera);

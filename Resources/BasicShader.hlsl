@@ -192,6 +192,11 @@ float4 pix(VSOutput input) : SV_TARGET
 				shadowCoord.y = 1 - shadowCoord.y;
         shadowCoord.z = lightClip.z;
 
+        if (Lights[i].cast_shadow == 0)
+        {
+            brightness += NdotL * Lights[i].color.rgb * Lights[i].intensity;
+            continue;
+        }
         float shadow = 0;
         if (shadowCoord.x < 0 || shadowCoord.x > 1 ||
             shadowCoord.y < 0 || shadowCoord.y > 1 || shadowCoord.z >= 1.0f)

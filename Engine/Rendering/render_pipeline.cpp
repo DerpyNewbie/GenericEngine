@@ -207,6 +207,10 @@ void RenderPipeline::UpdateLightsViewProjMatrixBuffer()
     int light_vp_idx = 0;
     for (const auto light : m_lights_)
     {
+        if (light->m_depth_texture_handle_.empty())
+        {
+            continue;
+        }
         const auto shadow_map_count = light->ShadowMapCount();
         const auto camera = CameraComponent::Current();
         const auto camera_property = camera->m_property_;
@@ -320,20 +324,17 @@ size_t RenderPipeline::GetRendererCount()
 {
     return Instance()->m_renderers_.size();
 }
-
-void RenderPipeline::AddLight(std::shared_ptr<Light> light)
+bool RenderPipeline::TryApplyShadow(std::shared_ptr<Light> light)
 {
     const auto go = light->GameObject();
     const auto shadow_map_count = light->ShadowMapCount();
 
+    if (m_free_depth_texture_handles_.size() < shadow_map_count)
+        return false;
+
     for (int i = 0; i < shadow_map_count; ++i)
     {
         auto handle_it = m_free_depth_texture_handles_.begin();
-        if (handle_it == m_free_depth_texture_handles_.end())
-        {
-            Logger::Error<RenderPipeline>("Could not retrieve depth texture: Pool is empty");
-            return;
-        }
 
         const auto handle = *handle_it;
         m_free_depth_texture_handles_.erase(handle_it);
@@ -346,16 +347,11 @@ void RenderPipeline::AddLight(std::shared_ptr<Light> light)
         else
             m_shadow_maps_[handle] = depth_texture;
     }
-
-    m_lights_.emplace_back(light);
+    return true;
 }
 
-void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
+void RenderPipeline::RemoveShadow(const std::shared_ptr<Light> &light)
 {
-    std::erase_if(m_lights_, [&](const std::shared_ptr<Light> &this_light) {
-        return light == this_light;
-    });
-
     const auto shadow_map_count = light->ShadowMapCount();
     for (int i = 0; i < shadow_map_count; ++i)
     {
@@ -366,6 +362,22 @@ void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
         m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[i]);
     }
     light->m_depth_texture_handle_.clear();
+}
+
+void RenderPipeline::AddLight(std::shared_ptr<Light> light)
+{
+    m_lights_.emplace_back(light);
+}
+
+void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
+{
+    std::erase_if(m_lights_, [&](const std::shared_ptr<Light> &this_light) {
+        return light == this_light;
+    });
+    if (light->m_depth_texture_handle_.empty())
+        return;
+
+    RemoveShadow(light);
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)

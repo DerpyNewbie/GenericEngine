@@ -59,6 +59,10 @@ bool DirectionalLight::InCameraView(const std::array<Vector3, 8> &frustum)
 {
     return true;
 }
+Vector3 DirectionalLight::GetPos()
+{
+    return CameraComponent::Main()->GameObject()->Transform()->Position();
+}
 
 int DirectionalLight::ShadowMapCount()
 {

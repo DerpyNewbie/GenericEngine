@@ -10,7 +10,7 @@ namespace engine
 struct alignas(16) LightData
 {
     int type = 1;
-    int cast_shadow = 1;
+    int cast_shadow = 0;
     float intensity = 1;
     float range = 1;
 
@@ -70,6 +70,7 @@ public:
     void OnDestroy() override;
 
     virtual bool InCameraView(const std::array<Vector3, 8> &frustum) = 0;
+    virtual Vector3 GetPos() = 0;
     virtual int ShadowMapCount() = 0;
     virtual std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) = 0;
 
