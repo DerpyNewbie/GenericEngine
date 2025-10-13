@@ -1,5 +1,5 @@
 #pragma once
-#include "RenderingConstants.h"
+#include "renderingconstants.h"
 #include "event.h"
 #include "rendering_settings_component.h"
 #include "CabotEngine/Graphics/RenderEngine.h"

@@ -1,5 +1,4 @@
 #pragma once
-#include <directxtk12/SimpleMath.h>
 
 namespace engine::RenderingConstants
 {
