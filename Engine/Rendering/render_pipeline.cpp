@@ -341,7 +341,10 @@ void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 
         auto depth_texture = std::make_shared<DepthTexture>();
         depth_texture->SetResource(m_depth_textures_, handle);
-        m_shadow_maps_.emplace_back(depth_texture);
+        if (m_shadow_maps_.size() <= handle)
+            m_shadow_maps_.emplace_back(depth_texture);
+        else
+            m_shadow_maps_[handle] = depth_texture;
     }
 
     m_lights_.emplace_back(light);
@@ -354,12 +357,12 @@ void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
     });
 
     const auto shadow_map_count = light->ShadowMapCount();
-    auto depth_texture_handle_begin = light->m_depth_texture_handle_[0];
     for (int i = 0; i < shadow_map_count; ++i)
     {
-        m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[depth_texture_handle_begin]));
+        m_depth_textures_->RemoveTexture(
+            AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[light->m_depth_texture_handle_[i]]));
 
-        m_shadow_maps_.erase(m_shadow_maps_.begin() + depth_texture_handle_begin);
+        m_shadow_maps_[light->m_depth_texture_handle_[i]].reset();
         m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[i]);
     }
     light->m_depth_texture_handle_.clear();
