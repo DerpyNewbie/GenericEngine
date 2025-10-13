@@ -180,27 +180,24 @@ void RenderPipeline::DepthRender()
         renderer->UpdateBuffer();
     }
 
-    auto current_shadow_map_count = 0;
-    for (const auto light : m_lights_)
+    for (int i = 0; i < m_lights_.size(); ++i)
     {
-        const auto shadow_map_count = light->ShadowMapCount();
-        for (int i = 0; i < shadow_map_count; ++i)
+        for (auto itr : m_lights_[i]->m_depth_texture_handle_)
         {
-            m_shadow_maps_[current_shadow_map_count]->BeginRender();
-            RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[current_shadow_map_count]->GetHeap(),
+            m_shadow_maps_[itr]->BeginRender();
+            RenderEngine::Instance()->SetRenderTarget(nullptr, m_shadow_maps_[itr]->GetHeap(),
                                                       Color());
 
             SetViewProjMatrix(m_light_view_proj_matrices_[i], Matrix::Identity);
             SetLightsViewProjMatrix();
-            SetCurrentShadowMapIndex(current_shadow_map_count);
+            SetCurrentShadowMapIndex(itr);
 
             for (const auto renderer : m_renderers_)
             {
                 renderer->DepthRender();
             }
 
-            m_shadow_maps_[current_shadow_map_count]->EndRender();
-            ++current_shadow_map_count;
+            m_shadow_maps_[itr]->EndRender();
         }
     }
 }
@@ -352,18 +349,20 @@ void RenderPipeline::AddLight(std::shared_ptr<Light> light)
 
 void RenderPipeline::RemoveLight(const std::shared_ptr<Light> &light)
 {
-    std::erase_if(m_lights_, [light](const std::shared_ptr<Light> &this_light) {
+    std::erase_if(m_lights_, [&](const std::shared_ptr<Light> &this_light) {
         return light == this_light;
     });
 
     const auto shadow_map_count = light->ShadowMapCount();
-    for (int i = 0; shadow_map_count < i; ++i)
+    auto depth_texture_handle_begin = light->m_depth_texture_handle_[0];
+    for (int i = 0; i < shadow_map_count; ++i)
     {
-        m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[i]));
+        m_depth_textures_->RemoveTexture(AssetPtr<Texture2D>::FromManaged(m_shadow_maps_[depth_texture_handle_begin]));
 
-        m_shadow_maps_[i].reset();
+        m_shadow_maps_.erase(m_shadow_maps_.begin() + depth_texture_handle_begin);
         m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[i]);
     }
+    light->m_depth_texture_handle_.clear();
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
