@@ -10,6 +10,7 @@ class Object : public enable_shared_from_base<Object>
     friend struct AssetDescriptor;
     friend cereal::access;
 
+    static bool m_in_gc_time_;
     static unsigned int m_last_instantiated_name_count_;
     static unsigned int m_last_immediately_destroyed_objects_;
     static std::unordered_map<xg::Guid, std::shared_ptr<Object>> m_objects_;

@@ -5,6 +5,7 @@
 namespace engine
 {
 
+bool Object::m_in_gc_time_ = false;
 unsigned int Object::m_last_instantiated_name_count_ = 0;
 unsigned int Object::m_last_immediately_destroyed_objects_ = 0;
 std::unordered_map<xg::Guid, std::shared_ptr<Object>> Object::m_objects_;
@@ -13,11 +14,19 @@ std::vector<std::shared_ptr<Object>> Object::m_destroyed_objects_;
 
 void Object::GarbageCollect()
 {
-    for (const auto &obj : m_destroying_objects_)
+    m_in_gc_time_ = true;
+    while (!m_destroying_objects_.empty())
     {
-        obj->OnDestroy();
-        m_objects_.erase(obj->m_guid_);
+        auto destroying_objects = m_destroying_objects_;
+        m_destroying_objects_.clear();
+        for (const auto &obj : destroying_objects)
+        {
+            obj->OnDestroy();
+            m_objects_.erase(obj->m_guid_);
+        }
     }
+
+    m_in_gc_time_ = false;
 
     if (m_last_immediately_destroyed_objects_ != 0)
     {
@@ -98,10 +107,24 @@ void Object::Destroy(const std::shared_ptr<Object> &obj)
 
 void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
 {
+    if (obj == nullptr)
+    {
+        return;
+    }
+
+    if (m_in_gc_time_)
+    {
+        Logger::Warn<Object>("Cannot immediately destroy object `%s` during GC cycle. Use Object::Destroy instead.",
+                             obj->Name().c_str());
+        Destroy(obj);
+        return;
+    }
+
     if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle())
     {
         Logger::Warn<Object>(
-            "Cannot immediately destroy object during UpdateManager cycle. Use Object::Destroy instead.");
+            "Cannot immediately destroy object `%s` during UpdateManager cycle. Use Object::Destroy instead.",
+            obj->Name().c_str());
         Destroy(obj);
         return;
     }
