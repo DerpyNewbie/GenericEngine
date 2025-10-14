@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "light.h"
 #include "gui.h"
+#include "Rendering/lighting.h"
 #include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -19,15 +20,14 @@ void Light::UpdateLightCountBuffer()
         m_light_count_buffer_->CreateBuffer();
     }
 
-    const auto render_pipeline = RenderPipeline::Instance();
-    LightCountBuffer lcb(static_cast<uint32_t>(render_pipeline->m_lights_.size()));
+    LightCountBuffer lcb(static_cast<uint32_t>(Lighting::Instance()->m_lights_.size()));
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
 }
 
 void Light::UpdateLightBuffer()
 {
-    if (RenderPipeline::Instance()->m_lights_.empty())
+    if (Lighting::Instance()->m_lights_.empty())
         return;
 
     if (m_lights_buffer_ == nullptr)
@@ -39,8 +39,8 @@ void Light::UpdateLightBuffer()
     }
 
     std::array<LightData, RenderingConstants::kMaxLightCount> properties;
-    for (int i = 0; i < RenderPipeline::Instance()->m_lights_.size(); ++i)
-        properties[i] = RenderPipeline::Instance()->m_lights_[i]->m_light_data_;
+    for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
+        properties[i] = Lighting::Instance()->m_lights_[i]->m_light_data_;
     m_lights_buffer_->UpdateBuffer(properties.data());
 }
 
@@ -78,31 +78,31 @@ void Light::OnInspectorGui()
         if (m_has_shadow_ == false)
         {
             m_light_data_.cast_shadow = false;
-            RenderPipeline::Instance()->RemoveShadow(shared_from_base<Light>());
+            Lighting::Instance()->RemoveShadow(shared_from_base<Light>());
         }
         else
-            RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
+            Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());
     }
 }
 
 void Light::OnEnabled()
 {
 
-    RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
+    Lighting::Instance()->AddLight(shared_from_base<Light>());
     if (m_has_shadow_)
-        RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
+        Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());
 }
 
 void Light::OnDisabled()
 {
     if (m_has_shadow_)
-        RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
+        Lighting::Instance()->RemoveLight(shared_from_base<Light>());
 }
 
 void Light::OnDestroy()
 {
     if (m_has_shadow_)
-        RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
+        Lighting::Instance()->RemoveLight(shared_from_base<Light>());
 }
 }
 

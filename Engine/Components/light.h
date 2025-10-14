@@ -1,6 +1,5 @@
 #pragma once
 #include "component.h"
-#include "Components/camera_component.h"
 #include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
@@ -46,8 +45,9 @@ struct alignas(256) LightCountBuffer
 
 class Light : public Component
 {
-    friend CameraComponent;
-    friend RenderPipeline;
+    friend class CameraComponent;
+    friend class RenderPipeline;
+    friend class Lighting;
 
     static std::shared_ptr<StructuredBuffer> m_lights_buffer_;
     static std::shared_ptr<ConstantBuffer> m_light_count_buffer_;
