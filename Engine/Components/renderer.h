@@ -11,7 +11,9 @@ class Renderer : public Component
 protected:
     bool m_is_visible_ = false;
 
-    virtual void OnDraw() = 0;
+    virtual void UpdateBuffer();
+    virtual void Render() = 0;
+    virtual void DepthRender();
     void SetVisible(bool visible);
 
 public:

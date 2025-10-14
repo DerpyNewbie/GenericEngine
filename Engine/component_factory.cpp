@@ -7,10 +7,13 @@
 #include "Audio/audio_source_component.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Components/controller.h"
+#include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
+#include "Components/light.h"
 #include "Components/mesh_renderer.h"
+#include "Components/rotator_component.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Components/text_asset_ref_test_component.h"
 #include "Physics/box_collider.h"
@@ -28,7 +31,7 @@ std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> IComponentFa
 void IComponentFactory::Init()
 {
 #define ADD_COMPONENT(type) Register(std::make_shared<ComponentFactory<type>>())
-    ADD_COMPONENT(Camera);
+    ADD_COMPONENT(CameraComponent);
     ADD_COMPONENT(Controller);
     ADD_COMPONENT(FrameMetaData);
     ADD_COMPONENT(MeshRenderer);
@@ -44,13 +47,16 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RigidbodyTesterComponent);
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
+    ADD_COMPONENT(DirectionalLight);
+    ADD_COMPONENT(RotatorComponent);
     ADD_COMPONENT(AnimationComponent);
     ADD_COMPONENT(RenderingSettingsComponent);
 #undef ADD_COMPONENT
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{}
+{
+}
 
 std::string IComponentFactory::Name()
 {

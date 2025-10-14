@@ -25,6 +25,7 @@ public:
 
 private:
     UINT64 m_SizeAligned;
+    UINT64 m_size_;
     ComPtr<ID3D12Resource> m_pBuffer; // 定数バッファ
     D3D12_CONSTANT_BUFFER_VIEW_DESC m_Desc; // 定数バッファビューの設定
     void *m_pMappedPtr = nullptr;

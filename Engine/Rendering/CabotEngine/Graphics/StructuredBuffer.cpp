@@ -61,7 +61,7 @@ void StructuredBuffer::CreateBuffer()
         return;
     }
 
-    m_gpu_address_ = m_upload_buffer_->GetGPUVirtualAddress();
+    m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
     m_is_valid_ = true;
 }
 
@@ -80,7 +80,7 @@ void StructuredBuffer::UpdateBuffer(void *data)
     m_upload_buffer_->Unmap(0, nullptr);
 
     RenderEngine::CommandList()->CopyBufferRegion(m_default_buffer_.Get(), 0, m_upload_buffer_.Get(), 0,
-                                                  m_element_count_);
+                                                  m_stride_ * m_element_count_);
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,

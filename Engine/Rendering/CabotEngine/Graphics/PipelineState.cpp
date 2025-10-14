@@ -8,102 +8,118 @@
 PipelineState::PipelineState()
 {
     // パイプラインステートの設定
-    desc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
-    desc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
-    desc.RasterizerState.FrontCounterClockwise = TRUE;
-    desc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // ブレンドステートもデフォルト
-    desc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // 深度ステンシルはデフォルトを使う
-    desc.SampleMask = UINT_MAX;
-    desc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
-    desc.NumRenderTargets = 1; // 描画対象は1
-    desc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-    desc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    desc.SampleDesc.Count = 1;
-    desc.SampleDesc.Quality = 0;
-    desc.pRootSignature = engine::RootSignature::Get();
+    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
+    m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
+    m_desc_.RasterizerState.FrontCounterClockwise = TRUE;
+    m_desc_.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // ブレンドステートもデフォルト
+    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // 深度ステンシルはデフォルトを使う
+    m_desc_.SampleMask = UINT_MAX;
+    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
+    m_desc_.NumRenderTargets = 1;
+    for (auto &RTVFormat : m_desc_.RTVFormats)
+        RTVFormat = DXGI_FORMAT_UNKNOWN;
+    m_desc_.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+    m_desc_.SampleDesc.Count = 1;
+    m_desc_.SampleDesc.Quality = 0;
+    m_desc_.pRootSignature = engine::RootSignature::Get();
 }
 
 bool PipelineState::IsValid() const
 {
-    return m_IsValid;
+    return m_is_valid_;
 }
 
-void PipelineState::SetInputLayout(D3D12_INPUT_LAYOUT_DESC layout)
+void PipelineState::SetInputLayout(const D3D12_INPUT_LAYOUT_DESC layout)
 {
-    desc.InputLayout = layout;
+    m_desc_.InputLayout = layout;
 }
 
-void PipelineState::SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type)
+void PipelineState::SetPrimitiveTopologyType(const D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type)
 {
-    desc.PrimitiveTopologyType = primitive_type;
+    m_desc_.PrimitiveTopologyType = primitive_type;
 }
 
 void PipelineState::SetRasterizerState(const D3D12_RASTERIZER_DESC &rasterizer_desc)
 {
-    desc.RasterizerState = rasterizer_desc;
+    m_desc_.RasterizerState = rasterizer_desc;
 }
 
-void PipelineState::SetDepthStencilState(D3D12_DEPTH_STENCIL_DESC depth_stencil_desc)
+void PipelineState::SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC &depth_stencil_desc)
 {
-    desc.DepthStencilState = depth_stencil_desc;
+    m_desc_.DepthStencilState = depth_stencil_desc;
 }
 
-void PipelineState::SetVS(std::wstring filePath)
+void PipelineState::SetNumRenderTarget(const UINT num_render_target)
 {
-    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pVsBlob.GetAddressOf());
+    //RTVの数の上限を超えてたら上限数に抑える
+    if (num_render_target > 8)
+    {
+        m_desc_.NumRenderTargets = 8;
+        engine::Logger::Warn<PipelineState>("NumRenderTarget exceeds 8");
+    }
+    m_desc_.NumRenderTargets = num_render_target;
+    for (UINT i = 0; i < m_desc_.NumRenderTargets; ++i)
+    {
+        m_desc_.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    }
+}
+
+void PipelineState::SetVS(const std::wstring &file_path)
+{
+    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_vs_blob_.GetAddressOf());
     if (FAILED(hr))
     {
         engine::Logger::Error<PipelineState>("Failed to load vertex shader");
         return;
     }
 
-    desc.VS = CD3DX12_SHADER_BYTECODE(m_pVsBlob.Get());
+    m_desc_.VS = CD3DX12_SHADER_BYTECODE(m_p_vs_blob_.Get());
 }
 
-void PipelineState::SetPS(std::wstring filePath)
+void PipelineState::SetPS(const std::wstring &file_path)
 {
-    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pPsBlob.GetAddressOf());
+    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_ps_blob_.GetAddressOf());
     if (FAILED(hr))
     {
         engine::Logger::Error<PipelineState>("Failed to load pixel shader");
         return;
     }
 
-    desc.PS = CD3DX12_SHADER_BYTECODE(m_pPsBlob.Get());
+    m_desc_.PS = CD3DX12_SHADER_BYTECODE(m_p_ps_blob_.Get());
 }
 
-void PipelineState::SetGS(std::wstring filePath)
+void PipelineState::SetGS(const std::wstring &file_path)
 {
-    auto hr = D3DReadFileToBlob(filePath.c_str(), m_pGsBlob.GetAddressOf());
+    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_gs_blob_.GetAddressOf());
     if (FAILED(hr))
     {
         engine::Logger::Error<PipelineState>("Failed to load geometry shader");
         return;
     }
 
-    desc.GS = CD3DX12_SHADER_BYTECODE(m_pGsBlob.Get());
+    m_desc_.GS = CD3DX12_SHADER_BYTECODE(m_p_gs_blob_.Get());
 }
 
-void PipelineState::SetShader(std::shared_ptr<engine::Shader> shader)
+void PipelineState::SetShader(const std::shared_ptr<engine::Shader> &shader)
 {
-    desc.VS = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
-    desc.PS = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
+    m_desc_.VS = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
+    m_desc_.PS = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
 }
 
 void PipelineState::Create()
 {
     auto hr = RenderEngine::Device()->CreateGraphicsPipelineState(
-        &desc, IID_PPV_ARGS(m_pPipelineState.ReleaseAndGetAddressOf()));
+        &m_desc_, IID_PPV_ARGS(m_p_pipeline_state_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
         engine::Logger::Error<PipelineState>("Failed to create PipelineState");
         return;
     }
 
-    m_IsValid = true;
+    m_is_valid_ = true;
 }
 
 ID3D12PipelineState *PipelineState::Get()
 {
-    return m_pPipelineState.Get();
+    return m_p_pipeline_state_.Get();
 }

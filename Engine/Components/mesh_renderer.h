@@ -38,7 +38,9 @@ public:
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
-    void OnDraw() override;
+    void UpdateBuffer() override;
+    void Render() override;
+    void DepthRender() override;
 
     void SetSharedMesh(const std::shared_ptr<Mesh> &mesh);
 
@@ -46,8 +48,6 @@ public:
     {
         return m_shared_mesh_;
     }
-
-    virtual void UpdateBuffers();
 
     template <class Archive>
     void serialize(Archive &ar)

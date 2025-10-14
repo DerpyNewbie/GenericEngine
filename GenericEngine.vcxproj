@@ -60,13 +60,16 @@
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
         <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
-        <ClCompile Include="Engine\Components\camera.cpp"/>
+        <ClCompile Include="Engine\Components\camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
+        <ClCompile Include="Engine\Components\directional_light.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
+        <ClCompile Include="Engine\Components\light.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
+        <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
@@ -92,20 +95,26 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
+            <EntryPointName>vrt</EntryPointName>
+            <ShaderType>Vertex</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
+        </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
+        <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <EntryPointName>pix</EntryPointName>
+            <ShaderModel>5.0</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vert</EntryPointName>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+            <EntryPointName>vert</EntryPointName>
+            <ShaderType>Vertex</ShaderType>
+            <ShaderModel>5.0</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
+        <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
-            <ObjectFileOutput>C:\Projects\team\x64\Debug\2DPixelShader.cso</ObjectFileOutput>
-            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
             <EntryPointName>pix</EntryPointName>
             <SuppressStartupBanner>true</SuppressStartupBanner>
             <ShaderModel>5.0</ShaderModel>
@@ -116,8 +125,6 @@
             <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl">
-            <ObjectFileOutput>C:\Projects\team\x64\Debug\2DVertShader.cso</ObjectFileOutput>
-            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
             <EntryPointName>vrt</EntryPointName>
             <SuppressStartupBanner>true</SuppressStartupBanner>
             <ShaderModel>5.0</ShaderModel>
@@ -128,14 +135,14 @@
             <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicPS</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <EntryPointName>BasicPS</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicVS</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <EntryPointName>BasicVS</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\billboard.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
@@ -143,13 +150,13 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl">
             <FileType>Document</FileType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl">
             <FileType>Document</FileType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp"/>
@@ -228,13 +235,16 @@
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
         <ClInclude Include="Engine\Audio\audio_source_component.h"/>
-        <ClInclude Include="Engine\Components\camera.h"/>
+        <ClInclude Include="Engine\Components\camera_component.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
+        <ClInclude Include="Engine\Components\directional_light.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
+        <ClInclude Include="Engine\Components\light.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
+        <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
@@ -268,7 +278,10 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
+        <ClInclude Include="Engine\Rendering\depth_texture.h"/>
+        <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\billboard.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
@@ -290,6 +303,7 @@
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
+        <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>

@@ -16,8 +16,6 @@ public:
 
 private:
     HWND m_h_wnd_ = nullptr;
-    UINT m_frame_buffer_width_ = 0;
-    UINT m_frame_buffer_height_ = 0;
     UINT m_current_back_buffer_index_ = 0;
     Color m_background_color_ = {0.5f, 0.5f, 0.5f, 0.5f};
 
@@ -60,10 +58,10 @@ private:
 public:
     static RenderEngine *Instance();
 
-
     void BeginRender();
     void SetMainRenderTarget(Color background_color);
-    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, Color background_color) const;
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
+                         Color background_color) const;
     void EndRender();
     void WaitRender();
 

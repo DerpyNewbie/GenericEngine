@@ -14,6 +14,7 @@ public:
     void CreateBuffer() override;
     void BeginRender(Color background_color);
     void EndRender() const;
+    ID3D12DescriptorHeap *GetHeap();
 
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 };

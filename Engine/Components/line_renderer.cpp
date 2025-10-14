@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "line_renderer.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 
 namespace engine
@@ -38,11 +38,11 @@ void LineRenderer::OnInspectorGui()
     Renderer::OnInspectorGui();
 }
 
-void LineRenderer::OnDraw()
+void LineRenderer::Render()
 {
-    const auto camera = Camera::Main();
-    const Matrix view = camera->GetViewMatrix();
-    const Matrix proj = camera->GetProjectionMatrix();
+    const auto camera = CameraComponent::Main();
+    const Matrix view = camera->ViewMatrix();
+    const Matrix proj = camera->m_property_.ProjectionMatrix();
 
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto &view_projection_buffer = m_view_projection_buffers_[current_buffer_idx];

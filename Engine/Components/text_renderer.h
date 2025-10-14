@@ -15,7 +15,7 @@ public:
     Color color;
 
     void OnInspectorGui() override;
-    void OnDraw() override;
+    void Render() override;
 
     std::shared_ptr<Transform> BoundsOrigin() override;
 };

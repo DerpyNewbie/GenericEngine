@@ -1,10 +1,6 @@
 #pragma once
-#include "component.h"
-#include "event_receivers.h"
 #include "renderer.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Asset/asset_ptr.h"
+#include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
 
 namespace engine
@@ -32,6 +28,7 @@ struct CameraProperty : Inspectable
     Color background_color = Color(0x1A1A1AFF);
 
     void OnInspectorGui() override;
+    Matrix ProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)
@@ -46,36 +43,31 @@ struct CameraProperty : Inspectable
     }
 };
 
-class Camera final : public Component
+class CameraComponent : public Component
 {
     friend RenderPipeline;
-    static std::weak_ptr<Camera> m_main_camera_;
-    static std::weak_ptr<Camera> m_current_camera_;
+    static std::weak_ptr<CameraComponent> m_main_camera_;
+    static std::weak_ptr<CameraComponent> m_current_camera_;
 
-    CameraProperty m_property_;
+    AssetPtr<DepthTexture> m_depth_texture_;
     AssetPtr<RenderTexture> m_render_texture_;
-
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
-
-    void SetViewProjMatrix() const;
-    static void SetMainCamera(const std::shared_ptr<Camera> &camera);
-    static void SetCurrentCamera(const std::shared_ptr<Camera> &camera);
+    UINT m_drawcall_count_;
 
 public:
     void OnAwake() override;
-    void OnConstructed() override;
     void OnInspectorGui() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
-    static std::shared_ptr<Camera> Main();
-    static std::shared_ptr<Camera> Current();
+    static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
+    static void SetCurrentCamera(const std::weak_ptr<CameraComponent> &camera);
 
-    [[nodiscard]] Matrix GetViewMatrix() const;
-    [[nodiscard]] Matrix GetProjectionMatrix() const;
+    CameraProperty m_property_;
 
-    [[nodiscard]] std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
+    static std::shared_ptr<CameraComponent> Main();
+    static std::shared_ptr<CameraComponent> Current();
+
+    Matrix ViewMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)

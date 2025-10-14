@@ -1,4 +1,4 @@
-TextureCube skyboxTexture : register(t1);
+TextureCube skyboxTexture : register(t3);
 SamplerState linearSampler : register(s0);
 
 struct VSOutput

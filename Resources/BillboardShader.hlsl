@@ -66,12 +66,13 @@ VSOutput vrt(VSInput input)
 }
 
 SamplerState smp : register(s0);
-Texture2D _MainTex : register(t1);
+Texture2DArray ShadowMaps : register (t3);
+Texture2D _MainTex : register(t4);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
     float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y),0,1);
-    float4 mainColor = _MainTex.Sample(smp, flippedUV);
+    float4 mainColor = ShadowMaps.Sample(smp, float3(flippedUV,6));
 
-    return mainColor;
+    return float4(mainColor.r, mainColor.r, mainColor.r, 1);
 }

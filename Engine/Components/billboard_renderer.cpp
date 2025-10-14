@@ -10,30 +10,7 @@ namespace engine
 {
 void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
 {
-    const auto material = shared_material;
-    const auto material_block = material->p_shared_material_block;
-
-    material->UpdateBuffer();
-
-    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
-    {
-        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
-        {
-            const auto shader_type = static_cast<kShaderType>(shader_i);
-            const auto param_type = static_cast<kParameterBufferType>(param_i);
-
-            if (material_block->Empty(shader_type, param_type))
-            {
-                continue;
-            }
-
-            // +3 for engine pre-defined shader variables
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 3;
-            const auto itr = material_block->Begin(shader_type, param_type);
-            const auto desc_handle = itr->handle->HandleGPU;
-            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
-        }
-    }
+    shared_material->SetDescriptorTable();
 }
 
 void BillboardRenderer::OnConstructed()
@@ -49,13 +26,16 @@ void BillboardRenderer::OnInspectorGui()
     shared_material->OnInspectorGui();
 }
 
-void BillboardRenderer::OnDraw()
+void BillboardRenderer::UpdateBuffer()
 {
     m_billboard_.world_matrix = GameObject()->Transform()->WorldMatrix();
     m_billboard_.Update();
 
     shared_material->p_shared_material_block->UpdateBuffer();
+}
 
+void BillboardRenderer::Render()
+{
     if (shared_material->IsValid())
     {
         auto shader = shared_material->p_shared_shader.CastedLock();

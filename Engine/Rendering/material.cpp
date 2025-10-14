@@ -3,6 +3,8 @@
 #include "material.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
+#include "CabotEngine/Graphics/RenderEngine.h"
+#include "CabotEngine/Graphics/RootSignature.h"
 
 
 namespace engine
@@ -78,6 +80,34 @@ bool Material::IsDirty() const
 bool Material::IsValid() const
 {
     return p_shared_material_block != nullptr;
+}
+
+void Material::SetDescriptorTable()
+{
+    const auto material_block = p_shared_material_block;
+    const auto cmd_list = RenderEngine::CommandList();
+
+    UpdateBuffer();
+
+    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
+    {
+        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
+        {
+            const auto shader_type = static_cast<kShaderType>(shader_i);
+            const auto param_type = static_cast<kParameterBufferType>(param_i);
+
+            if (material_block->Empty(shader_type, param_type))
+            {
+                continue;
+            }
+
+            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i +
+                                       RootSignature::kPreDefinedVariableCount;
+            const auto itr = material_block->Begin(shader_type, param_type);
+            const auto desc_handle = itr->handle->HandleGPU;
+            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+        }
+    }
 }
 }
 

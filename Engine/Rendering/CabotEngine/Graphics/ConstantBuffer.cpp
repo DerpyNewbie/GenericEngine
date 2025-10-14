@@ -6,6 +6,7 @@
 ConstantBuffer::ConstantBuffer(size_t size)
 {
     size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+    m_size_ = size;
     m_SizeAligned = (size + (align - 1)) & ~(align - 1); // alignに切り上げる.
 }
 
@@ -57,7 +58,7 @@ void ConstantBuffer::CreateBuffer()
 
 void ConstantBuffer::UpdateBuffer(void *data)
 {
-    memcpy(m_pMappedPtr, data, m_SizeAligned);
+    memcpy(m_pMappedPtr, data, m_size_);
 }
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()

@@ -64,7 +64,6 @@ void RenderTexture::BeginRender(const Color background_color)
         m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
-    RenderEngine::Instance()->SetRenderTarget(m_RTVHeap_.Get(), background_color);
 }
 
 void RenderTexture::EndRender() const
@@ -73,6 +72,11 @@ void RenderTexture::EndRender() const
         m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+}
+
+ID3D12DescriptorHeap *RenderTexture::GetHeap()
+{
+    return m_RTVHeap_.Get();
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()

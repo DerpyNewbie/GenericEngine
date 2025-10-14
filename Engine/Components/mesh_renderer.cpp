@@ -5,7 +5,7 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
-#include "camera.h"
+#include "camera_component.h"
 #include "Rendering/gizmos.h"
 #include "Rendering/material_data.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -97,10 +97,14 @@ void MeshRenderer::OnInspectorGui()
         ImGui::Unindent();
     }
 }
-
-void MeshRenderer::OnDraw()
+void MeshRenderer::UpdateBuffer()
 {
-    UpdateBuffers();
+    ReconstructBuffer();
+    UpdateWorldBuffer();
+}
+
+void MeshRenderer::Render()
+{
 
     auto current_material = shared_materials[0].CastedLock();
     auto current_shader = current_material->p_shared_shader.CastedLock();
@@ -119,7 +123,10 @@ void MeshRenderer::OnDraw()
 
         cmd_list->IASetIndexBuffer(m_index_buffers_[0]->View());
         SetDescriptorTable(cmd_list, 0);
+        const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+        const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
 
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
         const auto index_count = m_shared_mesh_->HasSubMeshes()
                                      ? m_shared_mesh_->sub_meshes[0].base_index
                                      : m_shared_mesh_->indices.size();
@@ -150,6 +157,36 @@ void MeshRenderer::OnDraw()
 
     if (m_draw_bounds_)
         DrawBounds();
+}
+void MeshRenderer::DepthRender()
+{
+    const auto cmd_list = RenderEngine::CommandList();
+
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
+
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
+    cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
+
+    cmd_list->IASetIndexBuffer(m_index_buffers_[0]->View());
+
+    const auto index_count = m_shared_mesh_->HasSubMeshes()
+                                 ? m_shared_mesh_->sub_meshes[0].base_index
+                                 : m_shared_mesh_->indices.size();
+
+    cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
+
+    // sub-meshes
+    for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
+    {
+        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
+
+        cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
+
+        const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
+        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+    }
 }
 
 void MeshRenderer::SetSharedMesh(const std::shared_ptr<Mesh> &mesh)
@@ -259,44 +296,11 @@ void MeshRenderer::ReconstructMeshesBuffer()
     }
 }
 
-void MeshRenderer::UpdateBuffers()
-{
-    ReconstructBuffer();
-    UpdateWorldBuffer();
-
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-    const auto cmd_list = RenderEngine::CommandList();
-
-    cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
-}
-
 void MeshRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, const int material_idx)
 {
     const auto material = shared_materials[material_idx].CastedLock();
-    const auto material_block = material->p_shared_material_block;
 
-    material->UpdateBuffer();
-
-    for (int shader_i = 0; shader_i < kShaderType_Count; ++shader_i)
-    {
-        for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
-        {
-            const auto shader_type = static_cast<kShaderType>(shader_i);
-            const auto param_type = static_cast<kParameterBufferType>(param_i);
-
-            if (material_block->Empty(shader_type, param_type))
-            {
-                continue;
-            }
-
-            // +3 for engine pre-defined shader variables
-            const int root_param_idx = shader_type * kParameterBufferType_Count + param_i + 3;
-            const auto itr = material_block->Begin(shader_type, param_type);
-            const auto desc_handle = itr->handle->HandleGPU;
-            cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
-        }
-    }
+    material->SetDescriptorTable();
 }
 }
 

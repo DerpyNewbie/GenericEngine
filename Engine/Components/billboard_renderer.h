@@ -17,7 +17,8 @@ public:
 
     void OnConstructed() override;
     void OnInspectorGui() override;
-    void OnDraw() override;
+    void UpdateBuffer() override;
+    void Render() override;
     std::shared_ptr<Transform> BoundsOrigin() override;
 
     template <class Archive>
