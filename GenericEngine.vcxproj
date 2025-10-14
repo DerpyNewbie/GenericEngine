@@ -96,27 +96,25 @@
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vrt</EntryPointName>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+            <EntryPointName>vrt</EntryPointName>
+            <ShaderType>Vertex</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <EntryPointName>pix</EntryPointName>
+            <ShaderModel>5.0</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">vert</EntryPointName>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+            <EntryPointName>vert</EntryPointName>
+            <ShaderType>Vertex</ShaderType>
+            <ShaderModel>5.0</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
-            <ObjectFileOutput>C:\Projects\team\x64\Debug\2DPixelShader.cso</ObjectFileOutput>
-            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
             <EntryPointName>pix</EntryPointName>
             <SuppressStartupBanner>true</SuppressStartupBanner>
             <ShaderModel>5.0</ShaderModel>
@@ -127,8 +125,6 @@
             <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl">
-            <ObjectFileOutput>C:\Projects\team\x64\Debug\2DVertShader.cso</ObjectFileOutput>
-            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
             <EntryPointName>vrt</EntryPointName>
             <SuppressStartupBanner>true</SuppressStartupBanner>
             <ShaderModel>5.0</ShaderModel>
@@ -139,14 +135,14 @@
             <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicPixelShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicPS</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <EntryPointName>BasicPS</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\BasicVertexShader.hlsl">
-            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">BasicVS</EntryPointName>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <EntryPointName>BasicVS</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\billboard.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
@@ -154,13 +150,13 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl">
             <FileType>Document</FileType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Pixel</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl">
             <FileType>Document</FileType>
-            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
-            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp"/>
