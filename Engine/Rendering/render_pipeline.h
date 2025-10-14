@@ -1,7 +1,6 @@
 #pragma once
 #include "renderingconstants.h"
 #include "event.h"
-#include "rendering_settings_component.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2DArray.h"
