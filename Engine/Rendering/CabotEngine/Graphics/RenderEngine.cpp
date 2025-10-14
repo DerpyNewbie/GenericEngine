@@ -310,8 +310,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = engine::Application::Instance()->WindowWidth();
-    m_viewport_.Height = engine::Application::Instance()->WindowHeight();
+    m_viewport_.Width = static_cast<float>(engine::Application::Instance()->WindowWidth());
+    m_viewport_.Height = static_cast<float>(engine::Application::Instance()->WindowHeight());
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }

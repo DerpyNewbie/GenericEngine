@@ -19,8 +19,8 @@ void Light::UpdateLightCountBuffer()
         m_light_count_buffer_->CreateBuffer();
     }
 
-    auto render_pipeline = RenderPipeline::Instance();
-    LightCountBuffer lcb(render_pipeline->m_lights_.size());
+    const auto render_pipeline = RenderPipeline::Instance();
+    LightCountBuffer lcb(static_cast<uint32_t>(render_pipeline->m_lights_.size()));
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
 }

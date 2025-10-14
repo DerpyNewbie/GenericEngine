@@ -18,14 +18,14 @@ class RenderPipeline
     friend class Engine;
     friend class CameraComponent;
 
-    //ライト関係
+    // lighting related
     std::vector<std::shared_ptr<Light>> m_lights_;
     std::vector<std::shared_ptr<Light>> m_waiting_lights_;
     std::array<Matrix, RenderingConstants::kMaxShadowMapCount> m_light_view_proj_matrices_;
     std::shared_ptr<StructuredBuffer> m_light_view_proj_matrices_buffer_;
     std::shared_ptr<DescriptorHandle> m_light_view_proj_handle_;
 
-    //深度テクスチャ関係
+    // depth textures related
     std::vector<std::shared_ptr<DepthTexture>> m_shadow_maps_;
     std::shared_ptr<Texture2DArray> m_depth_textures_;
     std::shared_ptr<DescriptorHandle> m_shadow_map_handle_;
@@ -44,7 +44,7 @@ class RenderPipeline
     void Render(const Matrix &view, const CameraProperty &camera_property);
     void DepthRender();
 
-    void SetCurrentShadowMapIndex(int shadow_map_index); //この処理はInstanceIDの実装により消されます
+    void SetCurrentShadowMapIndex(int shadow_map_index); // Will be removed after Instance ID has been implemented
     void UpdateLightsViewProjMatrixBuffer();
     void SetCascadeSlicesBuffer();
     void SetLightsViewProjMatrix() const;

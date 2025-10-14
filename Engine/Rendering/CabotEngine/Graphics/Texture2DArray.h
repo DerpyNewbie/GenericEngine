@@ -21,7 +21,7 @@ public:
                         D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE,
                         D3D12_CLEAR_VALUE *clear_value = nullptr);
     std::shared_ptr<DescriptorHandle> UploadBuffer();
-    bool IsValid();
+    bool IsValid() const;
 
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;

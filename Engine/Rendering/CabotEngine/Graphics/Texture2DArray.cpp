@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Texture2DArray.h"
 
 #include "DescriptorHeap.h"
@@ -7,9 +7,9 @@
 void Texture2DArray::CopyResource()
 {
     const auto texture = m_textures_[0].CastedLock();
-    const auto texture_size = Vector2(texture->Width(), texture->Height());
+    const auto texture_size = Vector2(static_cast<float>(texture->Width()), static_cast<float>(texture->Height()));
 
-    if (!CreateResource(texture_size, m_textures_.size(), texture->MipLevel(), texture->Format()))
+    if (!CreateResource(texture_size, static_cast<UINT16>(m_textures_.size()), texture->MipLevel(), texture->Format()))
     {
         return;
     }
@@ -26,7 +26,7 @@ void Texture2DArray::CopyResource()
             i, // array slice
             0, // plane slice
             texture->MipLevel(),
-            m_textures_.size()
+            static_cast<UINT>(m_textures_.size())
             );
 
         // コピー元 (既存の Texture2D の mip=0)
@@ -111,7 +111,7 @@ std::shared_ptr<DescriptorHandle> Texture2DArray::UploadBuffer()
     return DescriptorHeap::Register(this);
 }
 
-bool Texture2DArray::IsValid()
+bool Texture2DArray::IsValid() const
 {
     return m_is_valid_;
 }
