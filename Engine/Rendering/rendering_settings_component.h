@@ -1,5 +1,5 @@
 #pragma once
-#include "renderingconstants.h"
+#include "rendering_constants.h"
 #include "CabotEngine/Graphics/TextureCube.h"
 #include "Components/component.h"
 
