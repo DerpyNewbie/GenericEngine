@@ -167,6 +167,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\font_data.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
+        <ClCompile Include="Engine\Rendering\lighting.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
@@ -298,6 +299,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\font_data.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
+        <ClInclude Include="Engine\Rendering\lighting.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
         <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>

@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "camera_component.h"
 #include "directional_light.h"
 #include "game_object.h"
 
