@@ -304,9 +304,7 @@ void RenderPipeline::SetShadowMap()
 
         m_free_depth_texture_handles_.clear();
         for (UINT i = 0; i < RenderingConstants::kMaxShadowMapCount; i++)
-        {
             m_free_depth_texture_handles_.emplace(i);
-        }
     }
     const auto cmd_list = RenderEngine::CommandList();
     if (!m_lights_.empty())
@@ -324,13 +322,18 @@ size_t RenderPipeline::GetRendererCount()
 {
     return Instance()->m_renderers_.size();
 }
-bool RenderPipeline::TryApplyShadow(std::shared_ptr<Light> light)
+
+void RenderPipeline::TryApplyShadow(const std::shared_ptr<Light> &light)
 {
     const auto go = light->GameObject();
     const auto shadow_map_count = light->ShadowMapCount();
 
     if (m_free_depth_texture_handles_.size() < shadow_map_count)
-        return false;
+    {
+        light->m_light_data_.cast_shadow = false;
+        m_waiting_lights_.emplace_back(light);
+        return;
+    }
 
     for (int i = 0; i < shadow_map_count; ++i)
     {
@@ -347,11 +350,19 @@ bool RenderPipeline::TryApplyShadow(std::shared_ptr<Light> light)
         else
             m_shadow_maps_[handle] = depth_texture;
     }
-    return true;
+    light->m_light_data_.cast_shadow = true;
 }
 
 void RenderPipeline::RemoveShadow(const std::shared_ptr<Light> &light)
 {
+    if (light->m_depth_texture_handle_.empty())
+    {
+        erase_if(m_waiting_lights_, [&](const std::shared_ptr<Light> &a) {
+            return a == light;
+        });
+        return;
+    }
+
     const auto shadow_map_count = light->ShadowMapCount();
     for (int i = 0; i < shadow_map_count; ++i)
     {
@@ -362,6 +373,19 @@ void RenderPipeline::RemoveShadow(const std::shared_ptr<Light> &light)
         m_free_depth_texture_handles_.emplace(light->m_depth_texture_handle_[i]);
     }
     light->m_depth_texture_handle_.clear();
+
+    if (!m_waiting_lights_.empty())
+    {
+        auto camera_pos = CameraComponent::Main()->GameObject()->Transform()->Position();
+        auto it = std::ranges::min_element(m_waiting_lights_,
+                                           [camera_pos](const std::shared_ptr<Light> &a,
+                                                        const std::shared_ptr<Light> &b) {
+                                               return (camera_pos - a->GetPos()).Length() < (camera_pos - b->GetPos()).
+                                                      Length();
+                                           });
+        TryApplyShadow(*it);
+        m_waiting_lights_.erase(it);
+    }
 }
 
 void RenderPipeline::AddLight(std::shared_ptr<Light> light)

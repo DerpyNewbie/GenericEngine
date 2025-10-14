@@ -73,14 +73,15 @@ void Light::OnInspectorGui()
     Gui::PropertyField("Intensity", m_light_data_.intensity);
     Gui::ColorField("LightColor", m_light_data_.color);
 
-    bool cast_shadow = m_light_data_.cast_shadow;
-    if (Gui::BoolField("CastShadow", cast_shadow))
+    if (Gui::BoolField("CastShadow", m_has_shadow_))
     {
-        m_light_data_.cast_shadow = cast_shadow;
-        if (cast_shadow == false)
+        if (m_has_shadow_ == false)
+        {
+            m_light_data_.cast_shadow = false;
             RenderPipeline::Instance()->RemoveShadow(shared_from_base<Light>());
+        }
         else
-            m_light_data_.cast_shadow = RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
+            RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
     }
 }
 
@@ -88,18 +89,20 @@ void Light::OnEnabled()
 {
 
     RenderPipeline::Instance()->AddLight(shared_from_base<Light>());
-    if (m_light_data_.cast_shadow)
-        m_light_data_.cast_shadow = RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
+    if (m_has_shadow_)
+        RenderPipeline::Instance()->TryApplyShadow(shared_from_base<Light>());
 }
 
 void Light::OnDisabled()
 {
-    RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
+    if (m_has_shadow_)
+        RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
 }
 
 void Light::OnDestroy()
 {
-    RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
+    if (m_has_shadow_)
+        RenderPipeline::Instance()->RemoveLight(shared_from_base<Light>());
 }
 }
 

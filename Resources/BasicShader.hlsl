@@ -179,24 +179,27 @@ float4 pix(VSOutput input) : SV_TARGET
             cascade_index = 0;
     }
 
+    int current_shadowmap_count = 0;
     for (int i = 0; i < light_count; ++i)
     {
-        int itr = i * SHADOW_CASCADE_COUNT + cascade_index;
         float3 L = normalize(-Lights[i].direction);
         float NdotL = saturate(dot(N, L));
-
-        float4 worldPos = float4(input.worldpos, 1);
-        float4 lightClip = mul(LightViewProj[itr], worldPos);
-        float3 shadowCoord;
-        shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
-				shadowCoord.y = 1 - shadowCoord.y;
-        shadowCoord.z = lightClip.z;
 
         if (Lights[i].cast_shadow == 0)
         {
             brightness += NdotL * Lights[i].color.rgb * Lights[i].intensity;
             continue;
         }
+
+        int itr = current_shadowmap_count * SHADOW_CASCADE_COUNT + cascade_index;
+        
+        float4 worldPos = float4(input.worldpos, 1);
+        float4 lightClip = mul(LightViewProj[itr], worldPos);
+        float3 shadowCoord;
+        shadowCoord.xy = lightClip.xy / lightClip.w * 0.5f + 0.5f;
+        shadowCoord.y = 1 - shadowCoord.y;
+        shadowCoord.z = lightClip.z;
+        
         float shadow = 0;
         if (shadowCoord.x < 0 || shadowCoord.x > 1 ||
             shadowCoord.y < 0 || shadowCoord.y > 1 || shadowCoord.z >= 1.0f)
@@ -211,7 +214,8 @@ float4 pix(VSOutput input) : SV_TARGET
                 float3(shadowCoord.xy, itr),
                 shadowCoord.z);
         }
-
+        
+        ++current_shadowmap_count;
         brightness += shadow * NdotL * Lights[i].color.rgb * Lights[i].intensity;
     }
 

@@ -21,6 +21,7 @@ class RenderPipeline
 
     //ライト関係
     std::vector<std::shared_ptr<Light>> m_lights_;
+    std::vector<std::shared_ptr<Light>> m_waiting_lights_;
     std::array<Matrix, RenderingConstants::kMaxShadowMapCount> m_light_view_proj_matrices_;
     std::shared_ptr<StructuredBuffer> m_light_view_proj_matrices_buffer_;
     std::shared_ptr<DescriptorHandle> m_light_view_proj_handle_;
@@ -56,7 +57,7 @@ public:
     static RenderPipeline *Instance();
     static size_t GetRendererCount();
 
-    bool TryApplyShadow(std::shared_ptr<Light> light);
+    void TryApplyShadow(const std::shared_ptr<Light> &light);
     void RemoveShadow(const std::shared_ptr<Light> &light);
     void AddLight(std::shared_ptr<Light> light);
     void RemoveLight(const std::shared_ptr<Light> &light);

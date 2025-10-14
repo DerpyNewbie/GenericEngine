@@ -62,6 +62,7 @@ class Light : public Component
 protected:
     std::vector<int> m_depth_texture_handle_;
     LightData m_light_data_;
+    bool m_has_shadow_;
 
 public:
     void OnInspectorGui() override;
