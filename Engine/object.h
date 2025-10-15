@@ -14,8 +14,6 @@ class Object : public enable_shared_from_base<Object>
     static unsigned int m_last_instantiated_name_count_;
     static unsigned int m_last_immediately_destroyed_objects_;
     static std::unordered_map<xg::Guid, std::shared_ptr<Object>> m_objects_;
-    static std::vector<std::shared_ptr<Object>> m_destroying_objects_;
-    static std::vector<std::shared_ptr<Object>> m_destroyed_objects_;
 
     xg::Guid m_guid_;
     bool m_is_destroying_ = false;
