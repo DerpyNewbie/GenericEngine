@@ -1,9 +1,7 @@
 #pragma once
-#include "rendering_constants.h"
 #include "event.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
-#include "CabotEngine/Graphics/Texture2DArray.h"
 
 namespace engine
 {
@@ -25,7 +23,7 @@ class RenderPipeline
     void InvokeDrawCall();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
-    void Render(const Matrix &view, const CameraProperty &camera_property);
+    void Render(const std::shared_ptr<CameraComponent> &camera);
     void DepthRender();
 
 public:

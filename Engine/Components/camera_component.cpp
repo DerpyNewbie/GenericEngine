@@ -81,6 +81,14 @@ void CameraComponent::OnDisabled()
     RenderPipeline::RemoveCamera(shared_from_base<CameraComponent>());
 }
 
+std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
+{
+    return m_render_texture_.CastedLock() != nullptr
+               ? m_render_texture_.CastedLock()
+               : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
+               .CastedLock();
+}
+
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)
 {
     m_main_camera_ = camera;

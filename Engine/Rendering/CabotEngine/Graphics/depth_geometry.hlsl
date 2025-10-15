@@ -9,7 +9,6 @@ cbuffer LightCount : register (b3)
 
 struct VSOutput
 {
-    float4 pos : POSITIN;
     float3 world_pos : WORLDPOS;
 };
 
@@ -24,7 +23,7 @@ void geo(triangle VSOutput input[3], inout TriangleStream<GSOutput> tri_stream)
 {
     for (int i = 0; i < MAX_SHADOWMAP_COUNT; ++i)
     {
-        float4x4 viewproj = LightViewProj[light_count];
+        float4x4 viewproj = LightViewProj[i];
         for (uint j = 0; j < 3; j++)
         {
             GSOutput element;

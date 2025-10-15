@@ -131,31 +131,31 @@ Texture2D _MainTex : register (t4);
 SamplerState smp : register (s0);
 SamplerComparisonState shadowSampler : register (s1);
 
-float SampleShadowPCF(float3 shadowCoord, int lightIndex)
-{
-    float shadow = 0.0;
-    const float2 texelSize = 1.0 / float2(1920, 1065);
-
-    shadowCoord.z -= 0.005f;
-
-    [unroll]
-    for (int x = -1; x <= 1; x++)
-    {
-        [unroll]
-        for (int y = -1; y <= 1; y++)
+        float SampleShadowPCF(float3 shadowCoord, int lightIndex)
         {
-            float2 offset = float2(x, y) * texelSize;
-            shadow += ShadowMaps.SampleCmpLevelZero(
-                shadowSampler,
-                float3(shadowCoord.xy + offset, lightIndex),
-                shadowCoord.z
-            );
-        }
-    }
+            float shadow = 0.0;
+            const float2 texelSize = 1.0 / float2(1920, 1065);
 
-    shadow /= 9.0;
-    return shadow;
-}
+            shadowCoord.z -= 0.005f;
+
+            [unroll]
+            for (int x = -1; x <= 1; x++)
+            {
+                [unroll]
+                for (int y = -1; y <= 1; y++)
+                {
+                    float2 offset = float2(x, y) * texelSize;
+                    shadow += ShadowMaps.SampleCmpLevelZero(
+                        shadowSampler,
+                        float3(shadowCoord.xy + offset, lightIndex),
+                        shadowCoord.z
+                    );
+                }
+            }
+
+            shadow /= 9.0;
+            return shadow;
+        }
 
 float4 pix(VSOutput input) : SV_TARGET
 {
@@ -208,11 +208,7 @@ float4 pix(VSOutput input) : SV_TARGET
         }
         else
         {
-						shadowCoord.z -= 0.01f;
-            shadow = ShadowMaps.SampleCmpLevelZero(
-                shadowSampler,
-                float3(shadowCoord.xy, itr),
-                shadowCoord.z);
+            shadow = SampleShadowPCF(shadowCoord, itr);
         }
         
         ++current_shadowmap_count;
