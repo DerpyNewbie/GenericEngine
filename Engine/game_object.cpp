@@ -10,7 +10,8 @@
 
 namespace engine
 {
-GameObject::GameObject(): Object()
+GameObject::GameObject() :
+    Object()
 {}
 void GameObject::OnConstructed()
 {
@@ -29,7 +30,7 @@ void GameObject::OnDestroy()
 
     for (const auto &component : m_components_)
     {
-        DestroyImmediate(component);
+        Destroy(component);
     }
 }
 std::shared_ptr<Transform> GameObject::Transform() const
@@ -289,10 +290,10 @@ void GameObject::SetAsRootObject(const bool is_root_object)
     const auto scene = m_scene_.lock();
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
-        *root_objects,
-        [&shared_this](const std::shared_ptr<GameObject> &other) {
-            return shared_this == other;
-        });
+    *root_objects,
+    [&shared_this](const std::shared_ptr<GameObject> &other) {
+        return shared_this == other;
+    });
 
     if (is_root_object && pos == root_objects->end())
     {
