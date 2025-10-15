@@ -4,7 +4,6 @@
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
-#include "rendering_settings_component.h"
 #include "skybox.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -50,55 +49,18 @@ void RenderPipeline::InvokeDrawCall()
 
     for (const auto camera : m_cameras_)
     {
-        CameraComponent::SetCurrentCamera(camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
-
-        DepthRender();
-
-        ID3D12DescriptorHeap *rtv_heap = nullptr;
-        ID3D12DescriptorHeap *dsv_heap = nullptr;
-
-        auto render_tex = camera->m_render_texture_.CastedLock();
-        if (render_tex)
-        {
-            render_tex->BeginRender(camera->m_property_.background_color);
-            rtv_heap = render_tex->GetHeap();
-        }
-
-        auto depth_tex = camera->m_depth_texture_.CastedLock();
-        if (depth_tex)
-        {
-            depth_tex->BeginRender();
-            dsv_heap = depth_tex->GetHeap();
-        }
-
-        if (rtv_heap != nullptr || dsv_heap != nullptr)
-        {
-            RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-
-            auto view = camera->ViewMatrix();
-            auto &property = camera->m_property_;
-            Render(view, property);
-        }
-
-        if (render_tex)
-            render_tex->EndRender();
-
-        if (depth_tex)
-            depth_tex->EndRender();
+        Render(camera);
     }
 
     if (const auto main_camera = CameraComponent::Main())
     {
-        CameraComponent::SetCurrentCamera(main_camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
 
-        DepthRender();
+        auto rtv_heap = main_camera->RenderTexture()->GetHeap();
+        auto depth_tex = main_camera->m_depth_texture_;
 
-        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        const auto view = main_camera->ViewMatrix();
-        const auto &property = main_camera->m_property_;
-        Render(view, property);
+        RenderEngine::Instance()->SetRenderTarget(
+            rtv_heap, depth_tex.CastedLock() == nullptr ? nullptr : depth_tex.CastedLock()->GetHeap(),
+            main_camera->m_property_.background_color);
         on_rendering.Invoke();
     }
 }
@@ -141,18 +103,52 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     }
 }
 
-void RenderPipeline::Render(const Matrix &view, const CameraProperty &camera_property)
+void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
 {
-    const auto proj = camera_property.ProjectionMatrix();
-    UpdateBuffer(view, proj);
+    ID3D12DescriptorHeap *rtv_heap = nullptr;
+    ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
-    for (const auto renderer : renderers)
+    auto render_tex = camera->RenderTexture();
+    if (render_tex)
     {
-        renderer->Render();
+        render_tex->BeginRender(camera->m_property_.background_color);
+        rtv_heap = render_tex->GetHeap();
     }
 
-    Gizmos::Render();
+    auto depth_tex = camera->m_depth_texture_.CastedLock();
+    if (depth_tex)
+    {
+        depth_tex->BeginRender();
+        dsv_heap = depth_tex->GetHeap();
+    }
+
+    if (rtv_heap != nullptr || dsv_heap != nullptr)
+    {
+        CameraComponent::SetCurrentCamera(camera);
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+
+        DepthRender();
+
+        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
+
+        auto view = camera->ViewMatrix();
+        auto &property = camera->m_property_;
+
+        const auto proj = property.ProjectionMatrix();
+        UpdateBuffer(view, proj);
+
+        const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+        for (const auto renderer : renderers)
+        {
+            renderer->Render();
+        }
+
+        Gizmos::Render();
+    }
+    if (render_tex)
+        render_tex->EndRender();
+    if (depth_tex)
+        depth_tex->EndRender();
 }
 
 void RenderPipeline::DepthRender()
@@ -171,19 +167,23 @@ void RenderPipeline::DepthRender()
         for (auto itr : Lighting::Instance()->m_lights_[i]->m_depth_texture_handle_)
         {
             Lighting::Instance()->m_shadow_maps_[itr]->BeginRender();
-            RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_shadow_maps_[itr]->GetHeap(),
-                                                      Color());
+        }
+    }
+    RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
+                                              Color());
 
-            SetViewProjMatrix(Lighting::Instance()->m_light_view_proj_matrices_[i], Matrix::Identity);
-            auto lighting_instance = Lighting::Instance();
-            lighting_instance->SetLightsViewProjMatrix();
-            lighting_instance->SetCurrentShadowMapIndex(itr);
+    auto lighting_instance = Lighting::Instance();
+    lighting_instance->SetLightsViewProjMatrix();
 
-            for (const auto renderer : m_renderers_)
-            {
-                renderer->DepthRender();
-            }
+    for (const auto renderer : m_renderers_)
+    {
+        renderer->DepthRender();
+    }
 
+    for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
+    {
+        for (auto itr : Lighting::Instance()->m_lights_[i]->m_depth_texture_handle_)
+        {
             Lighting::Instance()->m_shadow_maps_[itr]->EndRender();
         }
     }

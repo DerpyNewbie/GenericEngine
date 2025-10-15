@@ -39,8 +39,9 @@ void PSOManager::Initialize()
     setting.PSOName = "Depth";
     setting.RasterizerDesc = rasterizer_desc;
     setting.NumRenderTarget = 0;
-    setting.VSPath = L"x64/Debug/Depth.cso";
+    setting.VSPath = L"x64/Debug/depth_vertex.cso";
     setting.PSPath = L"";
+    setting.GSPath = L"x64/Debug/depth_geometry.cso";
     Register(setting);
 
     //設定の一部が一緒なので使いまわす
@@ -50,6 +51,7 @@ void PSOManager::Initialize()
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
     setting.VSPath = L"x64/Debug/LineVertexShader.cso";
     setting.PSPath = L"x64/Debug/LinePixelShader.cso";
+    setting.GSPath = L"";
     Register(setting);
 
     setting.PSOName = "2DBasic";
@@ -79,9 +81,9 @@ bool PSOManager::Register(PSOSetting setting)
     pso->SetNumRenderTarget(setting.NumRenderTarget);
     pso->SetVS(setting.VSPath);
     if (!setting.PSPath.empty())
-    {
         pso->SetPS(setting.PSPath);
-    }
+    if (!setting.GSPath.empty())
+        pso->SetGS(setting.GSPath);
     pso->Create();
 
     if (!pso->IsValid())
