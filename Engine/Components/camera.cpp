@@ -4,14 +4,15 @@
 #include "application.h"
 #include "game_object.h"
 #include "gui.h"
-#include "update_manager.h"
 #include "Rendering/gizmos.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/view_projection.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
 std::weak_ptr<Camera> Camera::m_main_camera_;
+std::weak_ptr<Camera> Camera::m_current_camera_;
 
 void CameraProperty::OnInspectorGui()
 {
@@ -35,8 +36,8 @@ void CameraProperty::OnInspectorGui()
 
 void Camera::SetViewProjMatrix() const
 {
-    const auto cmd_list = g_RenderEngine->CommandList();
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto cmd_list = RenderEngine::CommandList();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
     const auto view_projection = view_projection_buffer->GetPtr<ViewProjection>();
 
@@ -44,6 +45,15 @@ void Camera::SetViewProjMatrix() const
     view_projection->matrices[1] = GetProjectionMatrix();
 
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
+}
+void Camera::SetMainCamera(const std::shared_ptr<Camera> &camera)
+{
+    m_main_camera_ = camera;
+}
+
+void Camera::SetCurrentCamera(const std::shared_ptr<Camera> &camera)
+{
+    m_current_camera_ = camera;
 }
 
 std::vector<std::shared_ptr<Renderer>> Camera::FilterVisibleObjects(
@@ -93,32 +103,17 @@ void Camera::OnConstructed()
 void Camera::OnInspectorGui()
 {
     m_property_.OnInspectorGui();
-
-    ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
-}
-
-void Camera::OnDraw()
-{
-    g_RenderEngine->SetBackGroundColor(m_property_.background_color);
-    SetViewProjMatrix();
-
-    const auto objects_in_view = FilterVisibleObjects(Renderer::m_renderers_);
-    for (const auto object : objects_in_view)
-    {
-        object->OnDraw();
-    }
-
-    m_drawcall_count_ = objects_in_view.size();
+    Gui::PropertyField("RenderTexture", m_render_texture_);
 }
 
 void Camera::OnEnabled()
 {
-    UpdateManager::SubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::AddCamera(shared_from_base<Camera>());
 }
 
 void Camera::OnDisabled()
 {
-    UpdateManager::UnsubscribeDrawCall(shared_from_base<Camera>());
+    RenderPipeline::RemoveCamera(shared_from_base<Camera>());
 }
 
 std::shared_ptr<Camera> Camera::Main()
@@ -126,27 +121,31 @@ std::shared_ptr<Camera> Camera::Main()
     return m_main_camera_.lock();
 }
 
+std::shared_ptr<Camera> Camera::Current()
+{
+    return m_current_camera_.lock();
+}
+
 Matrix Camera::GetViewMatrix() const
 {
     const auto transform = GameObject()->Transform();
-    return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
-                                     transform->Up());
+
+    return Matrix::CreateLookAt(transform->Position(), transform->Position() + transform->Forward(), transform->Up());
 }
 
 Matrix Camera::GetProjectionMatrix() const
 {
+
     switch (m_property_.view_mode)
     {
     case kViewMode::kPerspective:
-        return DirectX::XMMatrixPerspectiveFovRH(
-            m_property_.field_of_view * Mathf::kDeg2Rad,
-            m_property_.aspect_ratio,
-            m_property_.near_plane, m_property_.far_plane);
+        return Matrix::CreatePerspectiveFieldOfView(m_property_.field_of_view * Mathf::kDeg2Rad,
+                                                    m_property_.aspect_ratio, m_property_.near_plane,
+                                                    m_property_.far_plane);
     case kViewMode::kOrthographic:
-        return DirectX::XMMatrixOrthographicRH(
-            m_property_.ortho_size * m_property_.aspect_ratio,
-            m_property_.ortho_size,
-            m_property_.near_plane, m_property_.far_plane);
+        return Matrix::CreateOrthographic(m_property_.ortho_size * m_property_.aspect_ratio,
+                                          m_property_.ortho_size,
+                                          m_property_.near_plane, m_property_.far_plane);
     default:
         assert(false && "Invalid ViewMode");
         return Matrix::Identity;

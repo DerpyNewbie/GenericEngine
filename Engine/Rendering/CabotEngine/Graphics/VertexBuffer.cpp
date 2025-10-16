@@ -16,7 +16,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -29,6 +29,8 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         Logger::Error<VertexBuffer>("Failed to Create VertexBuffer Resource");
         return;
     }
+
+    m_pBuffer->SetName(L"VertexBuffer");
 
     // 頂点バッファビューの設定
     m_View.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
@@ -73,7 +75,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         }
         for (size_t i = 0; i < p_init_data->bone_weights.size(); ++i)
         {
-            ptr_.at(i).bones_per_vertex = p_init_data->bone_weights[i].size();
+            ptr_.at(i).bones_per_vertex = static_cast<unsigned int>(p_init_data->bone_weights[i].size());
             for (size_t j = 0; j < p_init_data->bone_weights[i].size(); ++j)
             {
                 ptr_.at(i).bone_index[j] = p_init_data->bone_weights[i][j].bone_index;
@@ -88,7 +90,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
     m_IsValid = true;
 }
 
-VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
+VertexBuffer::VertexBuffer(size_t num_vertices, const Vertex *p_init_data)
 {
     auto size = sizeof(Vertex) * num_vertices;
     auto stride = sizeof(Vertex);
@@ -97,7 +99,7 @@ VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(size); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,

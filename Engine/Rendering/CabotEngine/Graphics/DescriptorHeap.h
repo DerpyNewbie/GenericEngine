@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "TextureCube.h"
 
 class ConstantBuffer;
 class Texture2D;
@@ -6,6 +7,7 @@ class Texture2D;
 
 namespace engine
 {
+class ShaderResource;
 class MaterialBlock;
 class StructuredBuffer;
 }
@@ -35,8 +37,7 @@ public:
     DescriptorHeap();
 
     static ID3D12DescriptorHeap *GetHeap();
-    static std::shared_ptr<DescriptorHandle> Register(std::shared_ptr<Texture2D> texture);
-    static std::shared_ptr<DescriptorHandle> Register(engine::StructuredBuffer &structured_buffer);
+    static std::shared_ptr<DescriptorHandle> Register(engine::ShaderResource *shader_resource);
     static std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
 
     static std::shared_ptr<DescriptorHandle> Allocate();

@@ -2,14 +2,19 @@
 
 #include "component_factory.h"
 
+#include "Animation/animation_component.h"
 #include "Audio/audio_listener_component.h"
 #include "Audio/audio_source_component.h"
 #include "Components/image.h"
 #include "Components/text_renderer.h"
-#include "Components/camera.h"
+#include "Components/billboard_renderer.h"
+#include "Components/camera_component.h"
 #include "Components/controller.h"
+#include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
+#include "Components/light.h"
 #include "Components/mesh_renderer.h"
+#include "Components/rotator_component.h"
 #include "Components/rect_transform.h"
 #include "Components/renderer_2d.h"
 #include "Components/skinned_mesh_renderer.h"
@@ -20,6 +25,7 @@
 #include "Physics/rigidbody_component.h"
 #include "Physics/rigidbody_tester_component.h"
 #include "Physics/sphere_collider.h"
+#include "Rendering/rendering_settings_component.h"
 
 namespace engine
 {
@@ -28,11 +34,12 @@ std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> IComponentFa
 void IComponentFactory::Init()
 {
 #define ADD_COMPONENT(type) Register(std::make_shared<ComponentFactory<type>>())
-    ADD_COMPONENT(Camera);
+    ADD_COMPONENT(CameraComponent);
     ADD_COMPONENT(Controller);
     ADD_COMPONENT(FrameMetaData);
     ADD_COMPONENT(MeshRenderer);
     ADD_COMPONENT(SkinnedMeshRenderer);
+    ADD_COMPONENT(BillboardRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(TextRenderer);
     ADD_COMPONENT(Canvas);
@@ -46,11 +53,16 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RigidbodyTesterComponent);
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
+    ADD_COMPONENT(DirectionalLight);
+    ADD_COMPONENT(RotatorComponent);
+    ADD_COMPONENT(AnimationComponent);
+    ADD_COMPONENT(RenderingSettingsComponent);
 #undef ADD_COMPONENT
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{}
+{
+}
 
 std::string IComponentFactory::Name()
 {

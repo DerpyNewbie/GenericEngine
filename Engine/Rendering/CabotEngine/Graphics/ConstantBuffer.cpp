@@ -6,6 +6,7 @@
 ConstantBuffer::ConstantBuffer(size_t size)
 {
     size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+    m_size_ = size;
     m_SizeAligned = (size + (align - 1)) & ~(align - 1); // alignに切り上げる.
 }
 
@@ -26,7 +27,7 @@ void ConstantBuffer::CreateBuffer()
     auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_SizeAligned); // リソースの設定
 
     // リソースを生成
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -50,12 +51,14 @@ void ConstantBuffer::CreateBuffer()
     m_Desc.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
     m_Desc.SizeInBytes = UINT(m_SizeAligned);
 
+    m_pBuffer->SetName(L"ConstantBuffer");
+
     m_IsValid = true;
 }
 
 void ConstantBuffer::UpdateBuffer(void *data)
 {
-    memcpy(m_pMappedPtr, data, m_SizeAligned);
+    memcpy(m_pMappedPtr, data, m_size_);
 }
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()

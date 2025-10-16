@@ -56,7 +56,7 @@ VSOutput BasicVS(VSInput input)
     float4 bonePos = float4(0, 0, 0, 0);
     float3 boneNormal = float3(0, 0, 0);
 
-    for (int i = 0; i < input.bones_per_vertex; ++i)
+    for (uint i = 0; i < input.bones_per_vertex; ++i)
     {
         float weight = input.bone_weight[i];
         if (weight > 0)
@@ -82,4 +82,17 @@ VSOutput BasicVS(VSInput input)
     output.color = input.color; // 頂点色をそのままピクセルシェーダーに渡す
     output.uv = input.uv1;
     return output;
+}
+
+SamplerState smp : register(s0);
+Texture2D _MainTex : register(t1);
+
+float4 pix(VSOutput input) : SV_TARGET
+{
+    float3 light = normalize(float3(0.9, 0.3, -0.8));
+    float brightness = clamp(dot(-light, input.normal), 0, 1);
+    float2 flippedUV = clamp(float2(input.uv.x, 1.0 - input.uv.y), 0, 1);
+    float4 mainColor = _MainTex.Sample(smp, flippedUV);
+
+    return mainColor * brightness;
 }

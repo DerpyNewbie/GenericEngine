@@ -39,9 +39,9 @@ IAssetPtr IAssetPtr::FromInstance(const std::shared_ptr<Object> &ptr)
 IAssetPtr IAssetPtr::FromAssetDescriptor(const std::shared_ptr<AssetDescriptor> &asset)
 {
     return {
-        asset->managed_object,
+        asset->MainObject(),
         {},
-        asset->guid,
+        asset->Guid(),
         AssetPtrType::kExternalReference
     };
 }
@@ -74,9 +74,9 @@ std::shared_ptr<Object> IAssetPtr::Lock()
             const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(m_guid_);
             if (asset_descriptor != nullptr)
             {
-                asset_descriptor->Reload();
-                m_external_reference_ = asset_descriptor->managed_object;
-                return asset_descriptor->managed_object;
+                asset_descriptor->Import();
+                m_external_reference_ = asset_descriptor->MainObject();
+                return asset_descriptor->MainObject();
             }
 
             // missing reference

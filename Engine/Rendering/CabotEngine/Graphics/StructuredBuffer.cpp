@@ -3,100 +3,122 @@
 
 #include "RenderEngine.h"
 
-void engine::StructuredBuffer::CreateBuffer()
+namespace engine
 {
-    size_t totalSize = m_stride * m_elementCount;
+void StructuredBuffer::CreateBuffer()
+{
+    m_is_valid_ = false;
 
-    // GPU側リソース
-    CD3DX12_RESOURCE_DESC bufferDesc = CD3DX12_RESOURCE_DESC::Buffer(totalSize);
+    const auto total_size = m_stride_ * m_element_count_;
+    const CD3DX12_RESOURCE_DESC resource_desc = CD3DX12_RESOURCE_DESC::Buffer(total_size);
 
-    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-    auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-
-    g_RenderEngine->Device()->CreateCommittedResource(
-        &prop,
+    // create a default heap (used for gpu data processing)
+    const auto default_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
+        &default_heap_prop,
         D3D12_HEAP_FLAG_NONE,
-        &bufferDesc,
+        &resource_desc,
         D3D12_RESOURCE_STATE_COMMON,
         nullptr,
-        IID_PPV_ARGS(&m_pDefaultBuffer)
-        );
-
-    // アップロード用バッファ
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
-        &heap_prop,
-        D3D12_HEAP_FLAG_NONE,
-        &bufferDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_pUploadBuffer)
+        IID_PPV_ARGS(&m_default_buffer_)
         );
 
     if (FAILED(hr))
     {
+        Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (DefaultBuffer)");
         return;
     }
 
-    m_GpuAddress = m_pUploadBuffer->GetGPUVirtualAddress();
+    hr = m_default_buffer_->SetName(L"StructuredBuffer_Default");
+    if (FAILED(hr))
+    {
+        Logger::Error<StructuredBuffer>("Failed to SetName StructuredBuffer Resource (DefaultBuffer)");
+        return;
+    }
 
-    m_IsValid = true;
+    // create an upload heap (used for updating the default buffer with new data)
+    const auto upload_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+    hr = RenderEngine::Device()->CreateCommittedResource(
+        &upload_heap_prop,
+        D3D12_HEAP_FLAG_NONE,
+        &resource_desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&m_upload_buffer_)
+        );
+
+    if (FAILED(hr))
+    {
+        Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (UploadBuffer)");
+        return;
+    }
+
+    hr = m_upload_buffer_->SetName(L"StructuredBuffer_Upload");
+
+    if (FAILED(hr))
+    {
+        Logger::Error<StructuredBuffer>("Failed to SetName StructuredBuffer Resource (UploadBuffer)");
+        return;
+    }
+
+    m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
+    m_is_valid_ = true;
 }
 
-void engine::StructuredBuffer::UpdateBuffer(void *data)
+void StructuredBuffer::UpdateBuffer(void *data)
 {
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pDefaultBuffer.Get(),
+        m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_COPY_DEST
         );
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     void *mapped = nullptr;
-    m_pUploadBuffer->Map(0, nullptr, &mapped);
-    memcpy(mapped, data, m_stride * m_elementCount);
-    m_pUploadBuffer->Unmap(0, nullptr);
+    m_upload_buffer_->Map(0, nullptr, &mapped);
+    memcpy(mapped, data, m_stride_ * m_element_count_);
+    m_upload_buffer_->Unmap(0, nullptr);
 
-    g_RenderEngine->CommandList()->CopyBufferRegion(m_pDefaultBuffer.Get(), 0, m_pUploadBuffer.Get(), 0,
-                                                    m_elementCount);
+    RenderEngine::CommandList()->CopyBufferRegion(m_default_buffer_.Get(), 0, m_upload_buffer_.Get(), 0,
+                                                  m_stride_ * m_element_count_);
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pDefaultBuffer.Get(),
+        m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
-        D3D12_RESOURCE_STATE_GENERIC_READ
+        D3D12_RESOURCE_STATE_COMMON
         );
-    g_RenderEngine->CommandList()->ResourceBarrier(1, &barrier);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-std::shared_ptr<DescriptorHandle> engine::StructuredBuffer::UploadBuffer()
+std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
 {
-    auto pHandle = DescriptorHeap::Register(*this);
-    return pHandle;
+    return DescriptorHeap::Register(this);
 }
 
-D3D12_SHADER_RESOURCE_VIEW_DESC engine::StructuredBuffer::ViewDesc()
+bool StructuredBuffer::IsValid()
+{
+    return m_is_valid_;
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC StructuredBuffer::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     srvDesc.Format = DXGI_FORMAT_UNKNOWN;
     srvDesc.Buffer.FirstElement = 0;
-    srvDesc.Buffer.NumElements = m_elementCount;
-    srvDesc.Buffer.StructureByteStride = m_stride;
+    srvDesc.Buffer.NumElements = static_cast<UINT>(m_element_count_);
+    srvDesc.Buffer.StructureByteStride = static_cast<UINT>(m_stride_);
     srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
     return srvDesc;
 }
 
-D3D12_GPU_VIRTUAL_ADDRESS engine::StructuredBuffer::GetAddress() const
+ID3D12Resource *StructuredBuffer::Resource()
 {
-    return m_GpuAddress;
+    return m_default_buffer_.Get();
 }
 
-ID3D12Resource *engine::StructuredBuffer::Resource()
+D3D12_GPU_VIRTUAL_ADDRESS StructuredBuffer::GetAddress() const
 {
-    return m_pUploadBuffer.Get();
+    return m_gpu_address_;
 }
-
-bool engine::StructuredBuffer::IsValid()
-{
-    return m_IsValid;
 }

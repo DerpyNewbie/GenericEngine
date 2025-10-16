@@ -14,14 +14,14 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
         return std::make_shared<MaterialData<int>>(0, param);
     }},
     {"float", [](const ShaderParameter &param) {
-        return std::make_shared<MaterialData<float>>(0, param);
+        return std::make_shared<MaterialData<float>>(0.0F, param);
     }},
     {"vector<Matrix>", [](const ShaderParameter &param) {
         auto identity = std::vector{Matrix::Identity};
         return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
     }},
     {"Texture2D", [](const ShaderParameter &param) {
-        auto texture = Texture2DImporter::GetColorTexture({1, 0, 1, 1});
+        auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
             AssetPtr<Texture2D>::FromIAssetPtr(texture),
             param);

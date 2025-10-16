@@ -7,7 +7,7 @@ class EditorGizmos
 {
 public:
     static void DrawYPlaneGrid(const Matrix &view_matrix = Matrix::Identity,
-                               const Vector2 &spacing = {50, 50}, int count = 50);
+                               const Vector2 &spacing = {1, 1}, int count = 50);
 
     static void DrawObject(const std::shared_ptr<engine::GameObject> &game_object);
 };

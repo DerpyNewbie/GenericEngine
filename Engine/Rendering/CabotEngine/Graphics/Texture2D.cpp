@@ -11,6 +11,10 @@ using namespace DirectX;
 
 void Texture2D::OnInspectorGui()
 {
+    ImGui::Text("Texture2D");
+    ImGui::Text("Width: %d", width);
+    ImGui::Text("Height: %d", height);
+    ImGui::Text("Mip Level: %d", mip_level);
 }
 
 void Texture2D::CreateBuffer()
@@ -23,7 +27,7 @@ void Texture2D::CreateBuffer()
 
     auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
-    auto hr = g_RenderEngine->Device()->CreateCommittedResource(
+    auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
@@ -36,6 +40,8 @@ void Texture2D::CreateBuffer()
     {
         return;
     }
+
+    m_pResource->SetName(L"Texture");
 
     D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
     hr = m_pResource->WriteToSubresource(0,
@@ -60,22 +66,7 @@ void Texture2D::UpdateBuffer(void *data)
 
 std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
 {
-    return DescriptorHeap::Register(std::static_pointer_cast<Texture2D>(shared_from_this()));
-}
-
-ID3D12Resource *Texture2D::Resource()
-{
-    return m_pResource.Get();
-}
-
-D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
-{
-    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-    desc.Format = m_pResource->GetDesc().Format;
-    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
-    desc.Texture2D.MipLevels = 1; // no mipmaps
-    return desc;
+    return DescriptorHeap::Register(this);
 }
 
 bool Texture2D::CanUpdate()
@@ -86,4 +77,24 @@ bool Texture2D::CanUpdate()
 bool Texture2D::IsValid()
 {
     return m_IsValid;
+}
+
+ID3D12Resource *Texture2D::Resource()
+{
+    if (m_pResource == nullptr)
+    {
+        CreateBuffer();
+    }
+
+    return m_pResource != nullptr ? m_pResource.Get() : nullptr;
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
+{
+    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
+    desc.Format = Resource()->GetDesc().Format;
+    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
+    desc.Texture2D.MipLevels = 1; // no mipmaps
+    return desc;
 }

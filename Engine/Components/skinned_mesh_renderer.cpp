@@ -1,11 +1,10 @@
 #include "pch.h"
 #include "skinned_mesh_renderer.h"
 
-#include "camera.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
-#include "Components/transform.h"
-#include "game_object.h"
+#include "camera_component.h"
 #include "Rendering/gizmos.h"
+#include "Components/transform.h"
+#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
@@ -14,7 +13,7 @@ bool SkinnedMeshRenderer::m_draw_bones_ = false;
 
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer() const
 {
-    const auto current_buffer_idx = g_RenderEngine->CurrentBackBufferIndex();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto bone_matrices_buffer = m_bone_matrix_buffers_[current_buffer_idx];
 
     std::vector<Matrix> matrices(transforms.size());
@@ -68,12 +67,20 @@ void SkinnedMeshRenderer::OnInspectorGui()
         }
     }
 }
-
-void SkinnedMeshRenderer::OnDraw()
+void SkinnedMeshRenderer::UpdateBuffer()
 {
-    UpdateBuffers();
+    MeshRenderer::UpdateBuffer();
+    UpdateBoneTransformsBuffer();
 
-    MeshRenderer::OnDraw();
+    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
+    const auto cmd_list = RenderEngine::CommandList();
+
+    cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->HandleGPU);
+}
+
+void SkinnedMeshRenderer::Render()
+{
+    MeshRenderer::Render();
 
     if (m_draw_bones_)
         DrawBones();
@@ -83,26 +90,15 @@ void SkinnedMeshRenderer::ReconstructBuffer()
 {
     MeshRenderer::ReconstructBuffer();
 
-    for (auto &bone_matrices_buffer : m_bone_matrix_buffers_)
+    for (int i = 0; i < m_bone_matrix_buffers_.size(); ++i)
     {
-        if (!bone_matrices_buffer)
+        if (!m_bone_matrix_buffers_[i])
         {
-            bone_matrices_buffer = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
-            bone_matrices_buffer->CreateBuffer();
+            m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
+            m_bone_matrix_buffers_[i]->CreateBuffer();
+            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
         }
     }
-}
-
-void SkinnedMeshRenderer::UpdateBuffers()
-{
-    MeshRenderer::UpdateBuffers();
-    UpdateBoneTransformsBuffer();
-
-    const auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
-    const auto bone_matrix_buffer = m_bone_matrix_buffers_[current_buffer]->GetAddress();
-    const auto cmd_list = g_RenderEngine->CommandList();
-
-    cmd_list->SetGraphicsRootShaderResourceView(kBoneSRV, bone_matrix_buffer);
 }
 }
 

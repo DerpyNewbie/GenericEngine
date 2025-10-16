@@ -6,14 +6,14 @@ namespace engine
 {
 class Renderer : public Component
 {
-    friend class Camera;
-
-    static std::vector<std::weak_ptr<Renderer>> m_renderers_;
+    friend class RenderPipeline;
 
 protected:
     bool m_is_visible_ = false;
 
-    virtual void OnDraw() = 0;
+    virtual void UpdateBuffer();
+    virtual void Render() = 0;
+    virtual void DepthRender();
     void SetVisible(bool visible);
 
 public:

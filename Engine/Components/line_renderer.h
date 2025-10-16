@@ -13,7 +13,7 @@ class LineRenderer : public Renderer
 
     std::shared_ptr<VertexBuffer> m_vertex_buffer_;
     std::shared_ptr<IndexBuffer> m_index_buffer_;
-    std::shared_ptr<ConstantBuffer> m_view_projection_buffers_[RenderEngine::FRAME_BUFFER_COUNT];
+    std::shared_ptr<ConstantBuffer> m_view_projection_buffers_[RenderEngine::kFrame_Buffer_Count];
     bool m_is_valid_ = true;
 
 public:
@@ -22,7 +22,7 @@ public:
 
     void OnInspectorGui() override;
 
-    void OnDraw() override;
+    void Render() override;
 
 };
 }

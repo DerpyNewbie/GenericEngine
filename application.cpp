@@ -1,78 +1,77 @@
 #include "pch.h"
 
-#include "application.h"
+#include "imgui_impl_win32.h"
 
-#include <tchar.h>
-
-#include "engine.h"
-#include "scene.h"
-#include "game_object.h"
 #include "input.h"
-#include "Audio/audio_listener_component.h"
+#include "application.h"
+#include <tchar.h>
+#include "engine.h"
 
-#include "Components/camera.h"
-#include "Components/controller.h"
-#include "Components/skinned_mesh_renderer.h"
-#include "Rendering/model_importer.h"
-#include "Editor/editor.h"
-#include "Rendering/font_data.h"
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-std::shared_ptr<Application> Application::m_instance_;
-std::unordered_map<int, Application::WindowCallback> Application::m_callbacks_;
-float Application::m_window_height_ = 1080;
-float Application::m_window_width_ = 1920;
-HWND Application::m_h_wnd_ = nullptr;
-
-LRESULT Application::WndProcedure(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+namespace engine
 {
-    if (engine::Input::Instance()->Keyboard())
+int Application::m_window_height_ = 1080;
+int Application::m_window_width_ = 1920;
+HWND Application::m_window_handle_ = nullptr;
+Event<> Application::on_window_resized;
+
+LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+    switch (msg)
     {
-        engine::Input::Instance()->Keyboard()->ProcessMessage(msg, wparam, lparam);
+    case WM_DESTROY:
+        Logger::Log<Application>("Window destroyed");
+        PostQuitMessage(0);
+        break;
+    case WM_SIZE:
+        Logger::Log<Application>("Window resized");
+        if (wparam == SIZE_MINIMIZED)
+            break;
+        Instance()->m_window_width_ = LOWORD(lparam);
+        Instance()->m_window_height_ = HIWORD(lparam);
+        Instance()->on_window_resized.Invoke();
+        break;
+    case WM_MOUSEACTIVATE:
+        Logger::Log<Application>("Mouse activated");
+        return MA_ACTIVATEANDEAT;
+    default:
+        break;
     }
-    for (auto callback : std::views::values(m_callbacks_))
-    {
-        return callback(hwnd, msg, wparam, lparam);
-    }
+
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+        return true;
+
+    Input::ProcessMessage(msg, wparam, lparam);
+
     return DefWindowProc(hwnd, msg, wparam, lparam);
 }
 
 std::shared_ptr<Application> Application::Instance()
 {
-    return m_instance_;
+    static auto instance = std::make_shared<Application>();
+    return instance;
 }
 
-void Application::StartApp()
+WPARAM Application::StartApp()
 {
-    const auto engine = std::make_shared<engine::Engine>();
-    const auto editor = std::make_shared<editor::Editor>();
     InitWindow();
-    engine->Init();
-    editor->Init();
-    editor->Attach();
+    Engine::Init();
+    MSG msg = {};
 
+    while (msg.message != WM_QUIT)
     {
-        // Sample scene creation
-        const auto camera = engine::Object::Instantiate<engine::GameObject>("Camera");
-        camera->AddComponent<engine::Camera>();
-        camera->AddComponent<engine::Controller>();
-        camera->AddComponent<engine::AudioListenerComponent>();
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+            continue;
+        }
 
-        const auto parent_obj = engine::Object::Instantiate<engine::GameObject>("Parent");
-        const auto child_obj = engine::Object::Instantiate<engine::GameObject>("Child");
-        child_obj->Transform()->SetParent(parent_obj->Transform());
-
-        const auto parent_obj2 = engine::Object::Instantiate<engine::GameObject>("Parent2");
-        const auto child_obj2 = engine::Object::Instantiate<engine::GameObject>("Child2");
-        child_obj2->Transform()->SetParent(parent_obj2->Transform());
-
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/cube.fbx");
-        //engine::ModelImporter::LoadModelFromFBX("Resources/primitives/submesh_cube.fbx");
-        engine::ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+        Engine::Tick();
     }
 
-    engine->MainLoop();
-
-    editor->Finalize();
+    return msg.wParam;
 }
 
 int Application::WindowWidth()
@@ -85,21 +84,9 @@ int Application::WindowHeight()
     return m_window_height_;
 }
 
-HWND Application::GetWindowHandle()
+HWND Application::WindowHandle()
 {
-    return m_h_wnd_;
-}
-
-int Application::AddWindowCallback(std::function<LRESULT(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)> callback)
-{
-    int handle = reinterpret_cast<int>(&callback);
-    m_callbacks_.emplace(handle, callback);
-    return handle;
-}
-
-void Application::RemoveWindowCallback(int window_callback_handle)
-{
-    m_callbacks_.erase(window_callback_handle);
+    return m_window_handle_;
 }
 
 void Application::InitWindow()
@@ -107,30 +94,28 @@ void Application::InitWindow()
     WNDCLASSEX w = {};
 
     w.cbSize = sizeof(WNDCLASSEX);
-    w.lpfnWndProc = static_cast<WNDPROC>(WndProcedure); //コールバック関数の指定
-    w.lpszClassName = _T("GenericEngine"); //アプリケーションクラス名
-    w.hInstance = GetModuleHandle(nullptr); //ハンドルの取得
+    w.lpfnWndProc = static_cast<WNDPROC>(WindowProc);
+    w.lpszClassName = _T("GenericEngine");
+    w.hInstance = GetModuleHandle(nullptr);
 
-    RegisterClassEx(&w); //アプリケーションクラス(ウィンドウクラスの指定をOSに伝える)
+    RegisterClassEx(&w);
 
     RECT wrc = {0, 0, static_cast<LONG>(m_window_width_), static_cast<LONG>(m_window_height_)};
 
-    //関数を使ってウィンドウのサイズを補正する
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
-    //ウィンドウオブジェクトの生成
-    m_h_wnd_ = CreateWindow(w.lpszClassName,
-                            _T("GenericEngine"),
-                            WS_OVERLAPPEDWINDOW,
-                            CW_USEDEFAULT,
-                            CW_USEDEFAULT,
-                            wrc.right - wrc.left,
-                            wrc.bottom - wrc.top,
-                            nullptr,
-                            nullptr,
-                            w.hInstance,
-                            nullptr);
+    m_window_handle_ = CreateWindow(w.lpszClassName,
+                                    _T("GenericEngine"),
+                                    WS_OVERLAPPEDWINDOW,
+                                    CW_USEDEFAULT,
+                                    CW_USEDEFAULT,
+                                    wrc.right - wrc.left,
+                                    wrc.bottom - wrc.top,
+                                    nullptr,
+                                    nullptr,
+                                    w.hInstance,
+                                    nullptr);
 
-    //ウィンドウ表示
-    ShowWindow(m_h_wnd_,SW_SHOW);
+    ShowWindow(m_window_handle_,SW_SHOW);
+}
 }

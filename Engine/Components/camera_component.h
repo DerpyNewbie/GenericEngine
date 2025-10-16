@@ -1,12 +1,11 @@
 #pragma once
-#include "component.h"
-#include "event_receivers.h"
 #include "renderer.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/depth_texture.h"
+#include "Rendering/render_texture.h"
 
 namespace engine
 {
+class RenderPipeline;
 enum class kViewMode : unsigned char
 {
     kPerspective,
@@ -21,14 +20,15 @@ struct CameraProperty : Inspectable
     static constexpr float kMaxClippingPlane = 10000.0f;
 
     kViewMode view_mode = kViewMode::kPerspective;
-    float field_of_view = 70;
-    float near_plane = 0.1;
-    float far_plane = 1000;
-    float ortho_size = 50;
+    float field_of_view = 70.0f;
+    float near_plane = 0.1f;
+    float far_plane = 1000.0f;
+    float ortho_size = 50.0f;
     float aspect_ratio = 16.0f / 9.0f;
     Color background_color = Color(0x1A1A1AFF);
 
     void OnInspectorGui() override;
+    Matrix ProjectionMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)
@@ -43,33 +43,31 @@ struct CameraProperty : Inspectable
     }
 };
 
-class Camera : public Component, public IDrawCallReceiver
+class CameraComponent : public Component
 {
-    static std::weak_ptr<Camera> m_main_camera_;
+    friend RenderPipeline;
+    static std::weak_ptr<CameraComponent> m_main_camera_;
+    static std::weak_ptr<CameraComponent> m_current_camera_;
 
-    CameraProperty m_property_;
-
-    UINT m_drawcall_count_ = 0;
-
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::FRAME_BUFFER_COUNT> m_view_proj_matrix_buffers_;
-
-    void SetViewProjMatrix() const;
-
-    std::vector<std::shared_ptr<Renderer>> FilterVisibleObjects(
-        const std::vector<std::weak_ptr<Renderer>> &renderers) const;
+    AssetPtr<DepthTexture> m_depth_texture_;
+    AssetPtr<RenderTexture> m_render_texture_;
+    UINT m_drawcall_count_;
 
 public:
     void OnAwake() override;
-    void OnConstructed() override;
     void OnInspectorGui() override;
-    void OnDraw() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
-    static std::shared_ptr<Camera> Main();
+    static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
+    static void SetCurrentCamera(const std::weak_ptr<CameraComponent> &camera);
 
-    [[nodiscard]] Matrix GetViewMatrix() const;
-    [[nodiscard]] Matrix GetProjectionMatrix() const;
+    CameraProperty m_property_;
+
+    static std::shared_ptr<CameraComponent> Main();
+    static std::shared_ptr<CameraComponent> Current();
+
+    Matrix ViewMatrix() const;
 
     template <class Archive>
     void serialize(Archive &ar)

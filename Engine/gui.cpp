@@ -21,7 +21,7 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
 
     if (!filters.empty())
     {
-        hr = p_file_open->SetFileTypes(filters.size(), filters.data());
+        hr = p_file_open->SetFileTypes(static_cast<UINT>(filters.size()), filters.data());
         if (FAILED(hr))
         {
             Logger::Error<Gui>("Failed to set file types");
@@ -90,7 +90,7 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
         Logger::Error<Gui>("Failed to set default name");
     }
 
-    hr = p_file_save->SetFileTypes(filters.size(), filters.data());
+    hr = p_file_save->SetFileTypes(static_cast<UINT>(filters.size()), filters.data());
     if (FAILED(hr))
     {
         Logger::Error<Gui>("Failed to set file types");
@@ -124,13 +124,35 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
     return true;
 }
 
-void Gui::SetObjectDragDropTarget(const std::shared_ptr<Object> &object)
+bool Gui::ObjectHeader(const std::shared_ptr<Object> &object, std::string name)
 {
-    SetObjectDragDropTarget(object->Guid());
+    if (name.empty())
+    {
+        name = NameOf(object);
+    }
+
+    const auto result = ImGui::CollapsingHeader(name.c_str(), ImGuiTreeNodeFlags_DefaultOpen);
+    MakeDragDropSource(object);
+
+    return result;
+}
+
+void Gui::MakeDragDropSource(const std::shared_ptr<Object> &object)
+{
+    if (ImGui::BeginDragDropSource())
+    {
+        SetDragDropPayload(object);
+        ImGui::EndDragDropSource();
+    }
+}
+
+void Gui::SetDragDropPayload(const std::shared_ptr<Object> &object)
+{
+    SetDragDropPayload(object->Guid());
     ImGui::Text("Name: %s", NameOf(object).c_str());
 }
 
-void Gui::SetObjectDragDropTarget(const xg::Guid guid)
+void Gui::SetDragDropPayload(const xg::Guid guid)
 {
     const auto guid_str = guid.str();
     ImGui::SetDragDropPayload(DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
@@ -138,7 +160,7 @@ void Gui::SetObjectDragDropTarget(const xg::Guid guid)
     ImGui::Text("Guid: %s", guid.str().c_str());
 }
 
-std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload)
+std::shared_ptr<Object> Gui::GetDragDropPayload(const ImGuiPayload *payload)
 {
     if (payload == nullptr)
     {
@@ -167,22 +189,13 @@ std::shared_ptr<Object> Gui::GetObjectDragDropTarget(const ImGuiPayload *payload
         return nullptr;
     }
 
-    if (asset_descriptor->managed_object == nullptr)
-    {
-        asset_descriptor->Reload();
-    }
-
-    if (asset_descriptor->managed_object == nullptr)
-    {
-        return nullptr;
-    }
-
-    return asset_descriptor->managed_object;
+    asset_descriptor->Import();
+    return Object::Find(guid);
 }
 
-std::shared_ptr<Object> Gui::GetObjectDragDropTarget()
+std::shared_ptr<Object> Gui::GetDragDropPayload()
 {
-    return GetObjectDragDropTarget(ImGui::GetDragDropPayload());
+    return GetDragDropPayload(ImGui::GetDragDropPayload());
 }
 
 std::string Gui::NameOf(const std::shared_ptr<Object> &object)
@@ -220,7 +233,7 @@ bool Gui::FloatField(const char *label, float &value)
 
 bool Gui::IntField(const char *label, int &value)
 {
-    return ImGui::DragInt(label, &value, 1.0F, 0.0F, 0.0F, "%d");
+    return ImGui::DragInt(label, &value, 1, 0, 0, "%d");
 }
 
 bool Gui::Vector2Field(const char *label, Vector2 &value)
