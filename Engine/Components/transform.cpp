@@ -403,7 +403,7 @@ void Transform::OnDestroy()
 
     for (const auto child : m_children_)
     {
-        DestroyImmediate(child->GameObject());
+        Destroy(child->GameObject());
     }
 }
 } // namespace engine

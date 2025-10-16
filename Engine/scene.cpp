@@ -44,7 +44,7 @@ void Scene::OnDestroy()
     UpdateManager::UnsubscribeFixedUpdate(shared_from_base<Scene>());
     for (const auto &game_object : m_root_game_objects_)
     {
-        DestroyImmediate(game_object);
+        Destroy(game_object);
     }
 }
 
