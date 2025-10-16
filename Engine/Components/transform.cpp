@@ -399,12 +399,18 @@ void Transform::RecalculateMatrices()
 
 void Transform::OnDestroy()
 {
-    SetParent(nullptr);
-
     for (const auto child : m_children_)
     {
+        if (child == nullptr)
+        {
+            Logger::Error<Transform>("Found null children on OnDestroy at %s", GameObject()->Name().c_str());
+            continue;
+        }
+
         DestroyImmediate(child->GameObject());
     }
+
+    SetParent(nullptr);
 }
 } // namespace engine
 

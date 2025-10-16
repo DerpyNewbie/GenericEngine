@@ -5,6 +5,7 @@ namespace engine
 {
 class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
 {
+    friend class ObjectUtil;
     friend class GameObject;
     friend class SceneManager;
     friend class Transform;
