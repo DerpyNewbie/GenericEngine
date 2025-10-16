@@ -47,20 +47,56 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
+    for (const auto renderer : m_renderers_)
+    {
+        renderer->UpdateBuffer();
+    }
+
     for (const auto camera : m_cameras_)
     {
+        ID3D12DescriptorHeap *rtv_heap = nullptr;
+        ID3D12DescriptorHeap *dsv_heap = nullptr;
+
+        auto render_tex = camera->m_render_texture_.CastedLock();
+        if (render_tex)
+        {
+            render_tex->BeginRender(camera->m_property_.background_color);
+            rtv_heap = render_tex->GetHeap();
+        }
+
+        auto depth_tex = camera->m_depth_texture_.CastedLock();
+        if (depth_tex)
+        {
+            depth_tex->BeginRender();
+            dsv_heap = depth_tex->GetHeap();
+        }
+
+        if (rtv_heap == nullptr && dsv_heap == nullptr)
+            continue;
+
+        CameraComponent::SetCurrentCamera(camera);
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+
+        DepthRender();
+
+        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
         Render(camera);
+
+        if (render_tex)
+            render_tex->EndRender();
+
+        if (depth_tex)
+            depth_tex->EndRender();
     }
 
     if (const auto main_camera = CameraComponent::Main())
     {
+        CameraComponent::SetCurrentCamera(main_camera);
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        DepthRender();
 
-        auto rtv_heap = main_camera->RenderTexture()->GetHeap();
-        auto depth_tex = main_camera->m_depth_texture_;
-
-        RenderEngine::Instance()->SetRenderTarget(
-            rtv_heap, depth_tex.CastedLock() == nullptr ? nullptr : depth_tex.CastedLock()->GetHeap(),
-            main_camera->m_property_.background_color);
+        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
+        Render(main_camera);
         on_rendering.Invoke();
     }
 }
@@ -105,62 +141,23 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 
 void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
 {
-    ID3D12DescriptorHeap *rtv_heap = nullptr;
-    ID3D12DescriptorHeap *dsv_heap = nullptr;
+    const auto view = camera->ViewMatrix();
+    const auto proj = camera->m_property_.ProjectionMatrix();
+    UpdateBuffer(view, proj);
 
-    auto render_tex = camera->RenderTexture();
-    if (render_tex)
+    const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    for (const auto renderer : renderers)
     {
-        render_tex->BeginRender(camera->m_property_.background_color);
-        rtv_heap = render_tex->GetHeap();
+        renderer->Render();
     }
 
-    auto depth_tex = camera->m_depth_texture_.CastedLock();
-    if (depth_tex)
-    {
-        depth_tex->BeginRender();
-        dsv_heap = depth_tex->GetHeap();
-    }
-
-    if (rtv_heap != nullptr || dsv_heap != nullptr)
-    {
-        CameraComponent::SetCurrentCamera(camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
-
-        DepthRender();
-
-        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-
-        auto view = camera->ViewMatrix();
-        auto &property = camera->m_property_;
-
-        const auto proj = property.ProjectionMatrix();
-        UpdateBuffer(view, proj);
-
-        const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
-        for (const auto renderer : renderers)
-        {
-            renderer->Render();
-        }
-
-        Gizmos::Render();
-    }
-    if (render_tex)
-        render_tex->EndRender();
-    if (depth_tex)
-        depth_tex->EndRender();
+    Gizmos::Render();
 }
 
 void RenderPipeline::DepthRender()
 {
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
-
-    // FIXME: update buffer call may not be needed if it has been called before in a frame
-    for (const auto renderer : m_renderers_)
-    {
-        renderer->UpdateBuffer();
-    }
 
     for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
     {
