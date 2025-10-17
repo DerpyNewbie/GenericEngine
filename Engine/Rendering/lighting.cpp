@@ -63,6 +63,25 @@ void Lighting::CreateShadowMapResource()
     device->CreateDepthStencilView(m_depth_textures_->Resource(), &dsv_desc,
                                    Instance()->m_dsv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
+void Lighting::BeginDepthRender()
+{
+    auto resource = m_depth_textures_->Resource();
+
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+}
+
+void Lighting::EndDepthRender()
+{
+    auto resource = m_depth_textures_->Resource();
+
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        resource, D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+}
 
 Lighting *Lighting::Instance()
 {

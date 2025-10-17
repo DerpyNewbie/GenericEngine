@@ -156,16 +156,13 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
 
 void RenderPipeline::DepthRender()
 {
+    if (Lighting::Instance()->m_lights_.empty())
+        return;
+
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
 
-    for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
-    {
-        for (auto itr : Lighting::Instance()->m_lights_[i]->m_depth_texture_handle_)
-        {
-            Lighting::Instance()->m_shadow_maps_[itr]->BeginRender();
-        }
-    }
+    Lighting::Instance()->BeginDepthRender();
     RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
                                               Color());
 
@@ -178,13 +175,7 @@ void RenderPipeline::DepthRender()
         renderer->DepthRender();
     }
 
-    for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
-    {
-        for (auto itr : Lighting::Instance()->m_lights_[i]->m_depth_texture_handle_)
-        {
-            Lighting::Instance()->m_shadow_maps_[itr]->EndRender();
-        }
-    }
+    Lighting::Instance()->EndDepthRender();
 }
 
 RenderPipeline *RenderPipeline::Instance()

@@ -25,6 +25,8 @@ class Lighting
     std::shared_ptr<ConstantBuffer> m_cascade_slices_buffer_;
 
     void CreateShadowMapResource();
+    void BeginDepthRender();
+    void EndDepthRender();
 
 public:
     static Lighting *Instance();
