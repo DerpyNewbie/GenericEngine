@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "rendering_settings_component.h"
 #include "gui.h"
+#include "lighting.h"
 #include "render_pipeline.h"
 #include "skybox.h"
 #include "Components/directional_light.h"
@@ -32,7 +33,7 @@ void RenderingSettingsComponent::OnStart()
 void RenderingSettingsComponent::ApplySettings()
 {
     Skybox::Instance()->SetTextureCube(m_skybox_cube_.CastedLock());
-    RenderPipeline::SetCascadeSlices(m_cascade_slices_);
+    Lighting::Instance()->SetCascadeSlices(m_cascade_slices_);
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
 }
 }

@@ -95,13 +95,25 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl">
             <EntryPointName>vrt</EntryPointName>
             <ShaderType>Vertex</ShaderType>
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
+            <ObjectFileOutput>C:\Projects\team\x64\Debug\GeometryShader.cso</ObjectFileOutput>
+            <TrackerLogDirectory>GenericEngine\x64\Debug\GenericEngine.tlog\</TrackerLogDirectory>
+            <EntryPointName>geo</EntryPointName>
+            <SuppressStartupBanner>true</SuppressStartupBanner>
+            <ShaderModel>5.1</ShaderModel>
+            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
+            <DisableOptimizations>true</DisableOptimizations>
+            <EnableDebuggingInformation>true</EnableDebuggingInformation>
+            <ShaderType>Geometry</ShaderType>
+            <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)%(Filename).cso</ObjectFileOutput>
+        </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
             <EntryPointName>pix</EntryPointName>
             <ShaderModel>5.0</ShaderModel>
@@ -167,6 +179,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\font_data.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
+        <ClCompile Include="Engine\Rendering\lighting.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
@@ -298,6 +311,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\font_data.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
+        <ClInclude Include="Engine\Rendering\lighting.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
         <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>

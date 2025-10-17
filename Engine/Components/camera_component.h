@@ -59,6 +59,8 @@ public:
     void OnEnabled() override;
     void OnDisabled() override;
 
+    std::shared_ptr<RenderTexture> RenderTexture();
+
     static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
     static void SetCurrentCamera(const std::weak_ptr<CameraComponent> &camera);
 

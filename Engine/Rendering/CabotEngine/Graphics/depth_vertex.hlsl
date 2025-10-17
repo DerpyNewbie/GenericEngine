@@ -33,8 +33,15 @@ struct VSInput
     float4 bone_weight : BONEWEIGHT;
 };
 
-float4 vrt(VSInput input) : SV_POSITION
+struct VSOutput
 {
+    float3 world_pos : WORLDPOS;
+};
+
+VSOutput vrt(VSInput input)
+{
+    VSOutput output = (VSOutput)0;
+
     float4 localPos = float4(input.pos, 1.0f);
     float4 skinnedPos = 0;
 
@@ -53,7 +60,8 @@ float4 vrt(VSInput input) : SV_POSITION
         localPos = skinnedPos;
 
     float4 worldPos = mul(World, localPos);
-    float4 projPos = mul(LightViewProj[light_count], worldPos);
 
-    return projPos;
+    output.world_pos = worldPos.xyz;
+
+    return output;
 }
