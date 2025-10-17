@@ -104,13 +104,13 @@ void Lighting::UpdateLightsViewProjMatrixBuffer()
 
         for (int i = 0; i < shadow_map_count; ++i)
         {
-            m_light_view_proj_matrices_[++light_vp_idx] = light_vp[i];
+            m_light_view_proj_matrices_[light_vp_idx++] = light_vp[i];
         }
     }
 
     while (light_vp_idx < RenderingConstants::kMaxShadowMapCount)
     {
-        m_light_view_proj_matrices_[++light_vp_idx] = Matrix::Identity;
+        m_light_view_proj_matrices_[light_vp_idx++] = Matrix::Identity;
     }
 
     if (m_light_view_proj_matrices_buffer_ == nullptr)
