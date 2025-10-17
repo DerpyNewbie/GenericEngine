@@ -93,9 +93,7 @@ void Lighting::UpdateLightsViewProjMatrixBuffer()
     for (const auto light : m_lights_)
     {
         if (light->m_depth_texture_handle_.empty())
-        {
             continue;
-        }
 
         const auto shadow_map_count = light->ShadowMapCount();
         const auto camera = CameraComponent::Current();
@@ -106,9 +104,13 @@ void Lighting::UpdateLightsViewProjMatrixBuffer()
 
         for (int i = 0; i < shadow_map_count; ++i)
         {
-            m_light_view_proj_matrices_[light_vp_idx] = light_vp[i];
-            ++light_vp_idx;
+            m_light_view_proj_matrices_[++light_vp_idx] = light_vp[i];
         }
+    }
+
+    while (light_vp_idx < RenderingConstants::kMaxShadowMapCount)
+    {
+        m_light_view_proj_matrices_[++light_vp_idx] = Matrix::Identity;
     }
 
     if (m_light_view_proj_matrices_buffer_ == nullptr)
