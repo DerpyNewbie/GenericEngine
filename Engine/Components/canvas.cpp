@@ -18,10 +18,17 @@ void Canvas::OnInspectorGui()
     Gui::PropertyField("TargetCamera", m_target_camera_);
 }
 
-void Canvas::OnDraw()
+void Canvas::OnAwake()
 {
-    for (auto it : m_children_renderers_)
-        it->Render();
+    Renderer::OnAwake();
+    if (m_target_camera_.Lock() == nullptr)
+        m_target_camera_ = AssetPtr<CameraComponent>::FromManaged(CameraComponent::Main());
+}
+void Canvas::Render()
+{
+    if (CameraComponent::Current() == m_target_camera_.CastedLock())
+        for (auto it : m_children_renderers_)
+            it->Render();
 }
 
 Vector2 Canvas::CanvasSize()
@@ -30,7 +37,7 @@ Vector2 Canvas::CanvasSize()
 }
 std::shared_ptr<Transform> Canvas::BoundsOrigin()
 {
-    return Camera::Main()->GameObject()->Transform();
+    return CameraComponent::Main()->GameObject()->Transform();
 }
 
 void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
@@ -58,3 +65,5 @@ void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
     });
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Canvas)

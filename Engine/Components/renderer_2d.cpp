@@ -6,7 +6,10 @@
 
 namespace engine
 {
-
+void Renderer2D::OnAwake()
+{
+    GameObject()->AddComponent<RectTransform>();
+}
 void Renderer2D::OnUpdate()
 {
     if (auto canvas = m_canvas_.Lock())
@@ -43,3 +46,5 @@ Rect Renderer2D::NormalizedRect()
         rect.size / canvas_size};
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Renderer2D)

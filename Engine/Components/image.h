@@ -9,7 +9,7 @@ namespace engine
 {
 class Image : public Renderer2D
 {
-    std::shared_ptr<VertexBuffer> m_vertex_buffer_[RenderEngine::FRAME_BUFFER_COUNT];
+    std::shared_ptr<VertexBuffer> m_vertex_buffer_[RenderEngine::kFrame_Buffer_Count];
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
     AssetPtr<Texture2D> m_texture_;
@@ -19,5 +19,11 @@ public:
     void OnAwake() override;
     void OnUpdate() override;
     void Render() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Renderer2D>(this), CEREAL_NVP(m_texture_));
+    }
 };
 }

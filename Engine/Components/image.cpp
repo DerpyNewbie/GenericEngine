@@ -24,6 +24,7 @@ void Image::OnInspectorGui()
 
 void Image::OnAwake()
 {
+    Renderer2D::OnAwake();
     //create index buffer
     if (!m_index_buffer_)
     {
@@ -57,15 +58,18 @@ void Image::OnUpdate()
         vertices[2].uvs[0] = Vector2(0, 1);
         vertices[3].uvs[0] = Vector2(0, 0);
 
-        m_vertex_buffer_[g_RenderEngine->CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
+        m_vertex_buffer_[RenderEngine::CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
             vertices.size(), vertices.data());
     }
 }
 
 void Image::Render()
 {
-    const auto cmd_list = g_RenderEngine->CommandList();
-    auto current_buffer = g_RenderEngine->CurrentBackBufferIndex();
+    const auto cmd_list = RenderEngine::CommandList();
+    auto current_buffer = RenderEngine::CurrentBackBufferIndex();
+
+    if (m_vertex_buffer_[current_buffer] == nullptr)
+        return;
 
     cmd_list->SetPipelineState(PSOManager::Get("2DBasic"));
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -77,3 +81,5 @@ void Image::Render()
     cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Image)
