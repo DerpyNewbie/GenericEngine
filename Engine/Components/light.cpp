@@ -95,14 +95,12 @@ void Light::OnEnabled()
 
 void Light::OnDisabled()
 {
-    if (m_has_shadow_)
-        Lighting::Instance()->RemoveLight(shared_from_base<Light>());
+    Lighting::Instance()->RemoveLight(shared_from_base<Light>());
 }
 
 void Light::OnDestroy()
 {
-    if (m_has_shadow_)
-        Lighting::Instance()->RemoveLight(shared_from_base<Light>());
+    Lighting::Instance()->RemoveLight(shared_from_base<Light>());
 }
 }
 
