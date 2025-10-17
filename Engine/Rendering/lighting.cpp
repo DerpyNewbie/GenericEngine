@@ -70,23 +70,6 @@ Lighting *Lighting::Instance()
     return instance;
 }
 
-void Lighting::SetCurrentShadowMapIndex(int shadow_map_index)
-{
-    if (m_current_shadow_map_index_buffer_[0] == nullptr)
-    {
-        for (int i = 0; i < m_current_shadow_map_index_buffer_.size(); ++i)
-        {
-            const auto cb = m_current_shadow_map_index_buffer_[i] = std::make_shared<ConstantBuffer>(sizeof(int));
-            cb->CreateBuffer();
-            cb->UpdateBuffer(&i);
-        }
-    }
-
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV,
-                                                m_current_shadow_map_index_buffer_[shadow_map_index]->GetAddress());
-}
-
 void Lighting::UpdateLightsViewProjMatrixBuffer()
 {
     int light_vp_idx = 0;

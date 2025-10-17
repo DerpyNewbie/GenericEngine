@@ -21,8 +21,6 @@ class Lighting
     std::vector<std::shared_ptr<DepthTexture>> m_shadow_maps_;
     std::shared_ptr<Texture2DArray> m_depth_textures_;
     std::shared_ptr<DescriptorHandle> m_shadow_map_handle_;
-    std::array<std::shared_ptr<ConstantBuffer>, RenderingConstants::kMaxShadowMapCount>
-    m_current_shadow_map_index_buffer_;
     std::set<int> m_free_depth_texture_handles_;
     std::shared_ptr<ConstantBuffer> m_cascade_slices_buffer_;
 
@@ -31,7 +29,6 @@ class Lighting
 public:
     static Lighting *Instance();
 
-    void SetCurrentShadowMapIndex(int shadow_map_index); // Will be removed after Instance ID has been implemented
     void UpdateLightsViewProjMatrixBuffer();
     void SetCascadeSlicesBuffer();
     void SetLightsViewProjMatrix() const;
