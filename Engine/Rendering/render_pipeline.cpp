@@ -171,6 +171,7 @@ void RenderPipeline::DepthRender()
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
+    Light::SetBuffers();
 
     for (const auto renderer : m_renderers_)
     {

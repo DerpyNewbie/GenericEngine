@@ -21,7 +21,7 @@ struct GSOutput
 [maxvertexcount(3 * MAX_SHADOWMAP_COUNT)]
 void geo(triangle VSOutput input[3], inout TriangleStream<GSOutput> tri_stream)
 {
-    for (int i = 0; i < MAX_SHADOWMAP_COUNT; ++i)
+    for (int i = 0; i < light_count; ++i)
     {
         float4x4 viewproj = LightViewProj[i];
         for (uint j = 0; j < 3; j++)
