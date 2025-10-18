@@ -10,23 +10,22 @@ void Renderer2D::OnAwake()
 {
     GameObject()->AddComponent<RectTransform>();
 }
-void Renderer2D::OnUpdate()
+void Renderer2D::OnEnabled()
 {
-    if (auto canvas = m_canvas_.Lock())
-    {
-        return;
-    }
-
-    m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
-    auto canvas = m_canvas_.CastedLock();
-    if (!canvas && GameObject()->IsActiveInHierarchy())
-        return;
-    canvas->AddRenderer(shared_from_base<Renderer2D>());
+    if (auto canvas = m_canvas_.CastedLock())
+        canvas->AddRenderer(shared_from_base<Renderer2D>());
 }
+
 
 void Renderer2D::OnDisabled()
 {
-    m_canvas_.CastedLock()->RemoveRenderer(shared_from_base<Renderer2D>());
+    if (auto canvas = m_canvas_.CastedLock())
+        canvas->RemoveRenderer(shared_from_base<Renderer2D>());
+}
+
+void Renderer2D::SetCanvas(const std::shared_ptr<Canvas> &canvas)
+{
+    m_canvas_ = AssetPtr<Canvas>::FromManaged(canvas);
 }
 
 Rect Renderer2D::NormalizedRect()

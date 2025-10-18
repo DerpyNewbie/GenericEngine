@@ -10,9 +10,10 @@ class Renderer2D : public Component
 
 public:
     void OnAwake() override;
-    void OnUpdate() override;
+    void OnEnabled() override;
     void OnDisabled() override;
 
+    void SetCanvas(const std::shared_ptr<Canvas> &canvas);
     Rect NormalizedRect();
 
     virtual void Render() = 0;
