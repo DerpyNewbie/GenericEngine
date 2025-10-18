@@ -1,8 +1,9 @@
 #include "pch.h"
-#include "renderer_2d.h"
+#include "game_object.h"
+#include "Asset/asset_ptr.h"
 #include "rect_transform.h"
 #include "canvas.h"
-#include "game_object.h"
+#include "renderer_2d.h"
 
 namespace engine
 {
@@ -10,12 +11,13 @@ void Renderer2D::OnAwake()
 {
     GameObject()->AddComponent<RectTransform>();
 }
+
 void Renderer2D::OnEnabled()
 {
+    m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
     if (auto canvas = m_canvas_.CastedLock())
         canvas->AddRenderer(shared_from_base<Renderer2D>());
 }
-
 
 void Renderer2D::OnDisabled()
 {

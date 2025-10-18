@@ -1,21 +1,25 @@
 #pragma once
-#include "renderer.h"
+#include "Components/renderer.h"
 #include "Components/camera_component.h"
-#include "Asset/asset_ptr.h"
 
 namespace engine
 {
 class Renderer2D;
 
+struct RendererComparator
+{
+    bool operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const;
+};
 class Canvas : public Renderer
 {
     Vector2 m_canvas_size_;
     AssetPtr<CameraComponent> m_target_camera_;
-    std::list<std::shared_ptr<Renderer2D>> m_children_renderers_;
+    std::set<std::shared_ptr<Renderer2D>, RendererComparator> m_children_renderers_;
 
 public:
     void OnInspectorGui() override;
     void OnAwake() override;
+    void OnStart() override;
     void Render() override;
     Vector2 CanvasSize();
     std::shared_ptr<Transform> BoundsOrigin() override;

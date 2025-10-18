@@ -1,12 +1,19 @@
 #include "pch.h"
-#include "Components/renderer_2d.h"
-#include "canvas.h"
-
+#include "game_object.h"
 #include "application.h"
+#include "camera_component.h"
 #include "gui.h"
+#include "renderer.h"
+#include "renderer_2d.h"
+#include "canvas.h"
 
 namespace engine
 {
+bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const
+{
+    return a->GameObject()->Transform()->GetSiblingIndex() < b->GameObject()->Transform()->GetSiblingIndex();
+}
+
 void Canvas::OnInspectorGui()
 {
     float canvas_size[2];
@@ -27,7 +34,11 @@ void Canvas::OnAwake()
                              static_cast<float>(Application::WindowHeight())};
     if (m_target_camera_.Lock() == nullptr)
         m_target_camera_ = AssetPtr<CameraComponent>::FromManaged(CameraComponent::Main());
+}
 
+void Canvas::OnStart()
+{
+    Renderer::OnStart();
     auto renderers = GameObject()->GetComponentsInChildren<Renderer2D>();
 
     for (auto renderer : renderers)
@@ -68,7 +79,7 @@ void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
         }
     }
 
-    m_children_renderers_.emplace_back(renderer);
+    m_children_renderers_.emplace(renderer);
 }
 
 void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
