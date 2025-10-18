@@ -70,8 +70,8 @@ void RectTransform::OnInspectorGui()
     }
     if (ImGui::InputFloat2("anchored_position", anc_max))
     {
-        anchor_max.x = anc_max[0];
-        anchor_max.y = anc_max[1];
+        anchored_position.x = anc_max[0];
+        anchored_position.y = anc_max[1];
     }
 }
 
