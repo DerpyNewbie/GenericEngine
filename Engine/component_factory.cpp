@@ -5,6 +5,7 @@
 #include "Animation/animation_component.h"
 #include "Audio/audio_listener_component.h"
 #include "Audio/audio_source_component.h"
+#include "Components/image.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
@@ -14,6 +15,8 @@
 #include "Components/light.h"
 #include "Components/mesh_renderer.h"
 #include "Components/rotator_component.h"
+#include "Components/rect_transform.h"
+#include "Components/renderer_2d.h"
 #include "Components/skinned_mesh_renderer.h"
 #include "Components/text_asset_ref_test_component.h"
 #include "Physics/box_collider.h"
@@ -39,6 +42,9 @@ void IComponentFactory::Init()
     ADD_COMPONENT(BillboardRenderer);
     ADD_COMPONENT(TextAssetRefTestComponent);
     ADD_COMPONENT(TextRenderer);
+    ADD_COMPONENT(Canvas);
+    ADD_COMPONENT(Image);
+    ADD_COMPONENT(RectTransform);
     ADD_COMPONENT(RigidbodyComponent);
     ADD_COMPONENT(SphereCollider);
     ADD_COMPONENT(PlaneCollider);

@@ -60,6 +60,9 @@
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
         <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
+        <ClCompile Include="Engine\Components\image.cpp"/>
+        <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
+        <ClCompile Include="Engine\Components\canvas.cpp"/>
         <ClCompile Include="Engine\Components\camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -68,6 +71,7 @@
         <ClCompile Include="Engine\Components\light.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\rect_transform.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
@@ -83,6 +87,7 @@
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
+        <ClCompile Include="Engine\Math\rect.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
         <ClCompile Include="Engine\Physics\bullet_debug_drawer.cpp"/>
         <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
@@ -235,6 +240,9 @@
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
         <ClInclude Include="Engine\Audio\audio_source_component.h"/>
+        <ClInclude Include="Engine\Components\image.h"/>
+        <ClInclude Include="Engine\Components\renderer_2d.h"/>
+        <ClInclude Include="Engine\Components\canvas.h"/>
         <ClInclude Include="Engine\Components\camera_component.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -243,6 +251,7 @@
         <ClInclude Include="Engine\Components\light.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\rect_transform.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
@@ -266,6 +275,7 @@
         <ClInclude Include="Engine\logger.h"/>
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
+        <ClInclude Include="Engine\Math\rect.h"/>
         <ClInclude Include="Engine\object.h"/>
         <ClInclude Include="Engine\Physics\bullet_debug_drawer.h"/>
         <ClInclude Include="Engine\Physics\capsule_collider.h"/>
