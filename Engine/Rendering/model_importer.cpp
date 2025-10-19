@@ -104,6 +104,33 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
             auto root_node = AssimpUtil::GetRootBone(bone_names, current_mesh->mBones[0]);
             root_bone = node_map[reinterpret_cast<std::uintptr_t>(root_node)]->Transform();
         }
+
+        //create material data
+        auto mat_idx = scene->mMeshes[node->mMeshes[i]]->mMaterialIndex;
+        scene->mMaterials[mat_idx];
+
+        aiString ai_tex_path;
+        if (scene->mMaterials[i]->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_tex_path) != AI_SUCCESS)
+        {
+            scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &ai_tex_path);
+        }
+
+        if (ai_tex_path.length > 0)
+        {
+            std::shared_ptr<Texture2D> texture;
+            if (ai_tex_path.C_Str()[0] == '*')
+            {
+                int index = std::stoi(ai_tex_path.C_Str() + 1);
+                aiTexture *ai_texture = scene->mTextures[index];
+                texture = Texture2D::LoadFromAiTexture(ai_texture);
+            }
+            else
+            {
+                //TODO::Implement
+            }
+            materials[i].CastedLock()->p_shared_material_block->SetMaterialData(
+                "Albedo", AssetPtr<Texture2D>::FromManaged(texture));
+        }
     }
 
     if (!meshes.empty())
@@ -153,6 +180,7 @@ std::shared_ptr<GameObject> ModelImporter::LoadModelFromFBX(const char *file_pat
         aiProcess_JoinIdenticalVertices |
         aiProcess_FlipUVs;
     importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING, true);
 
     const auto scene = importer.ReadFile(file_path, import_settings);
     if (!scene)

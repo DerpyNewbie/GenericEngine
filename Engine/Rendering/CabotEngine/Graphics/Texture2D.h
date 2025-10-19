@@ -5,6 +5,7 @@
 
 namespace engine
 {
+class FbxImporter;
 class Texture2DImporter;
 }
 
@@ -14,6 +15,7 @@ class DescriptorHandle;
 
 class Texture2D : public engine::InspectableAsset, public IBuffer, public engine::ShaderResource
 {
+    friend class engine::FbxImporter;
     friend class engine::Texture2DImporter;
 
 protected:
@@ -27,6 +29,7 @@ protected:
     bool m_IsValid = false;
 
 public:
+    static std::shared_ptr<Texture2D> LoadFromAiTexture(aiTexture *ai_texture);
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;

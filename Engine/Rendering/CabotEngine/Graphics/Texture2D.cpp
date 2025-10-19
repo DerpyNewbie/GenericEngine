@@ -5,9 +5,44 @@
 #include <assimp/texture.h>
 #include "RenderEngine.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #pragma comment(lib, "DirectXTex.lib")
 
 using namespace DirectX;
+
+std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
+{
+    auto result_texture = std::make_shared<Texture2D>();
+    unsigned char *pixels = nullptr;
+    int width = 0, height = 0, channels = 0;
+
+    if (ai_texture->mHeight == 0)
+    {
+        // PNG/JPGデータをメモリから読み取る
+        pixels = stbi_load_from_memory(
+            reinterpret_cast<const unsigned char *>(ai_texture->pcData),
+            ai_texture->mWidth,
+            &width, &height, &channels, 4
+            );
+    }
+    else
+    {
+        // RGBAのRAWデータ
+        width = ai_texture->mWidth;
+        height = ai_texture->mHeight;
+        channels = 4;
+        pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
+    }
+    result_texture->width = width;
+    result_texture->height = height;
+    result_texture->format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    result_texture->tex_data.resize(width * height);
+    memcpy(result_texture->tex_data.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
+
+    return result_texture;
+}
 
 void Texture2D::OnInspectorGui()
 {
