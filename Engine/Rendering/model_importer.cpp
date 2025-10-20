@@ -16,6 +16,7 @@
 #include "game_object.h"
 #include "mesh.h"
 #include "assimp_util.h"
+#include "Asset/asset_database.h"
 
 namespace engine
 {
@@ -126,7 +127,8 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
             }
             else
             {
-                //TODO::Implement
+                std::string std_tex_path = ai_tex_path.C_Str();
+                texture = AssetDatabase::GetAsset<Texture2D>(std_tex_path).CastedLock();
             }
             materials[i].CastedLock()->p_shared_material_block->SetMaterialData(
                 "Albedo", AssetPtr<Texture2D>::FromManaged(texture));
