@@ -89,7 +89,7 @@ public:
         return std::dynamic_pointer_cast<T>(Lock());
     }
 
-    static AssetPtr FromIAssetPtr(IAssetPtr &ptr)
+    static AssetPtr FromIAssetPtr(IAssetPtr ptr)
     {
         return {ptr};
     }

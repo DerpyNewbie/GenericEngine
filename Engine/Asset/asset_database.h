@@ -49,7 +49,7 @@ public:
     template <typename T>
     static AssetPtr<T> GetAsset(const path &path)
     {
-        return reinterpret_cast<AssetPtr<T>>(GetAsset(path));
+        return AssetPtr<T>::FromIAssetPtr(GetAsset(path));
     }
 
     template <typename T>
