@@ -118,17 +118,24 @@ void MaterialBlock::LoadShaderParameters(const std::vector<std::shared_ptr<Shade
 {
     for (auto &param : shader_params)
     {
+        bool found = false;
         if (resource_material_data.empty())
+        {
+            for (auto material_data_pair : resource_material_data)
+            {
+                if (param->name == material_data_pair.data->parameter.name)
+                {
+                    Insert(material_data_pair.data);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
         {
             const auto material_data = CreateMaterialData(param);
             Insert(material_data);
-        }
-        for (auto material_data_pair : resource_material_data)
-        {
-            if (param->name == material_data_pair.data->parameter.name)
-            {
-                Insert(material_data_pair.data);
-            }
         }
     }
     UpdateBuffer();
