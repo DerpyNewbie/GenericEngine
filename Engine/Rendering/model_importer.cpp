@@ -108,12 +108,12 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
 
         //create material data
         auto mat_idx = scene->mMeshes[node->mMeshes[i]]->mMaterialIndex;
-        scene->mMaterials[mat_idx];
+        auto material = scene->mMaterials[mat_idx];
 
         aiString ai_tex_path;
-        if (scene->mMaterials[i]->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_tex_path) != AI_SUCCESS)
+        if (material->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_tex_path) != AI_SUCCESS)
         {
-            scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &ai_tex_path);
+            material->GetTexture(aiTextureType_DIFFUSE, 0, &ai_tex_path);
         }
 
         if (ai_tex_path.length > 0)
