@@ -29,11 +29,11 @@ void Lighting::UpdateLightCountBuffer()
 {
     if (m_light_count_buffer_ == nullptr)
     {
-        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
+        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(uint32_t));
         m_light_count_buffer_->CreateBuffer();
     }
 
-    LightCountBuffer lcb(static_cast<uint32_t>(Instance()->m_lights_.size()));
+    uint32_t lcb(static_cast<uint32_t>(Instance()->m_lights_.size()));
 
     m_light_count_buffer_->UpdateBuffer(&lcb);
 }
