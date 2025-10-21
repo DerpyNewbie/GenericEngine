@@ -49,16 +49,6 @@ class Light : public Component
     friend class RenderPipeline;
     friend class Lighting;
 
-    static std::shared_ptr<StructuredBuffer> m_lights_buffer_;
-    static std::shared_ptr<ConstantBuffer> m_light_count_buffer_;
-    static std::shared_ptr<DescriptorHandle> m_lights_buffer_handle_;
-
-    static void UpdateLightCountBuffer();
-    static void UpdateLightBuffer();
-    static void SetLightCountBuffer();
-    static void SetLightBuffer();
-    static void SetBuffers();
-
 protected:
     std::vector<int> m_depth_texture_handle_;
     LightData m_light_data_;

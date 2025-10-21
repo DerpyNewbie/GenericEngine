@@ -8,66 +8,6 @@
 
 namespace engine
 {
-std::shared_ptr<ConstantBuffer> Light::m_light_count_buffer_;
-std::shared_ptr<StructuredBuffer> Light::m_lights_buffer_;
-std::shared_ptr<DescriptorHandle> Light::m_lights_buffer_handle_;
-
-void Light::UpdateLightCountBuffer()
-{
-    if (m_light_count_buffer_ == nullptr)
-    {
-        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
-        m_light_count_buffer_->CreateBuffer();
-    }
-
-    LightCountBuffer lcb(static_cast<uint32_t>(Lighting::Instance()->m_lights_.size()));
-
-    m_light_count_buffer_->UpdateBuffer(&lcb);
-}
-
-void Light::UpdateLightBuffer()
-{
-    if (Lighting::Instance()->m_lights_.empty())
-        return;
-
-    if (m_lights_buffer_ == nullptr)
-    {
-        m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
-                                                              RenderingConstants::kMaxLightCount);
-        m_lights_buffer_->CreateBuffer();
-        m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
-    }
-
-    std::array<LightData, RenderingConstants::kMaxLightCount> properties;
-    for (int i = 0; i < Lighting::Instance()->m_lights_.size(); ++i)
-        properties[i] = Lighting::Instance()->m_lights_[i]->m_light_data_;
-    m_lights_buffer_->UpdateBuffer(properties.data());
-}
-
-void Light::SetLightCountBuffer()
-{
-    UpdateLightCountBuffer();
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
-}
-
-void Light::SetLightBuffer()
-{
-    UpdateLightBuffer();
-
-    if (m_lights_buffer_ == nullptr)
-        return;
-
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->HandleGPU);
-}
-
-void Light::SetBuffers()
-{
-    SetLightCountBuffer();
-    SetLightBuffer();
-}
-
 void Light::OnInspectorGui()
 {
     Gui::PropertyField("Intensity", m_light_data_.intensity);

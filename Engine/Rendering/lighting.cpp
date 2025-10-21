@@ -25,6 +25,62 @@ std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &
 
 namespace engine
 {
+void Lighting::UpdateLightCountBuffer()
+{
+    if (m_light_count_buffer_ == nullptr)
+    {
+        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(LightCountBuffer));
+        m_light_count_buffer_->CreateBuffer();
+    }
+
+    LightCountBuffer lcb(static_cast<uint32_t>(Instance()->m_lights_.size()));
+
+    m_light_count_buffer_->UpdateBuffer(&lcb);
+}
+
+void Lighting::UpdateLightBuffer()
+{
+    if (Instance()->m_lights_.empty())
+        return;
+
+    if (m_lights_buffer_ == nullptr)
+    {
+        m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
+                                                              RenderingConstants::kMaxLightCount);
+        m_lights_buffer_->CreateBuffer();
+        m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
+    }
+
+    std::array<LightData, RenderingConstants::kMaxLightCount> properties;
+    for (int i = 0; i < Instance()->m_lights_.size(); ++i)
+        properties[i] = Instance()->m_lights_[i]->m_light_data_;
+    m_lights_buffer_->UpdateBuffer(properties.data());
+}
+
+void Lighting::SetLightCountBuffer()
+{
+    UpdateLightCountBuffer();
+    const auto cmd_list = RenderEngine::CommandList();
+    cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
+}
+
+void Lighting::SetLightBuffer()
+{
+    UpdateLightBuffer();
+
+    if (m_lights_buffer_ == nullptr)
+        return;
+
+    const auto cmd_list = RenderEngine::CommandList();
+    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->HandleGPU);
+}
+
+void Lighting::SetBuffers()
+{
+    SetLightCountBuffer();
+    SetLightBuffer();
+}
+
 void Lighting::CreateShadowMapResource()
 {
     m_depth_textures_ = std::make_shared<Texture2DArray>();
