@@ -20,12 +20,16 @@ std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
 
     if (ai_texture->mHeight == 0)
     {
-        // PNG/JPGデータをメモリから読み取る
         pixels = stbi_load_from_memory(
             reinterpret_cast<const unsigned char *>(ai_texture->pcData),
             ai_texture->mWidth,
             &width, &height, &channels, 4
             );
+        if (pixels)
+        {
+            memcpy(result_texture->tex_data.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
+            stbi_image_free(pixels);
+        }
     }
     else
     {
