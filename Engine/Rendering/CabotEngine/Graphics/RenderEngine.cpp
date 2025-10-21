@@ -209,7 +209,7 @@ bool RenderEngine::CreateCommandQueue()
 bool RenderEngine::CreateSwapChain()
 {
     // DXGIファクトリーの生成
-    IDXGIFactory4 *dxgi_factory = nullptr;
+    IDXGIFactory2 *dxgi_factory = nullptr;
     HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory));
     if (FAILED(hr))
     {
@@ -217,26 +217,24 @@ bool RenderEngine::CreateSwapChain()
     }
 
     // スワップチェインの生成
-    DXGI_SWAP_CHAIN_DESC desc;
-    desc.BufferDesc.Width = engine::Application::WindowWidth();
-    desc.BufferDesc.Height = engine::Application::WindowHeight();
-    desc.BufferDesc.RefreshRate.Numerator = 60;
-    desc.BufferDesc.RefreshRate.Denominator = 1;
-    desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    desc.Width = engine::Application::WindowWidth();
+    desc.Height = engine::Application::WindowHeight();
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.BufferCount = kFrame_Buffer_Count;
-    desc.OutputWindow = m_h_wnd_;
-    desc.Windowed = TRUE;
+    desc.Scaling = DXGI_SCALING_NONE;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     // スワップチェインの生成
-    IDXGISwapChain *swap_chain = nullptr;
-    hr = dxgi_factory->CreateSwapChain(m_p_queue_.Get(), &desc, &swap_chain);
+    IDXGISwapChain1 *swap_chain = nullptr;
+    hr = dxgi_factory->CreateSwapChainForHwnd(
+        m_p_queue_.Get(), engine::Application::WindowHandle(), &desc, nullptr, nullptr, &swap_chain
+    );
+    
     if (FAILED(hr))
     {
         dxgi_factory->Release();
@@ -298,10 +296,7 @@ bool RenderEngine::CreateCommandList()
 
 bool RenderEngine::CreateFence()
 {
-    for (unsigned long long &i : m_fence_value_)
-    {
-        i = 0;
-    }
+    m_fence_value_ = 0;
 
     const auto hr = m_p_device_->CreateFence(
         0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_p_fence_.ReleaseAndGetAddressOf())
@@ -312,7 +307,7 @@ bool RenderEngine::CreateFence()
         return false;
     }
 
-    m_fence_value_[m_current_back_buffer_index_]++;
+    m_fence_value_++;
 
     //同期を行うときのイベントハンドラを作成する。
     m_fence_event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -394,8 +389,8 @@ bool RenderEngine::CreateDepthStencil()
     const CD3DX12_RESOURCE_DESC resource_desc(
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
-        engine::Application::WindowWidth(),
-        engine::Application::WindowHeight(),
+        engine::Application::Instance()->WindowWidth(),
+        engine::Application::Instance()->WindowHeight(),
         1,
         1,
         DXGI_FORMAT_D32_FLOAT,
@@ -438,9 +433,8 @@ RenderEngine *RenderEngine::Instance()
 void RenderEngine::WaitRender()
 {
     //描画終了待ち
-    const UINT64 fence_value = m_fence_value_[m_current_back_buffer_index_];
+    const UINT64 fence_value = ++m_fence_value_;
     m_p_queue_->Signal(m_p_fence_.Get(), fence_value);
-    m_fence_value_[m_current_back_buffer_index_]++;
 
     // 次のフレームの描画準備がまだであれば待機する.
     if (m_p_fence_->GetCompletedValue() < fence_value)
@@ -452,10 +446,26 @@ void RenderEngine::WaitRender()
             return;
         }
 
-        // 待機処理.
-        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE))
-        {
-            return;
-        }
+        WaitForSingleObject(m_fence_event_, INFINITE);
     }
+}
+
+void RenderEngine::UpdateMainRenderTarget()
+{
+    engine::Logger::Log<RenderEngine>("Updating main render target");
+    WaitRender();
+
+    for (auto rt : m_p_render_targets_)
+        rt.Reset();
+
+    m_p_swap_chain_->ResizeBuffers(kFrame_Buffer_Count,
+                                   engine::Application::WindowWidth(),
+                                   engine::Application::WindowHeight(),
+                                   DXGI_FORMAT_UNKNOWN,
+                                   0);
+
+    CreateRenderTarget();
+    CreateDepthStencil();
+    CreateViewPort();
+    CreateScissorRect();
 }

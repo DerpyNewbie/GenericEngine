@@ -1,21 +1,9 @@
 ﻿#include "pch.h"
-#include "application.h"
-#include "default_scene_generator.h"
-#include "engine.h"
-#include "Editor/editor.h"
+#include "bootstrap.h"
 
 using namespace engine;
-using namespace editor;
 
-int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
+int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR lpCmdLine, int)
 {
-    Engine::on_init.AddListener([] {
-        Editor::Instance()->Attach();
-    });
-
-    Engine::on_default_scene_creation.AddListener([] {
-        SampleSceneGenerator::CreateDefaultScene();
-    });
-
-    Application::Instance()->StartApp();
+    return static_cast<int>(bootstrap::Launch(bootstrap::LaunchOptions::Parse(lpCmdLine)));
 }

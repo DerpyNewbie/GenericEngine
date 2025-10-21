@@ -40,9 +40,10 @@ Matrix CameraProperty::ProjectionMatrix() const
         switch (view_mode)
         {
         case kViewMode::kPerspective:
+            // FIXME: aspect ratio is calculated based on window rect. which is not optimal for render textures
             return DirectX::XMMatrixPerspectiveFovRH(
                 field_of_view * Mathf::kDeg2Rad,
-                aspect_ratio,
+                static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight()),
                 near_plane, far_plane);
         case kViewMode::kOrthographic:
             return DirectX::XMMatrixOrthographicRH(

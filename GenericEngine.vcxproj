@@ -20,6 +20,7 @@
     </ItemGroup>
     <ItemGroup>
         <ClCompile Include="application.cpp"/>
+        <ClCompile Include="bootstrap.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
         <ClCompile Include="Editor\audio_window.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
@@ -218,6 +219,7 @@
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="application.h"/>
+        <ClInclude Include="bootstrap.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
         <ClInclude Include="Editor\audio_window.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
