@@ -21,7 +21,9 @@ void Light::OnInspectorGui()
             Lighting::Instance()->RemoveShadow(shared_from_base<Light>());
         }
         else
+        {
             Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());
+        }
     }
 }
 
