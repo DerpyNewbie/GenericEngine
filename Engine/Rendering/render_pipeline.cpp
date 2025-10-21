@@ -130,8 +130,8 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
     lighting_instance->SetCascadeSlicesBuffer();
+    lighting_instance->SetBuffers();
     Skybox::Instance()->Render();
-    Light::SetBuffers();
 
     for (const auto renderer : m_renderers_)
     {
@@ -168,7 +168,7 @@ void RenderPipeline::DepthRender()
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
-    Light::SetBuffers();
+    lighting_instance->SetBuffers();
 
     for (const auto renderer : m_renderers_)
     {
