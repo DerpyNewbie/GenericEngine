@@ -121,9 +121,19 @@ void AttachMeshObject(const aiScene *scene, const aiNode *node,
             std::shared_ptr<Texture2D> texture;
             if (ai_tex_path.C_Str()[0] == '*')
             {
-                int index = std::stoi(ai_tex_path.C_Str() + 1);
-                aiTexture *ai_texture = scene->mTextures[index];
-                texture = Texture2D::LoadFromAiTexture(ai_texture);
+                try
+                {
+                    int index = std::stoi(ai_tex_path.C_Str() + 1);
+                    if (index >= 0 && index < static_cast<int>(scene->mNumTextures))
+                    {
+                        aiTexture *ai_texture = scene->mTextures[index];
+                        texture = Texture2D::LoadFromAiTexture(ai_texture);
+                    }
+                }
+                catch (const std::exception &e)
+                {
+                    Logger::Warn<ModelImporter>("Invalid embedded texture index: %d", std::string(ai_tex_path.C_Str()));
+                }
             }
             else
             {
