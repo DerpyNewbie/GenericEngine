@@ -30,6 +30,8 @@ public:
     {
         ar(CEREAL_NVP(m_colliders_), CEREAL_NVP(m_transform_));
 
+        if (!m_shape_)
+            m_shape_ = std::make_unique<btCompoundShape>();
         UpdateShape();
     }
 };
