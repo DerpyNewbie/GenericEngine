@@ -37,10 +37,12 @@ struct IMaterialData : Inspectable
     }
 };
 
-inline IMaterialData::IMaterialData() : parameter()
+inline IMaterialData::IMaterialData() :
+    parameter()
 {}
 
-inline IMaterialData::IMaterialData(ShaderParameter param): parameter(std::move(param))
+inline IMaterialData::IMaterialData(ShaderParameter param):
+    parameter(std::move(param))
 {}
 
 template <typename T>
@@ -61,6 +63,7 @@ struct MaterialData : IMaterialData
     ~MaterialData() override = default;
 
     void OnInspectorGui() override;
+    void SetValue(T value);
 
     std::shared_ptr<IBuffer> CreateBuffer() override;
     bool CanUpdateBuffer() override;
@@ -81,11 +84,13 @@ struct MaterialData : IMaterialData
 };
 
 template <typename T>
-MaterialData<T>::MaterialData() : MaterialData({}, {})
+MaterialData<T>::MaterialData() :
+    MaterialData({}, {})
 {}
 
 template <typename T>
-MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) : MaterialData({}, new_parameter)
+MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) :
+    MaterialData({}, new_parameter)
 {}
 
 template <typename T>
@@ -124,6 +129,31 @@ void MaterialData<T>::OnInspectorGui()
     else
     {
         ImGui::Text("GUI not implemented for type %s", typeid(T).name());
+    }
+}
+
+template <typename T>
+void MaterialData<T>::SetValue(T value)
+{
+    if constexpr (std::is_same_v<T, int>)
+    {
+        this->value = value;
+        is_dirty = true;
+    }
+    else if constexpr (std::is_same_v<T, float>)
+    {
+        this->value = value;
+        is_dirty = true;
+    }
+    else if constexpr (kIsAssetPtr)
+    {
+        this->value = value;
+        buffer = CreateBuffer();
+        is_dirty = true;
+    }
+    else
+    {
+        Logger::Warn<MaterialData>("Invalid type set in material data");
     }
 }
 
