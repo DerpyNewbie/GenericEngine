@@ -13,7 +13,7 @@ std::string DeduplicatedName(const std::shared_ptr<GameObject> &object,
 {
     auto [original_name, dedupe_index] = ObjectUtil::GetOriginalName(object->Name());
     const auto count = std::ranges::count_if(siblings, [original_name](auto a) {
-        return ObjectUtil::GetOriginalName(a->Name()).first != original_name;
+        return ObjectUtil::GetOriginalName(a->Name()).first == original_name;
     });
 
     if (count == 0)
@@ -62,11 +62,11 @@ std::string ObjectUtil::GetDeduplicatedName(const std::shared_ptr<Object> &objec
 
 std::pair<std::string, int> ObjectUtil::GetOriginalName(const std::string &name)
 {
-    const auto pos = name.find_last_of(" (");
+    const auto pos = name.find_last_of("(");
     if (pos == std::string::npos)
         return {name, 0};
 
-    return {name.substr(0, pos), std::stoi(name.substr(pos + 2, name.size() - pos - 3))};
+    return {name.substr(0, pos - 1), std::stoi(name.substr(pos + 1, name.size() - pos - 2))};
 }
 
 #pragma push_macro("GetObject")
@@ -133,7 +133,7 @@ bool ObjectUtil::IsAssetPtr(const rapidjson::Document::Object &object)
 }
 
 std::vector<rapidjson::Document::Object> ObjectUtil::FindMatchingObjects(
-    const rapidjson::Document::Object &object, const std::function<bool(rapidjson::Document::Object)> &pred)
+const rapidjson::Document::Object &object, const std::function<bool(rapidjson::Document::Object)> &pred)
 {
     std::vector<rapidjson::Document::Object> matching_object;
     std::queue<rapidjson::Document::Object> to_process;
