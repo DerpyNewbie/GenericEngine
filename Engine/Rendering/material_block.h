@@ -85,7 +85,6 @@ public:
 template <typename T>
 bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 {
-    bool found = false;
     for (auto &data : this->material_data | std::views::transform(&MaterialDataPair::data))
     {
         if (data->parameter.name == name)
@@ -93,12 +92,11 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
             auto casted_data = std::dynamic_pointer_cast<MaterialData<T>>(data);
             if (casted_data == nullptr)
                 return false;
-
             casted_data->SetValue(material_data);
-            found = true;
+            return true;
         }
     }
-    return found;
+    return false;
 }
 
 }
