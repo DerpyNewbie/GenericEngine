@@ -78,7 +78,8 @@ private:
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
     {}
 
-    AssetPtr(const IAssetPtr &ptr) : IAssetPtr(ptr)
+    AssetPtr(const IAssetPtr &ptr) :
+        IAssetPtr(ptr)
     {}
 
 public:
@@ -89,7 +90,7 @@ public:
         return std::dynamic_pointer_cast<T>(Lock());
     }
 
-    static AssetPtr FromIAssetPtr(IAssetPtr &ptr)
+    static AssetPtr FromIAssetPtr(IAssetPtr ptr)
     {
         return {ptr};
     }
@@ -98,20 +99,20 @@ public:
     {
         auto lock = ptr.lock();
         return {
-            ptr,
-            {},
-            lock != nullptr ? lock->Guid() : kNullGuid,
-            lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
+        ptr,
+        {},
+        lock != nullptr ? lock->Guid() : kNullGuid,
+        lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
         };
     }
 
     static AssetPtr FromInstance(const std::shared_ptr<T> &ptr)
     {
         return {
-            {},
-            ptr,
-            ptr != nullptr ? ptr->Guid() : kNullGuid,
-            ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
+        {},
+        ptr,
+        ptr != nullptr ? ptr->Guid() : kNullGuid,
+        ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
         };
     }
 

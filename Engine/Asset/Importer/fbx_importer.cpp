@@ -1,12 +1,16 @@
 #include "pch.h"
 #include "fbx_importer.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 #include "Animation/animation_clip.h"
+#include "Asset/asset_database.h"
 #include "Asset/dummy_asset.h"
-
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include "Rendering/material.h"
+#include "Rendering/mesh.h"
 
 namespace engine
 {
@@ -24,15 +28,16 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
 {
     Assimp::Importer importer;
     constexpr int import_settings =
-        aiProcess_CalcTangentSpace |
-        aiProcess_Triangulate |
-        aiProcess_GenSmoothNormals |
-        aiProcess_SortByPType |
-        aiProcess_OptimizeMeshes |
-        aiProcess_PopulateArmatureData |
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_LimitBoneWeights;
+    aiProcess_CalcTangentSpace |
+    aiProcess_Triangulate |
+    aiProcess_GenSmoothNormals |
+    aiProcess_SortByPType |
+    aiProcess_OptimizeMeshes |
+    aiProcess_PopulateArmatureData |
+    aiProcess_JoinIdenticalVertices |
+    aiProcess_LimitBoneWeights;
     importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
+    importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING, true);
 
     const auto scene = importer.ReadFile(ctx->AssetPath().string().c_str(), import_settings);
     if (!scene)
@@ -47,12 +52,37 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     // TODO: implement importer in Mesh -> Material -> Animation order
     for (UINT i = 0; i < scene->mNumMeshes; ++i)
     {
-        ctx->AddObject(Object::Instantiate<DummyAsset>());
+        auto shared_mesh = Mesh::CreateFromAiMesh(scene->mMeshes[i]);
+        ctx->AddObject(shared_mesh);
     }
 
     for (UINT i = 0; i < scene->mNumMaterials; ++i)
     {
-        ctx->AddObject(Object::Instantiate<DummyAsset>());
+        auto material = Object::Instantiate<Material>();
+        aiString ai_tex_path;
+
+        if (scene->mMaterials[i]->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_tex_path) != AI_SUCCESS)
+        {
+            scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &ai_tex_path);
+        }
+
+        if (ai_tex_path.length > 0)
+        {
+            if (ai_tex_path.C_Str()[0] == '*')
+            {
+                int index = std::stoi(ai_tex_path.C_Str() + 1);
+                aiTexture *ai_texture = scene->mTextures[index];
+                auto texture = Texture2D::LoadFromAiTexture(ai_texture);
+                ctx->AddObject(texture);
+            }
+            else
+            {
+                std::string std_tex_path = ai_tex_path.C_Str();
+                auto texture = AssetDatabase::GetAsset<Texture2D>(std_tex_path);
+                material->p_shared_material_block->SetMaterialData("Albedo", texture.CastedLock());
+            }
+        }
+        ctx->AddObject(material);
     }
 
     for (UINT i = 0; i < scene->mNumAnimations; ++i)
