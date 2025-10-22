@@ -130,6 +130,7 @@
     <ClCompile Include="Engine\Rendering\skybox.cpp" />
     <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp" />
     <ClCompile Include="Engine\Rendering\lighting.cpp" />
+    <ClCompile Include="Engine\Rendering\light_data.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -263,5 +264,6 @@
     <ClInclude Include="Engine\Rendering\rendering_settings_component.h" />
     <ClInclude Include="Engine\Rendering\lighting.h" />
     <ClInclude Include="Engine\Rendering\rendering_constants.h" />
+    <ClInclude Include="Engine\Rendering\light_data.h" />
   </ItemGroup>
 </Project>
