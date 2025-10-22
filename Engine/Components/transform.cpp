@@ -411,6 +411,7 @@ void Transform::OnDestroy()
     }
 
     SetParent(nullptr);
+    m_owner_ = nullptr;
 }
 } // namespace engine
 
