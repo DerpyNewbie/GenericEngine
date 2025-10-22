@@ -119,7 +119,7 @@ void MaterialBlock::LoadShaderParameters(const std::vector<std::shared_ptr<Shade
     for (auto &param : shader_params)
     {
         bool found = false;
-        if (resource_material_data.empty())
+        if (!resource_material_data.empty())
         {
             for (auto material_data_pair : resource_material_data)
             {
