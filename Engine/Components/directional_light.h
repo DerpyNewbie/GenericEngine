@@ -1,5 +1,6 @@
 #pragma once
 #include "light.h"
+#include "Rendering/rendering_constants.h"
 
 namespace engine
 {
