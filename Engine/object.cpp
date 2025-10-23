@@ -152,20 +152,34 @@ std::shared_ptr<Object> Object::Find(const xg::Guid &guid)
 
 std::shared_ptr<Object> Object::Instantiate(const std::shared_ptr<Object> &original)
 {
-    std::stringstream ss;
+    try
     {
-        Serializer serializer;
-        serializer.Save(ss, original);
+        std::stringstream ss;
+        {
+            Serializer serializer;
+            serializer.Save(ss, original);
+        }
+
+        const std::string serialized_object(ss.view());
+        const auto serialized_clone_object = ObjectUtil::MakeClone(serialized_object);
+
+        std::istringstream is(serialized_clone_object);
+        Serializer deserializer;
+        auto cloned_object = deserializer.Load<Object>(is);
+        if (!cloned_object)
+        {
+            Logger::Error<Object>("Failed to deserialize cloned object");
+            return nullptr;
+        }
+
+        cloned_object->SetName(ObjectUtil::GetDeduplicatedName(cloned_object));
+        cloned_object->OnConstructed();
+        return cloned_object;
     }
-
-    const std::string serialized_object(ss.view());
-    const auto serialized_clone_object = ObjectUtil::MakeClone(serialized_object);
-
-    std::istringstream is(serialized_clone_object);
-    Serializer deserializer;
-    auto cloned_object = deserializer.Load<Object>(is);
-    cloned_object->SetName(ObjectUtil::GetDeduplicatedName(cloned_object));
-    cloned_object->OnConstructed();
-    return cloned_object;
+    catch (std::exception &e)
+    {
+        Logger::Error<Object>("Cloning failed: %s", e.what());
+        return nullptr;
+    }
 }
 }
