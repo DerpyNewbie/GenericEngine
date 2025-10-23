@@ -62,11 +62,21 @@ std::string ObjectUtil::GetDeduplicatedName(const std::shared_ptr<Object> &objec
 
 std::pair<std::string, int> ObjectUtil::GetOriginalName(const std::string &name)
 {
-    const auto pos = name.find_last_of("(");
+    const auto pos = name.find_last_of('(');
     if (pos == std::string::npos)
         return {name, 0};
 
-    return {name.substr(0, pos - 1), std::stoi(name.substr(pos + 1, name.size() - pos - 2))};
+    auto original_name = name.substr(0, pos - 1);
+
+    try
+    {
+        auto index = std::stoi(name.substr(pos + 1, name.size() - pos - 2));
+        return {original_name, index};
+    }
+    catch (const std::exception)
+    {
+        return {original_name, 0};
+    }
 }
 
 #pragma push_macro("GetObject")
