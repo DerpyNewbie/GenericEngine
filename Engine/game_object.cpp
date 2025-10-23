@@ -10,7 +10,8 @@
 
 namespace engine
 {
-GameObject::GameObject() : Object()
+GameObject::GameObject() :
+    Object()
 {}
 void GameObject::OnConstructed()
 {
@@ -101,6 +102,13 @@ void GameObject::InvokeUpdate()
         {
             has_destroying_component = true;
             continue;
+        }
+
+        if (!component->m_has_called_awake_)
+        {
+            component->OnAwake();
+            component->m_has_called_awake_ = true;
+            component->OnEnabled();
         }
 
         if (!component->m_has_called_start_)
@@ -290,7 +298,7 @@ void GameObject::SetAsRootObject(const bool is_root_object)
     const auto scene = m_scene_.lock();
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
-        *root_objects,
+    *root_objects,
     [&shared_this](const std::shared_ptr<GameObject> &other) {
         return shared_this == other;
     });
