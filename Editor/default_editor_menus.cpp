@@ -73,8 +73,8 @@ void DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
     {
-        {L"Scene Files (*.scene)", L"*.scene"},
-        {L"All Files (*.*)", L"*.*"}
+    {L"Scene Files (*.scene)", L"*.scene"},
+    {L"All Files (*.*)", L"*.*"}
     };
 
     if (ImGui::MenuItem("Load Scene"))
@@ -135,8 +135,14 @@ void DefaultEditorMenu::DrawObjectMenu(const std::shared_ptr<engine::GameObject>
 
     if (ImGui::MenuItem("Duplicate"))
     {
-        auto cloned_object = engine::Object::Instantiate(go);
-        engine::Logger::Log<DefaultEditorMenu>("Cloned %s", cloned_object->Name().c_str());
+        if (const auto cloned_object = engine::Object::Instantiate(go))
+        {
+            engine::Logger::Log<DefaultEditorMenu>("Cloned %s", cloned_object->Name().c_str());
+        }
+        else
+        {
+            engine::Logger::Error<DefaultEditorMenu>("Failed to clone object. Check logs for more details");
+        }
     }
 
     if (ImGui::MenuItem("Delete", nullptr, false, go != nullptr))
