@@ -41,6 +41,10 @@ void DirectionalLight::SetCascadeSlices(
 {
     m_cascade_slices_ = shadow_cascade_sprits;
 }
+void DirectionalLight::OnAwake()
+{
+    m_light_data_.type = static_cast<int>(kLightType::kDirectional);
+}
 
 void DirectionalLight::OnInspectorGui()
 {
