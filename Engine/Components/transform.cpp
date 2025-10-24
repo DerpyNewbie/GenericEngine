@@ -399,7 +399,8 @@ void Transform::RecalculateMatrices()
 
 void Transform::OnDestroy()
 {
-    for (const auto child : m_children_)
+    const auto children = m_children_;
+    for (const auto child : children)
     {
         if (child == nullptr)
         {
