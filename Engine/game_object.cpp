@@ -319,8 +319,11 @@ template <class Archive>
 void GameObject::serialize(Archive &ar)
 {
     ar(cereal::base_class<Object>(this), CEREAL_NVP(m_is_active_self_), CEREAL_NVP(m_components_));
+
     if (m_scene_.expired())
-        m_scene_ = SceneManager::GetActiveScene();
+    {
+        SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
+    }
 }
 }
 
