@@ -71,6 +71,7 @@
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\spot_light.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -257,6 +258,7 @@
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\spot_light.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
@@ -336,6 +338,7 @@
         <ClInclude Include="Engine\str_util.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
         <ClInclude Include="pch.h"/>
+        <ClInclude Include="Resources\Light.hlsli"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include=".clang-format"/>

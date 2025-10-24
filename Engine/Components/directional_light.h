@@ -17,6 +17,7 @@ public:
     static void SetCascadeSlices(
         std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_sprits);
 
+    void OnAwake() override;
     void OnInspectorGui() override;
     void OnUpdate() override;
     bool InCameraView(const std::array<Vector3, 8> &frustum) override;

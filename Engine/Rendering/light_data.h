@@ -5,7 +5,7 @@ struct alignas(16) LightData
     int type = 1;
     int cast_shadow = 0;
     float intensity = 1;
-    float range = 1;
+    float range = 10;
 
     Vector4 pos;
     Quaternion direction;
