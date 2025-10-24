@@ -15,6 +15,7 @@
 #include "Components/mesh_renderer.h"
 #include "Components/rotator_component.h"
 #include "Components/skinned_mesh_renderer.h"
+#include "Components/spot_light.h"
 #include "Components/text_asset_ref_test_component.h"
 #include "Physics/box_collider.h"
 #include "Physics/capsule_collider.h"
@@ -48,6 +49,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(AudioSourceComponent);
     ADD_COMPONENT(AudioListenerComponent);
     ADD_COMPONENT(DirectionalLight);
+    ADD_COMPONENT(SpotLight);
     ADD_COMPONENT(RotatorComponent);
     ADD_COMPONENT(AnimationComponent);
     ADD_COMPONENT(RenderingSettingsComponent);
@@ -55,8 +57,7 @@ void IComponentFactory::Init()
 }
 
 IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{
-}
+{}
 
 std::string IComponentFactory::Name()
 {
