@@ -130,7 +130,7 @@ float4 pix(VSOutput input) : SV_TARGET
             break;
 				case 1:
 						brightness += CalcSpotShadow(Lights[i],N,input.worldpos,current_shadowmap_count);
-						current_shadowmap_count += 0;
+						current_shadowmap_count += 1;
             break;
         default:
             break;
