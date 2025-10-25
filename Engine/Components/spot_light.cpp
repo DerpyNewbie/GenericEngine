@@ -8,8 +8,8 @@
 void engine::SpotLight::OnAwake()
 {
     m_light_data_.type = static_cast<int>(kLightType::kSpotLight);
-    m_light_data_.inner_cos = DirectX::XMConvertToRadians(50.0f);
-    m_light_data_.outer_cos = DirectX::XMConvertToRadians(45.0f);
+    m_light_data_.inner_cos = cos(DirectX::XMConvertToRadians(50.0f));
+    m_light_data_.outer_cos = cos(DirectX::XMConvertToRadians(45.0f));
 }
 void engine::SpotLight::OnInspectorGui()
 {
