@@ -35,7 +35,40 @@ void engine::SpotLight::OnUpdate()
 
 bool engine::SpotLight::InCameraView(const std::array<Vector3, 8> &frustum)
 {
-    return true;
+    float cone_length = m_light_data_.range;
+    float cone_radius = tanf(acosf(m_light_data_.outer_cos)) * cone_length;
+
+    // 球の中心を照射方向に 0.5 * range 移動した位置に置く
+    auto light_pos = Vector3(m_light_data_.pos.x, m_light_data_.pos.y, m_light_data_.pos.z);
+    auto light_dir = Vector3(m_light_data_.direction.x, m_light_data_.direction.y, m_light_data_.direction.z);
+    light_dir.Normalize();
+    Vector3 sphere_center = light_pos + light_dir * (cone_length * 0.5f);
+
+    // 半径は照射範囲の半分程度
+    float sphere_radius = 0.5f * sqrtf(cone_length * cone_length + cone_radius * cone_radius);
+
+    Vector3 min_v(FLT_MAX);
+    Vector3 max_v(-FLT_MAX);
+
+    for (const auto &v : frustum)
+    {
+        min_v.x = min(min_v.x, v.x);
+        min_v.y = min(min_v.y, v.y);
+        min_v.z = min(min_v.z, v.z);
+
+        max_v.x = max(max_v.x, v.x);
+        max_v.y = max(max_v.y, v.y);
+        max_v.z = max(max_v.z, v.z);
+    }
+
+    float x = max(min_v.x, min(sphere_center.x, max_v.x));
+    float y = max(min_v.y, min(sphere_center.y, max_v.y));
+    float z = max(min_v.z, min(sphere_center.z, max_v.z));
+
+    // 最近点との距離で判定
+    Vector3 nearest(x, y, z);
+    float distSq = (sphere_center - nearest).LengthSquared();
+    return distSq <= sphere_radius * sphere_radius;
 }
 
 Vector3 engine::SpotLight::GetPos()
