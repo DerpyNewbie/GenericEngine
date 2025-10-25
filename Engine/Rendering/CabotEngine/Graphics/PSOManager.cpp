@@ -40,7 +40,7 @@ void PSOManager::Initialize()
     setting.RasterizerDesc = rasterizer_desc;
     setting.NumRenderTarget = 0;
     setting.VSPath = L"x64/Debug/depth_vertex.cso";
-    setting.PSPath = L"";
+    setting.PSPath = L"x64/Debug/depth_pixel.cso";
     setting.GSPath = L"x64/Debug/depth_geometry.cso";
     Register(setting);
 

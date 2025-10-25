@@ -96,6 +96,14 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_pixel.hlsl">
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+            <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+            <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">pix</EntryPointName>
+            <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+        </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl">
             <EntryPointName>vrt</EntryPointName>
             <ShaderType>Vertex</ShaderType>
