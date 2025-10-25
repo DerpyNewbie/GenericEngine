@@ -49,10 +49,10 @@ float SampleShadowPCF(float3 shadowCoord, int lightIndex)
         {
             float2 offset = float2(x, y) * texelSize;
             shadow += ShadowMaps.SampleCmpLevelZero(
-            shadowSampler,
-            float3(shadowCoord.xy + offset, lightIndex),
-            shadowCoord.z
-            );
+                shadowSampler,
+                float3(shadowCoord.xy + offset, lightIndex),
+                shadowCoord.z
+                );
         }
     }
 
