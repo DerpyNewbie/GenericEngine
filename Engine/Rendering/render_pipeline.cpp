@@ -15,7 +15,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -145,7 +145,11 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
     const auto proj = camera->m_property_.ProjectionMatrix();
     UpdateBuffer(view, proj);
 
-    const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    std::ranges::sort(renderers,
+                      [](const std::shared_ptr<Renderer> &a, const std::shared_ptr<Renderer> &b) {
+                          return a->m_render_queue_ < b->m_render_queue_;
+                      });
     for (const auto renderer : renderers)
     {
         renderer->Render();

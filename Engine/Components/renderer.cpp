@@ -2,6 +2,7 @@
 
 #include "renderer.h"
 
+#include "gui.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -31,6 +32,10 @@ void Renderer::SetVisible(const bool visible)
     }
 }
 
+void Renderer::OnInspectorGui()
+{
+    Gui::PropertyField("RenderQueue", m_render_queue_);
+}
 void Renderer::OnEnabled()
 {
     SetVisible(true);

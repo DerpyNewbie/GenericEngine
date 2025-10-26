@@ -20,8 +20,6 @@ public:
     void SetVertices(std::vector<Vertex> vertices);
     void SetIndices(std::vector<uint32_t> indices);
 
-    void OnInspectorGui() override;
-
     void Render() override;
 
 };

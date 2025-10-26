@@ -10,6 +10,7 @@ class Renderer : public Component
 
 protected:
     bool m_is_visible_ = false;
+    int m_render_queue_ = 5000;
 
     virtual void UpdateBuffer();
     virtual void Render() = 0;
@@ -19,6 +20,7 @@ protected:
 public:
     DirectX::BoundingBox bounds;
 
+    void OnInspectorGui() override;
     void OnEnabled() override;
     void OnDisabled() override;
     void OnDestroy() override;
