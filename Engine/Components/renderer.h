@@ -26,5 +26,11 @@ public:
     void OnDestroy() override;
 
     virtual std::shared_ptr<Transform> BoundsOrigin() = 0;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_render_queue_));
+    }
 };
 }

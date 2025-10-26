@@ -56,3 +56,5 @@ void Renderer::OnDestroy()
     SetVisible(false);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Renderer)
