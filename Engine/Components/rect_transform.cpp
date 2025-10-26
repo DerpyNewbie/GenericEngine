@@ -6,38 +6,6 @@
 
 namespace engine
 {
-void RectTransform::OnAwake()
-{
-    std::shared_ptr<RectTransform> rect_transform = shared_from_base<RectTransform>();
-    std::shared_ptr<Transform> transform;
-
-    UINT itr = 0;
-    bool find = false;
-    for (size_t i = 0; i < GameObject()->m_components_.size(); ++i)
-    {
-        auto &component = GameObject()->m_components_[i];
-        transform = std::dynamic_pointer_cast<Transform>(component);
-        if (transform)
-        {
-            itr = i;
-            find = true;
-            break;
-        }
-    }
-    if (!find)
-    {
-        return;
-    }
-
-    rect_transform->m_parent_ = transform->Parent();
-    for (int i = 0; i < transform->ChildCount(); ++i)
-    {
-        rect_transform->m_children_.emplace_back(GameObject()->Transform()->GetChild(i));
-    }
-    GameObject()->m_components_[itr] = rect_transform;
-
-}
-
 void RectTransform::OnInspectorGui()
 {
     float anc_min[2], anc_max[2];
@@ -77,8 +45,9 @@ void RectTransform::OnInspectorGui()
 
 Rect RectTransform::CalculateScreenRect() const
 {
+    auto transform = GameObject()->Transform();
     Vector2 parentSize = Vector2::Zero;
-    if (auto parent = std::dynamic_pointer_cast<RectTransform>(Parent()))
+    if (auto parent = std::dynamic_pointer_cast<RectTransform>(transform->Parent()))
     {
         auto rect = parent->CalculateScreenRect();
         parentSize = rect.size;

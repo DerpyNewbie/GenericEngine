@@ -4,7 +4,7 @@
 
 namespace engine
 {
-class RectTransform : public Transform
+class RectTransform : public Component
 {
 public:
     Vector2 anchor_min = {0.5f, 0.5f};
@@ -13,7 +13,6 @@ public:
     Vector2 size_delta = {100.0f, 100.0f};
     Vector2 anchored_position = {0.0f, 0.0f};
 
-    void OnAwake() override;
     void OnInspectorGui() override;
 
     [[nodiscard]] Rect CalculateScreenRect() const;
@@ -21,7 +20,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Transform>(this),
+        ar(cereal::base_class<Component>(this),
            CEREAL_NVP(anchor_min),
            CEREAL_NVP(anchor_max),
            CEREAL_NVP(pivot),
