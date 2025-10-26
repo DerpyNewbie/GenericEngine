@@ -2,6 +2,8 @@
 
 #include "renderer.h"
 
+#include <algorithm>
+
 #include "gui.h"
 #include "Rendering/render_pipeline.h"
 
@@ -34,7 +36,10 @@ void Renderer::SetVisible(const bool visible)
 
 void Renderer::OnInspectorGui()
 {
-    Gui::PropertyField("RenderQueue", m_render_queue_);
+    if (Gui::PropertyField("RenderQueue", m_render_queue_))
+    {
+        m_render_queue_ = std::clamp(m_render_queue_, 0, 10000);
+    }
 }
 void Renderer::OnEnabled()
 {
