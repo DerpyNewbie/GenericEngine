@@ -33,11 +33,6 @@ void LineRenderer::SetIndices(std::vector<uint32_t> indices)
     }
 }
 
-void LineRenderer::OnInspectorGui()
-{
-    Renderer::OnInspectorGui();
-}
-
 void LineRenderer::Render()
 {
     const auto camera = CameraComponent::Main();

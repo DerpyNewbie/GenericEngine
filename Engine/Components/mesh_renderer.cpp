@@ -44,6 +44,7 @@ void MeshRenderer::RecalculateBoundingBox()
 void MeshRenderer::OnInspectorGui()
 {
     ImGui::Checkbox("Draw Bounds", &m_draw_bounds_);
+    Renderer::OnInspectorGui();
 
     if (ImGui::CollapsingHeader("Mesh"))
     {

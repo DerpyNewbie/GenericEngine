@@ -18,5 +18,11 @@ public:
     void Render() override;
 
     std::shared_ptr<Transform> BoundsOrigin() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Renderer>(this), CEREAL_NVP(position), CEREAL_NVP(font_data), CEREAL_NVP(color), CEREAL_NVP(string));
+    }
 };
 }

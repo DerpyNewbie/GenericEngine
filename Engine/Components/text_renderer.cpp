@@ -11,6 +11,7 @@ namespace engine
 {
 void TextRenderer::OnInspectorGui()
 {
+    Renderer::OnInspectorGui();
     float pos[2];
     EngineUtil::ToFloat2(pos, position);
     if (ImGui::InputFloat2("position", pos))
