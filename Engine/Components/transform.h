@@ -11,12 +11,14 @@ class Transform : public Component
 
     Matrix m_local_matrix_ = Matrix::Identity;
     Matrix m_world_matrix_ = Matrix::Identity;
-    std::weak_ptr<Transform> m_parent_ = {};
-    std::vector<std::shared_ptr<Transform>> m_children_;
-
+    
     void TransformGui(bool is_local);
     static Matrix TRS(Vector3 translation, Quaternion rotation, Vector3 scale);
     void RecalculateMatrices();
+
+protected:
+    std::weak_ptr<Transform> m_parent_ = {};
+    std::vector<std::shared_ptr<Transform>> m_children_;
 
 public:
     void OnDestroy() override;
