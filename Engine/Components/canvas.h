@@ -14,14 +14,14 @@ class Canvas : public Renderer
 {
     Vector2 m_canvas_size_;
     AssetPtr<CameraComponent> m_target_camera_;
-    std::set<std::shared_ptr<Renderer2D>, RendererComparator> m_children_renderers_;
+    std::set<std::shared_ptr<Renderer2D>, RendererComparator> m_child_renderers_;
 
 public:
     void OnInspectorGui() override;
     void OnAwake() override;
     void OnStart() override;
     void Render() override;
-    Vector2 CanvasSize();
+    [[nodiscard]] Vector2 CanvasSize() const;
     std::shared_ptr<Transform> BoundsOrigin() override;
 
     void AddRenderer(const std::shared_ptr<Renderer2D> &renderer);

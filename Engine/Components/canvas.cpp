@@ -16,15 +16,8 @@ bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const 
 
 void Canvas::OnInspectorGui()
 {
-    float canvas_size[2];
-    EngineUtil::ToFloat2(canvas_size, m_canvas_size_);
-    if (ImGui::InputFloat2("CanvasSize", canvas_size))
-    {
-        m_canvas_size_.x = canvas_size[0];
-        m_canvas_size_.y = canvas_size[1];
-    }
-
-    Gui::PropertyField("TargetCamera", m_target_camera_);
+    Gui::PropertyField("Canvas Size", m_canvas_size_);
+    Gui::PropertyField("Target Camera", m_target_camera_);
 }
 
 void Canvas::OnAwake()
@@ -39,7 +32,7 @@ void Canvas::OnAwake()
 void Canvas::OnStart()
 {
     Renderer::OnStart();
-    auto renderers = GameObject()->GetComponentsInChildren<Renderer2D>();
+    const auto renderers = GameObject()->GetComponentsInChildren<Renderer2D>();
 
     for (auto renderer : renderers)
     {
@@ -51,11 +44,11 @@ void Canvas::OnStart()
 void Canvas::Render()
 {
     if (CameraComponent::Current() == m_target_camera_.CastedLock())
-        for (auto it : m_children_renderers_)
+        for (const auto it : m_child_renderers_)
             it->Render();
 }
 
-Vector2 Canvas::CanvasSize()
+Vector2 Canvas::CanvasSize() const
 {
     return m_canvas_size_;
 }
@@ -66,25 +59,26 @@ std::shared_ptr<Transform> Canvas::BoundsOrigin()
 
 void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
 {
-    auto renderer_priority = renderer->GameObject()->Transform()->GetSiblingIndex();
+    const auto renderer_priority = renderer->GameObject()->Transform()->GetSiblingIndex();
 
-    for (auto it = m_children_renderers_.begin(); it != m_children_renderers_.end(); ++it)
+    // FIXME: this could break when child Renderer2D has changed its sibling position. has to update when it has marked dirty
+    for (auto it = m_child_renderers_.begin(); it != m_child_renderers_.end(); ++it)
     {
-        auto current_priority = (*it)->GameObject()->Transform()->GetSiblingIndex();
+        const auto current_priority = (*it)->GameObject()->Transform()->GetSiblingIndex();
 
         if (renderer_priority < current_priority)
         {
-            m_children_renderers_.insert(it, renderer);
+            m_child_renderers_.insert(it, renderer);
             return;
         }
     }
 
-    m_children_renderers_.emplace(renderer);
+    m_child_renderers_.emplace(renderer);
 }
 
 void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
 {
-    std::erase_if(m_children_renderers_, [renderer](const std::shared_ptr<Renderer2D> &a) {
+    std::erase_if(m_child_renderers_, [renderer](const std::shared_ptr<Renderer2D> &a) {
         return a == renderer;
     });
 }
