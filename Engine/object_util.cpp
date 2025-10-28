@@ -17,7 +17,9 @@ std::string DeduplicatedName(const std::shared_ptr<GameObject> &object,
     });
 
     if (count == 0)
+    {
         return original_name;
+    }
 
     return original_name + " (" + std::to_string(count) + ")";
 }
@@ -28,27 +30,15 @@ std::string ObjectUtil::GetDeduplicatedName(const std::shared_ptr<Object> &objec
     auto original_name = object->Name();
 
     const auto go = std::dynamic_pointer_cast<GameObject>(object);
-    if (go != nullptr)
+    if (go == nullptr)
     {
-        const auto transform = go->Transform();
-        const auto parent = transform->Parent();
-        if (parent != nullptr)
-        {
-            const auto child_count = parent->ChildCount();
-            auto vec = std::vector<std::shared_ptr<GameObject>>();
-            vec.reserve(child_count);
-            for (auto i = 0; i < child_count; ++i)
-            {
-                auto sibling_go = transform->GetChild(i)->GameObject();
-                if (sibling_go != nullptr && sibling_go != go)
-                {
-                    vec.emplace_back(sibling_go);
-                }
-            }
+        return original_name;
+    }
 
-            return DeduplicatedName(go, vec);
-        }
-
+    const auto transform = go->Transform();
+    const auto parent = transform->Parent();
+    if (parent == nullptr)
+    {
         auto siblings = go->Scene()->m_root_game_objects_;
         erase_if(siblings, [&go](auto a) {
             return a == go;
@@ -57,23 +47,36 @@ std::string ObjectUtil::GetDeduplicatedName(const std::shared_ptr<Object> &objec
         return DeduplicatedName(go, go->Scene()->m_root_game_objects_);
     }
 
-    return original_name;
+    const auto child_count = parent->ChildCount();
+    auto vec = std::vector<std::shared_ptr<GameObject>>();
+    vec.reserve(child_count);
+    for (auto i = 0; i < child_count; ++i)
+    {
+        auto sibling_go = transform->GetChild(i)->GameObject();
+        if (sibling_go == nullptr || sibling_go == go)
+            continue;
+
+        vec.emplace_back(sibling_go);
+    }
+
+    return DeduplicatedName(go, vec);
 }
 
 std::pair<std::string, int> ObjectUtil::GetOriginalName(const std::string &name)
 {
     const auto pos = name.find_last_of('(');
     if (pos == std::string::npos)
+    {
         return {name, 0};
+    }
 
     auto original_name = name.substr(0, pos - 1);
-
     try
     {
         auto index = std::stoi(name.substr(pos + 1, name.size() - pos - 2));
         return {original_name, index};
     }
-    catch (const std::exception)
+    catch (const std::exception &)
     {
         return {original_name, 0};
     }
@@ -168,13 +171,19 @@ const rapidjson::Document::Object &object, const std::function<bool(rapidjson::D
             if (i->value.IsObject())
             {
                 to_process.push(i->value.GetObject());
+                continue;
             }
-            else if (i->value.IsArray())
+
+            if (!i->value.IsArray())
             {
-                for (auto j = i->value.Begin(); j != i->value.End(); ++j)
+                continue;
+            }
+
+            for (auto j = i->value.Begin(); j != i->value.End(); ++j)
+            {
+                if (j->IsObject())
                 {
-                    if (j->IsObject())
-                        to_process.push(j->GetObject());
+                    to_process.push(j->GetObject());
                 }
             }
         }
