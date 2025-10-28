@@ -140,7 +140,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
     {
-        engine::Gui::SetObjectDragDropTarget(game_object);
+        engine::Gui::SetDragDropPayload(game_object);
         ImGui::EndDragDropSource();
     }
 
@@ -155,7 +155,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
                                                                        ImGuiDragDropFlags_AcceptBeforeDelivery))
         {
-            const auto payload_object = engine::Gui::GetObjectDragDropTarget(payload);
+            const auto payload_object = engine::Gui::GetDragDropPayload(payload);
             const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
             if (payload_go != nullptr)
             {
@@ -200,7 +200,7 @@ void Hierarchy::DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &
         if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
                                                                        ImGuiDragDropFlags_AcceptBeforeDelivery))
         {
-            const auto payload_object = engine::Gui::GetObjectDragDropTarget(payload);
+            const auto payload_object = engine::Gui::GetDragDropPayload(payload);
             const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
             if (payload_go != nullptr)
             {

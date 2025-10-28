@@ -9,15 +9,13 @@ class DescriptorHandle;
 
 class RenderEngine
 {
-    friend class Engine;
+    friend class engine::Engine;
 
 public:
     enum { kFrame_Buffer_Count = 2 };
 
 private:
     HWND m_h_wnd_ = nullptr;
-    UINT m_frame_buffer_width_ = 0;
-    UINT m_frame_buffer_height_ = 0;
     UINT m_current_back_buffer_index_ = 0;
     Color m_background_color_ = {0.5f, 0.5f, 0.5f, 0.5f};
 
@@ -60,8 +58,10 @@ private:
 public:
     static RenderEngine *Instance();
 
-
     void BeginRender();
+    void SetMainRenderTarget(Color background_color);
+    void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
+                         Color background_color) const;
     void EndRender();
     void WaitRender();
 
@@ -88,6 +88,16 @@ public:
     static D3D12_VIEWPORT Viewport()
     {
         return Instance()->m_viewport_;
+    }
+
+    static D3D12_RESOURCE_DESC BBuffDesc()
+    {
+        return Instance()->m_p_render_targets_[Instance()->m_current_back_buffer_index_]->GetDesc();
+    }
+
+    static D3D12_DESCRIPTOR_HEAP_DESC RTVHeapDesc()
+    {
+        return Instance()->m_p_rtv_heap_->GetDesc();
     }
 
     void SetBackgroundColor(Color color);

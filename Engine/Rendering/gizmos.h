@@ -15,7 +15,7 @@ using namespace DirectX::SimpleMath;
 /// <remarks>
 /// Can be called at any time. Rendering is guaranteed at the end of a frame. 
 /// </remarks>
-class Gizmos : public IDrawCallReceiver
+class Gizmos
 {
     friend class Engine;
 
@@ -32,14 +32,7 @@ class Gizmos : public IDrawCallReceiver
 public:
     static constexpr auto kDefaultColor = Color(1, 1, 1);
 
-    int Order() override
-    {
-        return INT_MAX - 1000; // at the very last. but before the editor.
-    }
-
-    void Render(int current_back_buffer_idx, ID3D12GraphicsCommandList *command_list);
-
-    void OnDraw() override;
+    static void Render();
 
     static void DrawLine(const Vector3 &start, const Vector3 &end, const Color &color = kDefaultColor);
     static void DrawLines(const std::vector<Vector3> &line, const Color &color = kDefaultColor);

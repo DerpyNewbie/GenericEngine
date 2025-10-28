@@ -26,7 +26,7 @@ bool DrawAssetHierarchyPopup(const std::shared_ptr<engine::AssetHierarchy> &asse
 
     if (ImGui::BeginMenu("Create"))
     {
-        const bool created = DefaultEditorMenu::DrawAssetMenu(asset_hierarchy->asset->path_hint.parent_path());
+        const bool created = DefaultEditorMenu::DrawAssetMenu(asset_hierarchy->asset->AssetPath().parent_path());
         ImGui::EndMenu();
 
         // HACK: early-return on asset creation to workaround iterator issues
@@ -39,27 +39,20 @@ bool DrawAssetHierarchyPopup(const std::shared_ptr<engine::AssetHierarchy> &asse
 
     if (ImGui::MenuItem("Save"))
     {
-        engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->path_hint.string().c_str());
-        engine::AssetDatabase::WriteAsset(asset_hierarchy->asset->guid);
-    }
-
-    if (ImGui::MenuItem("Reload"))
-    {
-        engine::Logger::Log<AssetBrowser>("Reloading %s", asset_hierarchy->asset->path_hint.string().c_str());
-        const auto descriptor = engine::AssetDatabase::GetAssetDescriptor(asset_hierarchy->asset->guid);
-        descriptor->Reload();
+        engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->AssetPath().string().c_str());
+        engine::AssetDatabase::WriteAsset(asset_hierarchy->asset->Guid());
     }
 
     if (ImGui::MenuItem("Reimport"))
     {
-        engine::Logger::Log<AssetBrowser>("Reimporting %s", asset_hierarchy->asset->path_hint.string().c_str());
-        engine::AssetDatabase::Import(asset_hierarchy->asset->path_hint);
+        engine::Logger::Log<AssetBrowser>("Reimporting %s", asset_hierarchy->asset->AssetPath().string().c_str());
+        engine::AssetDatabase::Reimport(asset_hierarchy->asset->Guid());
     }
 
     if (ImGui::MenuItem("Delete"))
     {
-        engine::Logger::Log<AssetBrowser>("Deleting %s", asset_hierarchy->asset->path_hint.string().c_str());
-        engine::AssetDatabase::DeleteAsset(asset_hierarchy->asset->path_hint);
+        engine::Logger::Log<AssetBrowser>("Deleting %s", asset_hierarchy->asset->AssetPath().string().c_str());
+        engine::AssetDatabase::DeleteAsset(asset_hierarchy->asset->AssetPath());
     }
 
     ImGui::EndPopup();
@@ -91,21 +84,21 @@ bool DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hie
     const bool open = ImGui::TreeNodeEx("", flags, "%s", asset_hierarchy->Name().c_str());
     if (asset_hierarchy->IsFile() && ImGui::BeginDragDropSource())
     {
-        const auto guid_str = asset_hierarchy->asset->guid.str();
+        const auto guid_str = asset_hierarchy->asset->Guid().str();
         ImGui::SetDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid, guid_str.c_str(), guid_str.size() + 1);
-        ImGui::Text("Dragging %s", asset_hierarchy->asset->path_hint.string().c_str());
+        ImGui::Text("Dragging %s", asset_hierarchy->asset->AssetPath().string().c_str());
         ImGui::EndDragDropSource();
     }
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))
     {
         if (asset_hierarchy->asset != nullptr)
-            engine::AssetDatabase::GetAsset(asset_hierarchy->asset->path_hint);
+            engine::AssetDatabase::GetAsset(asset_hierarchy->asset->AssetPath());
         Editor::Instance()->SetSelectedObject(asset_hierarchy);
 
         auto path = engine::AssetDatabase::GetProjectDirectory();
         if (asset_hierarchy->asset != nullptr)
-            path = asset_hierarchy->asset->path_hint;
+            path = asset_hierarchy->asset->AssetPath();
         if (!asset_hierarchy->IsDirectory())
             path = path.parent_path();
 

@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "PipelineState.h"
 
 struct PSOSetting
@@ -7,13 +6,17 @@ struct PSOSetting
     std::string PSOName;
     std::wstring VSPath;
     std::wstring PSPath;
+    std::wstring GSPath;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
+    D3D12_RASTERIZER_DESC RasterizerDesc;
+    D3D12_DEPTH_STENCIL_DESC DepthStencilDesc;
+    UINT NumRenderTarget;
 };
 
 class PSOManager
 {
-    std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_PSOCache_;
+    std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_pso_cache_;
 
     static std::shared_ptr<PSOManager> m_instance_;
 
@@ -26,7 +29,7 @@ public:
 
     static ID3D12PipelineState *Get(const std::string &id)
     {
-        return Instance()->m_PSOCache_[id]->Get();
+        return Instance()->m_pso_cache_[id]->Get();
     }
 
     static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader);

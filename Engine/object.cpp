@@ -2,22 +2,37 @@
 
 #include "update_manager.h"
 
+namespace
+{
+std::vector<std::shared_ptr<engine::Object>> g_destroying_objects;
+std::vector<std::shared_ptr<engine::Object>> g_destroyed_objects;
+}
+
 namespace engine
 {
 
+bool Object::m_in_gc_time_ = false;
 unsigned int Object::m_last_instantiated_name_count_ = 0;
 unsigned int Object::m_last_immediately_destroyed_objects_ = 0;
 std::unordered_map<xg::Guid, std::shared_ptr<Object>> Object::m_objects_;
-std::vector<std::shared_ptr<Object>> Object::m_destroying_objects_;
-std::vector<std::shared_ptr<Object>> Object::m_destroyed_objects_;
 
 void Object::GarbageCollect()
 {
-    for (const auto &obj : m_destroying_objects_)
+    m_in_gc_time_ = true;
+    g_destroyed_objects.clear();
+    while (!g_destroying_objects.empty())
     {
-        obj->OnDestroy();
-        m_objects_.erase(obj->m_guid_);
+        auto destroying_objects = g_destroying_objects;
+        g_destroying_objects.clear();
+        for (const auto &obj : destroying_objects)
+        {
+            obj->OnDestroy();
+            m_objects_.erase(obj->m_guid_);
+            g_destroyed_objects.emplace_back(obj);
+        }
     }
+
+    m_in_gc_time_ = false;
 
     if (m_last_immediately_destroyed_objects_ != 0)
     {
@@ -25,14 +40,9 @@ void Object::GarbageCollect()
         m_last_immediately_destroyed_objects_ = 0;
     }
 
-    m_destroyed_objects_.clear();
-    m_destroyed_objects_.insert(m_destroyed_objects_.begin(),
-                                m_destroying_objects_.begin(), m_destroying_objects_.end());
-
-    if (!m_destroying_objects_.empty())
+    if (!g_destroyed_objects.empty())
     {
-        Logger::Log<Object>("Destroyed %d objects.", m_destroying_objects_.size());
-        m_destroying_objects_.clear();
+        Logger::Log<Object>("Destroyed %d objects.", g_destroyed_objects.size());
     }
 }
 
@@ -51,6 +61,18 @@ xg::Guid Object::GenerateGuid()
     } while (m_objects_.contains(guid));
 
     return guid;
+}
+
+void Object::SetGuid(const xg::Guid new_guid)
+{
+    const auto pos = m_objects_.find(m_guid_);
+    if (pos != m_objects_.end() && pos->second.get() == this)
+    {
+        m_objects_.erase(pos);
+    }
+
+    m_guid_ = new_guid;
+    m_objects_.emplace(m_guid_, shared_from_this());
 }
 
 xg::Guid Object::Guid() const
@@ -81,15 +103,29 @@ void Object::DestroyThis()
 void Object::Destroy(const std::shared_ptr<Object> &obj)
 {
     obj->m_is_destroying_ = true;
-    m_destroying_objects_.emplace_back(obj);
+    g_destroying_objects.emplace_back(obj);
 }
 
 void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
 {
-    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle() || UpdateManager::InDrawCallCycle())
+    if (obj == nullptr)
+    {
+        return;
+    }
+
+    if (m_in_gc_time_)
+    {
+        Logger::Warn<Object>("Cannot immediately destroy object `%s` during GC cycle. Use Object::Destroy instead.",
+                             obj->Name().c_str());
+        Destroy(obj);
+        return;
+    }
+
+    if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle())
     {
         Logger::Warn<Object>(
-            "Cannot immediately destroy object during UpdateManager cycle. Use Object::Destroy instead.");
+        "Cannot immediately destroy object `%s` during UpdateManager cycle. Use Object::Destroy instead.",
+        obj->Name().c_str());
         Destroy(obj);
         return;
     }

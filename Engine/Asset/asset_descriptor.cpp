@@ -10,7 +10,7 @@ namespace engine
 {
 using namespace rapidjson;
 
-path AssetDescriptor::GetAbsoluteAssetFilePath(const path &asset_path)
+path AssetDescriptor::AssetFilePath(const path &asset_path)
 {
     auto absolute_path = asset_path;
     if (absolute_path.is_relative())
@@ -35,15 +35,15 @@ path AssetDescriptor::GetAbsoluteAssetFilePath(const path &asset_path)
     return absolute_path_str;
 }
 
-path AssetDescriptor::GetMetaFilePath(const path &asset_path)
+path AssetDescriptor::MetaFilePath(const path &asset_path)
 {
-    const auto absolute_asset_path = GetAbsoluteAssetFilePath(asset_path);
+    const auto absolute_asset_path = AssetFilePath(asset_path);
     return absolute_asset_path.string() + kMetaFileExtension;
 }
 
 bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
 {
-    const auto descriptor_file_path = GetMetaFilePath(asset_path);
+    const auto descriptor_file_path = MetaFilePath(asset_path);
     if (!exists(descriptor_file_path))
     {
         return false;
@@ -54,292 +54,233 @@ bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
     return true;
 }
 
-void AssetDescriptor::Write(const path &path)
+void AssetDescriptor::WriteMeta(const path &path)
 {
-    PopulateMetaJson();
+    m_meta_data_store_.SetString(kGuidKey, m_guid_.str());
+    m_meta_data_store_.SetString(kTypeKey, m_type_);
+    m_meta_data_store_.SetDataStore(kDataKey, m_user_data_store_);
 
-    StringBuffer string_buffer;
-    PrettyWriter writer(string_buffer);
-    writer.StartObject();
-
-    writer.String(kGuidKey);
-    writer.String(guid.str().c_str());
-
-    writer.String(kTypeKey);
-    writer.String(type_hint.c_str());
-
-    writer.String(kDataKey);
-    auto data_member = m_meta_json_.FindMember(kDataKey);
-    if (data_member == m_meta_json_.MemberEnd())
+    Value guids;
+    guids.SetArray();
+    if (m_objects_.size() > 1)
     {
-        m_meta_json_.AddMember(StringRef(kDataKey),
-                               Value(kObjectType),
-                               m_meta_json_.GetAllocator());
-        data_member = m_meta_json_.FindMember(kDataKey);
-    }
-    data_member->value.Accept(writer);
-
-    writer.EndObject();
-
-    std::ofstream output_stream(path);
-    output_stream << string_buffer.GetString();
-    output_stream.close();
-}
-
-GenericValue<UTF8<>> &AssetDescriptor::GetDataValue()
-{
-    PopulateMetaJson();
-    return m_meta_json_.FindMember(kDataKey)->value;
-}
-
-void AssetDescriptor::PopulateMetaJson()
-{
-    if (!m_meta_json_.IsObject())
-    {
-        m_meta_json_.SetObject();
-        Logger::Warn<AssetDescriptor>("Meta json is not an object! Resetting!");
-    }
-
-    auto &a = m_meta_json_.GetAllocator();
-
-    if (!m_meta_json_.HasMember(kGuidKey))
-    {
-        const auto guid_str = guid.str();
-        auto guid_value = Value();
-        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
-        m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
-    }
-
-    if (!m_meta_json_.HasMember(kTypeKey))
-    {
-        m_meta_json_.AddMember(StringRef(kTypeKey), Value(type_hint.c_str(), type_hint.size(), a), a);
-    }
-
-    if (!m_meta_json_.HasMember(kDataKey))
-    {
-        m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
-    }
-}
-
-#pragma push_macro("GetObject")
-#undef GetObject
-
-std::shared_ptr<AssetDescriptor> AssetDescriptor::Read(const path &path)
-{
-    std::string meta_json;
-    const std::string meta_file_path = GetMetaFilePath(path).string();
-    const std::string asset_file_path = GetAbsoluteAssetFilePath(path).string();
-
-    if (!GetMetaJson(path, meta_json))
-    {
-        Logger::Log<AssetDescriptor>("No meta file `%s` found. Generating!", path.string().c_str());
-        const auto descriptor = std::make_shared<AssetDescriptor>();
-        descriptor->path_hint = asset_file_path;
-        descriptor->guid = xg::newGuid();
-        descriptor->type_hint = path.extension().string();
-
-        descriptor->m_meta_json_.SetObject();
-        auto &a = descriptor->m_meta_json_.GetAllocator();
-
-        auto guid_str = descriptor->guid.str();
-        auto guid_value = Value();
-        guid_value.SetString(guid_str.c_str(), guid_str.size(), a);
-
-        descriptor->m_meta_json_.AddMember(StringRef(kGuidKey), guid_value, a);
-
-        auto type_hint_str = descriptor->type_hint;
-        auto type_hint_value = Value();
-        type_hint_value.SetString(type_hint_str.c_str(), type_hint_str.size(), a);
-
-        descriptor->m_meta_json_.AddMember(StringRef(kTypeKey), type_hint_value, a);
-        descriptor->m_meta_json_.AddMember(StringRef(kDataKey), Value(kObjectType), a);
-        descriptor->Write(meta_file_path);
-
-        if (!GetMetaJson(path, meta_json))
+        // off by one because the main object is also present in the objects
+        for (auto it = std::next(m_objects_.begin(), 1); it != m_objects_.end(); ++it)
         {
-            Logger::Error<AssetDescriptor>("Failed to generate meta file for asset '%s'!", path.string().c_str());
-            return nullptr;
+            auto value = (*it)->Guid().str();
+            auto object_guid = Value(value.c_str(), static_cast<SizeType>(value.size()), m_meta_json_.GetAllocator());
+            guids.PushBack(object_guid, m_meta_json_.GetAllocator());
         }
     }
 
-    auto result = std::make_shared<AssetDescriptor>();
-    result->path_hint = asset_file_path;
+    m_meta_data_store_.SetValue(kSubGuidsKey, guids);
 
-    Reload(result, meta_json);
-    return result;
+    StringBuffer sb;
+    PrettyWriter writer(sb);
+    m_meta_json_.Accept(writer);
+
+    auto file_output = std::ofstream(path);
+    file_output << sb.GetString();
+    file_output.flush();
+    file_output.close();
 }
 
-void AssetDescriptor::Reload(const std::shared_ptr<AssetDescriptor> &instance, const std::string &json)
+AssetDescriptor::AssetDescriptor(const path &file_path) :
+    m_type_(file_path.extension().string()), m_asset_path_(file_path),
+    m_meta_data_store_(nullptr, nullptr), m_user_data_store_(nullptr, nullptr)
 {
-    if (instance->IsInternalAsset())
+    std::string meta_json;
+    const std::string meta_file_path = MetaFilePath(file_path).string();
+    const path asset_file_path = AssetFilePath(file_path);
+
+    m_asset_path_ = asset_file_path;
+    m_type_ = file_path.extension().string();
+
+    m_meta_json_ = Document();
+
+    if (!GetMetaJson(file_path, meta_json))
     {
-        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", instance->guid.str().c_str());
+        Logger::Log<AssetDescriptor>("No meta file `%s` found. Generating!", file_path.string().c_str());
+        m_guid_ = xg::newGuid();
+        m_meta_json_.SetObject();
+        m_meta_data_store_ = PersistentDataStore{&m_meta_json_, &m_meta_json_};
+        auto data_value = Value(kObjectType);
+        m_meta_data_store_.SetValue(kDataKey, data_value);
+        m_user_data_store_ = m_meta_data_store_.GetDataStore(kDataKey);
+
+        WriteMeta(meta_file_path);
+
+        if (!GetMetaJson(file_path, meta_json))
+        {
+            Logger::Error<AssetDescriptor>("Failed to generate meta file for asset '%s'!", file_path.string().c_str());
+            assert(false);
+        }
+    }
+
+    m_meta_json_ = Document();
+    m_meta_json_.Parse(meta_json.c_str());
+
+    m_meta_data_store_ = PersistentDataStore{&m_meta_json_, &m_meta_json_};
+    m_user_data_store_ = m_meta_data_store_.GetDataStore(kDataKey);
+    m_type_ = m_meta_data_store_.GetString(kTypeKey);
+    m_guid_ = xg::Guid(m_meta_data_store_.GetString(kGuidKey));
+
+    // load sub guids
+    auto &objects = m_meta_data_store_.GetValue(kSubGuidsKey);
+    if (!objects.IsArray())
+    {
+        Logger::Warn<AssetDescriptor>("No objects found in meta file for asset '%s'!", m_asset_path_.string().c_str());
+        objects.SetArray();
+    }
+
+    const auto array = objects.GetArray();
+    for (auto i = array.begin(); i != array.end(); ++i)
+        m_sub_guids_.emplace_back(xg::Guid(i->GetString()));
+}
+
+xg::Guid AssetDescriptor::Guid() const
+{
+    return m_guid_;
+}
+
+std::list<xg::Guid> AssetDescriptor::SubGuids() const
+{
+    return m_sub_guids_;
+}
+
+path AssetDescriptor::AssetPath() const
+{
+    return m_asset_path_;
+}
+
+std::shared_ptr<Object> AssetDescriptor::MainObject() const
+{
+    return m_main_object_;
+}
+
+std::list<std::shared_ptr<Object>> AssetDescriptor::Objects() const
+{
+    return m_objects_;
+}
+
+PersistentDataStore &AssetDescriptor::DataStore()
+{
+    return m_user_data_store_;
+}
+
+std::list<ImportLog> AssetDescriptor::ImportLogs() const
+{
+    return m_import_logs_;
+}
+
+bool AssetDescriptor::HasImportError() const
+{
+    return std::ranges::any_of(m_import_logs_, [](const auto &log) {
+        return log.type == ImportLog::kLogType::kError;
+    });
+}
+
+void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
+{
+    m_main_object_ = object;
+
+    std::erase_if(m_objects_, [&object](auto &item) {
+        return item == object;
+    });
+
+    m_objects_.emplace_front(object);
+
+    object->SetGuid(m_guid_);
+    object->SetName(AssetPath().filename().string());
+}
+
+void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
+{
+    if (m_main_object_ == nullptr)
+    {
+        SetMainObject(object);
         return;
     }
 
-    instance->m_meta_json_ = Document();
-    instance->m_meta_json_.Parse(json.c_str());
-    instance->guid = xg::Guid(instance->m_meta_json_.FindMember(kGuidKey)->value.GetString());
-    instance->type_hint = instance->m_meta_json_.FindMember(kTypeKey)->value.GetString();
+    m_objects_.emplace_back(object);
+    const auto offset = m_objects_.size() - 1;
+    if (m_sub_guids_.size() < offset)
+    {
+        m_sub_guids_.emplace_back(object->Guid());
+        return;
+    }
 
-    const auto asset_importer = AssetImporter::Get(instance->type_hint);
+    const auto it = std::next(m_sub_guids_.begin(), offset - 1);
+    object->SetGuid(*it);
+    object->SetName(object->Name() + " (" + AssetPath().filename().string() + ")");
+}
+
+void AssetDescriptor::LogImportError(const std::string &message)
+{
+    m_import_logs_.emplace_back(message, ImportLog::kLogType::kError);
+}
+
+void AssetDescriptor::LogImportWarning(const std::string &message)
+{
+    m_import_logs_.emplace_back(message, ImportLog::kLogType::kWarning);
+}
+
+void AssetDescriptor::Import()
+{
+    m_main_object_ = nullptr;
+    m_objects_.clear();
+
+    const auto asset_importer = AssetImporter::Get(m_type_);
     if (asset_importer == nullptr)
     {
         Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
-                                      instance->type_hint.c_str(), instance->path_hint.string().c_str());
+                                      m_type_.c_str(), AssetPath().string().c_str());
         return;
     }
 
-    auto input_stream = std::ifstream(instance->path_hint);
-    const auto object = asset_importer->Import(input_stream, instance.get());
-    input_stream.close();
-
-    if (object == nullptr)
+    try
     {
-        Logger::Error<AssetDescriptor>("Failed to import asset '%s'!", instance->path_hint.string().c_str());
-        return;
-    }
+        asset_importer->OnImport(this);
+        if (HasImportError())
+            throw std::runtime_error("Contains import error. Will not proceed to save!");
 
-    if (object->Guid() != instance->guid)
+        Save();
+    }
+    catch (const std::runtime_error &e)
     {
-        Logger::Error<AssetDescriptor>("Asset guid mismatch from importer for '%s'! Expected '%s', got '%s'",
-                                       instance->type_hint.c_str(),
-                                       instance->guid.str().c_str(),
-                                       object->Guid().str().c_str());
-        throw std::runtime_error("Asset guid mismatch from AssetImporter!");
+        Logger::Error<AssetDescriptor>(
+            "Failed to import asset '%s': %s",
+            AssetPath().string().c_str(), e.what());
+
+#if defined(DEBUG) || defined(_DEBUG)
+        DebugBreak();
+#endif
     }
-
-    object->SetName(instance->path_hint.filename().string());
-    instance->managed_object = object;
-}
-
-#pragma pop_macro("GetObject")
-
-std::vector<std::string> AssetDescriptor::GetKeys()
-{
-    const auto &data = GetDataValue();
-    std::vector<std::string> keys;
-    for (auto i = data.MemberBegin(); i != data.MemberEnd(); ++i)
+    catch (...)
     {
-        keys.emplace_back(i->name.GetString());
+        Logger::Error<AssetDescriptor>(
+            "Failed to import asset '%s' due to an unknown exception!",
+            AssetPath().string().c_str());
+
+#if defined(DEBUG) || defined(_DEBUG)
+        DebugBreak();
+#endif
     }
-
-    return keys;
-}
-
-void AssetDescriptor::ClearKeys()
-{
-    auto &data = GetDataValue();
-    data.RemoveAllMembers();
-}
-
-void AssetDescriptor::SetString(const std::string &key, const std::string &value)
-{
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
-    auto json_value = Value(value.c_str(), value.size(), m_meta_json_.GetAllocator());
-    GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
-}
-
-void AssetDescriptor::SetInt(const std::string &key, const int value)
-{
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
-    auto json_value = Value(value);
-    GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
-}
-
-void AssetDescriptor::SetFloat(const std::string &key, const float value)
-{
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
-    auto json_value = Value(value);
-    GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
-}
-
-void AssetDescriptor::SetBool(const std::string &key, const bool value)
-{
-    auto json_key = Value(key.c_str(), key.size(), m_meta_json_.GetAllocator());
-    auto json_value = Value(value);
-    GetDataValue().AddMember(json_key, json_value, m_meta_json_.GetAllocator());
-}
-
-std::string AssetDescriptor::GetString(const std::string &key)
-{
-    auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
-    if (json_value == data.MemberEnd())
-    {
-        return "";
-    }
-
-    return json_value->value.GetString();
-}
-
-int AssetDescriptor::GetInt(const std::string &key)
-{
-    auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
-    if (json_value == data.MemberEnd())
-    {
-        return 0;
-    }
-
-    return json_value->value.GetInt();
-}
-
-float AssetDescriptor::GetFloat(const std::string &key)
-{
-    auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
-    if (json_value == data.MemberEnd())
-    {
-        return 0.0f;
-    }
-
-    return json_value->value.GetFloat();
-}
-
-bool AssetDescriptor::GetBool(const std::string &key)
-{
-    auto &data = GetDataValue();
-    const auto json_value = data.FindMember(StringRef(key.c_str(), key.size()));
-    if (json_value == data.MemberEnd())
-    {
-        return false;
-    }
-
-    return json_value->value.GetBool();
-}
-
-IAssetPtr AssetDescriptor::ToAssetPtr()
-{
-    return IAssetPtr::FromAssetDescriptor(shared_from_base<AssetDescriptor>());
 }
 
 void AssetDescriptor::Save()
 {
     if (IsInternalAsset())
     {
-        Logger::Warn<AssetDescriptor>("Cannot save internal asset '%s'", guid.str().c_str());
+        Logger::Warn<AssetDescriptor>("Cannot save internal asset '%s'", m_guid_.str().c_str());
         return;
     }
 
-    std::string json;
-    Write(GetMetaFilePath(path_hint));
+    WriteMeta(MetaFilePath(AssetPath()));
 }
 
-void AssetDescriptor::Reload()
-{
-    if (IsInternalAsset())
-    {
-        Logger::Warn<AssetDescriptor>("Cannot reload internal asset '%s'", guid.str().c_str());
-        return;
-    }
-
-    std::string json;
-    GetMetaJson(path_hint, json);
-    Reload(shared_from_base<AssetDescriptor>(), json);
-}
 bool AssetDescriptor::IsInternalAsset() const
 {
-    return path_hint.string() == kInternalAssetPath;
+    return AssetPath().string() == kInternalAssetPath;
 }
 }

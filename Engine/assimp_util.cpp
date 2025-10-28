@@ -62,7 +62,7 @@ Matrix GetBindPose(const std::vector<std::string> &bone_names, const aiNode *nod
 std::vector<Matrix> GetBindPoses(const std::vector<std::string> &bone_names, const aiMesh *mesh)
 {
     std::vector<Matrix> bind_poses;
-    for (int i = 0; i < mesh->mNumBones; ++i)
+    for (unsigned int i = 0; i < mesh->mNumBones; ++i)
         bind_poses.emplace_back(GetBindPose(bone_names, mesh->mBones[i]->mNode));
     return bind_poses;
 }

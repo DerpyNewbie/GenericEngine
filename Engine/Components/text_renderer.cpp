@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
+#include "Components/camera_component.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -10,6 +11,7 @@ namespace engine
 {
 void TextRenderer::OnInspectorGui()
 {
+    Renderer::OnInspectorGui();
     float pos[2];
     EngineUtil::ToFloat2(pos, position);
     if (ImGui::InputFloat2("position", pos))
@@ -38,7 +40,7 @@ void TextRenderer::OnInspectorGui()
     }
 }
 
-void TextRenderer::OnDraw()
+void TextRenderer::Render()
 {
     if (!font_data.Lock())
     {
@@ -54,6 +56,8 @@ void TextRenderer::OnDraw()
 
 std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return CameraComponent::Current()->GameObject()->Transform();
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::TextRenderer)

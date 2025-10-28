@@ -23,6 +23,7 @@ class Inspector final : public EditorWindow
     static void DrawComponent(const std::shared_ptr<engine::Component> &component);
     static void DrawInspectable(const std::shared_ptr<engine::Inspectable> &inspectable);
     static void DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy, bool root = true);
+    static void DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescriptor> &asset_descriptor);
 
 public:
     std::string Name() override;

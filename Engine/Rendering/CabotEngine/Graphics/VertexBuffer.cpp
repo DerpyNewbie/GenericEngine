@@ -30,6 +30,8 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         return;
     }
 
+    m_pBuffer->SetName(L"VertexBuffer");
+
     // 頂点バッファビューの設定
     m_View.BufferLocation = m_pBuffer->GetGPUVirtualAddress();
     m_View.SizeInBytes = static_cast<UINT>(size);
@@ -73,7 +75,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
         }
         for (size_t i = 0; i < p_init_data->bone_weights.size(); ++i)
         {
-            ptr_.at(i).bones_per_vertex = p_init_data->bone_weights[i].size();
+            ptr_.at(i).bones_per_vertex = static_cast<unsigned int>(p_init_data->bone_weights[i].size());
             for (size_t j = 0; j < p_init_data->bone_weights[i].size(); ++j)
             {
                 ptr_.at(i).bone_index[j] = p_init_data->bone_weights[i][j].bone_index;
@@ -88,7 +90,7 @@ VertexBuffer::VertexBuffer(const Mesh *p_init_data)
     m_IsValid = true;
 }
 
-VertexBuffer::VertexBuffer(UINT num_vertices, const Vertex *p_init_data)
+VertexBuffer::VertexBuffer(size_t num_vertices, const Vertex *p_init_data)
 {
     auto size = sizeof(Vertex) * num_vertices;
     auto stride = sizeof(Vertex);

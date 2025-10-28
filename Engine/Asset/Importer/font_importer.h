@@ -7,6 +7,7 @@ class FontImporter : public AssetImporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;
-    std::shared_ptr<Object> Import(std::istream &input_stream, AssetDescriptor *asset) override;
+    bool IsCompatibleWith(std::shared_ptr<Object> object) override;
+    void OnImport(AssetDescriptor *ctx) override;
 };
 }

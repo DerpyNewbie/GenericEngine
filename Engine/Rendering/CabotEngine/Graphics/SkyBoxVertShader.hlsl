@@ -1,43 +1,53 @@
-cbuffer CameraBuffer : register(b0)
+cbuffer Transforms : register(b1)
 {
-    float4x4 viewProj;
+    float4x4 View;
+    float4x4 Proj;
 }
 
 struct VSInput
 {
-    float3 pos : POSITION; // ’¸“_À•W
-    float4 color : COLOR; // ’¸“_F
-    float3 normal : NORMAL; // –@ü
-    float4 tangent : TANGENT; // Ú‹óŠÔ
-    float2 uv1 : TEXCOOD0; // UV
-    float2 uv2 : TEXCOOD1;
-    float2 uv3 : TEXCOOD2;
-    float2 uv4 : TEXCOOD3;
-    float2 uv5 : TEXCOOD4;
-    float2 uv6 : TEXCOOD5;
-    float2 uv7 : TEXCOOD6;
-    float2 uv8 : TEXCOOD7;
-    uint bones_per_vertex : BONESPERVERTEX;
-    uint4 bone_id : BONEINDEX;
-    float4 bone_weight : BONEWEIGHT;
+    float3 pos : POSITION; // ç«‹æ–¹ä½“ã®é ‚ç‚¹åº§æ¨™
 };
 
 struct VSOutput
 {
-    float4 pos : SV_POSITION;
-    float3 dir : TEXCOORD;
+    float4 svpos : SV_POSITION; // æŠ•å½±å¾Œã®ã‚¯ãƒªãƒƒãƒ—åº§æ¨™
+    float3 dir : TEXCOORD0; // ã‚­ãƒ¥ãƒ¼ãƒ–ãƒãƒƒãƒ—ç”¨ã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«
 };
+
+float4x4 RemoveTranslation(float4x4 view)
+{
+    float4x4 result = view;
+
+    // 4åˆ—ç›® (translationéƒ¨åˆ†) ã‚’ã‚¼ãƒ­ã«ã™ã‚‹
+    result[0][3] = 0;
+    result[1][3] = 0;
+    result[2][3] = 0;
+
+    // é½¢ã¯ãã®ã¾ã¾(åŒæ¬¡åº§æ¨™ç”¨ã®w)
+    result[3][3] = 1;
+
+    return result;
+}
 
 VSOutput vert(VSInput input)
 {
     VSOutput output;
 
-    // ƒJƒƒ‰ˆÊ’u‚Í–³‹i‰ñ“]‚Ì‚İj
-    float4 worldPos = float4(input.pos, 1.0f);
-    float4 clipPos = mul(viewProj, worldPos);
-    clipPos.z = clipPos.w; // z=1.0‚ÉŒÅ’è
-    output.pos = clipPos;
+    // View ã®å¹³è¡Œç§»å‹•ã ã‘ã‚’æ¶ˆã™
+    float4x4 viewNoTranslation = RemoveTranslation(View);
+    // VPåˆæˆ
+    float4x4 vp = mul(Proj, viewNoTranslation);
 
-    output.dir = input.pos; // ƒJƒƒ‰•ûŒüƒxƒNƒgƒ‹
+    // é ‚ç‚¹å¤‰æ›
+    float4 clipPos = mul(vp, float4(input.pos, 1.0f));
+
+    // å¸¸ã«å¥¥ã¸
+    clipPos.z = clipPos.w;
+    output.svpos = clipPos;
+
+    // ã‚µãƒ³ãƒ—ãƒ«æ–¹å‘
+    output.dir = input.pos;
+
     return output;
 }

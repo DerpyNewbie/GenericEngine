@@ -1,6 +1,6 @@
 # GenericEngine
 
-GenericEngine は Component 志向で開発が出来る C++ 製のゲームエンジンです。
+GenericEngine は Component 指向で開発が出来る C++ 製のゲームエンジンです。
 
 ## FAQ
 

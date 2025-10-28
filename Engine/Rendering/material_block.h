@@ -55,7 +55,11 @@ public:
 
     void OnInspectorGui() override;
 
-    void LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params);
+    template <typename T>
+    bool SetMaterialData(const std::string &name, T material_data);
+
+    void LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+                              const std::vector<MaterialDataPair> &resource_material_data = {});
 
     ShaderDataIndex *GetShaderDataIndex(kShaderType type);
     int GetOffset(kShaderType type) const;
@@ -77,4 +81,22 @@ public:
            CEREAL_NVP(material_data), CEREAL_NVP(pixel_shader_index), CEREAL_NVP(vertex_shader_index));
     }
 };
+
+template <typename T>
+bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
+{
+    for (auto &data : this->material_data | std::views::transform(&MaterialDataPair::data))
+    {
+        if (data->parameter.name == name)
+        {
+            auto casted_data = std::dynamic_pointer_cast<MaterialData<T>>(data);
+            if (casted_data == nullptr)
+                return false;
+            casted_data->SetValue(material_data);
+            return true;
+        }
+    }
+    return false;
+}
+
 }

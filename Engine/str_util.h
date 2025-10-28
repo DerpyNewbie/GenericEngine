@@ -10,11 +10,11 @@
 namespace StringUtil
 {
 /// <summary>
-/// 指定されたコードページの文字列をワイド文字列(wstring)に変換します。
+/// Converts a string with the specified code page to a wide string (wstring).
 /// </summary>
-/// <param name="string">変換する入力文字列。</param>
-/// <param name="src_code_page">入力文字列のソースコードページ。指定されない場合は CP_UTF8 がデフォルトとして使用されます。</param>
-/// <returns>入力文字列を変換したワイド文字列(wstring)表現を返します。</returns>
+/// <param name="string">The input string to convert.</param>
+/// <param name="src_code_page">The source code page of the input string. If not specified, CP_UTF8 is used as default.</param>
+/// <returns>Returns the wide string (wstring) representation of the converted input string.</returns>
 static std::wstring ConvertToWString(const std::string &string, const unsigned int src_code_page = CP_UTF8)
 {
     const int size = MultiByteToWideChar(src_code_page, 0, string.data(), -1, nullptr, 0);
@@ -30,11 +30,11 @@ static std::wstring ConvertToWString(const std::string &string, const unsigned i
 }
 
 /// <summary>
-/// 指定された wstring を指定のコードページに変換します。
+/// Converts the specified wstring to the specified code page.
 /// </summary>
-/// <param name="wstring">変換する入力 wstring。</param>
-/// <param name="dst_code_page">返される文字列の出力コードページ。指定されない場合は CP_UTF8 がデフォルトとして使用されます。</param>
-/// <returns>入力 wstring を変換した文字列表現を返します。</returns>
+/// <param name="wstring">The input wstring to convert.</param>
+/// <param name="dst_code_page">The output code page for the returned string. If not specified, CP_UTF8 is used as default.</param>
+/// <returns>Returns the string representation of the converted input wstring.</returns>
 static std::string ConvertToString(const std::wstring &wstring, const unsigned int dst_code_page = CP_UTF8)
 {
     const int size = WideCharToMultiByte(dst_code_page, 0, wstring.data(), -1, nullptr, 0, nullptr, nullptr);

@@ -1,5 +1,7 @@
 #pragma once
 #include "asset_ptr.h"
+#include "persistent_data_store.h"
+#include "Importer/import_log.h"
 
 namespace engine
 {
@@ -13,43 +15,45 @@ private:
     static constexpr auto kGuidKey = "guid";
     static constexpr auto kTypeKey = "type";
     static constexpr auto kDataKey = "data";
+    static constexpr auto kSubGuidsKey = "objects";
+    static constexpr auto kObjectsTypeKey = "type";
 
-    rapidjson::Document m_meta_json_ = rapidjson::Document();
+    xg::Guid m_guid_ = xg::Guid();
+    std::list<xg::Guid> m_sub_guids_;
+    std::string m_type_;
+    std::filesystem::path m_asset_path_;
+    std::shared_ptr<Object> m_main_object_;
+    std::list<std::shared_ptr<Object>> m_objects_;
+    std::list<ImportLog> m_import_logs_;
+    rapidjson::Document m_meta_json_;
+    PersistentDataStore m_meta_data_store_;
+    PersistentDataStore m_user_data_store_;
 
-    static std::filesystem::path GetAbsoluteAssetFilePath(const std::filesystem::path &asset_path);
-    static std::filesystem::path GetMetaFilePath(const std::filesystem::path &asset_path);
+    static std::filesystem::path AssetFilePath(const std::filesystem::path &asset_path);
+    static std::filesystem::path MetaFilePath(const std::filesystem::path &asset_path);
     static bool GetMetaJson(const std::filesystem::path &asset_path, std::string &out_json);
-
-    static std::shared_ptr<AssetDescriptor> Read(const std::filesystem::path &path);
-    static void Reload(const std::shared_ptr<AssetDescriptor> &instance, const std::string &json);
-
-    void Write(const std::filesystem::path &path);
-    rapidjson::GenericValue<rapidjson::UTF8<>> &GetDataValue();
-    void PopulateMetaJson();
+    void WriteMeta(const std::filesystem::path &path);
 
 public:
-    xg::Guid guid = xg::Guid();
-    std::filesystem::path path_hint = "";
-    std::string type_hint;
-    std::shared_ptr<Object> managed_object = nullptr; // can be null
+    explicit AssetDescriptor(const std::filesystem::path &file_path);
 
-    std::vector<std::string> GetKeys();
-    void ClearKeys();
+    [[nodiscard]] xg::Guid Guid() const;
+    [[nodiscard]] std::list<xg::Guid> SubGuids() const;
+    [[nodiscard]] std::filesystem::path AssetPath() const;
+    [[nodiscard]] std::shared_ptr<Object> MainObject() const;
+    [[nodiscard]] std::list<std::shared_ptr<Object>> Objects() const;
+    [[nodiscard]] PersistentDataStore &DataStore();
+    [[nodiscard]] std::list<ImportLog> ImportLogs() const;
+    [[nodiscard]] bool HasImportError() const;
 
-    void SetString(const std::string &key, const std::string &value);
-    void SetInt(const std::string &key, int value);
-    void SetFloat(const std::string &key, float value);
-    void SetBool(const std::string &key, bool value);
+    void SetMainObject(std::shared_ptr<Object> object);
+    void AddObject(std::shared_ptr<Object> object);
 
-    std::string GetString(const std::string &key);
-    int GetInt(const std::string &key);
-    float GetFloat(const std::string &key);
-    bool GetBool(const std::string &key);
+    void LogImportError(const std::string &message);
+    void LogImportWarning(const std::string &message);
 
-    IAssetPtr ToAssetPtr();
-
+    void Import();
     void Save();
-    void Reload();
 
     [[nodiscard]] bool IsInternalAsset() const;
 };

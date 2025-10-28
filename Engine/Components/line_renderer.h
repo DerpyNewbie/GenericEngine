@@ -17,12 +17,16 @@ class LineRenderer : public Renderer
     bool m_is_valid_ = true;
 
 public:
+    // FIXME: store raw vertices/indices in component to make them able to get or editable in inspector 
     void SetVertices(std::vector<Vertex> vertices);
     void SetIndices(std::vector<uint32_t> indices);
 
-    void OnInspectorGui() override;
+    void Render() override;
 
-    void OnDraw() override;
-
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Renderer>(this));
+    }
 };
 }

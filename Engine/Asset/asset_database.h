@@ -30,7 +30,7 @@ public:
     static std::shared_ptr<AssetHierarchy> GetRootAssetHierarchy();
     static std::shared_ptr<AssetHierarchy> GetAssetHierarchy(const path &path);
 
-    static void ReloadAsset(const xg::Guid &guid);
+    static void Reimport(const xg::Guid &guid);
 
     static std::shared_ptr<AssetDescriptor> GetAssetDescriptor(const xg::Guid &guid);
 
@@ -49,7 +49,7 @@ public:
     template <typename T>
     static AssetPtr<T> GetAsset(const path &path)
     {
-        return reinterpret_cast<AssetPtr<T>>(GetAsset(path));
+        return AssetPtr<T>::FromIAssetPtr(GetAsset(path));
     }
 
     template <typename T>

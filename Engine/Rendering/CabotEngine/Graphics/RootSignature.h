@@ -6,7 +6,12 @@ enum kRootParameterIndex
 {
     kWorldCBV,
     kViewProjCBV,
+    kCascadeSlicesCBV,
+    kLightCountCBV,
     kBoneSRV,
+    kLightSRV,
+    kLightViewProj,
+    kShadowMapSRV,
     kVertexCBV,
     kVertexSRV,
     kVertexUAV,
@@ -25,6 +30,8 @@ class RootSignature
     ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
 
 public:
+    constexpr static int kPreDefinedVariableCount = 8;
+
     static std::shared_ptr<RootSignature> Instance();
     static ID3D12RootSignature *Get();
     static bool IsValid();

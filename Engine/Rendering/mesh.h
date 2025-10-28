@@ -10,7 +10,7 @@ namespace engine
 class Mesh : public Object
 {
 public:
-    unsigned int max_bones_in_vertex = 0;
+    size_t max_bones_in_vertex = 0;
 
     std::vector<Vector3> vertices;
     std::vector<Color> colors; // per-vertex
@@ -25,8 +25,8 @@ public:
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
 
     void Append(Mesh other);
-    std::vector<Vector2> *GetUV(int index);
-    bool HasUV(int index) const;
+    std::vector<Vector2> *GetUV(size_t index);
+    bool HasUV(size_t index) const;
     bool HasTangents() const;
     bool HasNormals() const;
     bool HasColors() const;

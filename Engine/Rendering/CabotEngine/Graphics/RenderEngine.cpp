@@ -14,8 +14,6 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         debugController->EnableDebugLayer();
     }
 
-    m_frame_buffer_width_ = windowWidth;
-    m_frame_buffer_height_ = windowHeight;
     m_h_wnd_ = hwnd;
 
     if (!CreateDevice())
@@ -72,6 +70,21 @@ void RenderEngine::BeginRender()
     m_p_command_list_->Reset(m_p_allocator_[m_current_back_buffer_index_].Get(),
                              nullptr);
 
+    const auto ds_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_p_depth_stencil_buffer_.Get(),
+        D3D12_RESOURCE_STATE_COMMON,
+        D3D12_RESOURCE_STATE_DEPTH_WRITE
+        );
+    m_p_command_list_->ResourceBarrier(1, &ds_barrier);
+}
+
+void RenderEngine::SetMainRenderTarget(const Color background_color)
+{
+    // レンダーターゲットが使用可能になるまで待つ
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_, D3D12_RESOURCE_STATE_PRESENT,
+                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
+    m_p_command_list_->ResourceBarrier(1, &barrier);
+
     // ビューポートとシザー矩形を設定
     m_p_command_list_->RSSetViewports(1, &m_viewport_);
     m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
@@ -80,33 +93,50 @@ void RenderEngine::BeginRender()
     currentRtvHandle.ptr += m_current_back_buffer_index_ * m_rtv_descriptor_size_;
     auto currentDsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    // レンダーターゲットが使用可能になるまで待つ
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_,
-                                                        D3D12_RESOURCE_STATE_PRESENT,
-                                                        D3D12_RESOURCE_STATE_RENDER_TARGET);
-    m_p_command_list_->ResourceBarrier(1, &barrier);
-
-    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_depth_stencil_buffer_.Get(),
-        D3D12_RESOURCE_STATE_COMMON,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE
-        );
-    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
-
     // レンダーターゲットを設定
     m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, m_background_color_, 0,
-                                             nullptr);
+    float clearColor[] = {background_color.R(), background_color.G(), background_color.B(), background_color.A()};
+    m_p_command_list_->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
+
+    // 深度ステンシルビューをクリア
+    m_p_command_list_->ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+}
+
+void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
+                                   const Color background_color) const
+{
+    // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
+    int num_render_target = 0;
+    D3D12_CPU_DESCRIPTOR_HANDLE *currentRtvHandle = nullptr;
+    if (rtv_heap != nullptr)
+    {
+        num_render_target = 1;
+        auto rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+        currentRtvHandle = &rtv_handle;
+    }
+
+    // 深度ステンシルのディスクリプタヒープの開始アドレス取得
+    D3D12_CPU_DESCRIPTOR_HANDLE currentDsvHandle = dsv_heap == nullptr
+                                                       ? m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart()
+                                                       : dsv_heap->GetCPUDescriptorHandleForHeapStart();
+
+    // ビューポートとシザー矩形を設定
+    m_p_command_list_->RSSetViewports(1, &m_viewport_);
+    m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
+
+    // レンダーターゲットを設定
+    m_p_command_list_->OMSetRenderTargets(num_render_target, currentRtvHandle, FALSE, &currentDsvHandle);
+
+    // レンダーターゲットをクリア
+    if (currentRtvHandle != nullptr)
+        m_p_command_list_->ClearRenderTargetView(*currentRtvHandle, background_color, 0,
+                                                 nullptr);
 
     // 深度ステンシルビューをクリア
     m_p_command_list_->
         ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-
-    CommandList()->SetGraphicsRootSignature(engine::RootSignature::Get());
-    auto descriptor_heap = DescriptorHeap::GetHeap();
-    CommandList()->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 void RenderEngine::EndRender()
@@ -141,14 +171,15 @@ void RenderEngine::EndRender()
     m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
-void RenderEngine::SetBackgroundColor(Color color)
+void RenderEngine::SetBackgroundColor(const Color color)
 {
     m_background_color_ = color;
 }
 
 bool RenderEngine::CreateDevice()
 {
-    auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf()));
+    const auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0,
+                                      IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf()));
     return SUCCEEDED(hr);
 }
 
@@ -177,8 +208,8 @@ bool RenderEngine::CreateSwapChain()
 
     // スワップチェインの生成
     DXGI_SWAP_CHAIN_DESC desc = {};
-    desc.BufferDesc.Width = m_frame_buffer_width_;
-    desc.BufferDesc.Height = m_frame_buffer_height_;
+    desc.BufferDesc.Width = engine::Application::WindowWidth();
+    desc.BufferDesc.Height = engine::Application::WindowHeight();
     desc.BufferDesc.RefreshRate.Numerator = 60;
     desc.BufferDesc.RefreshRate.Denominator = 1;
     desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
@@ -279,8 +310,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = static_cast<float>(m_frame_buffer_width_);
-    m_viewport_.Height = static_cast<float>(m_frame_buffer_height_);
+    m_viewport_.Width = static_cast<float>(engine::Application::Instance()->WindowWidth());
+    m_viewport_.Height = static_cast<float>(engine::Application::Instance()->WindowHeight());
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }
@@ -288,9 +319,9 @@ void RenderEngine::CreateViewPort()
 void RenderEngine::CreateScissorRect()
 {
     m_scissor_.left = 0;
-    m_scissor_.right = m_frame_buffer_width_;
+    m_scissor_.right = engine::Application::Instance()->WindowWidth();
     m_scissor_.top = 0;
-    m_scissor_.bottom = m_frame_buffer_height_;
+    m_scissor_.bottom = engine::Application::Instance()->WindowHeight();
 }
 
 bool RenderEngine::CreateRenderTarget()
@@ -350,8 +381,8 @@ bool RenderEngine::CreateDepthStencil()
     CD3DX12_RESOURCE_DESC resourceDesc(
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
-        m_frame_buffer_width_,
-        m_frame_buffer_height_,
+        engine::Application::WindowWidth(),
+        engine::Application::WindowHeight(),
         1,
         1,
         DXGI_FORMAT_D32_FLOAT,
@@ -363,10 +394,12 @@ bool RenderEngine::CreateDepthStencil()
         &heapProp,
         D3D12_HEAP_FLAG_NONE,
         &resourceDesc,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        D3D12_RESOURCE_STATE_COMMON,
         &dsvClearValue,
         IID_PPV_ARGS(m_p_depth_stencil_buffer_.ReleaseAndGetAddressOf())
         );
+
+    m_p_depth_stencil_buffer_->SetName(L"DepthStencilBuffer");
 
     if (FAILED(hr))
     {

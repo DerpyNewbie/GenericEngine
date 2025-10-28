@@ -12,6 +12,7 @@ class SkinnedMeshRenderer : public MeshRenderer
     static bool m_draw_bones_;
 
     std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffers_;
+    std::array<std::shared_ptr<DescriptorHandle>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffer_handles_;
 
     Matrix WorldMatrix() override;
 
@@ -29,9 +30,9 @@ public:
 
     void OnInspectorGui() override;
 
-    void OnDraw() override;
+    void UpdateBuffer() override;
+    void Render() override;
     void ReconstructBuffer() override;
-    void UpdateBuffers() override;
 
     template <class Archive>
     void serialize(Archive &ar)

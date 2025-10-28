@@ -10,6 +10,8 @@ class Scene;
 
 class GameObject final : public Object
 {
+    friend class RectTransform;
+
 public:
     explicit GameObject();
 
@@ -112,7 +114,7 @@ public:
     }
 
     template <typename T>
-    std::vector<std::shared_ptr<T>> GetComponentInChildren()
+    std::shared_ptr<T> GetComponentInChildren()
     {
         auto result = GetComponent<T>();
         if (result != nullptr)

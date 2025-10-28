@@ -10,22 +10,22 @@ using MaterialFactory =
 std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
 
 std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-    {"int", [](const ShaderParameter &param) {
-        return std::make_shared<MaterialData<int>>(0, param);
-    }},
-    {"float", [](const ShaderParameter &param) {
-        return std::make_shared<MaterialData<float>>(0, param);
-    }},
-    {"vector<Matrix>", [](const ShaderParameter &param) {
-        auto identity = std::vector{Matrix::Identity};
-        return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
-    }},
-    {"Texture2D", [](const ShaderParameter &param) {
-        auto texture = Texture2DImporter::GetColorTexture({1, 0, 1, 1});
-        return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
-            AssetPtr<Texture2D>::FromIAssetPtr(texture),
-            param);
-    }}
+{"int", [](const ShaderParameter &param) {
+    return std::make_shared<MaterialData<int>>(0, param);
+}},
+{"float", [](const ShaderParameter &param) {
+    return std::make_shared<MaterialData<float>>(0.0F, param);
+}},
+{"vector<Matrix>", [](const ShaderParameter &param) {
+    auto identity = std::vector{Matrix::Identity};
+    return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
+}},
+{"Texture2D", [](const ShaderParameter &param) {
+    auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
+    return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
+    AssetPtr<Texture2D>::FromIAssetPtr(texture),
+    param);
+}}
 };
 
 std::shared_ptr<IMaterialData> CreateMaterialData(const std::weak_ptr<ShaderParameter> &shader_param)
@@ -113,12 +113,30 @@ void MaterialBlock::OnInspectorGui()
     }
 }
 
-void MaterialBlock::LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params)
+void MaterialBlock::LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+                                         const std::vector<MaterialDataPair> &resource_material_data)
 {
     for (auto &param : shader_params)
     {
-        const auto material_data = CreateMaterialData(param);
-        Insert(material_data);
+        bool found = false;
+        if (!resource_material_data.empty())
+        {
+            for (auto material_data_pair : resource_material_data)
+            {
+                if (param->name == material_data_pair.data->parameter.name)
+                {
+                    Insert(material_data_pair.data);
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            const auto material_data = CreateMaterialData(param);
+            Insert(material_data);
+        }
     }
     UpdateBuffer();
 }

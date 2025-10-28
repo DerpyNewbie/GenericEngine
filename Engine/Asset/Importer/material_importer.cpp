@@ -11,9 +11,29 @@ std::vector<std::string> MaterialImporter::SupportedExtensions()
     return {".material"};
 }
 
-std::shared_ptr<Object> MaterialImporter::Import(std::istream &input_stream, AssetDescriptor *asset)
+bool MaterialImporter::IsCompatibleWith(const std::shared_ptr<Object> object)
 {
+    return std::dynamic_pointer_cast<Material>(object) != nullptr;
+}
+
+void MaterialImporter::OnImport(AssetDescriptor *ctx)
+{
+    std::ifstream file(ctx->AssetPath());
     Serializer serializer;
-    return serializer.Load<Material>(input_stream);
+
+    ctx->SetMainObject(serializer.Load<Material>(file));
+}
+
+void MaterialImporter::OnExport(AssetDescriptor *ctx)
+{
+    const auto material = std::dynamic_pointer_cast<Material>(ctx->MainObject());
+    if (material == nullptr)
+    {
+        assert(false && "This object cannot be exported with MaterialExporter");
+    }
+
+    std::ofstream file(ctx->AssetPath());
+    Serializer serializer;
+    serializer.Save(file, material);
 }
 }
