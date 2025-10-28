@@ -15,5 +15,12 @@ public:
     Vector3 GetPos() override;
     int ShadowMapCount() override;
     std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_light_data_));
+    }
 };
 }

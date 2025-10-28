@@ -93,3 +93,5 @@ std::vector<Matrix> engine::SpotLight::CalcViewProj(const std::array<Vector3, 8>
                                                     m_light_data_.range);
     return {view * proj};
 }
+
+CEREAL_REGISTER_TYPE(engine::SpotLight)
