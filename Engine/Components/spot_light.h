@@ -7,7 +7,7 @@ class SpotLight : public Light
 {
 
 public:
-    void OnAwake() override;
+    void OnConstructed() override;
     void OnInspectorGui() override;
     void OnUpdate() override;
 

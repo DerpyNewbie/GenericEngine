@@ -5,8 +5,9 @@
 #include "camera_component.h"
 #include "gui.h"
 
-void engine::SpotLight::OnAwake()
+void engine::SpotLight::OnConstructed()
 {
+    Light::OnConstructed();
     m_light_data_.type = static_cast<int>(kLightType::kSpotLight);
     m_light_data_.inner_cos = cos(DirectX::XMConvertToRadians(45.0f));
     m_light_data_.outer_cos = cos(DirectX::XMConvertToRadians(50.0f));
