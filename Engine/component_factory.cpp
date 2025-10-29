@@ -8,6 +8,7 @@
 #include "Components/image.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
+#include "Components/blender.h"
 #include "Components/camera_component.h"
 #include "Components/controller.h"
 #include "Components/directional_light.h"
@@ -61,12 +62,13 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RotatorComponent);
     ADD_COMPONENT(AnimationComponent);
     ADD_COMPONENT(RenderingSettingsComponent);
+    ADD_COMPONENT(Blender);
 #undef ADD_COMPONENT
 }
 
-IComponentFactory::IComponentFactory(const std::string &name): m_name_(name)
-{
-}
+IComponentFactory::IComponentFactory(const std::string &name):
+    m_name_(name)
+{}
 
 std::string IComponentFactory::Name()
 {

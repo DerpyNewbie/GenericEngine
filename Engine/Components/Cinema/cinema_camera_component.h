@@ -1,7 +1,7 @@
 #pragma once
 #include "Components/component.h"
 #include "Components/transform.h"
-#include "Components/camera.h"
+#include "Components/camera_component.h"
 #include "Asset/asset_ptr.h"
 
 namespace engine

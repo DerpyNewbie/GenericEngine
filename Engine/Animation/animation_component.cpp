@@ -11,47 +11,6 @@ namespace engine
 
 namespace
 {
-Quaternion Slerp(const Quaternion &a, const Quaternion &b, const float t)
-{
-    float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
-    Quaternion end = b;
-    if (dot < 0.0f)
-    {
-        dot = -dot;
-        end = Quaternion(-b.x, -b.y, -b.z, -b.w);
-    }
-
-    if (Mathf::Approximately(dot, 1.0F))
-    {
-        auto result = Quaternion(
-            a.x + t * (end.x - a.x),
-            a.y + t * (end.y - a.y),
-            a.z + t * (end.z - a.z),
-            a.w + t * (end.w - a.w)
-            );
-        result.Normalize();
-        return result;
-    }
-
-    const float theta_0 = acosf(dot);
-    const float theta = theta_0 * t;
-
-    const float sin_theta = sinf(theta);
-    const float sin_theta_0 = sinf(theta_0);
-
-    const float s0 = cosf(theta) - dot * sin_theta / sin_theta_0;
-    const float s1 = sin_theta / sin_theta_0;
-
-    const auto result = Quaternion(
-        (a.x * s0) + (end.x * s1),
-        (a.y * s0) + (end.y * s1),
-        (a.z * s0) + (end.z * s1),
-        (a.w * s0) + (end.w * s1)
-        );
-    return result;
-}
-
 template <typename T>
 T Lerp(float time, const std::vector<std::pair<float, T>> &keys, size_t &last_index)
 {
@@ -258,7 +217,7 @@ void AnimationComponent::Sample()
                 final_trs.translate += default_matrix.translate * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
-                final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
+                final_trs.rotation = Mathf::Slerp(final_trs.rotation, default_matrix.rotation, t);
                 continue;
             }
 
@@ -267,7 +226,7 @@ void AnimationComponent::Sample()
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            final_trs.rotation = Slerp(final_trs.rotation, rot, t);
+            final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
 
         }
 

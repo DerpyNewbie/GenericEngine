@@ -1,55 +1,65 @@
 #include "pch.h"
 
 #include "cinema_brain_component.h"
+
+#include "engine_time.h"
 #include "gui.h"
+#include "Animation/animation_component.h"
 
 namespace engine
 {
 void CinemaBrainComponent::OnInspectorGui()
 {
     Gui::PropertyField("Target Camera", m_target_camera_);
-    Gui::PropertyField("Cinema Cameras", m_cinema_cameras_);
 }
 
 void CinemaBrainComponent::OnUpdate()
 {
     const auto target = m_target_camera_.CastedLock();
-    if (target == nullptr)
+    if (target == nullptr || !m_blend_.is_blending)
     {
         return;
     }
-
-    auto result = Matrix::Identity;
-    for (auto &[camera_ptr, blend] : m_cinema_cameras_)
+    m_blend_.time += Time::GetDeltaTime();
+    if (m_blend_.time > m_blend_.duration)
     {
-        auto camera = camera_ptr.CastedLock();
-        if (camera == nullptr)
-        {
-            continue;
-        }
-
-        camera->ApplyTransform();
-
-        auto look_at = camera->GetLookAtMatrix();
-        result += look_at * blend;
+        m_blend_.is_blending = false;
+        return;
     }
+
+    TRS final_trs;
+
+    final_trs.rotation = Quaternion::Identity;
+
+    float t = m_blend_.time / m_blend_.duration;
+
+    m_blend_.from->ApplyTransform();
+    m_blend_.to->ApplyTransform();
 
     Vector3 pos, sca;
     Quaternion rot;
-    result.Decompose(sca, rot, pos);
 
-    target->GameObject()->Transform()->SetPositionAndRotation(pos, rot);
+    m_blend_.from->GameObject()->Transform()->WorldMatrix().Decompose(sca, rot, pos);
+    final_trs.translate += pos * t;
+    final_trs.scale += sca * t;
+    final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
+
+    t = 1.f - t;
+    m_blend_.to->GameObject()->Transform()->WorldMatrix().Decompose(sca, rot, pos);
+    final_trs.translate += pos * t;
+    final_trs.scale += sca * t;
+    final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
+
+    m_target_camera_.CastedLock()->GameObject()->Transform()->SetLocalMatrix(final_trs.GetMatrix());
 }
-void CinemaBrainComponent::AddCamera(const std::shared_ptr<CinemaCameraComponent> &cinema_camera,
-                                     float blend_coefficient)
+
+void CinemaBrainComponent::Blend(const std::shared_ptr<CinemaCameraComponent> &from, const std::shared_ptr<CinemaCameraComponent> &to, float duration, float time)
 {
-    m_cinema_cameras_.emplace_back(AssetPtr<CinemaCameraComponent>::FromManaged(cinema_camera), blend_coefficient);
-}
-void CinemaBrainComponent::RemoveCamera(std::shared_ptr<CinemaCameraComponent> cinema_camera)
-{
-    std::erase_if(m_cinema_cameras_, [&](auto &pair) {
-        return pair.first.CastedLock() == cinema_camera;
-    });
+    m_blend_.from = from;
+    m_blend_.to = to;
+    m_blend_.duration = duration;
+    m_blend_.time = time;
+    m_blend_.is_blending = true;
 }
 }
 

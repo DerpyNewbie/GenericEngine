@@ -21,6 +21,11 @@ const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &v
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
     frustum.Transform(frustum, view.Invert());
 
+    if (isnan(Vector3(frustum.Origin).Length()))
+    {
+        return {};
+    }
+
     std::vector<std::shared_ptr<engine::Renderer>> results;
     for (auto renderer : renderers)
     {
