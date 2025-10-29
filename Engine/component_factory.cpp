@@ -8,7 +8,7 @@
 #include "Components/image.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
-#include "Components/blender.h"
+#include "Components/camera_transitioner.h"
 #include "Components/camera_component.h"
 #include "Components/controller.h"
 #include "Components/directional_light.h"
@@ -62,7 +62,7 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RotatorComponent);
     ADD_COMPONENT(AnimationComponent);
     ADD_COMPONENT(RenderingSettingsComponent);
-    ADD_COMPONENT(Blender);
+    ADD_COMPONENT(CameraTransitioner);
 #undef ADD_COMPONENT
 }
 

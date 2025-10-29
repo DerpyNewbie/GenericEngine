@@ -6,7 +6,7 @@
 
 namespace engine
 {
-class Blender : public Component
+class CameraTransitioner : public Component
 {
     AssetPtr<CinemaCameraComponent> m_from_camera_;
     AssetPtr<CinemaCameraComponent> m_to_camera_;

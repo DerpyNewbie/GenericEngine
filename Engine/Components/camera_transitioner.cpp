@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "blender.h"
+#include "camera_transitioner.h"
 
 #include "gui.h"
 
 namespace engine
 {
-void Blender::OnInspectorGui()
+void CameraTransitioner::OnInspectorGui()
 {
     Gui::PropertyField("FromCamera", m_from_camera_);
     Gui::PropertyField("ToCamera", m_to_camera_);

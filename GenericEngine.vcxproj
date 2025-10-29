@@ -60,7 +60,7 @@
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
         <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
-        <ClCompile Include="Engine\Components\blender.cpp"/>
+        <ClCompile Include="Engine\Components\camera_transitioner.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
@@ -254,7 +254,7 @@
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
         <ClInclude Include="Engine\Audio\audio_source_component.h"/>
-        <ClInclude Include="Engine\Components\blender.h"/>
+        <ClInclude Include="Engine\Components\camera_transitioner.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
