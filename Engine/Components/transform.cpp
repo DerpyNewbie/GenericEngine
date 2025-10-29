@@ -4,6 +4,7 @@
 #include "game_object.h"
 #include "gui.h"
 #include "scene.h"
+#include "scene_manager.h"
 
 namespace engine
 {
@@ -397,6 +398,12 @@ void Transform::RecalculateMatrices()
     }
 }
 
+void Transform::OnAwake()
+{
+    SceneManager::MoveGameObject(GameObject(), GameObject()->Scene());
+    RecalculateMatrices();
+}
+
 void Transform::OnDestroy()
 {
     const auto children = m_children_;
@@ -412,7 +419,6 @@ void Transform::OnDestroy()
     }
 
     SetParent(nullptr);
-    m_owner_ = nullptr;
 }
 } // namespace engine
 
