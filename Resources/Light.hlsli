@@ -15,13 +15,20 @@ struct Light
     float outer_cos;
     float2 padding;
 };
+cbuffer SceneData : register(b2)
+{
+    float2 screen_size;
+    float2 shadow_map_size;
+    float time;
+    float deltatime;
+}
 
-cbuffer ShadowCascadeSlices : register(b2)
+cbuffer ShadowCascadeSlices : register(b3)
 {
     float cascade_slices[SHADOW_CASCADE_COUNT];
 }
 
-cbuffer LightCount : register (b3)
+cbuffer LightCount : register (b4)
 {
     int light_count;
 }
@@ -36,9 +43,9 @@ SamplerComparisonState shadowSampler : register (s1);
 float SampleShadowPCF(float3 shadowCoord, int lightIndex)
 {
     float shadow = 0.0;
-    const float2 texelSize = 1.0 / float2(1920, 1065);
+    const float2 texelSize = 1.0 / float2(shadow_map_size.x, shadow_map_size.y);
 
-    shadowCoord.z -= 0.001f;
+    shadowCoord.z -= 0.005f;
 
     [unroll]
     for (int x = -1; x <= 1; x++)

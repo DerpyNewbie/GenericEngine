@@ -61,7 +61,7 @@ public:
     void BeginRender();
     void SetMainRenderTarget(Color background_color);
     void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
-                         Color background_color) const;
+                         Color background_color, D3D12_VIEWPORT *viewport = nullptr, D3D12_RECT *scissor = nullptr) const;
     void EndRender();
     void WaitRender();
 

@@ -138,15 +138,19 @@ void RenderPipeline::SetSceneData()
     const auto cmd_list = RenderEngine::CommandList();
     SceneData scene_data;
     scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
+    scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
     scene_data.time = Time::Get()->TimeSinceStartUp();
     scene_data.delta_time = Time::GetDeltaTime();
 
-    m_scene_data_buffer_
+    m_scene_data_buffer_->UpdateBuffer(&scene_data);
+
+    cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
 }
 
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(view, proj);
+    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
@@ -184,8 +188,24 @@ void RenderPipeline::DepthRender()
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
 
     Lighting::Instance()->BeginDepthRender();
+
+    Vector2 shadow_map_size = RenderingConstants::kShadowMapSize;
+    D3D12_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = shadow_map_size.x;
+    viewport.Height = shadow_map_size.y;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    D3D12_RECT scissor_rect;
+    scissor_rect.left = 0;
+    scissor_rect.right = static_cast<LONG>(shadow_map_size.x);
+    scissor_rect.top = 0;
+    scissor_rect.bottom = static_cast<LONG>(shadow_map_size.y);
+
     RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
-                                              Color());
+                                              Color(), &viewport, &scissor_rect);
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();

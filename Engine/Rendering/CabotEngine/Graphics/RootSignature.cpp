@@ -26,7 +26,7 @@ RootSignature::RootSignature()
 
     rootParam[kWorldCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kSceneData].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kSceneDataCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kCascadeSlicesCBV].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kLightCountCBV].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
     CD3DX12_DESCRIPTOR_RANGE tableRangeBone = {};

@@ -2,7 +2,7 @@
 
 StructuredBuffer<float4x4> LightViewProj : register(t1);
 
-cbuffer LightCount : register (b3)
+cbuffer LightCount : register (b4)
 {
     int light_count;
 }

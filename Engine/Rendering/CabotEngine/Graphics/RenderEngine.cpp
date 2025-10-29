@@ -63,7 +63,7 @@ void RenderEngine::BeginRender()
 {
     // 現在のレンダーターゲットを更新
     m_current_render_target_ = m_p_render_targets_[m_current_back_buffer_index_].
-        Get();
+    Get();
 
     // コマンドを初期化してためる準備をする
     m_p_allocator_[m_current_back_buffer_index_]->Reset();
@@ -71,10 +71,10 @@ void RenderEngine::BeginRender()
                              nullptr);
 
     const auto ds_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_depth_stencil_buffer_.Get(),
-        D3D12_RESOURCE_STATE_COMMON,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE
-        );
+    m_p_depth_stencil_buffer_.Get(),
+    D3D12_RESOURCE_STATE_COMMON,
+    D3D12_RESOURCE_STATE_DEPTH_WRITE
+    );
     m_p_command_list_->ResourceBarrier(1, &ds_barrier);
 }
 
@@ -105,7 +105,7 @@ void RenderEngine::SetMainRenderTarget(const Color background_color)
 }
 
 void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
-                                   const Color background_color) const
+                                   const Color background_color, D3D12_VIEWPORT *viewport, D3D12_RECT *scissor) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     int num_render_target = 0;
@@ -123,8 +123,8 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
                                                        : dsv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // ビューポートとシザー矩形を設定
-    m_p_command_list_->RSSetViewports(1, &m_viewport_);
-    m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
+    m_p_command_list_->RSSetViewports(1, viewport == nullptr ? &m_viewport_ : viewport);
+    m_p_command_list_->RSSetScissorRects(1, scissor == nullptr ? &m_scissor_ : scissor);
 
     // レンダーターゲットを設定
     m_p_command_list_->OMSetRenderTargets(num_render_target, currentRtvHandle, FALSE, &currentDsvHandle);
@@ -136,7 +136,7 @@ void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12Descrip
 
     // 深度ステンシルビューをクリア
     m_p_command_list_->
-        ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
 void RenderEngine::EndRender()
@@ -146,10 +146,10 @@ void RenderEngine::EndRender()
                                                         D3D12_RESOURCE_STATE_PRESENT);
     m_p_command_list_->ResourceBarrier(1, &barrier);
     auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_depth_stencil_buffer_.Get(),
-        D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        D3D12_RESOURCE_STATE_COMMON
-        );
+    m_p_depth_stencil_buffer_.Get(),
+    D3D12_RESOURCE_STATE_DEPTH_WRITE,
+    D3D12_RESOURCE_STATE_COMMON
+    );
     m_p_command_list_->ResourceBarrier(1, &dsBarrier);
 
     // コマンドの記録を終了
@@ -257,8 +257,8 @@ bool RenderEngine::CreateCommandList()
     for (size_t i = 0; i < kFrame_Buffer_Count; i++)
     {
         hr = m_p_device_->CreateCommandAllocator(
-            D3D12_COMMAND_LIST_TYPE_DIRECT,
-            IID_PPV_ARGS(m_p_allocator_[i].ReleaseAndGetAddressOf()));
+        D3D12_COMMAND_LIST_TYPE_DIRECT,
+        IID_PPV_ARGS(m_p_allocator_[i].ReleaseAndGetAddressOf()));
     }
 
     if (FAILED(hr))
@@ -268,12 +268,12 @@ bool RenderEngine::CreateCommandList()
 
     // コマンドリストの生成
     hr = m_p_device_->CreateCommandList(
-        0,
-        D3D12_COMMAND_LIST_TYPE_DIRECT,
-        m_p_allocator_[m_current_back_buffer_index_].Get(),
-        nullptr,
-        IID_PPV_ARGS(&m_p_command_list_)
-        );
+    0,
+    D3D12_COMMAND_LIST_TYPE_DIRECT,
+    m_p_allocator_[m_current_back_buffer_index_].Get(),
+    nullptr,
+    IID_PPV_ARGS(&m_p_command_list_)
+    );
 
     if (FAILED(hr))
     {
@@ -379,25 +379,25 @@ bool RenderEngine::CreateDepthStencil()
 
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     CD3DX12_RESOURCE_DESC resourceDesc(
-        D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-        0,
-        engine::Application::WindowWidth(),
-        engine::Application::WindowHeight(),
-        1,
-        1,
-        DXGI_FORMAT_D32_FLOAT,
-        1,
-        0,
-        D3D12_TEXTURE_LAYOUT_UNKNOWN,
-        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+    D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+    0,
+    engine::Application::WindowWidth(),
+    engine::Application::WindowHeight(),
+    1,
+    1,
+    DXGI_FORMAT_D32_FLOAT,
+    1,
+    0,
+    D3D12_TEXTURE_LAYOUT_UNKNOWN,
+    D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
     hr = m_p_device_->CreateCommittedResource(
-        &heapProp,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_COMMON,
-        &dsvClearValue,
-        IID_PPV_ARGS(m_p_depth_stencil_buffer_.ReleaseAndGetAddressOf())
-        );
+    &heapProp,
+    D3D12_HEAP_FLAG_NONE,
+    &resourceDesc,
+    D3D12_RESOURCE_STATE_COMMON,
+    &dsvClearValue,
+    IID_PPV_ARGS(m_p_depth_stencil_buffer_.ReleaseAndGetAddressOf())
+    );
 
     m_p_depth_stencil_buffer_->SetName(L"DepthStencilBuffer");
 
