@@ -346,12 +346,14 @@
         <ClInclude Include="Engine\str_util.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
         <ClInclude Include="pch.h"/>
-        <ClInclude Include="Resources\Light.hlsli"/>
     </ItemGroup>
     <ItemGroup>
         <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

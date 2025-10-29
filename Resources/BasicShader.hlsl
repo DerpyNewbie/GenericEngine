@@ -114,7 +114,7 @@ float4 pix(VSOutput input) : SV_TARGET
     int cascade_index = 0;
     for (int i = 0; i < SHADOW_CASCADE_COUNT; ++i)
     {
-        if (depth < cascade_sprits[i])
+        if (depth < cascade_slices[i])
             cascade_index = 0;
     }
 

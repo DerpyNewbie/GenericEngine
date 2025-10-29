@@ -16,9 +16,9 @@ struct Light
     float2 padding;
 };
 
-cbuffer ShadowCascadeSprits : register(b2)
+cbuffer ShadowCascadeSlices : register(b2)
 {
-    float cascade_sprits[SHADOW_CASCADE_COUNT];
+    float cascade_slices[SHADOW_CASCADE_COUNT];
 }
 
 cbuffer LightCount : register (b3)

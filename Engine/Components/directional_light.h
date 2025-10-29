@@ -15,7 +15,7 @@ class DirectionalLight : public Light
 
 public:
     static void SetCascadeSlices(
-    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_sprits);
+    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices);
 
     void OnConstructed() override;
     void OnInspectorGui() override;

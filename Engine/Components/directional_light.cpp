@@ -37,9 +37,9 @@ void DirectionalLight::CascadeFrustum(const std::array<Vector3, 8> &frustum,
 }
 
 void DirectionalLight::SetCascadeSlices(
-const std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_sprits)
+const std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices)
 {
-    m_cascade_slices_ = shadow_cascade_sprits;
+    m_cascade_slices_ = shadow_cascade_slices;
 }
 void DirectionalLight::OnConstructed()
 {
