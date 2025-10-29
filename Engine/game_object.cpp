@@ -16,9 +16,9 @@ GameObject::GameObject() :
 void GameObject::OnConstructed()
 {
     Object::OnConstructed();
+    SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
     if (Transform() == nullptr)
         AddComponent<engine::Transform>();
-    SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
 }
 void GameObject::OnDestroy()
 {
@@ -96,7 +96,7 @@ void GameObject::InvokeUpdate()
     }
 
     bool has_destroying_component = false;
-    for (auto &component : m_components_)
+    for (const auto &component : m_components_)
     {
         if (component->IsDestroying())
         {
