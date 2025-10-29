@@ -56,8 +56,8 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
     {
         if (ImGui::BeginTable("##bg", 1, ImGuiTableFlags_RowBg))
         {
-            for (const auto all_root_objects = scene->RootGameObjects();
-                 const auto &root_object : all_root_objects)
+            const auto all_root_objects = scene->RootGameObjects();
+            for (const auto &root_object : all_root_objects)
             {
                 DrawObjectRecursive(root_object);
             }
