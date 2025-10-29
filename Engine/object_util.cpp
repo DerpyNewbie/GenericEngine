@@ -11,17 +11,33 @@ namespace
 std::string DeduplicatedName(const std::shared_ptr<GameObject> &object,
                              const std::vector<std::shared_ptr<GameObject>> &siblings)
 {
+    std::set<int> dedupe_indices;
     auto [original_name, dedupe_index] = ObjectUtil::GetOriginalName(object->Name());
-    const auto count = std::ranges::count_if(siblings, [original_name](auto a) {
-        return ObjectUtil::GetOriginalName(a->Name()).first == original_name;
-    });
+    dedupe_indices.emplace(dedupe_index);
 
-    if (count == 0)
+    for (auto &&go : siblings)
+    {
+        auto [name, index] = ObjectUtil::GetOriginalName(go->Name());
+        if (name == original_name)
+        {
+            dedupe_indices.emplace(index);
+        }
+    }
+
+    if (dedupe_indices.empty())
     {
         return original_name;
     }
 
-    return original_name + " (" + std::to_string(count) + ")";
+    for (int i = 1; i < dedupe_indices.size(); ++i)
+    {
+        if (dedupe_indices.contains(i))
+            continue;
+
+        return std::format("{0} ({1})", original_name, i);
+    }
+
+    return std::format("{0} ({1})", original_name, std::to_string(dedupe_indices.size()));
 }
 }
 
@@ -126,7 +142,6 @@ std::string ObjectUtil::MakeClone(const std::string &object_json)
     rapidjson::StringBuffer buffer;
     rapidjson::PrettyWriter writer(buffer);
     document.Accept(writer);
-    Logger::Log(buffer.GetString());
     return buffer.GetString();
 }
 
