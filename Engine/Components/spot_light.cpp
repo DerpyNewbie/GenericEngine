@@ -5,21 +5,23 @@
 #include "camera_component.h"
 #include "gui.h"
 
-void engine::SpotLight::OnConstructed()
+namespace engine
+{
+void SpotLight::OnConstructed()
 {
     Light::OnConstructed();
     m_light_data_.type = static_cast<int>(kLightType::kSpotLight);
     m_light_data_.inner_cos = cos(DirectX::XMConvertToRadians(45.0f));
     m_light_data_.outer_cos = cos(DirectX::XMConvertToRadians(50.0f));
 }
-void engine::SpotLight::OnInspectorGui()
+void SpotLight::OnInspectorGui()
 {
     Gui::PropertyField("InnerAngle", m_light_data_.inner_cos);
     Gui::PropertyField("OuterAngle", m_light_data_.outer_cos);
     Gui::PropertyField("Range", m_light_data_.range);
     Light::OnInspectorGui();
 }
-void engine::SpotLight::OnUpdate()
+void SpotLight::OnUpdate()
 {
     auto transform = GameObject()->Transform();
 
@@ -34,7 +36,7 @@ void engine::SpotLight::OnUpdate()
     m_light_data_.direction.z = forward.z;
 }
 
-bool engine::SpotLight::InCameraView(const std::array<Vector3, 8> &frustum)
+bool SpotLight::InCameraView(const std::array<Vector3, 8> &frustum)
 {
     float cone_length = m_light_data_.range;
     float cone_radius = tanf(acosf(m_light_data_.outer_cos)) * cone_length;
@@ -72,17 +74,17 @@ bool engine::SpotLight::InCameraView(const std::array<Vector3, 8> &frustum)
     return distSq <= sphere_radius * sphere_radius;
 }
 
-Vector3 engine::SpotLight::GetPos()
+Vector3 SpotLight::GetPos()
 {
     return GameObject()->Transform()->Position();
 }
 
-int engine::SpotLight::ShadowMapCount()
+int SpotLight::ShadowMapCount()
 {
     return 1;
 }
 
-std::vector<Matrix> engine::SpotLight::CalcViewProj(const std::array<Vector3, 8> &frustum_corners)
+std::vector<Matrix> SpotLight::CalcViewProj(const std::array<Vector3, 8> &frustum_corners)
 {
     auto transform = GameObject()->Transform();
     Matrix view = DirectX::XMMatrixLookAtRH(transform->Position(),
@@ -93,6 +95,7 @@ std::vector<Matrix> engine::SpotLight::CalcViewProj(const std::array<Vector3, 8>
                                                     CameraComponent::Current()->m_property_.near_plane,
                                                     m_light_data_.range);
     return {view * proj};
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::SpotLight)
