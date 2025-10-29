@@ -72,41 +72,46 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
     ImGui::TableNextColumn();
 
     ImGui::PushID(game_object.get());
-
-    const bool has_style_color = !game_object->IsActiveInHierarchy();
-    if (has_style_color)
     {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
-    }
-
-    ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
-    DrawReorderingTarget(game_object, 0);
-    ImGui::PopStyleVar();
-
-    if (DrawObject(game_object))
-    {
-        const auto transform = game_object->Transform();
-        if (transform->ChildCount() != 0)
+        const bool has_style_color = !game_object->IsActiveInHierarchy();
+        if (has_style_color)
         {
-            DrawReorderingTarget(transform->GetChild(0)->GameObject(), 0);
+            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
         }
 
-        // Child count cannot be stored as it can be changed during DrawObjectRecursive
-        for (int i = 0; i < transform->ChildCount(); ++i)
         {
-            const auto child_go = transform->GetChild(i)->GameObject();
-            DrawObjectRecursive(child_go);
+            ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+            DrawReorderingTarget(game_object, 0);
+            ImGui::PopStyleVar();
         }
-        ImGui::TreePop();
-    }
 
-    ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
-    DrawReorderingTarget(game_object, 1);
-    ImGui::PopStyleVar();
+        if (DrawObject(game_object))
+        {
+            const auto transform = game_object->Transform();
+            if (transform->ChildCount() != 0)
+            {
+                DrawReorderingTarget(transform->GetChild(0)->GameObject(), 0);
+            }
 
-    if (has_style_color)
-    {
-        ImGui::PopStyleColor();
+            // Child count cannot be stored as it can be changed during DrawObjectRecursive
+            for (int i = 0; i < transform->ChildCount(); ++i)
+            {
+                const auto child_go = transform->GetChild(i)->GameObject();
+                DrawObjectRecursive(child_go);
+            }
+            ImGui::TreePop();
+        }
+
+        {
+            ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+            DrawReorderingTarget(game_object, 1);
+            ImGui::PopStyleVar();
+        }
+
+        if (has_style_color)
+        {
+            ImGui::PopStyleColor();
+        }
     }
 
     ImGui::PopID();
@@ -159,11 +164,8 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
             if (payload_object == nullptr)
             {
                 engine::Logger::Log<Hierarchy>("Cannot drag and drop object as payload is null");
-                return false;
             }
-
-            const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
-            if (payload_go != nullptr)
+            else if (const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object))
             {
                 const bool can_be_child = !game_object->Transform()->IsChildOf(payload_go->Transform());
 
