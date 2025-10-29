@@ -21,6 +21,7 @@ void Time::IncrementFrame()
         m_fps_check_time_ = now;
     }
 
+    m_time_since_level_load_ += m_delta_time_;
     m_time_since_start_up_ = duration<float>(now - m_start_up_time_).count();
     ++m_frames_;
 }
