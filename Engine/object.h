@@ -103,7 +103,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        bool is_loading = m_guid_ == xg::Guid() && m_name_ == "";
+        const bool is_loading = m_guid_ == xg::Guid() && m_name_ == "Unknown Object";
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_name_));
 
         if (is_loading)
