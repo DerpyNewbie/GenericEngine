@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "render_pipeline.h"
+
+#include "application.h"
+#include "engine_time.h"
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
+#include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -15,7 +19,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -121,6 +125,23 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
     view_projection_buffer->UpdateBuffer(&view_projection);
 
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
+}
+
+void RenderPipeline::SetSceneData()
+{
+    if (m_scene_data_buffer_ == nullptr)
+    {
+        m_scene_data_buffer_ = std::make_shared<ConstantBuffer>(sizeof(SceneData));
+        m_scene_data_buffer_->CreateBuffer();
+    }
+
+    const auto cmd_list = RenderEngine::CommandList();
+    SceneData scene_data;
+    scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
+    scene_data.time = Time::Get()->TimeSinceStartUp();
+    scene_data.delta_time = Time::GetDeltaTime();
+
+    m_scene_data_buffer_
 }
 
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
