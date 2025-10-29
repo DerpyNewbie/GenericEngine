@@ -24,7 +24,6 @@ cbuffer ShadowCascadeSlices : register(b2)
 cbuffer LightCount : register (b3)
 {
     int light_count;
-    int a[63];
 }
 
 StructuredBuffer<float4x4> LightViewProj : register(t1);
