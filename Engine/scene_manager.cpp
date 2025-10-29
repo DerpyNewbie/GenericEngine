@@ -5,6 +5,8 @@
 
 namespace engine
 {
+Event<std::shared_ptr<Scene>> SceneManager::scene_added;
+
 std::vector<std::shared_ptr<Scene>> SceneManager::m_scenes_;
 
 std::shared_ptr<Scene> SceneManager::GetActiveScene()
@@ -26,6 +28,7 @@ std::shared_ptr<Scene> SceneManager::CreateScene(const std::string &name)
 
 void SceneManager::AddScene(const std::shared_ptr<Scene> &scene)
 {
+    scene_added.Invoke(scene);
     m_scenes_.push_back(scene);
 }
 

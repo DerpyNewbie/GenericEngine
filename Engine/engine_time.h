@@ -26,7 +26,9 @@ class Time
     float m_delta_time_ = 0;
     float m_time_scale_ = 1;
     float m_time_since_start_up_ = 0;
+    float m_unscaled_tim_since_start_up_ = 0;
     float m_time_since_level_load_ = 0;
+    float m_unscaled_time_since_level_load_ = 0;
     int m_fps_ = 0;
     int m_fps_counter_ = 0;
     int m_last_fixed_frame_count_ = 0;
