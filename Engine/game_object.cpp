@@ -296,6 +296,12 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 {
     auto shared_this = shared_from_base<GameObject>();
     const auto scene = m_scene_.lock();
+    if (scene == nullptr)
+    {
+        Logger::Error("Failed to modify root state of %s; Scene is nullptr.", Name().c_str());
+        return;
+    }
+
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
     *root_objects,
