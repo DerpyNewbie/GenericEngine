@@ -94,7 +94,7 @@ Matrix CinemaCameraComponent::GetLookAtMatrix()
     const auto position = GetPosition();
     const auto target_pos = GetTargetPosition();
 
-    if (position == Vector3::Zero || position == target_pos)
+    if (Mathf::Approximately((position - target_pos).LengthSquared(), 0.0f))
         return Matrix::Identity;
 
     const Matrix view = Matrix::CreateLookAt(position, target_pos, Vector3::Up);
