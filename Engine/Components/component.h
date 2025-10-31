@@ -14,6 +14,7 @@ class Component : public Object
 {
     friend class GameObject;
 
+    bool m_has_called_awake_ = false;
     bool m_has_called_start_ = false;
     std::weak_ptr<GameObject> m_game_object_ = {};
 

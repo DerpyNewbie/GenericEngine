@@ -4,6 +4,7 @@
 #include "game_object.h"
 #include "gui.h"
 #include "scene.h"
+#include "scene_manager.h"
 
 namespace engine
 {
@@ -397,14 +398,27 @@ void Transform::RecalculateMatrices()
     }
 }
 
+void Transform::OnAwake()
+{
+    SceneManager::MoveGameObject(GameObject(), GameObject()->Scene());
+    RecalculateMatrices();
+}
+
 void Transform::OnDestroy()
 {
-    SetParent(nullptr);
-
-    for (const auto child : m_children_)
+    const auto children = m_children_;
+    for (const auto child : children)
     {
+        if (child == nullptr)
+        {
+            Logger::Error<Transform>("Found null children on OnDestroy at %s", GameObject()->Name().c_str());
+            continue;
+        }
+
         Destroy(child->GameObject());
     }
+
+    SetParent(nullptr);
 }
 } // namespace engine
 
