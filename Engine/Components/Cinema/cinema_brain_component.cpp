@@ -50,7 +50,10 @@ void CinemaBrainComponent::OnUpdate()
     final_trs.scale += sca * t;
     final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
 
-    m_target_camera_.CastedLock()->GameObject()->Transform()->SetLocalMatrix(final_trs.GetMatrix());
+    auto transform = m_target_camera_.CastedLock()->GameObject()->Transform();
+    transform->SetPosition(final_trs.translate);
+    transform->SetRotation(final_trs.rotation);
+    transform->SetLocalScale(final_trs.scale);
 }
 
 void CinemaBrainComponent::Blend(const std::shared_ptr<CinemaCameraComponent> &from, const std::shared_ptr<CinemaCameraComponent> &to, float duration, float time)
