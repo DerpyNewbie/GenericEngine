@@ -22,7 +22,7 @@ public:
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
-    bool SetTextures(std::array<AssetPtr<Texture2D>, 6> textures);
+    bool SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures);
 
     template <class Archive>
     void serialize(Archive &ar)
