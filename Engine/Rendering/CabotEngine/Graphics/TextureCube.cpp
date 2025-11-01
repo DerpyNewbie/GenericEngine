@@ -52,13 +52,13 @@ void TextureCube::CreateBuffer()
 
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &cube_desc,
-        D3D12_RESOURCE_STATE_COPY_DEST,
-        nullptr,
-        IID_PPV_ARGS(&m_p_resource_)
-        );
+    &prop,
+    D3D12_HEAP_FLAG_NONE,
+    &cube_desc,
+    D3D12_RESOURCE_STATE_COPY_DEST,
+    nullptr,
+    IID_PPV_ARGS(&m_p_resource_)
+    );
 
     if (FAILED(hr))
     {
@@ -90,10 +90,10 @@ void TextureCube::CreateBuffer()
     }
 
     const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(),
-        D3D12_RESOURCE_STATE_COPY_DEST,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-        );
+    m_p_resource_.Get(),
+    D3D12_RESOURCE_STATE_COPY_DEST,
+    D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+    );
 
     cmd_list->ResourceBarrier(1, &barrier);
     m_is_valid_ = true;
