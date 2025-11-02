@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "event.h"
 #include "game_object.h"
 
 namespace engine
@@ -9,6 +10,8 @@ class SceneManager
     static std::vector<std::shared_ptr<Scene>> m_scenes_;
 
 public:
+    static Event<std::shared_ptr<Scene>> scene_added;
+
     static std::shared_ptr<Scene> GetActiveScene();
     static const std::vector<std::shared_ptr<Scene>> &GetCurrentScenes();
     static std::shared_ptr<Scene> CreateScene(const std::string &name);
