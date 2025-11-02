@@ -34,10 +34,29 @@ public:
         static constexpr auto kObjectGuid = "ENGINE_OBJ_GUID";
     };
 
+    enum class MbDialogIcon
+    {
+        kNone,
+        kInfo,
+        kWarning,
+        kHelp,
+        kError
+    };
+
+    struct MbDialogOption
+    {
+        MbDialogIcon icon = MbDialogIcon::kNone;
+
+        UINT Flags() const;
+    };
+
     static bool OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters = {});
 
     static bool SaveFileDialog(std::string &file_path, const std::string &default_name,
                                const std::vector<FilterSpec> &filters = {});
+
+    static bool OkDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
+    static bool OkCancelDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
 
     static bool ObjectHeader(const std::shared_ptr<Object> &object, std::string name = "");
     static void MakeDragDropSource(const std::shared_ptr<Object> &object);

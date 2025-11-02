@@ -106,7 +106,15 @@ void DefaultEditorMenu::DrawFilesMenu()
 
         engine::Serializer serializer;
         std::ofstream ofs(file_path);
-        serializer.Save(ofs, target_scene);
+        if (serializer.Save(ofs, target_scene))
+        {
+            engine::Gui::OkDialog("Scene saved", "Scene saved successfully", {engine::Gui::MbDialogIcon::kInfo});
+        }
+        else
+        {
+            engine::Gui::OkDialog("Scene save failed", "Failed to save a scene!\nCheck logs for more details.", {engine::Gui::MbDialogIcon::kError});
+        }
+
     }
 }
 
@@ -157,7 +165,7 @@ void DefaultEditorMenu::DrawObjectMenu(const std::shared_ptr<engine::GameObject>
             std::stringstream ss;
             {
                 engine::Serializer serializer;
-                serializer.Save(ss, go);
+                auto _ = serializer.Save(ss, go);
             }
 
             const std::string serialized_object(ss.view());
