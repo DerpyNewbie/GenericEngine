@@ -71,6 +71,8 @@ template <typename T> requires std::is_base_of_v<Object, T>
 struct AssetPtr : IAssetPtr
 {
 private:
+    std::weak_ptr<T> m_cached_ptr_;
+
     AssetPtr(const std::weak_ptr<Object> &weak_ptr,
              const std::shared_ptr<Object> &shared_ptr,
              const xg::Guid guid,
@@ -78,7 +80,8 @@ private:
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
     {}
 
-    AssetPtr(const IAssetPtr &ptr) : IAssetPtr(ptr)
+    AssetPtr(const IAssetPtr &ptr) :
+        IAssetPtr(ptr)
     {}
 
 public:
@@ -86,7 +89,16 @@ public:
 
     std::shared_ptr<T> CastedLock()
     {
-        return std::dynamic_pointer_cast<T>(Lock());
+        if (auto cached = m_cached_ptr_.lock();
+            cached != nullptr)
+        {
+            return cached;
+        }
+
+        auto locked = std::dynamic_pointer_cast<T>(Lock());
+        m_cached_ptr_ = locked;
+
+        return locked;
     }
 
     static AssetPtr FromIAssetPtr(IAssetPtr &ptr)
