@@ -14,12 +14,14 @@ class Object : public enable_shared_from_base<Object>
     static unsigned int m_last_instantiated_name_count_;
     static unsigned int m_last_immediately_destroyed_objects_;
     static std::unordered_map<xg::Guid, std::shared_ptr<Object>> m_objects_;
+    static std::vector<std::shared_ptr<Object>> m_deserialized_objects_;
 
     xg::Guid m_guid_;
     bool m_is_destroying_ = false;
     std::string m_name_ = "Unknown Object";
 
     static void GarbageCollect();
+    static void InvokeOnDeserialized();
     static std::string GenerateName();
     static xg::Guid GenerateGuid();
 
@@ -32,24 +34,27 @@ public:
     virtual void OnConstructed()
     {}
 
+    virtual void OnDeserialized()
+    {}
+
     virtual void OnDestroy()
     {}
 
-    xg::Guid Guid() const;
+    [[nodiscard]] xg::Guid Guid() const;
 
-    std::string Name() const;
+    [[nodiscard]] std::string Name() const;
     void SetName(const std::string &name);
 
-    bool IsDestroying() const;
+    [[nodiscard]] bool IsDestroying() const;
     void DestroyThis();
 
     static void Destroy(const std::shared_ptr<Object> &obj);
     static void DestroyImmediate(const std::shared_ptr<Object> &obj);
 
-    static std::shared_ptr<Object> Find(const xg::Guid &guid);
+    [[nodiscard]] static std::shared_ptr<Object> Find(const xg::Guid &guid);
 
     template <class T>
-    static std::vector<std::shared_ptr<T>> FindByType()
+    [[nodiscard]] static std::vector<std::shared_ptr<T>> FindByType()
     {
         static_assert(std::is_base_of<Object, T>(), "Base type is not Object.");
         std::vector<std::shared_ptr<T>> result;
@@ -109,15 +114,16 @@ public:
         if (is_loading)
         {
             m_objects_[m_guid_] = shared_from_this();
+            m_deserialized_objects_.emplace_back(shared_from_this());
         }
     }
 
-    bool Equals(const Object *rhs) const
+    [[nodiscard]] bool Equals(const Object *rhs) const
     {
         return Equals(this, rhs);
     }
 
-    static bool Equals(const Object *a, const Object *b)
+    [[nodiscard]] static bool Equals(const Object *a, const Object *b)
     {
         return a == b || (a != nullptr && b != nullptr && a->Guid() == b->Guid());
     }

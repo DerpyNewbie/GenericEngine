@@ -86,6 +86,10 @@ void Engine::Tick()
     Profiler::Begin("Cleanup Objects");
     Object::GarbageCollect();
     Profiler::End("Cleanup Objects");
+
+    Profiler::Begin("OnDeserialization");
+    Object::InvokeOnDeserialized();
+    Profiler::End("OnDeserialization");
 }
 
 void Engine::Finalize()
