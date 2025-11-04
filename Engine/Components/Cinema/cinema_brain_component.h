@@ -10,12 +10,12 @@ struct BlendState
     std::shared_ptr<CinemaCameraComponent> to;
     float duration;
     float time;
-    bool is_blending = false;
 };
 
 class CinemaBrainComponent : public Component
 {
     AssetPtr<CameraComponent> m_target_camera_;
+    bool m_is_blending_ = false;
     BlendState m_blend_;
 
 public:
