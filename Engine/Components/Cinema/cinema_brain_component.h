@@ -18,6 +18,8 @@ class CinemaBrainComponent : public Component
     bool m_is_blending_ = false;
     BlendState m_blend_;
 
+    void DoBlending(float delta_time);
+
 public:
     void OnInspectorGui() override;
     void OnUpdate() override;

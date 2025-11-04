@@ -8,19 +8,14 @@
 
 namespace engine
 {
-void CinemaBrainComponent::OnInspectorGui()
-{
-    Gui::PropertyField("Target Camera", m_target_camera_);
-}
-
-void CinemaBrainComponent::OnUpdate()
+void CinemaBrainComponent::DoBlending(const float delta_time)
 {
     const auto target = m_target_camera_.CastedLock();
     if (target == nullptr || !m_is_blending_)
     {
         return;
     }
-    m_blend_.time += Time::GetDeltaTime();
+    m_blend_.time += delta_time;
     if (m_blend_.time > m_blend_.duration)
     {
         m_is_blending_ = false;
@@ -43,6 +38,16 @@ void CinemaBrainComponent::OnUpdate()
     transform->SetPosition(result_trs.translate);
     transform->SetRotation(result_trs.rotation);
     transform->SetLocalScale(result_trs.scale);
+}
+
+void CinemaBrainComponent::OnInspectorGui()
+{
+    Gui::PropertyField("Target Camera", m_target_camera_);
+}
+
+void CinemaBrainComponent::OnUpdate()
+{
+    DoBlending(Time::GetDeltaTime());
 }
 
 void CinemaBrainComponent::Blend(const std::shared_ptr<CinemaCameraComponent> &from, const std::shared_ptr<CinemaCameraComponent> &to, float duration, float time)
