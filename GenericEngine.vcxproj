@@ -350,7 +350,6 @@
         <ClInclude Include="pch.h"/>
     </ItemGroup>
     <ItemGroup>
-        <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
     </ItemGroup>
