@@ -26,8 +26,8 @@ struct AnimationState final : Inspectable
     void SetClip(std::shared_ptr<AnimationClip> clip);
     void UpdateTime();
     [[nodiscard]] float GetTime() const;
-    [[nodiscard]] float NormalizedSpeed() const;
     [[nodiscard]] float NormalizedTime() const;
+    [[nodiscard]] float NormalizedSpeed() const;
     [[nodiscard]] bool HasEnded() const;
     void SetNormalizedTime(float normalized_time);
     void SetNormalizedSpeed(float normalized_speed);
