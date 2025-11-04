@@ -37,3 +37,5 @@ void RenderingSettingsComponent::ApplySettings()
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::RenderingSettingsComponent)
