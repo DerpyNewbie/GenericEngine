@@ -38,7 +38,7 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
     m_transforms_.emplace(path, node);
 
     TRS trs;
-    node->LocalMatrix().Decompose(trs.scale, trs.rotation, trs.translate);
+    node->LocalMatrix().Decompose(trs.scale, trs.rotation, trs.translation);
     m_default_poses_.emplace(path, trs);
     for (UINT i = 0; i < node->ChildCount(); ++i)
     {
@@ -194,7 +194,7 @@ void AnimationComponent::Sample()
     {
         auto &default_matrix = m_default_poses_[path];
         TRS final_trs;
-        final_trs.translate = default_matrix.translate * base_weight;
+        final_trs.translation = default_matrix.translation * base_weight;
         final_trs.scale = default_matrix.scale * base_weight;
 
         final_trs.rotation = default_matrix.rotation;
@@ -214,7 +214,7 @@ void AnimationComponent::Sample()
                                 : state->weight / total_rot_weight;
             if (curve == nullptr)
             {
-                final_trs.translate += default_matrix.translate * state->weight;
+                final_trs.translation += default_matrix.translation * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
                 final_trs.rotation = Mathf::Slerp(final_trs.rotation, default_matrix.rotation, t);
@@ -222,7 +222,7 @@ void AnimationComponent::Sample()
             }
 
             const auto time = state->GetTime();
-            final_trs.translate += Lerp(time, curve->position_key, curve->position_index) * state->weight;
+            final_trs.translation += Lerp(time, curve->position_key, curve->position_index) * state->weight;
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);

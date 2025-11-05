@@ -67,10 +67,10 @@ public:
         if (Approximately(dot, 1.0F))
         {
             auto result = DirectX::SimpleMath::Quaternion(
-            a.x + t * (end.x - a.x),
-            a.y + t * (end.y - a.y),
-            a.z + t * (end.z - a.z),
-            a.w + t * (end.w - a.w)
+                a.x + t * (end.x - a.x),
+                a.y + t * (end.y - a.y),
+                a.z + t * (end.z - a.z),
+                a.w + t * (end.w - a.w)
             );
             result.Normalize();
             return result;
@@ -86,10 +86,10 @@ public:
         const float s1 = sin_theta / sin_theta_0;
 
         const auto result = DirectX::SimpleMath::Quaternion(
-        (a.x * s0) + (end.x * s1),
-        (a.y * s0) + (end.y * s1),
-        (a.z * s0) + (end.z * s1),
-        (a.w * s0) + (end.w * s1)
+            (a.x * s0) + (end.x * s1),
+            (a.y * s0) + (end.y * s1),
+            (a.z * s0) + (end.z * s1),
+            (a.w * s0) + (end.w * s1)
         );
         return result;
     }

@@ -4,17 +4,15 @@ namespace engine
 {
 struct TRS
 {
-    Vector3 translate;
+    Vector3 translation;
     Vector3 scale;
     Quaternion rotation;
 
-    Matrix GetMatrix()
-    {
-        return Matrix::CreateScale(scale) *
-               Matrix::CreateFromQuaternion(rotation) *
-               Matrix::CreateTranslation(translate);
-    }
+    TRS() = default;
+    explicit TRS(Matrix matrix);
 
-    static TRS BlendTRS(TRS rhs, TRS lhs, float t);
+    [[nodiscard]] Matrix GetMatrix() const;
+
+    static TRS Blend(const TRS &from, const TRS &to, float t);
 };
 }

@@ -4,7 +4,7 @@
 
 #include "engine_time.h"
 #include "gui.h"
-#include "Animation/animation_component.h"
+#include "Math/trs.h"
 
 namespace engine
 {
@@ -15,27 +15,37 @@ void CinemaBrainComponent::DoBlending(const float delta_time)
     {
         return;
     }
-    m_blend_.time += delta_time;
-    if (m_blend_.time > m_blend_.duration)
+
+    const auto transform = target->GameObject()->Transform();
+    if (transform == nullptr)
     {
-        m_is_blending_ = false;
         return;
     }
 
-    float t = m_blend_.time / m_blend_.duration;
+    m_blend_.time += delta_time;
+    if (m_blend_.time > m_blend_.duration)
+    {
+        m_blend_.time = m_blend_.duration;
+        m_is_blending_ = false;
+
+        const TRS to_trs{m_blend_.to->GameObject()->Transform()->WorldMatrix()};
+
+        transform->SetPosition(to_trs.translation);
+        transform->SetRotation(to_trs.rotation);
+        transform->SetLocalScale(to_trs.scale);
+        return;
+    }
+
+    const float t = m_blend_.time / m_blend_.duration;
 
     m_blend_.from->ApplyTransform();
     m_blend_.to->ApplyTransform();
 
-    TRS from_trs;
-    TRS to_trs;
-    m_blend_.from->GameObject()->Transform()->WorldMatrix().Decompose(from_trs.scale, from_trs.rotation, from_trs.translate);
-    m_blend_.to->GameObject()->Transform()->WorldMatrix().Decompose(to_trs.scale, to_trs.rotation, to_trs.translate);
+    const TRS from_trs{m_blend_.from->GameObject()->Transform()->WorldMatrix()};
+    const TRS to_trs{m_blend_.to->GameObject()->Transform()->WorldMatrix()};
+    const auto result_trs = TRS::Blend(from_trs, to_trs, t);
 
-    auto result_trs = TRS::BlendTRS(from_trs, to_trs, t);
-
-    auto transform = m_target_camera_.CastedLock()->GameObject()->Transform();
-    transform->SetPosition(result_trs.translate);
+    transform->SetPosition(result_trs.translation);
     transform->SetRotation(result_trs.rotation);
     transform->SetLocalScale(result_trs.scale);
 }
