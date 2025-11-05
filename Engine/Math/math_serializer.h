@@ -55,4 +55,10 @@ void serialize(Archive &ar, struct Rectangle &v)
     ar(CEREAL_NVP(v.x), CEREAL_NVP(v.y), CEREAL_NVP(v.width), CEREAL_NVP(v.height));
 }
 
+template <class Archive>
+void serialize(Archive &ar, DirectX::PackedVector::XMCOLOR &v)
+{
+    ar(CEREAL_NVP(v.c));
+}
+
 }

@@ -5,6 +5,8 @@
 
 namespace engine
 {
+Event<std::shared_ptr<Scene>> SceneManager::scene_added;
+
 std::vector<std::shared_ptr<Scene>> SceneManager::m_scenes_;
 
 std::shared_ptr<Scene> SceneManager::GetActiveScene()
@@ -26,6 +28,7 @@ std::shared_ptr<Scene> SceneManager::CreateScene(const std::string &name)
 
 void SceneManager::AddScene(const std::shared_ptr<Scene> &scene)
 {
+    scene_added.Invoke(scene);
     m_scenes_.push_back(scene);
 }
 
@@ -43,21 +46,20 @@ void SceneManager::DestroyScene(const std::string &name)
 
 void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const std::shared_ptr<Scene> &scene)
 {
-    if (!go->m_scene_.expired() && go->Transform()->Parent() == nullptr)
-    {
-        go->SetAsRootObject(false);
-    }
-
+    // NOTE: transform could be nullptr at this point
+    const auto transform = go->Transform();
     if (const auto prev_scene = go->m_scene_.lock())
     {
-        prev_scene->m_all_game_objects_.erase(std::ranges::find(prev_scene->m_all_game_objects_, go));
+        if (transform != nullptr && transform->Parent() == nullptr)
+            go->SetAsRootObject(false);
+
+        const auto pos = std::ranges::find(prev_scene->m_all_game_objects_, go);
+        if (pos != prev_scene->m_all_game_objects_.end())
+            prev_scene->m_all_game_objects_.erase(pos);
     }
 
     go->m_scene_ = scene;
     scene->m_all_game_objects_.emplace_back(go);
-    if (go->Transform()->Parent() == nullptr)
-    {
-        go->SetAsRootObject(true);
-    }
+    go->SetAsRootObject(transform == nullptr || transform->Parent() == nullptr);
 }
 }

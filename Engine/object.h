@@ -25,10 +25,8 @@ class Object : public enable_shared_from_base<Object>
 
     void SetGuid(xg::Guid new_guid);
 
-protected:
-    Object() = default;
-
 public:
+    Object() = default;
     virtual ~Object() = default;
 
     virtual void OnConstructed()
@@ -100,10 +98,12 @@ public:
         return Instantiate<T>(GenerateName(), GenerateGuid());
     }
 
+    static std::shared_ptr<Object> Instantiate(const std::shared_ptr<Object> &original);
+
     template <class Archive>
     void serialize(Archive &ar)
     {
-        bool is_loading = m_guid_ == xg::Guid() && m_name_ == "";
+        const bool is_loading = m_guid_ == xg::Guid() && m_name_ == "Unknown Object";
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_name_));
 
         if (is_loading)
