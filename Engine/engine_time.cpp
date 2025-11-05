@@ -26,7 +26,7 @@ void Time::IncrementFrame()
     auto scaled_delta_time = DeltaTime();
     m_time_since_level_load_ += scaled_delta_time;
     m_unscaled_time_since_level_load_ += m_fixed_delta_time_;
-    m_time_since_start_up_ = scaled_delta_time;
+    m_time_since_start_up_ += scaled_delta_time;
     m_unscaled_tim_since_start_up_ += m_delta_time_;
     ++m_frames_;
 }
