@@ -194,6 +194,10 @@ std::shared_ptr<AnimationState> AnimationComponent::AddClip(const std::shared_pt
 
 void AnimationComponent::AddState(std::shared_ptr<AnimationState> state, const std::string &name)
 {
+    if (!state || name.empty())
+    {
+        return;
+    }
     m_states_.insert_or_assign(name, state);
 }
 
