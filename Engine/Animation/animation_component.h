@@ -49,6 +49,7 @@ public:
     void Stop();
 
     std::shared_ptr<AnimationState> AddClip(const std::shared_ptr<AnimationClip> &clip, const std::string &name);
+    void AddState(std::shared_ptr<AnimationState> state, const std::string &name);
     std::shared_ptr<AnimationState> FindClip(const std::string &name) const;
     void RemoveClip(const std::string &name);
     [[nodiscard]] size_t ClipCount() const;

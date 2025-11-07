@@ -25,11 +25,11 @@ Quaternion Slerp(const Quaternion &a, const Quaternion &b, const float t)
     if (Mathf::Approximately(dot, 1.0F))
     {
         auto result = Quaternion(
-            a.x + t * (end.x - a.x),
-            a.y + t * (end.y - a.y),
-            a.z + t * (end.z - a.z),
-            a.w + t * (end.w - a.w)
-            );
+        a.x + t * (end.x - a.x),
+        a.y + t * (end.y - a.y),
+        a.z + t * (end.z - a.z),
+        a.w + t * (end.w - a.w)
+        );
         result.Normalize();
         return result;
     }
@@ -44,11 +44,11 @@ Quaternion Slerp(const Quaternion &a, const Quaternion &b, const float t)
     const float s1 = sin_theta / sin_theta_0;
 
     const auto result = Quaternion(
-        (a.x * s0) + (end.x * s1),
-        (a.y * s0) + (end.y * s1),
-        (a.z * s0) + (end.z * s1),
-        (a.w * s0) + (end.w * s1)
-        );
+    (a.x * s0) + (end.x * s1),
+    (a.y * s0) + (end.y * s1),
+    (a.z * s0) + (end.z * s1),
+    (a.w * s0) + (end.w * s1)
+    );
     return result;
 }
 
@@ -190,6 +190,11 @@ std::shared_ptr<AnimationState> AnimationComponent::AddClip(const std::shared_pt
 
     m_states_.insert_or_assign(name, state);
     return state;
+}
+
+void AnimationComponent::AddState(std::shared_ptr<AnimationState> state, const std::string &name)
+{
+    m_states_.insert_or_assign(name, state);
 }
 
 std::shared_ptr<AnimationState> AnimationComponent::FindClip(const std::string &name) const
