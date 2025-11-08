@@ -170,7 +170,11 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
     const auto proj = camera->m_property_.ProjectionMatrix();
     UpdateBuffer(view, proj);
 
-    const auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+    std::ranges::sort(renderers,
+                      [](const std::shared_ptr<Renderer> &a, const std::shared_ptr<Renderer> &b) {
+                          return a->m_render_queue_ < b->m_render_queue_;
+                      });
     for (const auto renderer : renderers)
     {
         renderer->Render();
@@ -238,9 +242,10 @@ void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 {
     auto &renderers = Instance()->m_renderers_;
-    std::erase_if(renderers, [&](const auto &r) {
-        return r == renderer;
-    });
+    std::erase_if(renderers,
+                  [&](const auto &r) {
+                      return r == renderer;
+                  });
 }
 
 void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)

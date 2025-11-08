@@ -2,6 +2,8 @@
 
 #include "engine_time.h"
 
+#include "scene_manager.h"
+
 namespace engine
 {
 using namespace std::chrono;
@@ -21,7 +23,11 @@ void Time::IncrementFrame()
         m_fps_check_time_ = now;
     }
 
-    m_time_since_start_up_ = duration<float>(now - m_start_up_time_).count();
+    auto scaled_delta_time = DeltaTime();
+    m_time_since_level_load_ += scaled_delta_time;
+    m_unscaled_time_since_level_load_ += m_fixed_delta_time_;
+    m_time_since_start_up_ += scaled_delta_time;
+    m_unscaled_tim_since_start_up_ += m_delta_time_;
     ++m_frames_;
 }
 
@@ -52,6 +58,11 @@ void Time::Init()
     m_time_ = m_start_up_time_;
     m_fps_check_time_ = m_start_up_time_;
     m_fixed_update_check_time_ = m_start_up_time_;
+
+    SceneManager::scene_added.AddListener([&](auto _) {
+        m_time_since_level_load_ = 0;
+        m_unscaled_time_since_level_load_ = 0;
+    });
 }
 
 double Time::CurrentFrameTime() const

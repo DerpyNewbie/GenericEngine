@@ -16,8 +16,9 @@ GameObject::GameObject() :
 void GameObject::OnConstructed()
 {
     Object::OnConstructed();
-    AddComponent<engine::Transform>();
     SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
+    if (Transform() == nullptr)
+        AddComponent<engine::Transform>();
 }
 void GameObject::OnDestroy()
 {
@@ -95,12 +96,19 @@ void GameObject::InvokeUpdate()
     }
 
     bool has_destroying_component = false;
-    for (auto &component : m_components_)
+    for (const auto &component : m_components_)
     {
         if (component->IsDestroying())
         {
             has_destroying_component = true;
             continue;
+        }
+
+        if (!component->m_has_called_awake_)
+        {
+            component->OnAwake();
+            component->m_has_called_awake_ = true;
+            component->OnEnabled();
         }
 
         if (!component->m_has_called_start_)
@@ -288,6 +296,12 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 {
     auto shared_this = shared_from_base<GameObject>();
     const auto scene = m_scene_.lock();
+    if (scene == nullptr)
+    {
+        Logger::Error("Failed to modify root state of %s; Scene is nullptr.", Name().c_str());
+        return;
+    }
+
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
     *root_objects,
@@ -310,8 +324,12 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 template <class Archive>
 void GameObject::serialize(Archive &ar)
 {
-    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_scene_), CEREAL_NVP(m_is_active_self_),
-       CEREAL_NVP(m_components_));
+    ar(cereal::base_class<Object>(this), CEREAL_NVP(m_is_active_self_), CEREAL_NVP(m_components_));
+
+    if (m_scene_.expired())
+    {
+        SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
+    }
 }
 }
 

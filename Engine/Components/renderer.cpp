@@ -2,6 +2,9 @@
 
 #include "renderer.h"
 
+#include <algorithm>
+
+#include "gui.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -31,6 +34,13 @@ void Renderer::SetVisible(const bool visible)
     }
 }
 
+void Renderer::OnInspectorGui()
+{
+    if (Gui::PropertyField("RenderQueue", m_render_queue_))
+    {
+        m_render_queue_ = std::clamp(m_render_queue_, 0, 10000);
+    }
+}
 void Renderer::OnEnabled()
 {
     SetVisible(true);
@@ -46,3 +56,5 @@ void Renderer::OnDestroy()
     SetVisible(false);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Renderer)

@@ -26,7 +26,8 @@ void Scene::OnUpdate()
         m_has_destroying_game_object_ = false;
     }
 
-    for (const auto &game_object : m_root_game_objects_)
+    const auto root_objects = m_root_game_objects_;
+    for (const auto &game_object : root_objects)
     {
         game_object->InvokeUpdate();
     }
