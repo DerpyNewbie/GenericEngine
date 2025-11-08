@@ -15,7 +15,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -167,7 +167,8 @@ void RenderPipeline::DepthRender()
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
 
     Lighting::Instance()->BeginDepthRender();
-    RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
+    RenderEngine::Instance()->SetRenderTarget(nullptr,
+                                              Lighting::Instance()->m_dsv_heap_.Get(),
                                               Color());
 
     auto lighting_instance = Lighting::Instance();
@@ -201,9 +202,10 @@ void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 {
     auto &renderers = Instance()->m_renderers_;
-    std::erase_if(renderers, [&](const auto &r) {
-        return r == renderer;
-    });
+    std::erase_if(renderers,
+                  [&](const auto &r) {
+                      return r == renderer;
+                  });
 }
 
 void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
