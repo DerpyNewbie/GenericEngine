@@ -8,12 +8,10 @@
 #include "Components/image.h"
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
-#include "Components/camera_transitioner.h"
 #include "Components/camera_component.h"
 #include "Components/controller.h"
 #include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
-#include "Components/light.h"
 #include "Components/mesh_renderer.h"
 #include "Components/rotator_component.h"
 #include "Components/rect_transform.h"
@@ -28,6 +26,7 @@
 #include "Physics/sphere_collider.h"
 #include "Components/Cinema/cinema_brain_component.h"
 #include "Components/Cinema/cinema_camera_component.h"
+#include "Components/Cinema/cinema_camera_transitioner.h"
 #include "Rendering/rendering_settings_component.h"
 
 namespace engine
@@ -62,13 +61,13 @@ void IComponentFactory::Init()
     ADD_COMPONENT(RotatorComponent);
     ADD_COMPONENT(AnimationComponent);
     ADD_COMPONENT(RenderingSettingsComponent);
-    ADD_COMPONENT(CameraTransitioner);
+    ADD_COMPONENT(CinemaCameraTransitioner);
 #undef ADD_COMPONENT
 }
 
-IComponentFactory::IComponentFactory(const std::string &name):
+IComponentFactory::IComponentFactory(const std::string &name) :
     m_name_(name)
-{}
+{ }
 
 std::string IComponentFactory::Name()
 {
@@ -88,6 +87,6 @@ std::shared_ptr<IComponentFactory> IComponentFactory::Get(const std::string &nam
 std::vector<std::string> IComponentFactory::GetNames()
 {
     auto view = m_factories_ | std::views::keys;
-    return {view.begin(), view.end()};
+    return { view.begin(), view.end() };
 }
 }
