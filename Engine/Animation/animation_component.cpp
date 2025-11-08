@@ -147,7 +147,7 @@ std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(c
     const auto state = std::make_shared<AnimationState>();
     state->SetClip(clip);
 
-    return m_states_.insert_or_assign(name, state);
+    return AddState(state, name);
 }
 
 std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddState(std::shared_ptr<AnimationState> state, const std::string &name)
