@@ -1,12 +1,12 @@
 #pragma once
-#include "component.h"
+#include "Components/component.h"
 #include "Asset/asset_ptr.h"
-#include "Cinema/cinema_brain_component.h"
-#include "Cinema/cinema_camera_component.h"
+#include "cinema_brain_component.h"
+#include "cinema_camera_component.h"
 
 namespace engine
 {
-class CameraTransitioner : public Component
+class CinemaCameraTransitioner : public Component
 {
     AssetPtr<CinemaCameraComponent> m_from_camera_;
     AssetPtr<CinemaCameraComponent> m_to_camera_;

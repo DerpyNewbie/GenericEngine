@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "camera_transitioner.h"
+#include "cinema_camera_transitioner.h"
 
 #include "gui.h"
 
 namespace engine
 {
-void CameraTransitioner::OnInspectorGui()
+void CinemaCameraTransitioner::OnInspectorGui()
 {
     Gui::PropertyField("FromCamera", m_from_camera_);
     Gui::PropertyField("ToCamera", m_to_camera_);
