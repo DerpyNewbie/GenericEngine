@@ -4,23 +4,10 @@
 #include "Asset/asset_ptr.h"
 #include "Components/component.h"
 #include "Components/transform.h"
+#include "Math/trs.h"
 
 namespace engine
 {
-struct TRS
-{
-    Vector3 translate;
-    Vector3 scale;
-    Quaternion rotation;
-
-    Matrix GetMatrix()
-    {
-        return Matrix::CreateScale(scale) *
-               Matrix::CreateFromQuaternion(rotation) *
-               Matrix::CreateTranslation(translate);
-    }
-};
-
 class AnimationComponent : public Component
 {
     /// <summary>

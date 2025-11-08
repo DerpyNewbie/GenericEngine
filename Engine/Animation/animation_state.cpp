@@ -45,7 +45,7 @@ void AnimationState::UpdateTime()
     }
 }
 
-float AnimationState::GetTime()
+float AnimationState::GetTime() const
 {
     if (wrap_mode == kWrapMode::kOnce || wrap_mode == kWrapMode::kLoop)
         return time;
@@ -58,6 +58,10 @@ float AnimationState::GetTime()
 float AnimationState::NormalizedTime() const
 {
     return Mathf::Approximately(length, 0) ? 0 : time / length;
+}
+bool AnimationState::HasEnded() const
+{
+    return wrap_mode == kWrapMode::kOnce && time >= length;
 }
 
 float AnimationState::NormalizedSpeed() const

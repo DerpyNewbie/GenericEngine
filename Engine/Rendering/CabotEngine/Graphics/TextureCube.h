@@ -27,7 +27,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(m_textures_);
+        ar(cereal::base_class<Object>(this), CEREAL_NVP(m_textures_));
     }
 };
 }
