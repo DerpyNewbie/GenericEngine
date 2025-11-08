@@ -7,13 +7,12 @@ struct Light
     float intensity;
     float range;
 
-    float4 pos;
-    float4 direction;
+    float3 pos;
+    float3 direction;
     float4 color;
 
     float inner_cos;
     float outer_cos;
-    float2 padding;
 };
 cbuffer SceneData : register(b2)
 {

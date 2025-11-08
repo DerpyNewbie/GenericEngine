@@ -10,3 +10,5 @@ void engine::FrameMetaData::OnInspectorGui()
     ImGui::Text("tris: %d", tris);
     ImGui::Text("meshes: %d", meshes);
 }
+
+CEREAL_REGISTER_TYPE(engine::FrameMetaData)
