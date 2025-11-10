@@ -70,16 +70,16 @@ void SkinnedMeshRenderer::OnInspectorGui()
 void SkinnedMeshRenderer::UpdateBuffer()
 {
     MeshRenderer::UpdateBuffer();
+}
+
+void SkinnedMeshRenderer::Render()
+{
     UpdateBoneTransformsBuffer();
 
     const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
     const auto cmd_list = RenderEngine::CommandList();
 
     cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->HandleGPU);
-}
-
-void SkinnedMeshRenderer::Render()
-{
     MeshRenderer::Render();
 
     if (m_draw_bones_)
