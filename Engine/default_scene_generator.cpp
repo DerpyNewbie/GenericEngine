@@ -15,7 +15,6 @@ void SampleSceneGenerator::CreateDefaultScene()
     CreateDefaultCamera();
     CreateDefaultFloor();
     CreateYBot();
-    CreateYBot();
     CreateRenderingSettings();
 }
 
