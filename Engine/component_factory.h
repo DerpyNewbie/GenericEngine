@@ -9,15 +9,19 @@ class IComponentFactory
 
     static std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> m_factories_;
     std::string m_name_;
+    std::string m_friendly_name_;
+    std::string m_category_;
 
     static void Init();
 
 public:
     virtual ~IComponentFactory() = default;
 
-    explicit IComponentFactory(const std::string &name);
+    explicit IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category);
 
     std::string Name();
+    std::string FriendlyName();
+    std::string Category();
 
     virtual void AddComponentTo(std::shared_ptr<GameObject>) = 0;
 
@@ -32,8 +36,8 @@ template <typename T>
 class ComponentFactory final : public IComponentFactory
 {
 public:
-    ComponentFactory() : IComponentFactory(typeid(T).name())
-    {}
+    ComponentFactory(const std::string &category = "") : IComponentFactory(typeid(T).name(), EngineUtil::GetTypeName(typeid(T).name()), category)
+    { }
 
     void AddComponentTo(const std::shared_ptr<GameObject> game_object) override
     {

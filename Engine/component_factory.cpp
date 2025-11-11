@@ -30,50 +30,67 @@
 #include "Components/Cinema/cinema_camera_transitioner.h"
 #include "Rendering/rendering_settings_component.h"
 
+namespace
+{
+template <class T>
+void Reg(const std::string &category)
+{
+    engine::IComponentFactory::Register(std::make_shared<engine::ComponentFactory<T>>(category));
+}
+}
+
 namespace engine
 {
 std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> IComponentFactory::m_factories_;
 
 void IComponentFactory::Init()
 {
-#define ADD_COMPONENT(type) Register(std::make_shared<ComponentFactory<type>>())
-    ADD_COMPONENT(CameraComponent);
-    ADD_COMPONENT(Controller);
-    ADD_COMPONENT(FrameMetaData);
-    ADD_COMPONENT(MeshRenderer);
-    ADD_COMPONENT(SkinnedMeshRenderer);
-    ADD_COMPONENT(BillboardRenderer);
-    ADD_COMPONENT(TextAssetRefTestComponent);
-    ADD_COMPONENT(TextRenderer);
-    ADD_COMPONENT(Canvas);
-    ADD_COMPONENT(Image);
-    ADD_COMPONENT(RectTransform);
-    ADD_COMPONENT(RigidbodyComponent);
-    ADD_COMPONENT(SphereCollider);
-    ADD_COMPONENT(PlaneCollider);
-    ADD_COMPONENT(BoxCollider);
-    ADD_COMPONENT(CapsuleCollider);
-    ADD_COMPONENT(RigidbodyTesterComponent);
-    ADD_COMPONENT(AudioSourceComponent);
-    ADD_COMPONENT(AudioListenerComponent);
-    ADD_COMPONENT(CinemaCameraComponent);
-    ADD_COMPONENT(CinemaBrainComponent);
-    ADD_COMPONENT(DirectionalLight);
-    ADD_COMPONENT(SpotLight);
-    ADD_COMPONENT(RotatorComponent);
-    ADD_COMPONENT(AnimationComponent);
-    ADD_COMPONENT(RenderingSettingsComponent);
-    ADD_COMPONENT(CinemaCameraTransitioner);
-#undef ADD_COMPONENT
+    Reg<CameraComponent>("Rendering");
+    Reg<Controller>("Debug");
+    Reg<FrameMetaData>("Debug");
+    Reg<MeshRenderer>("Rendering/Renderer");
+    Reg<SkinnedMeshRenderer>("Rendering/Renderer");
+    Reg<BillboardRenderer>("Rendering/Renderer");
+    Reg<TextAssetRefTestComponent>("Debug");
+    Reg<TextRenderer>("Rendering/Renderer");
+    Reg<Canvas>("Rendering/Renderer");
+    Reg<Image>("Rendering/Renderer");
+    Reg<RectTransform>("Rendering/Renderer");
+    Reg<RigidbodyComponent>("Physics");
+    Reg<SphereCollider>("Physics");
+    Reg<PlaneCollider>("Physics");
+    Reg<BoxCollider>("Physics");
+    Reg<CapsuleCollider>("Physics");
+    Reg<RigidbodyTesterComponent>("Debug");
+    Reg<AudioSourceComponent>("Audio");
+    Reg<AudioListenerComponent>("Audio");
+    Reg<CinemaCameraComponent>("Rendering/Cinema");
+    Reg<CinemaBrainComponent>("Rendering/Cinema");
+    Reg<DirectionalLight>("Rendering/Light");
+    Reg<SpotLight>("Rendering/Light");
+    Reg<RotatorComponent>("Debug");
+    Reg<AnimationComponent>("Animation");
+    Reg<RenderingSettingsComponent>("Rendering");
+    Reg<CinemaCameraTransitioner>("Rendering/Cinema");
 }
 
-IComponentFactory::IComponentFactory(const std::string &name) :
-    m_name_(name)
+IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :
+    m_name_(name), m_friendly_name_(friendly_name), m_category_(category)
 { }
 
 std::string IComponentFactory::Name()
 {
     return m_name_;
+}
+
+std::string IComponentFactory::FriendlyName()
+{
+    return m_friendly_name_;
+}
+
+std::string IComponentFactory::Category()
+{
+    return m_category_;
 }
 
 void IComponentFactory::Register(const std::shared_ptr<IComponentFactory> &factory)

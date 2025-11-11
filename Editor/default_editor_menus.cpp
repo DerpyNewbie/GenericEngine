@@ -73,8 +73,8 @@ void DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
     {
-    {L"Scene Files (*.scene)", L"*.scene"},
-    {L"All Files (*.*)", L"*.*"}
+        { L"Scene Files (*.scene)", L"*.scene" },
+        { L"All Files (*.*)", L"*.*" }
     };
 
     if (ImGui::MenuItem("Load Scene"))
@@ -108,11 +108,11 @@ void DefaultEditorMenu::DrawFilesMenu()
         std::ofstream ofs(file_path);
         if (serializer.Save(ofs, target_scene))
         {
-            engine::Gui::OkDialog("Scene saved", "Scene saved successfully", {engine::Gui::MbDialogIcon::kInfo});
+            engine::Gui::OkDialog("Scene saved", "Scene saved successfully", { engine::Gui::MbDialogIcon::kInfo });
         }
         else
         {
-            engine::Gui::OkDialog("Scene save failed", "Failed to save a scene!\nCheck logs for more details.", {engine::Gui::MbDialogIcon::kError});
+            engine::Gui::OkDialog("Scene save failed", "Failed to save a scene!\nCheck logs for more details.", { engine::Gui::MbDialogIcon::kError });
         }
 
     }
@@ -182,10 +182,35 @@ void DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObje
     }
 
     const auto component_names = engine::IComponentFactory::GetNames();
+    std::vector<std::shared_ptr<engine::IComponentFactory>> factories;
     for (auto component_name : component_names)
     {
-        if (ImGui::MenuItem(component_name.c_str()))
-            engine::IComponentFactory::Get(component_name)->AddComponentTo(go);
+        factories.emplace_back(engine::IComponentFactory::Get(component_name));
+    }
+
+    std::map<std::string, std::vector<std::shared_ptr<engine::IComponentFactory>>> category_map;
+    for (const auto &factory : factories)
+    {
+        category_map[factory->Category()].emplace_back(factory);
+    }
+
+    for (const auto &[category, categorized_factories] : category_map)
+    {
+        if (category.empty() || ImGui::BeginMenu(category.c_str()))
+        {
+            for (const auto &factory : categorized_factories)
+            {
+                if (ImGui::MenuItem(factory->FriendlyName().c_str(), nullptr, false, go != nullptr))
+                {
+                    factory->AddComponentTo(go);
+                }
+            }
+
+            if (!category.empty())
+            {
+                ImGui::EndMenu();
+            }
+        }
     }
 
     if (go == nullptr)
