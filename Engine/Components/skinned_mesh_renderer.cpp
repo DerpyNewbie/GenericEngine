@@ -80,7 +80,6 @@ void SkinnedMeshRenderer::UpdateBuffer()
 
 void SkinnedMeshRenderer::Render()
 {
-    
     MeshRenderer::Render();
 
     if (m_draw_bones_)
