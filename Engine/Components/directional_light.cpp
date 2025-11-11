@@ -103,8 +103,8 @@ std::vector<Matrix> DirectionalLight::CalcViewProj(const std::array<Vector3, 8> 
         for (auto &corner : cascade_corners)
         {
             Vector3 v = Vector3::Transform(corner, light_view);
-            min_corner = Vector3::Min(min_corner, v);
-            max_corner = Vector3::Max(max_corner, v);
+            Vector3::Min(min_corner, v, min_corner);
+            Vector3::Max(max_corner, v, max_corner);
         }
 
         const Matrix light_proj = Matrix::CreateOrthographicOffCenter(
