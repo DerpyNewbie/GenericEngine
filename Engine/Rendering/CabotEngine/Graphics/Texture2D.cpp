@@ -55,9 +55,23 @@ std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(const aiTexture *ai_text
 void Texture2D::OnInspectorGui()
 {
     ImGui::Text("Texture2D");
-    ImGui::Text("Width: %d", width);
-    ImGui::Text("Height: %d", height);
+    ImGui::Text("Width  : %d", width);
+    ImGui::Text("Height : %d", height);
     ImGui::Text("Mip Level: %d", mip_level);
+
+    if (const auto desc_heap = UploadBuffer())
+    {
+        const auto ratio = static_cast<float>(width) / static_cast<float>(height);
+        const auto max_width = ImGui::CalcItemWidth();
+        static float scale = 1.0f;
+        ImGui::SliderFloat("Preview Scale", &scale, 0.1f, 1.0f);
+        ImGui::Image(desc_heap->HandleGPU.ptr, ImVec2(scale * max_width, scale * max_width * ratio));
+        DescriptorHeap::Free(desc_heap);
+    }
+    else
+    {
+        ImGui::Text("Could not preview the texture.");
+    }
 }
 
 void Texture2D::CreateBuffer()
