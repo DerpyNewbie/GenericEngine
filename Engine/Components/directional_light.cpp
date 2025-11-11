@@ -98,8 +98,8 @@ std::vector<Matrix> DirectionalLight::CalcViewProj(const std::array<Vector3, 8> 
         Matrix light_view = Matrix::CreateLookAt(light_pos, frustum_center, up);
 
         // calculate min/max of cascade corners
-        Vector3 min_corner{ FLT_MAX, FLT_MAX, FLT_MAX };
-        Vector3 max_corner{ -FLT_MAX, -FLT_MAX, -FLT_MAX };
+        Vector3 min_corner(FLT_MAX);
+        Vector3 max_corner(-FLT_MAX);
         for (auto &corner : cascade_corners)
         {
             Vector3 v = Vector3::Transform(corner, light_view);
