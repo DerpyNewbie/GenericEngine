@@ -141,14 +141,18 @@ void AnimationComponent::Stop()
     }
 }
 
-std::shared_ptr<AnimationState> AnimationComponent::AddClip(const std::shared_ptr<AnimationClip> &clip,
-                                                            const std::string &name)
+std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(const std::shared_ptr<AnimationClip> &clip,
+                                                                               const std::string &name)
 {
     const auto state = std::make_shared<AnimationState>();
     state->SetClip(clip);
 
-    m_states_.insert_or_assign(name, state);
-    return state;
+    return AddState(state, name);
+}
+
+std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddState(std::shared_ptr<AnimationState> state, const std::string &name)
+{
+    return m_states_.insert_or_assign(name, state);
 }
 
 std::shared_ptr<AnimationState> AnimationComponent::FindClip(const std::string &name) const
