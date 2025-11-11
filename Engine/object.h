@@ -32,13 +32,13 @@ public:
     virtual ~Object() = default;
 
     virtual void OnConstructed()
-    {}
+    { }
 
     virtual void OnDeserialized()
-    {}
+    { }
 
     virtual void OnDestroy()
-    {}
+    { }
 
     [[nodiscard]] xg::Guid Guid() const;
 
@@ -108,13 +108,21 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        const bool is_loading = m_guid_ == xg::Guid() && m_name_ == "Unknown Object";
+        bool was_just_deserialized = false;
+        if constexpr (Archive::is_loading::value)
+        {
+            was_just_deserialized = m_guid_ == xg::Guid() && m_name_ == "Unknown Object";
+        }
+
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_name_));
 
-        if (is_loading)
+        if constexpr (Archive::is_loading::value)
         {
             m_objects_[m_guid_] = shared_from_this();
-            m_deserialized_objects_.emplace_back(shared_from_this());
+            if (was_just_deserialized)
+            {
+                m_deserialized_objects_.emplace_back(shared_from_this());
+            }
         }
     }
 
