@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "render_pipeline.h"
+
+#include "application.h"
+#include "engine_time.h"
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
+#include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -15,7 +19,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -123,9 +127,30 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
 
+void RenderPipeline::SetSceneData()
+{
+    if (m_scene_data_buffer_ == nullptr)
+    {
+        m_scene_data_buffer_ = std::make_shared<ConstantBuffer>(sizeof(SceneData));
+        m_scene_data_buffer_->CreateBuffer();
+    }
+
+    const auto cmd_list = RenderEngine::CommandList();
+    SceneData scene_data;
+    scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
+    scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
+    scene_data.time = Time::Get()->TimeSinceStartUp();
+    scene_data.delta_time = Time::GetDeltaTime();
+
+    m_scene_data_buffer_->UpdateBuffer(&scene_data);
+
+    cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
+}
+
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(view, proj);
+    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
@@ -167,9 +192,24 @@ void RenderPipeline::DepthRender()
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
 
     Lighting::Instance()->BeginDepthRender();
-    RenderEngine::Instance()->SetRenderTarget(nullptr,
-                                              Lighting::Instance()->m_dsv_heap_.Get(),
-                                              Color());
+
+    Vector2 shadow_map_size = RenderingConstants::kShadowMapSize;
+    D3D12_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = shadow_map_size.x;
+    viewport.Height = shadow_map_size.y;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    D3D12_RECT scissor_rect;
+    scissor_rect.left = 0;
+    scissor_rect.right = static_cast<LONG>(shadow_map_size.x);
+    scissor_rect.top = 0;
+    scissor_rect.bottom = static_cast<LONG>(shadow_map_size.y);
+
+    RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
+                                              Color(), &viewport, &scissor_rect);
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();

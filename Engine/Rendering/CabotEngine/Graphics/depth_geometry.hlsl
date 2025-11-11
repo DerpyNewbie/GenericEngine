@@ -2,7 +2,7 @@
 
 StructuredBuffer<float4x4> LightViewProj : register(t1);
 
-cbuffer LightCount : register (b3)
+cbuffer LightCount : register (b4)
 {
     int light_count;
 }
@@ -14,7 +14,8 @@ struct VSOutput
 
 struct GSOutput
 {
-    float4 pos : SV_POSITION;
+    float4 pos : SV_POSITION; // clip space
+    float2 near_far : NEARFAR;
     uint RTIndex : SV_RenderTargetArrayIndex;
 };
 
@@ -28,6 +29,7 @@ void geo(triangle VSOutput input[3], inout TriangleStream<GSOutput> tri_stream)
         {
             GSOutput element;
             element.pos = mul(viewproj, float4(input[j].world_pos, 1));
+            element.near_far = float2(0.1f, 10.0f);
             element.RTIndex = i;
             tri_stream.Append(element);
         }
