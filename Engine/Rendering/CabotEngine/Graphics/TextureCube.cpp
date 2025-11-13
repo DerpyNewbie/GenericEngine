@@ -12,7 +12,7 @@ void TextureCube::OnInspectorGui()
 {
     for (int i = 0; i < 6; ++i)
     {
-        constexpr const char *dir_labels[] = {"Right", "Left", "Top", "Bottom", "Front", "Back"};
+        constexpr const char *dir_labels[] = { "Right", "Left", "Top", "Bottom", "Front", "Back" };
         if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
         {
             m_is_valid_ = false;
@@ -136,7 +136,7 @@ D3D12_SHADER_RESOURCE_VIEW_DESC TextureCube::ViewDesc()
     return view_desc;
 }
 
-bool TextureCube::SetTextures(std::array<AssetPtr<Texture2D>, 6> textures)
+bool TextureCube::SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures)
 {
     m_textures_ = textures;
     m_is_valid_ = false;

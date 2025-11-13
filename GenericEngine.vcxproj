@@ -78,6 +78,7 @@
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\spot_light.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -105,6 +106,11 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_pixel.hlsl">
+            <ShaderType>Pixel</ShaderType>
+            <EntryPointName>pix</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+        </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl">
             <EntryPointName>vrt</EntryPointName>
             <ShaderType>Vertex</ShaderType>
@@ -114,11 +120,7 @@
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
             <EntryPointName>geo</EntryPointName>
-            <SuppressStartupBanner>true</SuppressStartupBanner>
             <ShaderModel>5.1</ShaderModel>
-            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-            <DisableOptimizations>true</DisableOptimizations>
-            <EnableDebuggingInformation>true</EnableDebuggingInformation>
             <ShaderType>Geometry</ShaderType>
         </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
@@ -195,6 +197,7 @@
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
+        <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
@@ -274,6 +277,7 @@
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\spot_light.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
@@ -340,6 +344,7 @@
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
+        <ClInclude Include="Engine\Rendering\scene_data.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_resource.h"/>
@@ -360,6 +365,9 @@
     <ItemGroup>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

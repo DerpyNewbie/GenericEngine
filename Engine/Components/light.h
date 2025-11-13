@@ -7,6 +7,12 @@
 
 namespace engine
 {
+enum class kLightType : uint8_t
+{
+    kDirectional,
+    kSpotLight,
+};
+
 class Light : public Component
 {
     friend class CameraComponent;
