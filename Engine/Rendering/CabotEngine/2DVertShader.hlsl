@@ -6,7 +6,7 @@ struct VSInput
     float4 color : COLOR; // 頂点色
     float3 normal : NORMAL; // 法線
     float4 tangent : TANGENT; // 接空間
-    float2 uv1 : TEXCOORD; // UV
+    float2 uv1 : TEXCOORD0; // UV
     float2 uv2 : TEXCOORD1;
     float2 uv3 : TEXCOORD2;
     float2 uv4 : TEXCOORD3;
