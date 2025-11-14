@@ -243,3 +243,5 @@ bool AnimationComponent::IsPlaying() const
     return m_is_playing_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AnimationComponent);

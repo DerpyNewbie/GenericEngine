@@ -47,5 +47,11 @@ public:
     void Sample();
 
     [[nodiscard]] bool IsPlaying() const;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this));
+    }
 };
 }
