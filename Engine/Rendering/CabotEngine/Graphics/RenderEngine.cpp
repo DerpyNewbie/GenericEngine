@@ -54,6 +54,10 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         return false;
     }
 
+    engine::Application::on_window_resized.AddListener([this] {
+        UpdateMainRenderTarget();
+    });
+
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
     PSOManager::Initialize();
     return true;
