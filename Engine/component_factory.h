@@ -44,4 +44,13 @@ public:
         game_object->AddComponent<T>();
     }
 };
+
+namespace component_factory_util
+{
+template <typename T>
+void Register(const std::string &category = "")
+{
+    IComponentFactory::Register(std::make_shared<ComponentFactory<T>>(category));
+}
+}
 }
