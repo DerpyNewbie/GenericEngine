@@ -21,6 +21,7 @@ public:
     void OnUpdate() override;
     void Render() override;
 
+    AssetPtr<Texture2D> GetTexture();
     void SetTexture(AssetPtr<Texture2D> texture);
 
     template <class Archive>

@@ -82,6 +82,10 @@ void Image::Render()
 
     cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
+AssetPtr<Texture2D> Image::GetTexture()
+{
+    return m_texture_;
+}
 
 void Image::SetTexture(AssetPtr<Texture2D> texture)
 {
