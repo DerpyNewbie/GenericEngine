@@ -51,11 +51,6 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
-    for (const auto renderer : m_renderers_)
-    {
-        renderer->UpdateBuffer();
-    }
-
     for (const auto camera : m_cameras_)
     {
         ID3D12DescriptorHeap *rtv_heap = nullptr;
@@ -157,11 +152,6 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     lighting_instance->SetCascadeSlicesBuffer();
     lighting_instance->SetBuffers();
     Skybox::Instance()->Render();
-
-    for (const auto renderer : m_renderers_)
-    {
-        renderer->UpdateBuffer();
-    }
 }
 
 void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
@@ -177,6 +167,7 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
                       });
     for (const auto renderer : renderers)
     {
+        renderer->UpdateBuffer();
         renderer->Render();
     }
 
@@ -217,6 +208,7 @@ void RenderPipeline::DepthRender()
 
     for (const auto renderer : m_renderers_)
     {
+        renderer->UpdateBuffer();
         renderer->DepthRender();
     }
 
