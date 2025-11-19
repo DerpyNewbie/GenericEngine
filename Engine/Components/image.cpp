@@ -80,6 +80,16 @@ void Image::Render()
 
     cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
 }
+
+void Image::SetTexture(AssetPtr<Texture2D> texture)
+{
+    if (auto tex = texture.CastedLock())
+    {
+        m_texture_ = texture;
+        tex->CreateBuffer();
+        m_texture_handle_ = tex->UploadBuffer();
+    }
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::Image)
