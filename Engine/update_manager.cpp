@@ -4,14 +4,6 @@
 
 namespace engine
 {
-
-std::vector<std::weak_ptr<IUpdateReceiver>> UpdateManager::m_update_receivers_;
-std::vector<std::weak_ptr<IFixedUpdateReceiver>> UpdateManager::m_fixed_update_receivers_;
-std::queue<std::function<void()>> UpdateManager::m_in_cycle_buffer_;
-
-bool UpdateManager::m_in_update_cycle_ = false;
-bool UpdateManager::m_in_fixed_update_cycle_ = false;
-
 namespace
 {
 template <typename It, typename V>
@@ -71,6 +63,16 @@ void UpdateManager::InvokeFixedUpdate()
         receiver->OnFixedUpdate();
     });
     m_in_fixed_update_cycle_ = false;
+    PostFix();
+}
+
+void UpdateManager::InvokeGarbageCollect()
+{
+    m_in_garbage_collect_cycle_ = true;
+    Update(m_garbage_collect_receivers_, [&](const auto &receiver) {
+        receiver->OnGarbageCollect();
+    });
+    m_in_garbage_collect_cycle_ = false;
     PostFix();
 }
 
@@ -136,6 +138,32 @@ void UpdateManager::UnsubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateRec
     Erase(m_fixed_update_receivers_, receiver);
 }
 
+void UpdateManager::SubscribeGarbageCollect(const std::shared_ptr<IGarbageCollectReceiver> &receiver)
+{
+    if (InGarbageCollectCycle())
+    {
+        m_in_cycle_buffer_.emplace([receiver] {
+            SubscribeGarbageCollect(receiver);
+        });
+        return;
+    }
+
+    Subscribe(m_garbage_collect_receivers_, receiver);
+}
+
+void UpdateManager::UnsubscribeGarbageCollect(const std::shared_ptr<IGarbageCollectReceiver> &receiver)
+{
+    if (InGarbageCollectCycle())
+    {
+        m_in_cycle_buffer_.emplace([receiver] {
+            UnsubscribeGarbageCollect(receiver);
+        });
+        return;
+    }
+
+    Erase(m_garbage_collect_receivers_, receiver);
+}
+
 bool UpdateManager::InUpdateCycle()
 {
     return m_in_update_cycle_;
@@ -143,5 +171,9 @@ bool UpdateManager::InUpdateCycle()
 bool UpdateManager::InFixedUpdateCycle()
 {
     return m_in_fixed_update_cycle_;
+}
+bool UpdateManager::InGarbageCollectCycle()
+{
+    return m_in_garbage_collect_cycle_;
 }
 }

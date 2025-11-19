@@ -91,6 +91,10 @@ int Application::WindowHeight()
 {
     return window_height;
 }
+float Application::WindowAspectRatio()
+{
+    return static_cast<float>(window_width) / static_cast<float>(window_height);
+}
 
 HWND Application::WindowHandle()
 {

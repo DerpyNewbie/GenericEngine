@@ -29,6 +29,9 @@
 
 #include <ranges>
 
+#include "scene_manager.h"
+#include "serializer.h"
+
 namespace editor
 {
 using namespace engine;
@@ -56,8 +59,8 @@ void Editor::SetEditorStyle(const int i)
 
 void Editor::Init()
 {
+    // begin IMGUI init
     {
-        // imgui init
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
         ImPlot::CreateContext();
@@ -91,7 +94,9 @@ void Editor::Init()
             font_gpu_desc_handle
         );
     }
+    // end IMGUI init
 
+    // begin EditorWindow register
     {
         AddEditorWindow("Hierarchy", std::make_shared<Hierarchy>());
         AddEditorWindow("Inspector", std::make_shared<Inspector>());
@@ -103,7 +108,9 @@ void Editor::Init()
         AddEditorWindow("Audio", std::make_shared<AudioWindow>());
         AddEditorWindow("Tools", std::make_shared<ToolWindow>());
     }
+    // end EditorWindow register
 
+    // begin DefaultMenu register
     {
         const auto default_menu = std::make_shared<DefaultEditorMenu>();
         AddEditorMenu("File", default_menu, -1000);
@@ -113,7 +120,9 @@ void Editor::Init()
         AddEditorMenu("Component", default_menu, -960);
         AddEditorMenu("Window", default_menu, -950);
     }
+    // end DefaultMenu register
 
+    // begin CreateMenu register
     {
         AddCreateMenu("Text Asset", ".txt", [] {
             return Object::Instantiate<TextAsset>("New Text Asset");
@@ -131,27 +140,26 @@ void Editor::Init()
             return Object::Instantiate<TextureCube>("New TextureCube");
         });
     }
+    // end CreateMenu register
+
+    // begin Engine Event Hook register
+    {
+        Engine::on_tick.AddListener([this] {
+            OnEngineTick();
+        });
+    }
+}
+
+void Editor::OnEngineTick() const
+{
+    if (m_paused_)
+        Application::SetPlayMode(false);
 }
 
 std::shared_ptr<Editor> Editor::Instance()
 {
     static auto instance = std::make_shared<Editor>();
     return instance;
-}
-
-void Editor::Attach()
-{
-    Engine::on_init.AddListener([this] {
-        Init();
-    });
-
-    RenderPipeline::Instance()->on_rendering.AddListener([this] {
-        OnDraw();
-    });
-
-    Engine::on_finalize.AddListener([this] {
-        Finalize();
-    });
 }
 
 void Editor::OnDraw()
@@ -203,6 +211,21 @@ void Editor::OnDraw()
     }
 }
 
+void Editor::Attach()
+{
+    Engine::on_init.AddListener([this] {
+        Init();
+    });
+
+    RenderPipeline::Instance()->on_rendering.AddListener([this] {
+        OnDraw();
+    });
+
+    Engine::on_finalize.AddListener([this] {
+        Finalize();
+    });
+}
+
 void Editor::Finalize()
 {
     ImGui_ImplWin32_Shutdown();
@@ -210,9 +233,109 @@ void Editor::Finalize()
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
-void Editor::SetPlayMode(bool is_playing)
+
+void Editor::PushSceneSnapshot()
 {
-    Application::SetPlayMode(is_playing);
+    Logger::Log<Editor>("Pushing scene snapshot");
+
+    const auto current_scenes = SceneManager::GetCurrentScenes();
+    std::vector<std::string> serialized_scenes;
+    for (const auto current_scene : current_scenes)
+    {
+        std::stringstream ss;
+        {
+            Serializer serializer;
+            if (!serializer.Save(ss, current_scene))
+            {
+                Logger::Error("Failed to serialize scene: {}", current_scene->Name());
+                throw std::runtime_error("Failed to serialize scene");
+            }
+        }
+
+        serialized_scenes.emplace_back(ss.str());
+    }
+
+    Logger::Log<Editor>("Serialized %d scenes", serialized_scenes.size());
+
+    m_scene_snapshots_.emplace(serialized_scenes);
+}
+
+void Editor::PopSceneSnapshot()
+{
+    Logger::Log<Editor>("Popping scene snapshot");
+
+    if (m_scene_snapshots_.empty())
+    {
+        throw std::runtime_error("No scene snapshots to pop");
+        return;
+    }
+
+    const auto scenes = SceneManager::GetCurrentScenes();
+    for (const auto scene : scenes)
+    {
+        SceneManager::DestroyScene(scene->Name());
+    }
+
+    const auto snapshot = m_scene_snapshots_.front();
+    m_scene_snapshots_.pop();
+
+    Logger::Log<Editor>("Restoring %d scenes", snapshot.size());
+    for (auto serialized_scene : snapshot)
+    {
+        SceneManager::DeserializeScene(serialized_scene);
+    }
+}
+
+void Editor::SetEditorMode(const EditorMode mode)
+{
+    const auto last_mode = m_mode_;
+    m_mode_ = mode;
+
+    if (last_mode == m_mode_)
+        return;
+
+    if (m_mode_ == EditorMode::kPlay)
+    {
+        PushSceneSnapshot();
+    }
+
+    Application::SetPlayMode(mode == EditorMode::kPlay);
+
+    if (m_mode_ == EditorMode::kEdit)
+    {
+        PopSceneSnapshot();
+    }
+}
+
+EditorMode Editor::GetEditorMode() const
+{
+    return m_mode_;
+}
+
+void Editor::SetPaused(const bool is_paused)
+{
+    m_paused_ = is_paused;
+    if (!m_paused_ && GetEditorMode() == EditorMode::kPlay)
+    {
+        Application::SetPlayMode(true);
+    }
+}
+
+bool Editor::IsPaused() const
+{
+    return m_paused_;
+}
+
+void Editor::SingleTickStep()
+{
+    if (GetEditorMode() != EditorMode::kPlay)
+    {
+        Logger::Warn<Editor>("Cannot single step when not in play mode");
+        return;
+    }
+
+    m_paused_ = true;
+    Application::SetPlayMode(true);
 }
 
 void Editor::SetSelectedObject(const std::shared_ptr<Object> &object)

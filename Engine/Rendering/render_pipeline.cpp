@@ -73,13 +73,16 @@ void RenderPipeline::InvokeDrawCall()
         if (rtv_heap == nullptr && dsv_heap == nullptr)
             continue;
 
+        const auto view = camera->ViewMatrix();
+        const auto proj = camera->m_property_.ProjectionMatrix();
+
         CameraComponent::SetCurrentCamera(camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
 
         DepthRender();
 
         RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-        Render(camera);
+        Render(view, proj);
 
         if (render_tex)
             render_tex->EndRender();
@@ -94,14 +97,29 @@ void RenderPipeline::InvokeDrawCall()
         const auto prev_property = main_camera->m_property_;
         main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
         CameraComponent::SetCurrentCamera(main_camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        const auto view = main_camera->ViewMatrix();
+        const auto proj = main_camera->m_property_.ProjectionMatrix();
+
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(main_camera);
+        Render(view, proj);
 
         // revert back to original property
         main_camera->m_property_ = prev_property;
+    }
+    else
+    {
+        const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
+        const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
+
+        CameraComponent::SetCurrentCamera({});
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
+        DepthRender();
+
+        RenderEngine::Instance()->SetMainRenderTarget(Color());
+        Render(view, proj);
     }
 
     on_rendering.Invoke();
@@ -161,10 +179,8 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     Skybox::Instance()->Render();
 }
 
-void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
+void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
 {
-    const auto view = camera->ViewMatrix();
-    const auto proj = camera->m_property_.ProjectionMatrix();
     UpdateBuffer(view, proj);
 
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
@@ -249,11 +265,13 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 
 void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
 {
+    Logger::Log<RenderPipeline>("Adding camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.emplace(camera);
 }
 
 void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
 {
+    Logger::Log<RenderPipeline>("Removing camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.erase(camera);
 }
 }

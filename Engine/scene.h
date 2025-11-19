@@ -3,7 +3,7 @@
 
 namespace engine
 {
-class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
+class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver, public IGarbageCollectReceiver
 {
     friend class ObjectUtil;
     friend class GameObject;
@@ -18,6 +18,7 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
     void OnUpdate() override;
     void OnFixedUpdate() override;
     void OnDestroy() override;
+    void OnGarbageCollect() override;
 
 public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();

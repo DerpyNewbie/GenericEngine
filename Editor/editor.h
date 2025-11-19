@@ -9,6 +9,12 @@ namespace editor
 class EditorMenu;
 class EditorWindow;
 
+enum class EditorMode
+{
+    kEdit,
+    kPlay,
+};
+
 class Editor final : public enable_shared_from_base<Editor>
 {
     struct PrioritizedEditorMenu
@@ -40,9 +46,14 @@ class Editor final : public enable_shared_from_base<Editor>
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
     std::vector<PrioritizedEditorMenu> m_editor_menus_;
     std::vector<PrioritizedCreateMenu> m_create_menus_;
+    std::queue<std::vector<std::string>> m_scene_snapshots_;
+
+    EditorMode m_mode_ = EditorMode::kEdit;
+    bool m_paused_ = false;
 
     void SetEditorStyle(int i);
     void Init();
+    void OnEngineTick() const;
 
 public:
     static std::shared_ptr<Editor> Instance();
@@ -52,7 +63,15 @@ public:
     void Attach();
     void Finalize();
 
-    void SetPlayMode(bool is_playing);
+    void PushSceneSnapshot();
+    void PopSceneSnapshot();
+
+    void SetEditorMode(EditorMode mode);
+    EditorMode GetEditorMode() const;
+    void SetPaused(bool is_paused);
+    bool IsPaused() const;
+
+    void SingleTickStep();
 
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
     std::shared_ptr<engine::Object> SelectedObject() const;

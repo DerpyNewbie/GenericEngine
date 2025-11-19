@@ -5,9 +5,10 @@ namespace engine
 {
 class Transform : public Component
 {
+    bool m_is_dirty_ = true;
     Vector3 m_local_position_ = {};
     Quaternion m_local_rotation_ = Quaternion::Identity;
-    Vector3 m_local_scale_ = {1, 1, 1};
+    Vector3 m_local_scale_ = { 1, 1, 1 };
 
     Matrix m_local_matrix_ = Matrix::Identity;
     Matrix m_world_matrix_ = Matrix::Identity;
@@ -17,21 +18,23 @@ class Transform : public Component
     void TransformGui(bool is_local);
     static Matrix TRS(Vector3 translation, Quaternion rotation, Vector3 scale);
     void RecalculateMatrices();
+    void SetDirty();
 
 public:
+    void OnValidate() override;
     void OnAwake() override;
     void OnDestroy() override;
     void OnInspectorGui() override;
 
     [[nodiscard]] Matrix LocalMatrix() const;
-    [[nodiscard]] Matrix WorldMatrix() const;
+    [[nodiscard]] Matrix WorldMatrix();
     [[nodiscard]] Matrix ParentMatrix() const;
-    [[nodiscard]] Matrix LocalToWorld() const;
-    [[nodiscard]] Matrix WorldToLocal() const;
+    [[nodiscard]] Matrix LocalToWorld();
+    [[nodiscard]] Matrix WorldToLocal();
 
-    [[nodiscard]] Vector3 Position() const;
-    [[nodiscard]] Quaternion Rotation() const;
-    [[nodiscard]] Vector3 Scale() const;
+    [[nodiscard]] Vector3 Position();
+    [[nodiscard]] Quaternion Rotation();
+    [[nodiscard]] Vector3 Scale();
 
     [[nodiscard]] Vector3 LocalPosition() const;
     [[nodiscard]] Quaternion LocalRotation() const;
@@ -60,34 +63,40 @@ public:
 
     void SetLocalMatrix(const Matrix &matrix);
 
-    [[nodiscard]] Vector3 Forward() const
+    [[nodiscard]] Vector3 Forward()
     {
-        return Vector3::Transform(Vector3::Forward, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Forward, rot);
     }
 
-    [[nodiscard]] Vector3 Back() const
+    [[nodiscard]] Vector3 Back()
     {
-        return Vector3::Transform(Vector3::Backward, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Backward, rot);
     }
 
-    [[nodiscard]] Vector3 Right() const
+    [[nodiscard]] Vector3 Right()
     {
-        return Vector3::Transform(Vector3::Right, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Right, rot);
     }
 
-    [[nodiscard]] Vector3 Left() const
+    [[nodiscard]] Vector3 Left()
     {
-        return Vector3::Transform(Vector3::Left, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Left, rot);
     }
 
-    [[nodiscard]] Vector3 Up() const
+    [[nodiscard]] Vector3 Up()
     {
-        return Vector3::Transform(Vector3::Up, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Up, rot);
     }
 
-    [[nodiscard]] Vector3 Down() const
+    [[nodiscard]] Vector3 Down()
     {
-        return Vector3::Transform(Vector3::Down, Rotation());
+        const auto rot = Rotation();
+        return Vector3::Transform(Vector3::Down, rot);
     }
 
     template <class Archive>

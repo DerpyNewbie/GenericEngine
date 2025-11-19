@@ -56,6 +56,7 @@ class CameraComponent : public Component
 public:
     void OnAwake() override;
     void OnInspectorGui() override;
+    void OnValidate() override;
     void OnEnabled() override;
     void OnDisabled() override;
 

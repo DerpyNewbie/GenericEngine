@@ -88,6 +88,7 @@ void Engine::Tick()
 
     Profiler::Begin("Cleanup Objects");
     Object::GarbageCollect();
+    UpdateManager::InvokeGarbageCollect();
     Profiler::End("Cleanup Objects");
 }
 

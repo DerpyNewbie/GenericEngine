@@ -53,12 +53,7 @@ Matrix CameraProperty::ProjectionMatrix() const
 }
 
 void CameraComponent::OnAwake()
-{
-    if (Main() == nullptr)
-    {
-        SetMainCamera(shared_from_base<CameraComponent>());
-    }
-}
+{ }
 
 void CameraComponent::OnInspectorGui()
 {
@@ -66,14 +61,31 @@ void CameraComponent::OnInspectorGui()
     Gui::PropertyField("RenderTexture", m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }
+void CameraComponent::OnValidate()
+{
+    if (GameObject()->IsActiveInHierarchy())
+    {
+        OnEnabled();
+    }
+}
 
 void CameraComponent::OnEnabled()
 {
+    if (Main() == nullptr)
+    {
+        SetMainCamera(shared_from_base<CameraComponent>());
+    }
+
     RenderPipeline::AddCamera(shared_from_base<CameraComponent>());
 }
 
 void CameraComponent::OnDisabled()
 {
+    if (m_main_camera_.lock() == shared_from_base<CameraComponent>())
+    {
+        SetMainCamera({});
+    }
+
     RenderPipeline::RemoveCamera(shared_from_base<CameraComponent>());
 }
 
@@ -107,9 +119,17 @@ std::shared_ptr<CameraComponent> CameraComponent::Current()
 
 Matrix CameraComponent::ViewMatrix() const
 {
-    auto transform = GameObject()->Transform();
-    return DirectX::XMMatrixLookAtRH(transform->Position(), transform->Position() + transform->Forward(),
-                                     transform->Up());
+    const auto transform = GameObject()->Transform();
+    if (transform == nullptr)
+    {
+        return Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
+    }
+
+    return Matrix::CreateLookAt(
+        transform->Position(),
+        transform->Position() + transform->Forward(),
+        transform->Up()
+    );
 }
 }
 
