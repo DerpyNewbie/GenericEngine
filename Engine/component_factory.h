@@ -32,7 +32,7 @@ public:
     static std::vector<std::string> GetNames();
 };
 
-template <typename T>
+template <class T>
 class ComponentFactory final : public IComponentFactory
 {
 public:
@@ -47,8 +47,8 @@ public:
 
 namespace component_factory_util
 {
-template <typename T>
-void Register(const std::string &category = "")
+template <class T>
+void RegisterComponentFactory(const std::string &category = "")
 {
     IComponentFactory::Register(std::make_shared<ComponentFactory<T>>(category));
 }

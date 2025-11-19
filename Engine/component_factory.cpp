@@ -38,33 +38,33 @@ void IComponentFactory::Init()
 {
     using namespace component_factory_util;
 
-    Register<CameraComponent>("Rendering");
-    Register<Controller>("Debug");
-    Register<FrameMetaData>("Debug");
-    Register<MeshRenderer>("Rendering/Renderer");
-    Register<SkinnedMeshRenderer>("Rendering/Renderer");
-    Register<BillboardRenderer>("Rendering/Renderer");
-    Register<TextAssetRefTestComponent>("Debug");
-    Register<TextRenderer>("Rendering/Renderer");
-    Register<Canvas>("Rendering/Renderer");
-    Register<Image>("Rendering/Renderer");
-    Register<RectTransform>("Rendering/Renderer");
-    Register<RigidbodyComponent>("Physics");
-    Register<SphereCollider>("Physics");
-    Register<PlaneCollider>("Physics");
-    Register<BoxCollider>("Physics");
-    Register<CapsuleCollider>("Physics");
-    Register<RigidbodyTesterComponent>("Debug");
-    Register<AudioSourceComponent>("Audio");
-    Register<AudioListenerComponent>("Audio");
-    Register<CinemaCameraComponent>("Rendering/Cinema");
-    Register<CinemaBrainComponent>("Rendering/Cinema");
-    Register<DirectionalLight>("Rendering/Light");
-    Register<SpotLight>("Rendering/Light");
-    Register<RotatorComponent>("Debug");
-    Register<AnimationComponent>("Animation");
-    Register<RenderingSettingsComponent>("Rendering");
-    Register<CinemaCameraTransitioner>("Rendering/Cinema");
+    RegisterComponentFactory<CameraComponent>("Rendering");
+    RegisterComponentFactory<Controller>("Debug");
+    RegisterComponentFactory<FrameMetaData>("Debug");
+    RegisterComponentFactory<MeshRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<SkinnedMeshRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<BillboardRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<TextAssetRefTestComponent>("Debug");
+    RegisterComponentFactory<TextRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<Canvas>("Rendering/Renderer");
+    RegisterComponentFactory<Image>("Rendering/Renderer");
+    RegisterComponentFactory<RectTransform>("Rendering/Renderer");
+    RegisterComponentFactory<RigidbodyComponent>("Physics");
+    RegisterComponentFactory<SphereCollider>("Physics");
+    RegisterComponentFactory<PlaneCollider>("Physics");
+    RegisterComponentFactory<BoxCollider>("Physics");
+    RegisterComponentFactory<CapsuleCollider>("Physics");
+    RegisterComponentFactory<RigidbodyTesterComponent>("Debug");
+    RegisterComponentFactory<AudioSourceComponent>("Audio");
+    RegisterComponentFactory<AudioListenerComponent>("Audio");
+    RegisterComponentFactory<CinemaCameraComponent>("Rendering/Cinema");
+    RegisterComponentFactory<CinemaBrainComponent>("Rendering/Cinema");
+    RegisterComponentFactory<DirectionalLight>("Rendering/Light");
+    RegisterComponentFactory<SpotLight>("Rendering/Light");
+    RegisterComponentFactory<RotatorComponent>("Debug");
+    RegisterComponentFactory<AnimationComponent>("Animation");
+    RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
+    RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :
