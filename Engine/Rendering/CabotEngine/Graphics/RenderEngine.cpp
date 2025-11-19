@@ -2,7 +2,6 @@
 
 #include "RenderEngine.h"
 #include "PSOManager.h"
-#include "RootSignature.h"
 #include "application.h"
 #include "Rendering/font_data.h"
 
@@ -325,8 +324,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = static_cast<float>(engine::Application::Instance()->WindowWidth());
-    m_viewport_.Height = static_cast<float>(engine::Application::Instance()->WindowHeight());
+    m_viewport_.Width = static_cast<float>(engine::Application::WindowWidth());
+    m_viewport_.Height = static_cast<float>(engine::Application::WindowHeight());
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }
@@ -334,9 +333,9 @@ void RenderEngine::CreateViewPort()
 void RenderEngine::CreateScissorRect()
 {
     m_scissor_.left = 0;
-    m_scissor_.right = engine::Application::Instance()->WindowWidth();
+    m_scissor_.right = engine::Application::WindowWidth();
     m_scissor_.top = 0;
-    m_scissor_.bottom = engine::Application::Instance()->WindowHeight();
+    m_scissor_.bottom = engine::Application::WindowHeight();
 }
 
 bool RenderEngine::CreateRenderTarget()
@@ -396,8 +395,8 @@ bool RenderEngine::CreateDepthStencil()
     const CD3DX12_RESOURCE_DESC resource_desc(
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
-        engine::Application::Instance()->WindowWidth(),
-        engine::Application::Instance()->WindowHeight(),
+        engine::Application::WindowWidth(),
+        engine::Application::WindowHeight(),
         1,
         1,
         DXGI_FORMAT_D32_FLOAT,
