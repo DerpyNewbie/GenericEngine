@@ -15,6 +15,7 @@
 #include "audio_window.h"
 #include "editor_gizmos.h"
 #include "engine.h"
+#include "tool_window.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -38,16 +39,16 @@ void Editor::SetEditorStyle(const int i)
         return;
     switch (i)
     {
-    default:
-    case 0:
-        ImGui::StyleColorsDark();
-        break;
-    case 1:
-        ImGui::StyleColorsLight();
-        break;
-    case 2:
-        ImGui::StyleColorsClassic();
-        break;
+        default:
+        case 0:
+            ImGui::StyleColorsDark();
+            break;
+        case 1:
+            ImGui::StyleColorsLight();
+            break;
+        case 2:
+            ImGui::StyleColorsClassic();
+            break;
     }
 
     m_last_editor_style_ = i;
@@ -88,7 +89,7 @@ void Editor::Init()
             DescriptorHeap::GetHeap(),
             font_cpu_desc_handle,
             font_gpu_desc_handle
-            );
+        );
     }
 
     {
@@ -100,6 +101,7 @@ void Editor::Init()
         AddEditorWindow("Asset Browser", std::make_shared<AssetBrowser>());
         AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
         AddEditorWindow("Audio", std::make_shared<AudioWindow>());
+        AddEditorWindow("Tools", std::make_shared<ToolWindow>());
     }
 
     {
@@ -208,6 +210,10 @@ void Editor::Finalize()
     ImPlot::DestroyContext();
     ImGui::DestroyContext();
 }
+void Editor::SetPlayMode(bool is_playing)
+{
+    Application::SetPlayMode(is_playing);
+}
 
 void Editor::SetSelectedObject(const std::shared_ptr<Object> &object)
 {
@@ -237,7 +243,7 @@ void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWind
 std::vector<std::string> Editor::GetEditorWindowNames()
 {
     auto keys = std::views::keys(m_editor_windows_);
-    return {keys.begin(), keys.end()};
+    return { keys.begin(), keys.end() };
 }
 
 std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
@@ -276,7 +282,7 @@ void Editor::RemoveEditorMenu(const std::string &name)
 }
 
 void Editor::AddCreateMenu(const std::string &name, const std::string &extension,
-                           std::function<std::shared_ptr<Object>()> factory, int priority)
+    std::function<std::shared_ptr<Object>()> factory, int priority)
 {
     m_create_menus_.emplace_back(name, extension, factory, priority);
     std::ranges::sort(m_create_menus_, std::ranges::less(), &PrioritizedCreateMenu::priority);

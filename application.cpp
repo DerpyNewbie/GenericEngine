@@ -15,28 +15,29 @@ int Application::m_window_height_ = 1080;
 int Application::m_window_width_ = 1920;
 HWND Application::m_window_handle_ = nullptr;
 Event<> Application::on_window_resized;
+bool Application::m_play_mode_ = false;
 
 LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     switch (msg)
     {
-    case WM_DESTROY:
-        Logger::Log<Application>("Window destroyed");
-        PostQuitMessage(0);
-        break;
-    case WM_SIZE:
-        Logger::Log<Application>("Window resized");
-        if (wparam == SIZE_MINIMIZED)
+        case WM_DESTROY:
+            Logger::Log<Application>("Window destroyed");
+            PostQuitMessage(0);
             break;
-        Instance()->m_window_width_ = LOWORD(lparam);
-        Instance()->m_window_height_ = HIWORD(lparam);
-        Instance()->on_window_resized.Invoke();
-        break;
-    case WM_MOUSEACTIVATE:
-        Logger::Log<Application>("Mouse activated");
-        return MA_ACTIVATEANDEAT;
-    default:
-        break;
+        case WM_SIZE:
+            Logger::Log<Application>("Window resized");
+            if (wparam == SIZE_MINIMIZED)
+                break;
+            Instance()->m_window_width_ = LOWORD(lparam);
+            Instance()->m_window_height_ = HIWORD(lparam);
+            Instance()->on_window_resized.Invoke();
+            break;
+        case WM_MOUSEACTIVATE:
+            Logger::Log<Application>("Mouse activated");
+            return MA_ACTIVATEANDEAT;
+        default:
+            break;
     }
 
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
@@ -89,6 +90,11 @@ HWND Application::WindowHandle()
     return m_window_handle_;
 }
 
+bool Application::IsPlayMode()
+{
+    return m_play_mode_;
+}
+
 void Application::InitWindow()
 {
     WNDCLASSEX w = {};
@@ -100,7 +106,7 @@ void Application::InitWindow()
 
     RegisterClassEx(&w);
 
-    RECT wrc = {0, 0, static_cast<LONG>(m_window_width_), static_cast<LONG>(m_window_height_)};
+    RECT wrc = { 0, 0, static_cast<LONG>(m_window_width_), static_cast<LONG>(m_window_height_) };
 
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
@@ -117,5 +123,10 @@ void Application::InitWindow()
                                     nullptr);
 
     ShowWindow(m_window_handle_,SW_SHOW);
+}
+
+void Application::SetPlayMode(const bool play)
+{
+    m_play_mode_ = play;
 }
 }

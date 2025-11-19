@@ -32,6 +32,7 @@
         <ClCompile Include="Editor\imgui_demo_window.cpp"/>
         <ClCompile Include="Editor\inspector.cpp"/>
         <ClCompile Include="Editor\profiler.cpp"/>
+        <ClCompile Include="Editor\tool_window.cpp"/>
         <ClCompile Include="Editor\update_man_debugger.cpp"/>
         <ClCompile Include="Engine\Animation\animation_state.cpp"/>
         <ClCompile Include="Engine\Animation\animation_clip.cpp"/>
@@ -230,6 +231,7 @@
         <ClInclude Include="Editor\imgui_demo_window.h"/>
         <ClInclude Include="Editor\inspector.h"/>
         <ClInclude Include="Editor\profiler.h"/>
+        <ClInclude Include="Editor\tool_window.h"/>
         <ClInclude Include="Editor\update_man_debugger.h"/>
         <ClInclude Include="Engine\Animation\animation_state.h"/>
         <ClInclude Include="Engine\Animation\animation_clip.h"/>

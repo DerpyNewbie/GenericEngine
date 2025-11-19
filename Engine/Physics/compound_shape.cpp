@@ -17,8 +17,8 @@ void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) con
     relative_matrix.Decompose(sca, rot, pos);
 
     btTransform bt_transform = btTransform::getIdentity();
-    bt_transform.setOrigin({pos.x, pos.y, pos.z});
-    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
+    bt_transform.setOrigin({ pos.x, pos.y, pos.z });
+    bt_transform.setRotation({ rot.x, rot.y, rot.z, rot.w });
 
     m_shape_->addChildShape(bt_transform, collider->GetShape());
 }
@@ -31,7 +31,7 @@ void CompoundShape::RemoveChildShape(const std::shared_ptr<Collider> &collider) 
 CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
     m_shape_(std::make_unique<btCompoundShape>()),
     m_transform_(target)
-{}
+{ }
 
 void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
 {
@@ -50,6 +50,9 @@ void CompoundShape::RemoveChild(const std::shared_ptr<Collider> &collider)
 
 void CompoundShape::UpdateShape() const
 {
+    if (m_shape_ == nullptr)
+        return;
+
     for (auto &weak_collider : m_colliders_)
     {
         auto collider = weak_collider.lock();

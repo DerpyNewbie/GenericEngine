@@ -33,7 +33,7 @@ class Editor final : public enable_shared_from_base<Editor>
         std::function<std::shared_ptr<engine::Object>()> factory;
         int priority;
     };
-    
+
     int m_last_editor_style_ = -1;
     std::weak_ptr<engine::Object> m_selected_object_;
     std::filesystem::path m_selected_directory_ = "";
@@ -52,6 +52,8 @@ public:
     void Attach();
     void Finalize();
 
+    void SetPlayMode(bool is_playing);
+
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
     std::shared_ptr<engine::Object> SelectedObject() const;
 
@@ -69,7 +71,7 @@ public:
     void RemoveEditorMenu(const std::string &name);
 
     void AddCreateMenu(const std::string &name, const std::string &extension,
-                       std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
+        std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
     std::vector<PrioritizedCreateMenu> GetCreateMenus();
     void RemoveCreateMenu(const std::string &name);
 
