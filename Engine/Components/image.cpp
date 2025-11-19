@@ -17,6 +17,8 @@ void Image::OnInspectorGui()
         if (auto tex = m_texture_.CastedLock())
         {
             tex->CreateBuffer();
+            if (m_texture_handle_ != nullptr)
+                DescriptorHeap::Free(m_texture_handle_);
             m_texture_handle_ = tex->UploadBuffer();
         }
     }
@@ -87,6 +89,8 @@ void Image::SetTexture(AssetPtr<Texture2D> texture)
     {
         m_texture_ = texture;
         tex->CreateBuffer();
+        if (m_texture_handle_ != nullptr)
+            DescriptorHeap::Free(m_texture_handle_);
         m_texture_handle_ = tex->UploadBuffer();
     }
 }
