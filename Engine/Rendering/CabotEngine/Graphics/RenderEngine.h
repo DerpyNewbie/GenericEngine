@@ -64,6 +64,7 @@ public:
         Color background_color, const D3D12_VIEWPORT *viewport = nullptr, const D3D12_RECT *scissor = nullptr) const;
     void EndRender();
     void WaitRender();
+    void UpdateMainRenderTarget();
 
     static ID3D12Device6 *Device()
     {

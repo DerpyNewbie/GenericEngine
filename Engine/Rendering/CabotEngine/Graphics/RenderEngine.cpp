@@ -2,7 +2,6 @@
 
 #include "RenderEngine.h"
 #include "PSOManager.h"
-#include "RootSignature.h"
 #include "application.h"
 #include "Rendering/font_data.h"
 
@@ -53,6 +52,10 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         engine::Logger::Error<RenderEngine>("Failed to create DepthStencil");
         return false;
     }
+
+    engine::Application::on_window_resized.AddListener([this] {
+        UpdateMainRenderTarget();
+    });
 
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
     PSOManager::Initialize();
@@ -209,7 +212,7 @@ bool RenderEngine::CreateCommandQueue()
 bool RenderEngine::CreateSwapChain()
 {
     // DXGIファクトリーの生成
-    IDXGIFactory4 *dxgi_factory = nullptr;
+    IDXGIFactory2 *dxgi_factory = nullptr;
     HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory));
     if (FAILED(hr))
     {
@@ -217,26 +220,24 @@ bool RenderEngine::CreateSwapChain()
     }
 
     // スワップチェインの生成
-    DXGI_SWAP_CHAIN_DESC desc;
-    desc.BufferDesc.Width = engine::Application::WindowWidth();
-    desc.BufferDesc.Height = engine::Application::WindowHeight();
-    desc.BufferDesc.RefreshRate.Numerator = 60;
-    desc.BufferDesc.RefreshRate.Denominator = 1;
-    desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    desc.Width = engine::Application::WindowWidth();
+    desc.Height = engine::Application::WindowHeight();
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.BufferCount = kFrame_Buffer_Count;
-    desc.OutputWindow = m_h_wnd_;
-    desc.Windowed = TRUE;
+    desc.Scaling = DXGI_SCALING_NONE;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     // スワップチェインの生成
-    IDXGISwapChain *swap_chain = nullptr;
-    hr = dxgi_factory->CreateSwapChain(m_p_queue_.Get(), &desc, &swap_chain);
+    IDXGISwapChain1 *swap_chain = nullptr;
+    hr = dxgi_factory->CreateSwapChainForHwnd(
+        m_p_queue_.Get(), engine::Application::WindowHandle(), &desc, nullptr, nullptr, &swap_chain
+    );
+
     if (FAILED(hr))
     {
         dxgi_factory->Release();
@@ -323,8 +324,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = static_cast<float>(engine::Application::Instance()->WindowWidth());
-    m_viewport_.Height = static_cast<float>(engine::Application::Instance()->WindowHeight());
+    m_viewport_.Width = static_cast<float>(engine::Application::WindowWidth());
+    m_viewport_.Height = static_cast<float>(engine::Application::WindowHeight());
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }
@@ -332,9 +333,9 @@ void RenderEngine::CreateViewPort()
 void RenderEngine::CreateScissorRect()
 {
     m_scissor_.left = 0;
-    m_scissor_.right = engine::Application::Instance()->WindowWidth();
+    m_scissor_.right = engine::Application::WindowWidth();
     m_scissor_.top = 0;
-    m_scissor_.bottom = engine::Application::Instance()->WindowHeight();
+    m_scissor_.bottom = engine::Application::WindowHeight();
 }
 
 bool RenderEngine::CreateRenderTarget()
@@ -452,10 +453,26 @@ void RenderEngine::WaitRender()
             return;
         }
 
-        // 待機処理.
-        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE))
-        {
-            return;
-        }
+        WaitForSingleObject(m_fence_event_, INFINITE);
     }
+}
+
+void RenderEngine::UpdateMainRenderTarget()
+{
+    engine::Logger::Log<RenderEngine>("Updating main render target");
+    WaitRender();
+
+    for (auto rt : m_p_render_targets_)
+        rt.Reset();
+
+    m_p_swap_chain_->ResizeBuffers(kFrame_Buffer_Count,
+                                   engine::Application::WindowWidth(),
+                                   engine::Application::WindowHeight(),
+                                   DXGI_FORMAT_UNKNOWN,
+                                   0);
+
+    CreateRenderTarget();
+    CreateDepthStencil();
+    CreateViewPort();
+    CreateScissorRect();
 }

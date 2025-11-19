@@ -21,8 +21,8 @@ void RenderTexture::CreateBuffer()
     clearValue.Color[2] = 0.5f;
     clearValue.Color[3] = 0.5f;
 
-    width = Application::Instance()->WindowWidth();
-    height = Application::Instance()->WindowHeight();
+    width = Application::WindowWidth();
+    height = Application::WindowHeight();
 
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,
@@ -31,7 +31,7 @@ void RenderTexture::CreateBuffer()
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &clearValue,
         IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
-        );
+    );
     m_pResource->SetName(L"RenderTexture");
 
     if (FAILED(hr))
