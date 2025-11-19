@@ -188,7 +188,7 @@ void DefaultEditorMenu::DrawComponentMenu(const std::shared_ptr<engine::GameObje
         factories.emplace_back(engine::IComponentFactory::Get(component_name));
     }
 
-    std::map<std::string, std::vector<std::shared_ptr<engine::IComponentFactory>>> category_map;
+    std::unordered_map<std::string, std::vector<std::shared_ptr<engine::IComponentFactory>>> category_map;
     for (const auto &factory : factories)
     {
         category_map[factory->Category()].emplace_back(factory);
