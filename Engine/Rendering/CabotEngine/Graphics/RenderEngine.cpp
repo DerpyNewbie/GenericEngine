@@ -234,7 +234,7 @@ bool RenderEngine::CreateSwapChain()
     hr = dxgi_factory->CreateSwapChainForHwnd(
         m_p_queue_.Get(), engine::Application::WindowHandle(), &desc, nullptr, nullptr, &swap_chain
     );
-    
+
     if (FAILED(hr))
     {
         dxgi_factory->Release();
@@ -296,7 +296,10 @@ bool RenderEngine::CreateCommandList()
 
 bool RenderEngine::CreateFence()
 {
-    m_fence_value_ = 0;
+    for (unsigned long long &i : m_fence_value_)
+    {
+        i = 0;
+    }
 
     const auto hr = m_p_device_->CreateFence(
         0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_p_fence_.ReleaseAndGetAddressOf())
@@ -307,7 +310,7 @@ bool RenderEngine::CreateFence()
         return false;
     }
 
-    m_fence_value_++;
+    m_fence_value_[m_current_back_buffer_index_]++;
 
     //同期を行うときのイベントハンドラを作成する。
     m_fence_event_ = CreateEvent(nullptr, FALSE, FALSE, nullptr);
@@ -433,8 +436,9 @@ RenderEngine *RenderEngine::Instance()
 void RenderEngine::WaitRender()
 {
     //描画終了待ち
-    const UINT64 fence_value = ++m_fence_value_;
+    const UINT64 fence_value = m_fence_value_[m_current_back_buffer_index_];
     m_p_queue_->Signal(m_p_fence_.Get(), fence_value);
+    m_fence_value_[m_current_back_buffer_index_]++;
 
     // 次のフレームの描画準備がまだであれば待機する.
     if (m_p_fence_->GetCompletedValue() < fence_value)

@@ -26,7 +26,7 @@ private:
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
     HANDLE m_fence_event_ = nullptr;
     ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
-    UINT64 m_fence_value_ = {};
+    UINT64 m_fence_value_[kFrame_Buffer_Count] = {};
     D3D12_VIEWPORT m_viewport_ = {};
     D3D12_RECT m_scissor_ = {};
 
