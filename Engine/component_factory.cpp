@@ -36,44 +36,54 @@ std::unordered_map<std::string, std::shared_ptr<IComponentFactory>> IComponentFa
 
 void IComponentFactory::Init()
 {
-#define ADD_COMPONENT(type) Register(std::make_shared<ComponentFactory<type>>())
-    ADD_COMPONENT(CameraComponent);
-    ADD_COMPONENT(Controller);
-    ADD_COMPONENT(FrameMetaData);
-    ADD_COMPONENT(MeshRenderer);
-    ADD_COMPONENT(SkinnedMeshRenderer);
-    ADD_COMPONENT(BillboardRenderer);
-    ADD_COMPONENT(TextAssetRefTestComponent);
-    ADD_COMPONENT(TextRenderer);
-    ADD_COMPONENT(Canvas);
-    ADD_COMPONENT(Image);
-    ADD_COMPONENT(RectTransform);
-    ADD_COMPONENT(RigidbodyComponent);
-    ADD_COMPONENT(SphereCollider);
-    ADD_COMPONENT(PlaneCollider);
-    ADD_COMPONENT(BoxCollider);
-    ADD_COMPONENT(CapsuleCollider);
-    ADD_COMPONENT(RigidbodyTesterComponent);
-    ADD_COMPONENT(AudioSourceComponent);
-    ADD_COMPONENT(AudioListenerComponent);
-    ADD_COMPONENT(CinemaCameraComponent);
-    ADD_COMPONENT(CinemaBrainComponent);
-    ADD_COMPONENT(DirectionalLight);
-    ADD_COMPONENT(SpotLight);
-    ADD_COMPONENT(RotatorComponent);
-    ADD_COMPONENT(AnimationComponent);
-    ADD_COMPONENT(RenderingSettingsComponent);
-    ADD_COMPONENT(CinemaCameraTransitioner);
-#undef ADD_COMPONENT
+    using namespace component_factory_util;
+
+    RegisterComponentFactory<CameraComponent>("Rendering");
+    RegisterComponentFactory<Controller>("Debug");
+    RegisterComponentFactory<FrameMetaData>("Debug");
+    RegisterComponentFactory<MeshRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<SkinnedMeshRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<BillboardRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<TextAssetRefTestComponent>("Debug");
+    RegisterComponentFactory<TextRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<Canvas>("Rendering/Renderer");
+    RegisterComponentFactory<Image>("Rendering/Renderer");
+    RegisterComponentFactory<RectTransform>("Rendering/Renderer");
+    RegisterComponentFactory<RigidbodyComponent>("Physics");
+    RegisterComponentFactory<SphereCollider>("Physics");
+    RegisterComponentFactory<PlaneCollider>("Physics");
+    RegisterComponentFactory<BoxCollider>("Physics");
+    RegisterComponentFactory<CapsuleCollider>("Physics");
+    RegisterComponentFactory<RigidbodyTesterComponent>("Debug");
+    RegisterComponentFactory<AudioSourceComponent>("Audio");
+    RegisterComponentFactory<AudioListenerComponent>("Audio");
+    RegisterComponentFactory<CinemaCameraComponent>("Rendering/Cinema");
+    RegisterComponentFactory<CinemaBrainComponent>("Rendering/Cinema");
+    RegisterComponentFactory<DirectionalLight>("Rendering/Light");
+    RegisterComponentFactory<SpotLight>("Rendering/Light");
+    RegisterComponentFactory<RotatorComponent>("Debug");
+    RegisterComponentFactory<AnimationComponent>("Animation");
+    RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
+    RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
 }
 
-IComponentFactory::IComponentFactory(const std::string &name) :
-    m_name_(name)
+IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :
+    m_name_(name), m_friendly_name_(friendly_name), m_category_(category)
 { }
 
 std::string IComponentFactory::Name()
 {
     return m_name_;
+}
+
+std::string IComponentFactory::FriendlyName()
+{
+    return m_friendly_name_;
+}
+
+std::string IComponentFactory::Category()
+{
+    return m_category_;
 }
 
 void IComponentFactory::Register(const std::shared_ptr<IComponentFactory> &factory)
