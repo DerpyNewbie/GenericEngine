@@ -5,8 +5,6 @@
 #include "Components/camera_component.h"
 
 #include "Rendering/render_pipeline.h"
-#include "Rendering/view_projection.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -36,14 +34,12 @@ void CameraProperty::OnInspectorGui()
 
 Matrix CameraProperty::ProjectionMatrix() const
 {
+    switch (view_mode)
     {
-        switch (view_mode)
-        {
         case kViewMode::kPerspective:
-            // FIXME: aspect ratio is calculated based on window rect. which is not optimal for render textures
             return DirectX::XMMatrixPerspectiveFovRH(
                 field_of_view * Mathf::kDeg2Rad,
-                static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight()),
+                aspect_ratio,
                 near_plane, far_plane);
         case kViewMode::kOrthographic:
             return DirectX::XMMatrixOrthographicRH(
@@ -53,7 +49,6 @@ Matrix CameraProperty::ProjectionMatrix() const
         default:
             assert(false && "Invalid ViewMode");
             return Matrix::Identity;
-        }
     }
 }
 
@@ -85,9 +80,9 @@ void CameraComponent::OnDisabled()
 std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
 {
     return m_render_texture_.CastedLock() != nullptr
-               ? m_render_texture_.CastedLock()
-               : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
-               .CastedLock();
+        ? m_render_texture_.CastedLock()
+        : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
+        .CastedLock();
 }
 
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)
