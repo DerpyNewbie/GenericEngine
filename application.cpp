@@ -26,24 +26,24 @@ LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 {
     switch (msg)
     {
-    case WM_DESTROY:
-        Logger::Log<Application>("Window destroyed");
-        PostQuitMessage(0);
-        break;
-    case WM_SIZE:
-        if (wparam == SIZE_MINIMIZED)
+        case WM_DESTROY:
+            Logger::Log<Application>("Window destroyed");
+            PostQuitMessage(0);
             break;
+        case WM_SIZE:
+            if (wparam == SIZE_MINIMIZED)
+                break;
 
-        window_width = LOWORD(lparam);
-        window_height = HIWORD(lparam);
+            window_width = LOWORD(lparam);
+            window_height = HIWORD(lparam);
 
-        on_window_resized.Invoke();
-        break;
-    case WM_MOUSEACTIVATE:
-        Logger::Log<Application>("Mouse activated");
-        return MA_ACTIVATEANDEAT;
-    default:
-        break;
+            on_window_resized.Invoke();
+            break;
+        case WM_MOUSEACTIVATE:
+            Logger::Log<Application>("Mouse activated");
+            return MA_ACTIVATEANDEAT;
+        default:
+            break;
     }
 
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
@@ -130,21 +130,23 @@ void Application::InitWindow()
 
     RegisterClassEx(&w);
 
-    RECT wrc = {0, 0, static_cast<LONG>(window_width), static_cast<LONG>(window_height)};
+    RECT wrc = { 0, 0, static_cast<LONG>(window_width), static_cast<LONG>(window_height) };
 
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
-    window_handle = CreateWindow(w.lpszClassName,
-                                 _T(window_title.c_str()),
-                                 WS_OVERLAPPEDWINDOW,
-                                 CW_USEDEFAULT,
-                                 CW_USEDEFAULT,
-                                 wrc.right - wrc.left,
-                                 wrc.bottom - wrc.top,
-                                 nullptr,
-                                 nullptr,
-                                 w.hInstance,
-                                 nullptr);
+    window_handle = CreateWindow(
+        w.lpszClassName,
+        _T(window_title.c_str()),
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        wrc.right - wrc.left,
+        wrc.bottom - wrc.top,
+        nullptr,
+        nullptr,
+        w.hInstance,
+        nullptr
+    );
 
     ShowWindow(window_handle,SW_SHOW);
 }

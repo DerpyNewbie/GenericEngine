@@ -90,19 +90,21 @@ void RenderPipeline::InvokeDrawCall()
 
     if (const auto main_camera = CameraComponent::Main())
     {
+        // store previous property as we're editing aspect ratio to match window aspect ratio
         const auto prev_property = main_camera->m_property_;
-        {
-            main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / Application::WindowHeight();
-            CameraComponent::SetCurrentCamera(main_camera);
-            Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
-            DepthRender();
+        main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
+        CameraComponent::SetCurrentCamera(main_camera);
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        DepthRender();
 
-            RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-            Render(main_camera);
-            on_rendering.Invoke();
-        }
+        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
+        Render(main_camera);
+
+        // revert back to original property
         main_camera->m_property_ = prev_property;
     }
+
+    on_rendering.Invoke();
 }
 
 void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
