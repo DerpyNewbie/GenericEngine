@@ -9,35 +9,41 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+namespace
+{
+int window_height = 1080;
+int window_width = 1920;
+HWND window_handle = nullptr;
+std::string window_title = "GenericEngine";
+bool play_mode = false;
+}
+
 namespace engine
 {
-int Application::m_window_height_ = 1080;
-int Application::m_window_width_ = 1920;
-HWND Application::m_window_handle_ = nullptr;
 Event<> Application::on_window_resized;
-bool Application::m_play_mode_ = false;
 
 LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
 {
     switch (msg)
     {
-        case WM_DESTROY:
-            Logger::Log<Application>("Window destroyed");
-            PostQuitMessage(0);
+    case WM_DESTROY:
+        Logger::Log<Application>("Window destroyed");
+        PostQuitMessage(0);
+        break;
+    case WM_SIZE:
+        if (wparam == SIZE_MINIMIZED)
             break;
-        case WM_SIZE:
-            Logger::Log<Application>("Window resized");
-            if (wparam == SIZE_MINIMIZED)
-                break;
-            Instance()->m_window_width_ = LOWORD(lparam);
-            Instance()->m_window_height_ = HIWORD(lparam);
-            Instance()->on_window_resized.Invoke();
-            break;
-        case WM_MOUSEACTIVATE:
-            Logger::Log<Application>("Mouse activated");
-            return MA_ACTIVATEANDEAT;
-        default:
-            break;
+
+        window_width = LOWORD(lparam);
+        window_height = HIWORD(lparam);
+
+        on_window_resized.Invoke();
+        break;
+    case WM_MOUSEACTIVATE:
+        Logger::Log<Application>("Mouse activated");
+        return MA_ACTIVATEANDEAT;
+    default:
+        break;
     }
 
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
@@ -54,7 +60,7 @@ std::shared_ptr<Application> Application::Instance()
     return instance;
 }
 
-WPARAM Application::StartApp()
+WPARAM Application::Run()
 {
     InitWindow();
     Engine::Init();
@@ -72,31 +78,49 @@ WPARAM Application::StartApp()
         Engine::Tick();
     }
 
+    Engine::Finalize();
     return msg.wParam;
 }
 
 int Application::WindowWidth()
 {
-    return m_window_width_;
+    return window_width;
 }
 
 int Application::WindowHeight()
 {
-    return m_window_height_;
+    return window_height;
 }
 
 HWND Application::WindowHandle()
 {
-    return m_window_handle_;
+    return window_handle;
+}
+
+std::string Application::WindowTitle()
+{
+    return window_title;
+}
+
+void Application::SetWindowTitle(const std::string &title)
+{
+    window_title = title;
+
+    if (window_handle == nullptr)
+        return;
+
+    SetWindowText(window_handle, window_title.c_str());
 }
 
 bool Application::IsPlayMode()
 {
-    return m_play_mode_;
+    return play_mode;
 }
 
 void Application::InitWindow()
 {
+    // SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+
     WNDCLASSEX w = {};
 
     w.cbSize = sizeof(WNDCLASSEX);
@@ -106,27 +130,27 @@ void Application::InitWindow()
 
     RegisterClassEx(&w);
 
-    RECT wrc = { 0, 0, static_cast<LONG>(m_window_width_), static_cast<LONG>(m_window_height_) };
+    RECT wrc = {0, 0, static_cast<LONG>(window_width), static_cast<LONG>(window_height)};
 
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
-    m_window_handle_ = CreateWindow(w.lpszClassName,
-                                    _T("GenericEngine"),
-                                    WS_OVERLAPPEDWINDOW,
-                                    CW_USEDEFAULT,
-                                    CW_USEDEFAULT,
-                                    wrc.right - wrc.left,
-                                    wrc.bottom - wrc.top,
-                                    nullptr,
-                                    nullptr,
-                                    w.hInstance,
-                                    nullptr);
+    window_handle = CreateWindow(w.lpszClassName,
+                                 _T(window_title.c_str()),
+                                 WS_OVERLAPPEDWINDOW,
+                                 CW_USEDEFAULT,
+                                 CW_USEDEFAULT,
+                                 wrc.right - wrc.left,
+                                 wrc.bottom - wrc.top,
+                                 nullptr,
+                                 nullptr,
+                                 w.hInstance,
+                                 nullptr);
 
-    ShowWindow(m_window_handle_,SW_SHOW);
+    ShowWindow(window_handle,SW_SHOW);
 }
 
 void Application::SetPlayMode(const bool play)
 {
-    m_play_mode_ = play;
+    play_mode = play;
 }
 }

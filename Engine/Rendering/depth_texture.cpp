@@ -10,8 +10,8 @@ void DepthTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
 
-    width = Application::Instance()->WindowWidth();
-    height = Application::Instance()->WindowHeight();
+    width = Application::WindowWidth();
+    height = Application::WindowHeight();
     format = DXGI_FORMAT_R32_FLOAT;
     mip_level = 1;
 
@@ -46,7 +46,7 @@ void DepthTexture::CreateBuffer()
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &dsvClearValue,
         IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
-        );
+    );
 
     if (FAILED(hr))
     {
