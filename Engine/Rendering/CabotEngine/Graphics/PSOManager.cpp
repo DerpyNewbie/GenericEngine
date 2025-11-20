@@ -28,6 +28,7 @@ void PSOManager::Initialize()
     PSOSetting setting;
     setting.PSOName = "Basic";
     setting.InputLayout = engine::Vertex::InputLayout;
+    setting.IsTransParent = false;
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     setting.RasterizerDesc = rasterizer_desc;
     setting.DepthStencilDesc = depth_stencil_desc;
@@ -79,7 +80,7 @@ bool PSOManager::Register(PSOSetting setting)
     pso->SetRasterizerState(setting.RasterizerDesc);
     pso->SetDepthStencilState(setting.DepthStencilDesc);
     pso->SetNumRenderTarget(setting.NumRenderTarget);
-    pso->SetTransParent(false);
+    pso->SetTransParent(setting.IsTransParent);
     pso->SetVS(setting.VSPath);
     if (!setting.PSPath.empty())
         pso->SetPS(setting.PSPath);
