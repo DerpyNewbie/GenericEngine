@@ -1,29 +1,31 @@
 #include "pch.h"
 #include "shader.h"
 
+#include "gui.h"
+
 namespace engine
 {
-std::shared_ptr<Shader> Shader::m_pDefaultShader;
+std::shared_ptr<Shader> Shader::m_p_default_shader_;
 
 std::shared_ptr<Shader> Shader::GetDefault()
 {
-    if (!m_pDefaultShader)
+    if (!m_p_default_shader_)
     {
-        m_pDefaultShader = std::make_shared<Shader>();
+        m_p_default_shader_ = std::make_shared<Shader>();
         std::wstring file_path = L"x64/Debug/BasicVertexShader.cso";
-        auto hr = D3DReadFileToBlob(file_path.c_str(), m_pDefaultShader->m_pVSBlob.GetAddressOf());
+        auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_default_shader_->m_p_vs_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
         file_path = L"x64/Debug/BasicPixelShader.cso";
-        hr = D3DReadFileToBlob(file_path.c_str(), m_pDefaultShader->m_pPSBlob.GetAddressOf());
+        hr = D3DReadFileToBlob(file_path.c_str(), m_p_default_shader_->m_p_ps_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
     }
-    return m_pDefaultShader;
+    return m_p_default_shader_;
 }
 
 void Shader::OnInspectorGui()
@@ -34,6 +36,7 @@ void Shader::OnInspectorGui()
     auto pixel_params = std::views::filter(parameters, [](auto &p) {
         return p->shader_type == kShaderType_Pixel;
     });
+    Gui::PropertyField("Transparent", m_is_transparent_);
 
     auto draw_params = [](auto &params, auto &sources) {
         int index = 0;
@@ -98,5 +101,10 @@ void Shader::OnInspectorGui()
         ImGui::Unindent();
     }
     ImGui::PopID();
+}
+
+bool Shader::IsTransparent() const
+{
+    return m_is_transparent_;
 }
 }

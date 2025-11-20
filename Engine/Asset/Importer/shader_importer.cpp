@@ -20,7 +20,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "vs_5_0",
         0,
         0,
-        &shader->m_pVSBlob,
+        &shader->m_p_vs_blob_,
         &error_blob
         );
 
@@ -38,7 +38,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "ps_5_0",
         0,
         0,
-        &shader->m_pPSBlob,
+        &shader->m_p_ps_blob_,
         &error_blob
         );
 
@@ -72,6 +72,16 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
         return false;
     }
 
+    const auto transparent_member = doc.FindMember("transparent");
+    if (transparent_member == doc.MemberEnd())
+    {
+        Logger::Warn<ShaderImporter>("No Transparent found for shader '%s'", descriptor->AssetPath().string().c_str());
+        return false;
+    }
+
+    auto is_transparent = transparent_member->value.GetBool();
+    shader->m_is_transparent_ = is_transparent;
+    
     const auto parameters_member = doc.FindMember("parameters");
     if (parameters_member == doc.MemberEnd())
     {
@@ -242,6 +252,7 @@ void ShaderImporter::OnExport(AssetDescriptor *ctx)
     Document doc;
     doc.SetObject();
     doc.AddMember("parameters", create_shader_params_value(doc.GetAllocator()), doc.GetAllocator());
+    doc.AddMember("transparent", Value(shader->m_is_transparent_), doc.GetAllocator());
 
     StringBuffer string_buffer;
     Writer writer(string_buffer);

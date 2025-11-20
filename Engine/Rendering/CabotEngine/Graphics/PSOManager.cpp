@@ -79,6 +79,7 @@ bool PSOManager::Register(PSOSetting setting)
     pso->SetRasterizerState(setting.RasterizerDesc);
     pso->SetDepthStencilState(setting.DepthStencilDesc);
     pso->SetNumRenderTarget(setting.NumRenderTarget);
+    pso->SetTransParent(false);
     pso->SetVS(setting.VSPath);
     if (!setting.PSPath.empty())
         pso->SetPS(setting.PSPath);
@@ -103,6 +104,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
     pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
     pso->SetNumRenderTarget(1);
     pso->SetShader(shader);
+    pso->SetTransParent(shader->IsTransparent());
     pso->Create();
 
     if (!pso->IsValid())

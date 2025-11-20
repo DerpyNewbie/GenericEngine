@@ -16,14 +16,17 @@ class ShaderImporter;
 class Shader : public InspectableAsset
 {
     friend ShaderImporter;
-    ComPtr<ID3DBlob> m_pVSBlob;
-    ComPtr<ID3DBlob> m_pPSBlob;
-    static std::shared_ptr<Shader> m_pDefaultShader;
+    static std::shared_ptr<Shader> m_p_default_shader_;
+
+    bool m_is_transparent_ = false;
+    ComPtr<ID3DBlob> m_p_vs_blob_;
+    ComPtr<ID3DBlob> m_p_ps_blob_;
 
 public:
     std::vector<std::shared_ptr<ShaderParameter>> parameters;
 
     void OnInspectorGui() override;
+    bool IsTransparent() const;
     static std::shared_ptr<Shader> GetDefault();
 
     CD3DX12_SHADER_BYTECODE GetByteCode(const kShaderType type) const
@@ -31,9 +34,9 @@ public:
         switch (type)
         {
         case kShaderType_Vertex:
-            return m_pVSBlob.Get();
+            return m_p_vs_blob_.Get();
         case kShaderType_Pixel:
-            return m_pPSBlob.Get();
+            return m_p_ps_blob_.Get();
         default:
             throw std::runtime_error("Invalid shader type");
         }

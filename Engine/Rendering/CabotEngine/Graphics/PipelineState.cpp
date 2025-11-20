@@ -11,7 +11,6 @@ PipelineState::PipelineState()
     m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
     m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
     m_desc_.RasterizerState.FrontCounterClockwise = TRUE;
-    m_desc_.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); // ブレンドステートもデフォルト
     m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // 深度ステンシルはデフォルトを使う
     m_desc_.SampleMask = UINT_MAX;
     m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
@@ -27,6 +26,35 @@ PipelineState::PipelineState()
 bool PipelineState::IsValid() const
 {
     return m_is_valid_;
+}
+
+void PipelineState::SetTransParent(bool is_transparent)
+{
+    CD3DX12_BLEND_DESC blend_state = {};
+    if (!is_transparent)
+    {
+        blend_state = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    }
+    else
+    {
+        blend_state.AlphaToCoverageEnable = false;
+        blend_state.IndependentBlendEnable = false;
+        auto &[BlendEnable, LogicOpEnable, SrcBlend, DestBlend, BlendOp, SrcBlendAlpha, DestBlendAlpha, BlendOpAlpha, LogicOp, RenderTargetWriteMask] = blend_state.RenderTarget[0];
+        BlendEnable = true;
+        LogicOpEnable = false;
+        SrcBlend = D3D12_BLEND_SRC_ALPHA;
+        DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+        BlendOp = D3D12_BLEND_OP_ADD;
+        SrcBlendAlpha = D3D12_BLEND_ONE;
+        DestBlendAlpha = D3D12_BLEND_ZERO;
+        BlendOpAlpha = D3D12_BLEND_OP_ADD;
+        LogicOp = D3D12_LOGIC_OP_NOOP;
+        RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+        m_desc_.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+        m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+    }
+
+    m_desc_.BlendState = blend_state;
 }
 
 void PipelineState::SetInputLayout(const D3D12_INPUT_LAYOUT_DESC layout)
