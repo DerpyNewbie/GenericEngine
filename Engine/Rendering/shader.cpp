@@ -5,27 +5,27 @@
 
 namespace engine
 {
-std::shared_ptr<Shader> Shader::m_p_default_shader_;
+std::shared_ptr<Shader> Shader::m_default_shader_;
 
 std::shared_ptr<Shader> Shader::GetDefault()
 {
-    if (!m_p_default_shader_)
+    if (!m_default_shader_)
     {
-        m_p_default_shader_ = std::make_shared<Shader>();
+        m_default_shader_ = std::make_shared<Shader>();
         std::wstring file_path = L"x64/Debug/BasicVertexShader.cso";
-        auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_default_shader_->m_p_vs_blob_.GetAddressOf());
+        auto hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_vs_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
         file_path = L"x64/Debug/BasicPixelShader.cso";
-        hr = D3DReadFileToBlob(file_path.c_str(), m_p_default_shader_->m_p_ps_blob_.GetAddressOf());
+        hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_ps_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
     }
-    return m_p_default_shader_;
+    return m_default_shader_;
 }
 
 void Shader::OnInspectorGui()

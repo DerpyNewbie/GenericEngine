@@ -20,7 +20,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "vs_5_0",
         0,
         0,
-        &shader->m_p_vs_blob_,
+        &shader->m_vs_blob_,
         &error_blob
         );
 
@@ -38,7 +38,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "ps_5_0",
         0,
         0,
-        &shader->m_p_ps_blob_,
+        &shader->m_ps_blob_,
         &error_blob
         );
 
