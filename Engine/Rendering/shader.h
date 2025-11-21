@@ -1,5 +1,6 @@
 #pragma once
 #include "shader_parameter.h"
+#include "shader_settings.h"
 #include "Asset/inspectable_asset.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 
@@ -22,11 +23,14 @@ class Shader : public InspectableAsset
     ComPtr<ID3DBlob> m_vs_blob_;
     ComPtr<ID3DBlob> m_ps_blob_;
 
+    ShaderSettings m_shader_settings_;
+
+    void DrawShaderSettings();
 public:
     std::vector<std::shared_ptr<ShaderParameter>> parameters;
 
     void OnInspectorGui() override;
-    bool IsTransparent() const;
+    ShaderSettings ShaderSettings() const;
     static std::shared_ptr<Shader> GetDefault();
 
     CD3DX12_SHADER_BYTECODE GetByteCode(const kShaderType type) const

@@ -8,6 +8,7 @@ struct PSOSetting
     std::wstring PSPath;
     std::wstring GSPath;
     bool IsTransParent;
+    D3D12_CULL_MODE CullMode;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
     D3D12_RASTERIZER_DESC RasterizerDesc;

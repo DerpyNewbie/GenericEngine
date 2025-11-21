@@ -51,10 +51,15 @@ void PipelineState::SetTransParent(bool is_transparent)
         LogicOp = D3D12_LOGIC_OP_NOOP;
         RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
         m_desc_.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-        m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+        m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     }
 
     m_desc_.BlendState = blend_state;
+}
+
+void PipelineState::SetCullMode(D3D12_CULL_MODE cull_mode)
+{
+    m_desc_.RasterizerState.CullMode = cull_mode;
 }
 
 void PipelineState::SetInputLayout(const D3D12_INPUT_LAYOUT_DESC layout)
@@ -132,6 +137,31 @@ void PipelineState::SetShader(const std::shared_ptr<engine::Shader> &shader)
 {
     m_desc_.VS = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
     m_desc_.PS = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
+    auto shader_setting = shader->ShaderSettings();
+    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    m_desc_.RasterizerState.CullMode = DX_Cull[shader_setting.cull];
+
+    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    m_desc_.DepthStencilState.DepthFunc = DX_ZTest[shader_setting.z_test];
+    m_desc_.DepthStencilState.DepthWriteMask = DX_ZWrite[shader_setting.z_write];
+
+    m_desc_.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    auto &rt = m_desc_.BlendState.RenderTarget[0];
+    rt.BlendEnable = TRUE;
+    rt.SrcBlend = DX_BlendFactor[shader_setting.blend_src];
+    rt.DestBlend = DX_BlendFactor[shader_setting.blend_dst];
+    rt.BlendOp = DX_BlendOp[shader_setting.blend_op];
+    rt.RenderTargetWriteMask = DX_ColorMask[shader_setting.color_mask];
+
+    m_desc_.BlendState.AlphaToCoverageEnable = shader_setting.alpha_to_mask == 1;
+
+    m_desc_.NumRenderTargets = 1;
+    m_desc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    m_desc_.DSVFormat = DXGI_FORMAT_D32_FLOAT;
+
+    m_desc_.SampleMask = UINT_MAX;
+    m_desc_.SampleDesc.Count = 1;
+    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 }
 
 void PipelineState::Create()

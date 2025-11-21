@@ -139,5 +139,5 @@ float4 pix(VSOutput input) : SV_TARGET
 
     float4 main_color = _MainTex.Sample(smp, input.uv);
 
-    return float4(main_color.rgb * brightness, main_color.a);
+    return float4(main_color.rgb * brightness, 0.5f);
 }

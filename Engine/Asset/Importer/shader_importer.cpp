@@ -72,15 +72,21 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
         return false;
     }
 
-    const auto transparent_member = doc.FindMember("transparent");
-    if (transparent_member == doc.MemberEnd())
+    auto shader_settings = doc.FindMember("shader_settings");
+    if (shader_settings == doc.MemberEnd())
     {
         Logger::Warn<ShaderImporter>("No Transparent found for shader '%s'", descriptor->AssetPath().string().c_str());
         return false;
     }
 
-    auto is_transparent = transparent_member->value.GetBool();
-    shader->m_is_transparent_ = is_transparent;
+    shader->m_shader_settings_.z_test = shader_settings->value.FindMember("z_test")->value.GetInt();
+    shader->m_shader_settings_.z_write = shader_settings->value.FindMember("z_write")->value.GetInt();
+    shader->m_shader_settings_.cull = shader_settings->value.FindMember("cull")->value.GetInt();
+    shader->m_shader_settings_.blend_src = shader_settings->value.FindMember("blend_src")->value.GetInt();
+    shader->m_shader_settings_.blend_dst = shader_settings->value.FindMember("blend_dst")->value.GetInt();
+    shader->m_shader_settings_.blend_op = shader_settings->value.FindMember("blend_op")->value.GetInt();
+    shader->m_shader_settings_.color_mask = shader_settings->value.FindMember("color_mask")->value.GetInt();
+    shader->m_shader_settings_.alpha_to_mask = shader_settings->value.FindMember("alpha_to_mask")->value.GetInt();
     
     const auto parameters_member = doc.FindMember("parameters");
     if (parameters_member == doc.MemberEnd())
@@ -248,12 +254,22 @@ void ShaderImporter::OnExport(AssetDescriptor *ctx)
         result.AddMember("pixel", pixel_params_obj, alloc);
         return result;
     };
-
+    
     Document doc;
     doc.SetObject();
     doc.AddMember("parameters", create_shader_params_value(doc.GetAllocator()), doc.GetAllocator());
-    doc.AddMember("transparent", Value(shader->m_is_transparent_), doc.GetAllocator());
 
+    Value shader_settings(kObjectType);
+    shader_settings.AddMember("z_test", shader->m_shader_settings_.z_test, doc.GetAllocator());
+    shader_settings.AddMember("z_write", shader->m_shader_settings_.z_write, doc.GetAllocator());
+    shader_settings.AddMember("cull", shader->m_shader_settings_.cull, doc.GetAllocator());
+    shader_settings.AddMember("blend_src", shader->m_shader_settings_.blend_src, doc.GetAllocator());
+    shader_settings.AddMember("blend_dst", shader->m_shader_settings_.blend_dst, doc.GetAllocator());
+    shader_settings.AddMember("blend_op", shader->m_shader_settings_.blend_op, doc.GetAllocator());
+    shader_settings.AddMember("color_mask", shader->m_shader_settings_.color_mask, doc.GetAllocator());
+    shader_settings.AddMember("alpha_to_mask", shader->m_shader_settings_.alpha_to_mask, doc.GetAllocator());
+    doc.AddMember("shader_settings", shader_settings, doc.GetAllocator());
+    
     StringBuffer string_buffer;
     Writer writer(string_buffer);
     doc.Accept(writer);

@@ -41,6 +41,7 @@ void Renderer::OnInspectorGui()
         m_render_queue_ = std::clamp(m_render_queue_, 0, 10000);
     }
 }
+
 void Renderer::OnEnabled()
 {
     SetVisible(true);

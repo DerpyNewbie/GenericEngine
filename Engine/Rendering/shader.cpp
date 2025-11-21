@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "shader.h"
-
 #include "gui.h"
 
 namespace engine
@@ -28,6 +27,23 @@ std::shared_ptr<Shader> Shader::GetDefault()
     return m_default_shader_;
 }
 
+void Shader::DrawShaderSettings()
+{
+    ImGui::Combo("ZTest", &m_shader_settings_.z_test, ZTestNames, IM_ARRAYSIZE(ZTestNames));
+    ImGui::Combo("ZWrite", &m_shader_settings_.z_write, ZWriteNames, IM_ARRAYSIZE(ZWriteNames));
+
+    ImGui::Combo("Cull", &m_shader_settings_.cull, CullNames, IM_ARRAYSIZE(CullNames));
+
+    ImGui::Separator();
+    ImGui::Text("Blend");
+    ImGui::Combo("SrcFactor", &m_shader_settings_.blend_src, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
+    ImGui::Combo("DstFactor", &m_shader_settings_.blend_dst, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
+    ImGui::Combo("BlendOp", &m_shader_settings_.blend_op, BlendOpNames, IM_ARRAYSIZE(BlendOpNames));
+
+    ImGui::Combo("ColorMask", &m_shader_settings_.color_mask, ColorMaskNames, IM_ARRAYSIZE(ColorMaskNames));
+    ImGui::Combo("AlphaToMask", &m_shader_settings_.alpha_to_mask, ZWriteNames, IM_ARRAYSIZE(ZWriteNames));
+}
+
 void Shader::OnInspectorGui()
 {
     auto vertex_params = std::views::filter(parameters, [](auto &p) {
@@ -36,7 +52,11 @@ void Shader::OnInspectorGui()
     auto pixel_params = std::views::filter(parameters, [](auto &p) {
         return p->shader_type == kShaderType_Pixel;
     });
-    Gui::PropertyField("Transparent", m_is_transparent_);
+
+    if (ImGui::CollapsingHeader("ShaderSettings"))
+    {
+        DrawShaderSettings();
+    }
 
     auto draw_params = [](auto &params, auto &sources) {
         int index = 0;
@@ -103,8 +123,8 @@ void Shader::OnInspectorGui()
     ImGui::PopID();
 }
 
-bool Shader::IsTransparent() const
+ShaderSettings Shader::ShaderSettings() const
 {
-    return m_is_transparent_;
+    return m_shader_settings_;
 }
 }
