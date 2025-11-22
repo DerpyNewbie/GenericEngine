@@ -91,7 +91,6 @@ void MeshRenderer::OnInspectorGui()
                 ImGui::Indent();
                 auto &current_material = shared_materials[i];
                 Gui::PropertyField("Material", current_material);
-                ImGui::Separator();
                 ImGui::PushID(i);
                 if (const auto material = shared_materials[i].CastedLock())
                     material->OnInspectorGui();
