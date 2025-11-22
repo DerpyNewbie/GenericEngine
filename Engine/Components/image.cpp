@@ -89,23 +89,6 @@ void Image::Render()
         cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
     }
 }
-
-AssetPtr<Texture2D> Image::GetTexture()
-{
-    return m_texture_;
-}
-
-void Image::SetTexture(AssetPtr<Texture2D> texture)
-{
-    if (auto tex = texture.CastedLock())
-    {
-        m_texture_ = texture;
-        tex->CreateBuffer();
-        if (m_texture_handle_ != nullptr)
-            DescriptorHeap::Free(m_texture_handle_);
-        m_texture_handle_ = tex->UploadBuffer();
-    }
-}
 }
 
 CEREAL_REGISTER_TYPE(engine::Image)
