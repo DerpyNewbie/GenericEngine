@@ -76,17 +76,18 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
     if (shader_settings == doc.MemberEnd())
     {
         Logger::Warn<ShaderImporter>("No Transparent found for shader '%s'", descriptor->AssetPath().string().c_str());
-        return false;
     }
-
-    shader->m_shader_settings_.z_test = shader_settings->value.FindMember("z_test")->value.GetInt();
-    shader->m_shader_settings_.z_write = shader_settings->value.FindMember("z_write")->value.GetInt();
-    shader->m_shader_settings_.cull = shader_settings->value.FindMember("cull")->value.GetInt();
-    shader->m_shader_settings_.blend_src = shader_settings->value.FindMember("blend_src")->value.GetInt();
-    shader->m_shader_settings_.blend_dst = shader_settings->value.FindMember("blend_dst")->value.GetInt();
-    shader->m_shader_settings_.blend_op = shader_settings->value.FindMember("blend_op")->value.GetInt();
-    shader->m_shader_settings_.color_mask = shader_settings->value.FindMember("color_mask")->value.GetInt();
-    shader->m_shader_settings_.alpha_to_mask = shader_settings->value.FindMember("alpha_to_mask")->value.GetInt();
+    else
+    {
+        shader->m_shader_settings_.z_test = shader_settings->value.FindMember("z_test")->value.GetInt();
+        shader->m_shader_settings_.z_write = shader_settings->value.FindMember("z_write")->value.GetInt();
+        shader->m_shader_settings_.cull = shader_settings->value.FindMember("cull")->value.GetInt();
+        shader->m_shader_settings_.blend_src = shader_settings->value.FindMember("blend_src")->value.GetInt();
+        shader->m_shader_settings_.blend_dst = shader_settings->value.FindMember("blend_dst")->value.GetInt();
+        shader->m_shader_settings_.blend_op = shader_settings->value.FindMember("blend_op")->value.GetInt();
+        shader->m_shader_settings_.color_mask = shader_settings->value.FindMember("color_mask")->value.GetInt();
+        shader->m_shader_settings_.alpha_to_mask = shader_settings->value.FindMember("alpha_to_mask")->value.GetInt();
+    }
     
     const auto parameters_member = doc.FindMember("parameters");
     if (parameters_member == doc.MemberEnd())
