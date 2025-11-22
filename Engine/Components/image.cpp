@@ -12,15 +12,11 @@ namespace engine
 {
 void Image::OnInspectorGui()
 {
-    if (Gui::PropertyField("Image", m_texture_))
+    Gui::PropertyField("Material", m_material_);
+
+    if (auto material = m_material_.CastedLock())
     {
-        if (auto tex = m_texture_.CastedLock())
-        {
-            tex->CreateBuffer();
-            if (m_texture_handle_ != nullptr)
-                DescriptorHeap::Free(m_texture_handle_);
-            m_texture_handle_ = tex->UploadBuffer();
-        }
+        material->OnInspectorGui();
     }
 }
 
@@ -67,21 +63,33 @@ void Image::OnUpdate()
 
 void Image::Render()
 {
-    const auto cmd_list = RenderEngine::CommandList();
-    auto current_buffer = RenderEngine::CurrentBackBufferIndex();
-
+    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
     if (m_vertex_buffer_[current_buffer] == nullptr)
         return;
 
-    cmd_list->SetPipelineState(PSOManager::Get("2DBasic"));
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_[current_buffer]->View());
-    cmd_list->IASetIndexBuffer(m_index_buffer_->View());
-    if (m_texture_handle_)
-        cmd_list->SetGraphicsRootDescriptorTable(kPixelSRV, m_texture_handle_->HandleGPU);
+    const auto material = m_material_.CastedLock();
+    if (material == nullptr)
+        return;
 
-    cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+    const auto shader = material->p_shared_shader.CastedLock();
+    const auto cmd_list = RenderEngine::CommandList();
+
+    if (material->IsValid())
+    {
+        if (shader)
+        {
+            PSOManager::SetPipelineState(cmd_list, shader);
+        }
+
+        material->SetDescriptorTable();
+        cmd_list->IASetIndexBuffer(m_index_buffer_->View());
+        cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_[current_buffer]->View());
+
+        cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+    }
 }
+
 AssetPtr<Texture2D> Image::GetTexture()
 {
     return m_texture_;

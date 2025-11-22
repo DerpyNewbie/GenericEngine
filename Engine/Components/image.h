@@ -1,6 +1,7 @@
 #pragma once
 #include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/material.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/Texture2D.h"
@@ -14,7 +15,8 @@ class Image : public Renderer2D
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
     AssetPtr<Texture2D> m_texture_;
-
+    AssetPtr<Material> m_material_;
+    
 public:
     void OnInspectorGui() override;
     void OnAwake() override;
