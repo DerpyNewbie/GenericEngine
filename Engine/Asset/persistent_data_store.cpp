@@ -125,7 +125,7 @@ std::string PersistentDataStore::GetString(const std::string &key, const std::st
 int PersistentDataStore::GetInt(const std::string &key, const int &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsInt())
     {
         return default_value;
     }
@@ -136,7 +136,7 @@ int PersistentDataStore::GetInt(const std::string &key, const int &default_value
 float PersistentDataStore::GetFloat(const std::string &key, const float &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsFloat())
     {
         return default_value;
     }
@@ -147,7 +147,7 @@ float PersistentDataStore::GetFloat(const std::string &key, const float &default
 bool PersistentDataStore::GetBool(const std::string &key, const bool &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsBool())
     {
         return default_value;
     }
