@@ -17,6 +17,8 @@ void Image::OnInspectorGui()
         if (auto tex = m_texture_.CastedLock())
         {
             tex->CreateBuffer();
+            if (m_texture_handle_ != nullptr)
+                DescriptorHeap::Free(m_texture_handle_);
             m_texture_handle_ = tex->UploadBuffer();
         }
     }
@@ -79,6 +81,22 @@ void Image::Render()
         cmd_list->SetGraphicsRootDescriptorTable(kPixelSRV, m_texture_handle_->HandleGPU);
 
     cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
+}
+AssetPtr<Texture2D> Image::GetTexture()
+{
+    return m_texture_;
+}
+
+void Image::SetTexture(AssetPtr<Texture2D> texture)
+{
+    if (auto tex = texture.CastedLock())
+    {
+        m_texture_ = texture;
+        tex->CreateBuffer();
+        if (m_texture_handle_ != nullptr)
+            DescriptorHeap::Free(m_texture_handle_);
+        m_texture_handle_ = tex->UploadBuffer();
+    }
 }
 }
 
