@@ -18,8 +18,7 @@ class Shader : public InspectableAsset
 {
     friend ShaderImporter;
     static std::shared_ptr<Shader> m_default_shader_;
-
-    bool m_is_transparent_ = false;
+    
     ComPtr<ID3DBlob> m_vs_blob_;
     ComPtr<ID3DBlob> m_ps_blob_;
 
