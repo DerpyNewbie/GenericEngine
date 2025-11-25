@@ -19,7 +19,7 @@ constexpr const char *ZTestNames[] = {
     "Less", "Greater", "LEqual", "GEqual", "Equal", "NotEqual", "Always", "Never",
 };
 constexpr const char *ZWriteNames[] = {
-    "On", "Off",
+    "On(All)", "Off(Zero)",
 };
 constexpr const char *CullNames[] = {
     "Back", "Front", "Off",
