@@ -28,7 +28,7 @@ bool PipelineState::IsValid() const
     return m_is_valid_;
 }
 
-void PipelineState::SetTransParent(bool is_transparent)
+void PipelineState::SetTransparent(bool is_transparent)
 {
     CD3DX12_BLEND_DESC blend_state = {};
     if (!is_transparent)

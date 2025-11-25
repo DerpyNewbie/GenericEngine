@@ -28,7 +28,7 @@ void PSOManager::Initialize()
     PSOSetting setting;
     setting.PSOName = "Basic";
     setting.InputLayout = engine::Vertex::InputLayout;
-    setting.IsTransParent = false;
+    setting.IsTransparent = false;
     setting.CullMode = D3D12_CULL_MODE_NONE;
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     setting.RasterizerDesc = rasterizer_desc;
@@ -57,14 +57,14 @@ void PSOManager::Initialize()
     Register(setting);
 
     setting.PSOName = "2DBasic";
-    setting.IsTransParent = true;
+    setting.IsTransparent = true;
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     setting.VSPath = L"x64/Debug/2DVertShader.cso";
     setting.PSPath = L"x64/Debug/2DPixelShader.cso";
     Register(setting);
 
     setting.PSOName = "Skybox";
-    setting.IsTransParent = false;
+    setting.IsTransparent = false;
     setting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
     setting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
     setting.DepthStencilDesc.DepthEnable = true;
@@ -83,7 +83,7 @@ bool PSOManager::Register(PSOSetting setting)
     pso->SetRasterizerState(setting.RasterizerDesc);
     pso->SetDepthStencilState(setting.DepthStencilDesc);
     pso->SetNumRenderTarget(setting.NumRenderTarget);
-    pso->SetTransParent(setting.IsTransParent);
+    pso->SetTransparent(setting.IsTransparent);
     pso->SetCullMode(setting.CullMode);
     pso->SetVS(setting.VSPath);
     if (!setting.PSPath.empty())
