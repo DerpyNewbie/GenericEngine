@@ -1,5 +1,6 @@
 #pragma once
 #include "light.h"
+#include "Rendering/rendering_constants.h"
 
 namespace engine
 {
@@ -14,8 +15,9 @@ class DirectionalLight : public Light
 
 public:
     static void SetCascadeSlices(
-        std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_sprits);
+    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices);
 
+    void OnConstructed() override;
     void OnInspectorGui() override;
     void OnUpdate() override;
     bool InCameraView(const std::array<Vector3, 8> &frustum) override;

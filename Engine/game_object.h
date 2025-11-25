@@ -10,6 +10,8 @@ class Scene;
 
 class GameObject final : public Object
 {
+    friend class RectTransform;
+
 public:
     explicit GameObject();
 
@@ -43,6 +45,8 @@ public:
         m_components_.push_back(instance);
 
         instance->OnAwake();
+        instance->m_has_called_awake_ = true;
+
         if (IsActiveInHierarchy())
         {
             instance->OnEnabled();

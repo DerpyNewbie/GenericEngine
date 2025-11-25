@@ -40,7 +40,8 @@ public:
         ar(cereal::base_class<MeshRenderer>(this),
            CEREAL_NVP(m_shared_mesh_),
            CEREAL_NVP(transforms),
-           CEREAL_NVP(inverted_bind_poses));
+           CEREAL_NVP(inverted_bind_poses),
+           CEREAL_NVP(root_bone));
     }
 };
 }

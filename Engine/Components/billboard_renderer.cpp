@@ -23,6 +23,7 @@ void BillboardRenderer::OnConstructed()
 
 void BillboardRenderer::OnInspectorGui()
 {
+    Renderer::OnInspectorGui();
     shared_material->OnInspectorGui();
 }
 

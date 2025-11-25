@@ -33,11 +33,6 @@ void LineRenderer::SetIndices(std::vector<uint32_t> indices)
     }
 }
 
-void LineRenderer::OnInspectorGui()
-{
-    Renderer::OnInspectorGui();
-}
-
 void LineRenderer::Render()
 {
     const auto camera = CameraComponent::Main();
@@ -59,3 +54,5 @@ void LineRenderer::Render()
     cmd_list->DrawIndexedInstanced(m_num_indices_, 1, 0, 0, 0);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::LineRenderer)

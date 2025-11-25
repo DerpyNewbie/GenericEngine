@@ -9,7 +9,9 @@
     <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl" />
     <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl" />
-    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl" />
+    <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_pixel.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="application.cpp" />
@@ -128,6 +130,9 @@
     <ClCompile Include="Engine\Rendering\shader_resource.cpp" />
     <ClCompile Include="Engine\Rendering\skybox.cpp" />
     <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp" />
+    <ClCompile Include="Engine\Rendering\lighting.cpp" />
+    <ClCompile Include="Engine\Rendering\light_data.cpp" />
+    <ClCompile Include="Engine\Components\spot_light.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application.h" />
@@ -259,5 +264,10 @@
     <ClInclude Include="Engine\Rendering\shader_resource.h" />
     <ClInclude Include="Engine\Rendering\skybox.h" />
     <ClInclude Include="Engine\Rendering\rendering_settings_component.h" />
+    <ClInclude Include="Engine\Rendering\lighting.h" />
+    <ClInclude Include="Engine\Rendering\rendering_constants.h" />
+    <ClInclude Include="Engine\Rendering\light_data.h" />
+    <ClInclude Include="Engine\Components\spot_light.h" />
+    <ClInclude Include="Resources\Light.hlsli" />
   </ItemGroup>
 </Project>

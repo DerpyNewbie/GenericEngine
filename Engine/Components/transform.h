@@ -19,6 +19,7 @@ class Transform : public Component
     void RecalculateMatrices();
 
 public:
+    void OnAwake() override;
     void OnDestroy() override;
     void OnInspectorGui() override;
 

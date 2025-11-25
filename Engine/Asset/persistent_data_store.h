@@ -1,6 +1,4 @@
 #pragma once
-#include <string>
-#include <vector>
 
 namespace engine
 {
@@ -16,7 +14,7 @@ class PersistentDataStore
 public:
     explicit PersistentDataStore(rapidjson::Document *document, rapidjson::Value *value) :
         m_document_(document), m_value_(value)
-    {}
+    { }
 
     [[nodiscard]] bool HasKey(const std::string &key) const;
     void RemoveKey(const std::string &key) const;
@@ -30,10 +28,10 @@ public:
     void SetDataStore(const std::string &key, const PersistentDataStore &value) const;
     void SetValue(const std::string &key, rapidjson::Value &value) const;
 
-    [[nodiscard]] std::string GetString(const std::string &key) const;
-    [[nodiscard]] int GetInt(const std::string &key) const;
-    [[nodiscard]] float GetFloat(const std::string &key) const;
-    [[nodiscard]] bool GetBool(const std::string &key) const;
+    [[nodiscard]] std::string GetString(const std::string &key, const std::string &default_value = "") const;
+    [[nodiscard]] int GetInt(const std::string &key, const int &default_value = 0) const;
+    [[nodiscard]] float GetFloat(const std::string &key, const float &default_value = 0.0f) const;
+    [[nodiscard]] bool GetBool(const std::string &key, const bool &default_value = false) const;
     [[nodiscard]] PersistentDataStore GetDataStore(const std::string &key) const;
     [[nodiscard]] rapidjson::Value &GetValue(const std::string &key) const;
 

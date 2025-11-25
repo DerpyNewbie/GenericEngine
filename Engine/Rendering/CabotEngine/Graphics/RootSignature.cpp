@@ -21,14 +21,14 @@ RootSignature::RootSignature()
     auto flag = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT;
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS;
     flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS;
-    flag |= D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS;
 
     std::vector<CD3DX12_ROOT_PARAMETER> rootParam(kRootParameterIndexCount);
 
     rootParam[kWorldCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kCascadeSlicesCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kLightCountCBV].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kSceneDataCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kCascadeSlicesCBV].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
+    rootParam[kLightCountCBV].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
     CD3DX12_DESCRIPTOR_RANGE tableRangeBone = {};
     tableRangeBone.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     rootParam[kBoneSRV].InitAsDescriptorTable(1, &tableRangeBone, D3D12_SHADER_VISIBILITY_ALL);
@@ -49,10 +49,10 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 4);
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 5);
     tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 4);
     tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
-    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 4);
+    tableRangePSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 5);
     tableRangePSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 4);
     tableRangePSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
 
@@ -68,16 +68,16 @@ RootSignature::RootSignature()
     sampler[0] = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
     sampler[1] = CD3DX12_STATIC_SAMPLER_DESC(
-        1, // shader register
-        D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, // ←ここが重要！
-        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
-        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
-        D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
-        0.0f,
-        16,
-        D3D12_COMPARISON_FUNC_LESS_EQUAL, // ←比較関数を有効にする
-        D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE
-        );
+    1, // shader register
+    D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, // ←ここが重要！
+    D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+    D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+    D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+    0.0f,
+    16,
+    D3D12_COMPARISON_FUNC_LESS_EQUAL, // ←比較関数を有効にする
+    D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE
+    );
 
     D3D12_ROOT_SIGNATURE_DESC desc = {};
     desc.NumParameters = static_cast<UINT>(std::size(rootParam));
@@ -90,10 +90,10 @@ RootSignature::RootSignature()
     ComPtr<ID3DBlob> pErrorBlob;
 
     auto hr = D3D12SerializeRootSignature(
-        &desc,
-        D3D_ROOT_SIGNATURE_VERSION_1_0,
-        pBlob.GetAddressOf(),
-        pErrorBlob.GetAddressOf());
+    &desc,
+    D3D_ROOT_SIGNATURE_VERSION_1_0,
+    pBlob.GetAddressOf(),
+    pErrorBlob.GetAddressOf());
     if (FAILED(hr))
     {
         Logger::Error("Failed to serialize RootSignature");
@@ -102,10 +102,10 @@ RootSignature::RootSignature()
 
     // ルートシグネチャ生成
     hr = RenderEngine::Device()->CreateRootSignature(
-        0,
-        pBlob->GetBufferPointer(),
-        pBlob->GetBufferSize(),
-        IID_PPV_ARGS(m_pRootSignature.GetAddressOf()));
+    0,
+    pBlob->GetBufferPointer(),
+    pBlob->GetBufferSize(),
+    IID_PPV_ARGS(m_pRootSignature.GetAddressOf()));
     if (FAILED(hr))
     {
         Logger::Error("Failed to Create RootSignature");

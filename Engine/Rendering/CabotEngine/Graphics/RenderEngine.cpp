@@ -2,7 +2,6 @@
 
 #include "RenderEngine.h"
 #include "PSOManager.h"
-#include "RootSignature.h"
 #include "application.h"
 #include "Rendering/font_data.h"
 
@@ -54,6 +53,10 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         return false;
     }
 
+    engine::Application::on_window_resized.AddListener([this] {
+        UpdateMainRenderTarget();
+    });
+
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
     PSOManager::Initialize();
     return true;
@@ -74,7 +77,7 @@ void RenderEngine::BeginRender()
         m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_DEPTH_WRITE
-        );
+    );
     m_p_command_list_->ResourceBarrier(1, &ds_barrier);
 }
 
@@ -97,7 +100,7 @@ void RenderEngine::SetMainRenderTarget(const Color background_color)
     m_p_command_list_->OMSetRenderTargets(1, &currentRtvHandle, FALSE, &currentDsvHandle);
 
     // レンダーターゲットをクリア
-    float clearColor[] = {background_color.R(), background_color.G(), background_color.B(), background_color.A()};
+    float clearColor[] = { background_color.R(), background_color.G(), background_color.B(), background_color.A() };
     m_p_command_list_->ClearRenderTargetView(currentRtvHandle, clearColor, 0, nullptr);
 
     // 深度ステンシルビューをクリア
@@ -105,59 +108,69 @@ void RenderEngine::SetMainRenderTarget(const Color background_color)
 }
 
 void RenderEngine::SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
-                                   const Color background_color) const
+    const Color background_color, const D3D12_VIEWPORT *viewport, const D3D12_RECT *scissor) const
 {
     // 現在のフレームのレンダーターゲットビューのディスクリプタヒープの開始アドレスを取得
     int num_render_target = 0;
-    D3D12_CPU_DESCRIPTOR_HANDLE *currentRtvHandle = nullptr;
+    const D3D12_CPU_DESCRIPTOR_HANDLE *current_rtv_handle = nullptr;
     if (rtv_heap != nullptr)
     {
         num_render_target = 1;
-        auto rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
-        currentRtvHandle = &rtv_handle;
+        const auto rtv_handle = rtv_heap->GetCPUDescriptorHandleForHeapStart();
+        current_rtv_handle = &rtv_handle;
     }
 
     // 深度ステンシルのディスクリプタヒープの開始アドレス取得
-    D3D12_CPU_DESCRIPTOR_HANDLE currentDsvHandle = dsv_heap == nullptr
-                                                       ? m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart()
-                                                       : dsv_heap->GetCPUDescriptorHandleForHeapStart();
+    const D3D12_CPU_DESCRIPTOR_HANDLE current_dsv_handle = dsv_heap == nullptr
+        ? m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart()
+        : dsv_heap->GetCPUDescriptorHandleForHeapStart();
 
     // ビューポートとシザー矩形を設定
-    m_p_command_list_->RSSetViewports(1, &m_viewport_);
-    m_p_command_list_->RSSetScissorRects(1, &m_scissor_);
+    m_p_command_list_->RSSetViewports(1, viewport == nullptr ? &m_viewport_ : viewport);
+    m_p_command_list_->RSSetScissorRects(1, scissor == nullptr ? &m_scissor_ : scissor);
 
     // レンダーターゲットを設定
-    m_p_command_list_->OMSetRenderTargets(num_render_target, currentRtvHandle, FALSE, &currentDsvHandle);
+    m_p_command_list_->OMSetRenderTargets(
+        num_render_target, current_rtv_handle, FALSE, &current_dsv_handle
+    );
 
     // レンダーターゲットをクリア
-    if (currentRtvHandle != nullptr)
-        m_p_command_list_->ClearRenderTargetView(*currentRtvHandle, background_color, 0,
-                                                 nullptr);
+    if (current_rtv_handle != nullptr)
+    {
+        m_p_command_list_->ClearRenderTargetView(
+            *current_rtv_handle, background_color, 0, nullptr
+        );
+    }
 
     // 深度ステンシルビューをクリア
-    m_p_command_list_->
-        ClearDepthStencilView(currentDsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+    m_p_command_list_->ClearDepthStencilView(
+        current_dsv_handle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr
+    );
 }
 
 void RenderEngine::EndRender()
 {
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_current_render_target_,
-                                                        D3D12_RESOURCE_STATE_RENDER_TARGET,
-                                                        D3D12_RESOURCE_STATE_PRESENT);
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_current_render_target_,
+        D3D12_RESOURCE_STATE_RENDER_TARGET,
+        D3D12_RESOURCE_STATE_PRESENT
+    );
+
     m_p_command_list_->ResourceBarrier(1, &barrier);
-    auto dsBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+    const auto ds_barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_p_depth_stencil_buffer_.Get(),
         D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_COMMON
-        );
-    m_p_command_list_->ResourceBarrier(1, &dsBarrier);
+    );
+
+    m_p_command_list_->ResourceBarrier(1, &ds_barrier);
 
     // コマンドの記録を終了
     m_p_command_list_->Close();
 
     // コマンドを実行
-    ID3D12CommandList *ppCmdLists[] = {m_p_command_list_.Get()};
-    m_p_queue_->ExecuteCommandLists(1, ppCmdLists);
+    ID3D12CommandList *pp_cmd_lists[] = { m_p_command_list_.Get() };
+    m_p_queue_->ExecuteCommandLists(1, pp_cmd_lists);
 
     // スワップチェーンを切り替え
     m_p_swap_chain_->Present(1, 0);
@@ -178,75 +191,73 @@ void RenderEngine::SetBackgroundColor(const Color color)
 
 bool RenderEngine::CreateDevice()
 {
-    const auto hr = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_11_0,
-                                      IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf()));
+    const auto hr = D3D12CreateDevice(
+        nullptr, D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf())
+    );
     return SUCCEEDED(hr);
 }
 
 bool RenderEngine::CreateCommandQueue()
 {
-    D3D12_COMMAND_QUEUE_DESC desc = {};
+    D3D12_COMMAND_QUEUE_DESC desc;
     desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
     desc.Priority = D3D12_COMMAND_QUEUE_PRIORITY_NORMAL;
     desc.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE;
     desc.NodeMask = 0;
 
-    auto hr = m_p_device_->CreateCommandQueue(&desc, IID_PPV_ARGS(m_p_queue_.ReleaseAndGetAddressOf()));
-
+    const auto hr = m_p_device_->CreateCommandQueue(&desc, IID_PPV_ARGS(m_p_queue_.ReleaseAndGetAddressOf()));
     return SUCCEEDED(hr);
 }
 
 bool RenderEngine::CreateSwapChain()
 {
     // DXGIファクトリーの生成
-    IDXGIFactory4 *pFactory = nullptr;
-    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&pFactory));
+    IDXGIFactory2 *dxgi_factory = nullptr;
+    HRESULT hr = CreateDXGIFactory1(IID_PPV_ARGS(&dxgi_factory));
     if (FAILED(hr))
     {
         return false;
     }
 
     // スワップチェインの生成
-    DXGI_SWAP_CHAIN_DESC desc = {};
-    desc.BufferDesc.Width = engine::Application::WindowWidth();
-    desc.BufferDesc.Height = engine::Application::WindowHeight();
-    desc.BufferDesc.RefreshRate.Numerator = 60;
-    desc.BufferDesc.RefreshRate.Denominator = 1;
-    desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-    desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-    desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_SWAP_CHAIN_DESC1 desc = {};
+    desc.Width = engine::Application::WindowWidth();
+    desc.Height = engine::Application::WindowHeight();
+    desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     desc.SampleDesc.Count = 1;
     desc.SampleDesc.Quality = 0;
     desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
     desc.BufferCount = kFrame_Buffer_Count;
-    desc.OutputWindow = m_h_wnd_;
-    desc.Windowed = TRUE;
+    desc.Scaling = DXGI_SCALING_NONE;
     desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
     desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
     // スワップチェインの生成
-    IDXGISwapChain *pSwapChain = nullptr;
-    hr = pFactory->CreateSwapChain(m_p_queue_.Get(), &desc, &pSwapChain);
+    IDXGISwapChain1 *swap_chain = nullptr;
+    hr = dxgi_factory->CreateSwapChainForHwnd(
+        m_p_queue_.Get(), engine::Application::WindowHandle(), &desc, nullptr, nullptr, &swap_chain
+    );
+
     if (FAILED(hr))
     {
-        pFactory->Release();
+        dxgi_factory->Release();
         return false;
     }
 
     // IDXGISwapChain3を取得
-    hr = pSwapChain->QueryInterface(IID_PPV_ARGS(m_p_swap_chain_.ReleaseAndGetAddressOf()));
+    hr = swap_chain->QueryInterface(IID_PPV_ARGS(m_p_swap_chain_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
-        pFactory->Release();
-        pSwapChain->Release();
+        dxgi_factory->Release();
+        swap_chain->Release();
         return false;
     }
 
     // バックバッファ番号を取得
     m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 
-    pFactory->Release();
-    pSwapChain->Release();
+    dxgi_factory->Release();
+    swap_chain->Release();
     return true;
 }
 
@@ -258,12 +269,13 @@ bool RenderEngine::CreateCommandList()
     {
         hr = m_p_device_->CreateCommandAllocator(
             D3D12_COMMAND_LIST_TYPE_DIRECT,
-            IID_PPV_ARGS(m_p_allocator_[i].ReleaseAndGetAddressOf()));
-    }
+            IID_PPV_ARGS(m_p_allocator_[i].ReleaseAndGetAddressOf())
+        );
 
-    if (FAILED(hr))
-    {
-        return false;
+        if (FAILED(hr))
+        {
+            return false;
+        }
     }
 
     // コマンドリストの生成
@@ -273,7 +285,7 @@ bool RenderEngine::CreateCommandList()
         m_p_allocator_[m_current_back_buffer_index_].Get(),
         nullptr,
         IID_PPV_ARGS(&m_p_command_list_)
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -281,19 +293,21 @@ bool RenderEngine::CreateCommandList()
     }
 
     //コマンドリストは開かれている状態で作成されるので、いったん閉じる。
-    m_p_command_list_->Close();
-
+    auto _ = m_p_command_list_->Close();
     return true;
 }
 
 bool RenderEngine::CreateFence()
 {
-    for (auto i = 0u; i < kFrame_Buffer_Count; i++)
+    for (unsigned long long &i : m_fence_value_)
     {
-        m_fence_value_[i] = 0;
+        i = 0;
     }
 
-    auto hr = m_p_device_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_p_fence_.ReleaseAndGetAddressOf()));
+    const auto hr = m_p_device_->CreateFence(
+        0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(m_p_fence_.ReleaseAndGetAddressOf())
+    );
+
     if (FAILED(hr))
     {
         return false;
@@ -310,8 +324,8 @@ void RenderEngine::CreateViewPort()
 {
     m_viewport_.TopLeftX = 0;
     m_viewport_.TopLeftY = 0;
-    m_viewport_.Width = static_cast<float>(engine::Application::Instance()->WindowWidth());
-    m_viewport_.Height = static_cast<float>(engine::Application::Instance()->WindowHeight());
+    m_viewport_.Width = static_cast<float>(engine::Application::WindowWidth());
+    m_viewport_.Height = static_cast<float>(engine::Application::WindowHeight());
     m_viewport_.MinDepth = 0.0f;
     m_viewport_.MaxDepth = 1.0f;
 }
@@ -319,9 +333,9 @@ void RenderEngine::CreateViewPort()
 void RenderEngine::CreateScissorRect()
 {
     m_scissor_.left = 0;
-    m_scissor_.right = engine::Application::Instance()->WindowWidth();
+    m_scissor_.right = engine::Application::WindowWidth();
     m_scissor_.top = 0;
-    m_scissor_.bottom = engine::Application::Instance()->WindowHeight();
+    m_scissor_.bottom = engine::Application::WindowHeight();
 }
 
 bool RenderEngine::CreateRenderTarget()
@@ -331,7 +345,7 @@ bool RenderEngine::CreateRenderTarget()
     desc.NumDescriptors = kFrame_Buffer_Count;
     desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
     desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    auto hr = m_p_device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_p_rtv_heap_.ReleaseAndGetAddressOf()));
+    const auto hr = m_p_device_->CreateDescriptorHeap(&desc, IID_PPV_ARGS(m_p_rtv_heap_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
     {
         return false;
@@ -339,18 +353,18 @@ bool RenderEngine::CreateRenderTarget()
 
     // ディスクリプタのサイズを取得。
     m_rtv_descriptor_size_ = m_p_device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-    D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_p_rtv_heap_->GetCPUDescriptorHandleForHeapStart();
+    D3D12_CPU_DESCRIPTOR_HANDLE rtv_handle = m_p_rtv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+    D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
 
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+    rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 
     for (UINT i = 0; i < kFrame_Buffer_Count; i++)
     {
         m_p_swap_chain_->GetBuffer(i, IID_PPV_ARGS(m_p_render_targets_[i].ReleaseAndGetAddressOf()));
-        m_p_device_->CreateRenderTargetView(m_p_render_targets_[i].Get(), &rtvDesc, rtvHandle);
-        rtvHandle.ptr += m_rtv_descriptor_size_;
+        m_p_device_->CreateRenderTargetView(m_p_render_targets_[i].Get(), &rtv_desc, rtv_handle);
+        rtv_handle.ptr += m_rtv_descriptor_size_;
     }
 
     return true;
@@ -359,11 +373,11 @@ bool RenderEngine::CreateRenderTarget()
 bool RenderEngine::CreateDepthStencil()
 {
     //DSV用のディスクリプタヒープを作成する
-    D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
-    heapDesc.NumDescriptors = 1;
-    heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
-    heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    auto hr = m_p_device_->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_p_dsv_heap_));
+    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
+    heap_desc.NumDescriptors = 1;
+    heap_desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+    heap_desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+    auto hr = m_p_device_->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(&m_p_dsv_heap_));
     if (FAILED(hr))
     {
         return false;
@@ -372,13 +386,13 @@ bool RenderEngine::CreateDepthStencil()
     //ディスクリプタのサイズを取得
     m_dsv_descriptor_size_ = m_p_device_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_DSV);
 
-    D3D12_CLEAR_VALUE dsvClearValue;
-    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-    dsvClearValue.DepthStencil.Depth = 1.0f;
-    dsvClearValue.DepthStencil.Stencil = 0;
+    D3D12_CLEAR_VALUE dsv_clear_value;
+    dsv_clear_value.Format = DXGI_FORMAT_D32_FLOAT;
+    dsv_clear_value.DepthStencil.Depth = 1.0f;
+    dsv_clear_value.DepthStencil.Stencil = 0;
 
-    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    CD3DX12_RESOURCE_DESC resourceDesc(
+    const auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+    const CD3DX12_RESOURCE_DESC resource_desc(
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
         engine::Application::WindowWidth(),
@@ -389,15 +403,17 @@ bool RenderEngine::CreateDepthStencil()
         1,
         0,
         D3D12_TEXTURE_LAYOUT_UNKNOWN,
-        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE);
+        D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL | D3D12_RESOURCE_FLAG_DENY_SHADER_RESOURCE
+    );
+
     hr = m_p_device_->CreateCommittedResource(
-        &heapProp,
+        &heap_prop,
         D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
+        &resource_desc,
         D3D12_RESOURCE_STATE_COMMON,
-        &dsvClearValue,
+        &dsv_clear_value,
         IID_PPV_ARGS(m_p_depth_stencil_buffer_.ReleaseAndGetAddressOf())
-        );
+    );
 
     m_p_depth_stencil_buffer_->SetName(L"DepthStencilBuffer");
 
@@ -407,9 +423,9 @@ bool RenderEngine::CreateDepthStencil()
     }
 
     //ディスクリプタを作成
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
+    const D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle = m_p_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    m_p_device_->CreateDepthStencilView(m_p_depth_stencil_buffer_.Get(), nullptr, dsvHandle);
+    m_p_device_->CreateDepthStencilView(m_p_depth_stencil_buffer_.Get(), nullptr, dsv_handle);
 
     return true;
 }
@@ -423,24 +439,40 @@ RenderEngine *RenderEngine::Instance()
 void RenderEngine::WaitRender()
 {
     //描画終了待ち
-    const UINT64 fenceValue = m_fence_value_[m_current_back_buffer_index_];
-    m_p_queue_->Signal(m_p_fence_.Get(), fenceValue);
+    const UINT64 fence_value = m_fence_value_[m_current_back_buffer_index_];
+    m_p_queue_->Signal(m_p_fence_.Get(), fence_value);
     m_fence_value_[m_current_back_buffer_index_]++;
 
     // 次のフレームの描画準備がまだであれば待機する.
-    if (m_p_fence_->GetCompletedValue() < fenceValue)
+    if (m_p_fence_->GetCompletedValue() < fence_value)
     {
         // 完了時にイベントを設定.
-        auto hr = m_p_fence_->SetEventOnCompletion(fenceValue, m_fence_event_);
+        const auto hr = m_p_fence_->SetEventOnCompletion(fence_value, m_fence_event_);
         if (FAILED(hr))
         {
             return;
         }
 
-        // 待機処理.
-        if (WAIT_OBJECT_0 != WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE))
-        {
-            return;
-        }
+        WaitForSingleObject(m_fence_event_, INFINITE);
     }
+}
+
+void RenderEngine::UpdateMainRenderTarget()
+{
+    engine::Logger::Log<RenderEngine>("Updating main render target");
+    WaitRender();
+
+    for (auto rt : m_p_render_targets_)
+        rt.Reset();
+
+    m_p_swap_chain_->ResizeBuffers(kFrame_Buffer_Count,
+                                   engine::Application::WindowWidth(),
+                                   engine::Application::WindowHeight(),
+                                   DXGI_FORMAT_UNKNOWN,
+                                   0);
+
+    CreateRenderTarget();
+    CreateDepthStencil();
+    CreateViewPort();
+    CreateScissorRect();
 }

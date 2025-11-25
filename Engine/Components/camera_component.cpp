@@ -5,8 +5,6 @@
 #include "Components/camera_component.h"
 
 #include "Rendering/render_pipeline.h"
-#include "Rendering/view_projection.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -36,9 +34,8 @@ void CameraProperty::OnInspectorGui()
 
 Matrix CameraProperty::ProjectionMatrix() const
 {
+    switch (view_mode)
     {
-        switch (view_mode)
-        {
         case kViewMode::kPerspective:
             return DirectX::XMMatrixPerspectiveFovRH(
                 field_of_view * Mathf::kDeg2Rad,
@@ -52,7 +49,6 @@ Matrix CameraProperty::ProjectionMatrix() const
         default:
             assert(false && "Invalid ViewMode");
             return Matrix::Identity;
-        }
     }
 }
 
@@ -79,6 +75,14 @@ void CameraComponent::OnEnabled()
 void CameraComponent::OnDisabled()
 {
     RenderPipeline::RemoveCamera(shared_from_base<CameraComponent>());
+}
+
+std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
+{
+    return m_render_texture_.CastedLock() != nullptr
+        ? m_render_texture_.CastedLock()
+        : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
+        .CastedLock();
 }
 
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)

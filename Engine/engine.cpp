@@ -36,9 +36,9 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-    if (!RenderEngine::Instance()->Init(Application::Instance()->WindowHandle(),
-                                        Application::Instance()->WindowWidth(),
-                                        Application::Instance()->WindowHeight()))
+    if (!RenderEngine::Instance()->Init(Application::WindowHandle(),
+                                        Application::WindowWidth(),
+                                        Application::WindowHeight()))
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }

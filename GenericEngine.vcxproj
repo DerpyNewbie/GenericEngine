@@ -20,6 +20,7 @@
     </ItemGroup>
     <ItemGroup>
         <ClCompile Include="application.cpp"/>
+        <ClCompile Include="bootstrap.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
         <ClCompile Include="Editor\audio_window.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
@@ -60,6 +61,12 @@
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
         <ClCompile Include="Engine\Audio\audio_listener_component.cpp"/>
         <ClCompile Include="Engine\Audio\audio_source_component.cpp"/>
+        <ClCompile Include="Engine\Components\Cinema\cinema_camera_transitioner.cpp"/>
+        <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
+        <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
+        <ClCompile Include="Engine\Components\image.cpp"/>
+        <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
+        <ClCompile Include="Engine\Components\canvas.cpp"/>
         <ClCompile Include="Engine\Components\camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component.cpp"/>
         <ClCompile Include="Engine\Components\controller.cpp"/>
@@ -68,9 +75,11 @@
         <ClCompile Include="Engine\Components\light.cpp"/>
         <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\rect_transform.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
         <ClCompile Include="Engine\Components\rotator_component.cpp"/>
         <ClCompile Include="Engine\Components\skinned_mesh_renderer.cpp"/>
+        <ClCompile Include="Engine\Components\spot_light.cpp"/>
         <ClCompile Include="Engine\Components\text_renderer.cpp"/>
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
@@ -83,7 +92,10 @@
         <ClCompile Include="Engine\game_object.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
+        <ClCompile Include="Engine\Math\rect.cpp"/>
+        <ClCompile Include="Engine\Math\trs.cpp"/>
         <ClCompile Include="Engine\object.cpp"/>
+        <ClCompile Include="Engine\object_util.cpp"/>
         <ClCompile Include="Engine\Physics\bullet_debug_drawer.cpp"/>
         <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
         <ClCompile Include="Engine\Physics\collider.cpp"/>
@@ -95,13 +107,23 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth.hlsl">
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_pixel.hlsl">
+            <ShaderType>Pixel</ShaderType>
+            <EntryPointName>pix</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+        </FxCompile>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl">
             <EntryPointName>vrt</EntryPointName>
             <ShaderType>Vertex</ShaderType>
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
+        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
+            <EntryPointName>geo</EntryPointName>
+            <ShaderModel>5.1</ShaderModel>
+            <ShaderType>Geometry</ShaderType>
+        </FxCompile>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
             <EntryPointName>pix</EntryPointName>
             <ShaderModel>5.0</ShaderModel>
@@ -167,6 +189,8 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\font_data.cpp"/>
         <ClCompile Include="Engine\Rendering\gizmos.cpp"/>
+        <ClCompile Include="Engine\Rendering\lighting.cpp"/>
+        <ClCompile Include="Engine\Rendering\light_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
         <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
@@ -174,6 +198,7 @@
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
+        <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
@@ -194,6 +219,7 @@
     </ItemGroup>
     <ItemGroup>
         <ClInclude Include="application.h"/>
+        <ClInclude Include="bootstrap.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
         <ClInclude Include="Editor\audio_window.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
@@ -235,6 +261,12 @@
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
         <ClInclude Include="Engine\Audio\audio_listener_component.h"/>
         <ClInclude Include="Engine\Audio\audio_source_component.h"/>
+        <ClInclude Include="Engine\Components\Cinema\cinema_camera_transitioner.h"/>
+        <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
+        <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
+        <ClInclude Include="Engine\Components\image.h"/>
+        <ClInclude Include="Engine\Components\renderer_2d.h"/>
+        <ClInclude Include="Engine\Components\canvas.h"/>
         <ClInclude Include="Engine\Components\camera_component.h"/>
         <ClInclude Include="Engine\Components\component.h"/>
         <ClInclude Include="Engine\Components\controller.h"/>
@@ -243,9 +275,11 @@
         <ClInclude Include="Engine\Components\light.h"/>
         <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\rect_transform.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
         <ClInclude Include="Engine\Components\rotator_component.h"/>
         <ClInclude Include="Engine\Components\skinned_mesh_renderer.h"/>
+        <ClInclude Include="Engine\Components\spot_light.h"/>
         <ClInclude Include="Engine\Components\text_renderer.h"/>
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
@@ -266,7 +300,10 @@
         <ClInclude Include="Engine\logger.h"/>
         <ClInclude Include="Engine\Math\mathf.h"/>
         <ClInclude Include="Engine\Math\math_serializer.h"/>
+        <ClInclude Include="Engine\Math\rect.h"/>
+        <ClInclude Include="Engine\Math\trs.h"/>
         <ClInclude Include="Engine\object.h"/>
+        <ClInclude Include="Engine\object_util.h"/>
         <ClInclude Include="Engine\Physics\bullet_debug_drawer.h"/>
         <ClInclude Include="Engine\Physics\capsule_collider.h"/>
         <ClInclude Include="Engine\Physics\collider.h"/>
@@ -298,6 +335,8 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\VertexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\font_data.h"/>
         <ClInclude Include="Engine\Rendering\gizmos.h"/>
+        <ClInclude Include="Engine\Rendering\lighting.h"/>
+        <ClInclude Include="Engine\Rendering\light_data.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
         <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
@@ -307,6 +346,7 @@
         <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
+        <ClInclude Include="Engine\Rendering\scene_data.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_resource.h"/>
@@ -325,9 +365,11 @@
         <ClInclude Include="pch.h"/>
     </ItemGroup>
     <ItemGroup>
-        <Content Include=".clang-format"/>
         <Content Include=".gitignore"/>
         <Content Include="vcpkg.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Folder Include="Resources\"/>
     </ItemGroup>
     <PropertyGroup Label="Globals">
         <VCProjectVersion>17.0</VCProjectVersion>

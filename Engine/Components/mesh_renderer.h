@@ -52,7 +52,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_shared_mesh_), CEREAL_NVP(shared_materials));
+        ar(cereal::base_class<Renderer>(this), CEREAL_NVP(m_shared_mesh_), CEREAL_NVP(shared_materials));
     }
 };
 }

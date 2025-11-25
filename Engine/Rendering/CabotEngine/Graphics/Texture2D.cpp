@@ -59,21 +59,23 @@ void Texture2D::OnInspectorGui()
 
 void Texture2D::CreateBuffer()
 {
-    auto desc = CD3DX12_RESOURCE_DESC::Tex2D(format,
-                                             width,
-                                             height,
-                                             1,
-                                             mip_level);
+    const auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
+        format,
+        width,
+        height,
+        1,
+        mip_level
+    );
 
-    auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
+    const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
     auto hr = RenderEngine::Device()->CreateCommittedResource(
-    &prop,
-    D3D12_HEAP_FLAG_NONE,
-    &desc,
-    D3D12_RESOURCE_STATE_GENERIC_READ,
-    nullptr,
-    IID_PPV_ARGS(&m_pResource)
+        &prop,
+        D3D12_HEAP_FLAG_NONE,
+        &desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ,
+        nullptr,
+        IID_PPV_ARGS(&m_pResource)
     );
 
     if (FAILED(hr))
@@ -83,12 +85,13 @@ void Texture2D::CreateBuffer()
 
     m_pResource->SetName(L"Texture");
 
-    D3D12_BOX destRegion = {0, 0, 0, width, height, 1};
-    hr = m_pResource->WriteToSubresource(0,
-                                         &destRegion, // copy all
-                                         tex_data.data(), // origin data addr
-                                         width * sizeof(PackedVector::XMCOLOR), // 1 line size
-                                         width * height * sizeof(PackedVector::XMCOLOR) // all line sizes
+    const D3D12_BOX dest_region = {0, 0, 0, width, height, 1};
+    hr = m_pResource->WriteToSubresource(
+        0,
+        &dest_region, // copy all
+        tex_data.data(), // origin data addr
+        width * sizeof(PackedVector::XMCOLOR), // 1 line size
+        width * height * sizeof(PackedVector::XMCOLOR) // all line sizes
     );
 
     if (FAILED(hr))
@@ -138,3 +141,5 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
     desc.Texture2D.MipLevels = 1; // no mipmaps
     return desc;
 }
+
+CEREAL_REGISTER_TYPE(Texture2D)

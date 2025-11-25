@@ -135,26 +135,9 @@ void MaterialData<T>::OnInspectorGui()
 template <typename T>
 void MaterialData<T>::SetValue(T value)
 {
-    if constexpr (std::is_same_v<T, int>)
-    {
-        this->value = value;
-        is_dirty = true;
-    }
-    else if constexpr (std::is_same_v<T, float>)
-    {
-        this->value = value;
-        is_dirty = true;
-    }
-    else if constexpr (kIsAssetPtr)
-    {
-        this->value = value;
-        buffer = CreateBuffer();
-        is_dirty = true;
-    }
-    else
-    {
-        Logger::Warn<MaterialData>("Invalid type set in material data");
-    }
+    this->value = value;
+    is_dirty = true;
+    buffer = CreateBuffer();
 }
 
 template <typename T>
