@@ -254,17 +254,18 @@ void ShaderImporter::OnExport(AssetDescriptor *ctx)
     Document doc;
     doc.SetObject();
     doc.AddMember("parameters", create_shader_params_value(doc.GetAllocator()), doc.GetAllocator());
+    PersistentDataStore data_store{&doc, &doc};
 
-    Value shader_settings(kObjectType);
-    shader_settings.AddMember("z_test", shader->m_shader_settings_.z_test, doc.GetAllocator());
-    shader_settings.AddMember("z_write", shader->m_shader_settings_.z_write, doc.GetAllocator());
-    shader_settings.AddMember("cull", shader->m_shader_settings_.cull, doc.GetAllocator());
-    shader_settings.AddMember("blend_src", shader->m_shader_settings_.blend_src, doc.GetAllocator());
-    shader_settings.AddMember("blend_dst", shader->m_shader_settings_.blend_dst, doc.GetAllocator());
-    shader_settings.AddMember("blend_op", shader->m_shader_settings_.blend_op, doc.GetAllocator());
-    shader_settings.AddMember("color_mask", shader->m_shader_settings_.color_mask, doc.GetAllocator());
-    shader_settings.AddMember("alpha_to_mask", shader->m_shader_settings_.alpha_to_mask, doc.GetAllocator());
-    doc.AddMember("shader_settings", shader_settings, doc.GetAllocator());
+    auto shader_settings = data_store.GetDataStore("shader_settings");
+    shader_settings.SetInt("z_test", shader->m_shader_settings_.z_test);
+    shader_settings.SetBool("z_write", shader->m_shader_settings_.z_write);
+    shader_settings.SetInt("cull", shader->m_shader_settings_.cull);
+    shader_settings.SetInt("blend_src", shader->m_shader_settings_.blend_src);
+    shader_settings.SetInt("blend_dst", shader->m_shader_settings_.blend_dst);
+    shader_settings.SetInt("blend_op", shader->m_shader_settings_.blend_op);
+    shader_settings.SetInt("color_mask", shader->m_shader_settings_.color_mask);
+    shader_settings.SetBool("alpha_to_mask", shader->m_shader_settings_.alpha_to_mask);
+    shader_settings.SetDataStore("shader_settings", data_store);
 
     StringBuffer string_buffer;
     Writer writer(string_buffer);
