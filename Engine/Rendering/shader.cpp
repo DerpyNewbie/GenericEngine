@@ -55,7 +55,9 @@ void Shader::OnInspectorGui()
 
     if (ImGui::CollapsingHeader("ShaderSettings"))
     {
+        ImGui::Indent();
         DrawShaderSettings();
+        ImGui::Unindent();
     }
 
     auto draw_params = [](auto &params, auto &sources) {
