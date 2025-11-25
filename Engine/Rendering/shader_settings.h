@@ -3,7 +3,7 @@
 struct ShaderSettings
 {
     int z_test = 0;
-    int z_write = 0;
+    int z_write = 1;
     int cull = 0;
 
     int blend_src = 0;
@@ -12,7 +12,7 @@ struct ShaderSettings
 
     int color_mask = 0;
 
-    int alpha_to_mask = 0;
+    bool alpha_to_mask = false;
 };
 
 constexpr const char *ZTestNames[] = {
@@ -34,12 +34,6 @@ constexpr const char *BlendOpNames[] = {
 };
 constexpr const char *ColorMaskNames[] = {
     "RGBA", "RGB", "A", "R", "G", "B", "0"
-};
-constexpr const char *StencilCompNames[] = {
-    "Always", "Never", "Less", "Greater", "LEqual", "GEqual", "Equal", "NotEqual"
-};
-constexpr const char *StencilOpNames[] = {
-    "Keep", "Zero", "Replace", "IncrSat", "DecrSat", "Invert", "IncrWrap", "DecrWrap"
 };
 constexpr const char *LightModeNames[] = {
     "UniversalForward", "ShadowCaster", "DepthOnly", "Meta", "UniversalGBuffer"
@@ -92,28 +86,6 @@ constexpr D3D12_BLEND_OP DX_BlendOp[] = {
     D3D12_BLEND_OP_REV_SUBTRACT,
     D3D12_BLEND_OP_MIN,
     D3D12_BLEND_OP_MAX
-};
-
-constexpr D3D12_COMPARISON_FUNC DX_StencilComp[] = {
-    D3D12_COMPARISON_FUNC_ALWAYS,
-    D3D12_COMPARISON_FUNC_NEVER,
-    D3D12_COMPARISON_FUNC_LESS,
-    D3D12_COMPARISON_FUNC_GREATER,
-    D3D12_COMPARISON_FUNC_LESS_EQUAL,
-    D3D12_COMPARISON_FUNC_GREATER_EQUAL,
-    D3D12_COMPARISON_FUNC_EQUAL,
-    D3D12_COMPARISON_FUNC_NOT_EQUAL
-};
-
-constexpr D3D12_STENCIL_OP DX_StencilOp[] = {
-    D3D12_STENCIL_OP_KEEP,
-    D3D12_STENCIL_OP_ZERO,
-    D3D12_STENCIL_OP_REPLACE,
-    D3D12_STENCIL_OP_INCR_SAT,
-    D3D12_STENCIL_OP_DECR_SAT,
-    D3D12_STENCIL_OP_INVERT,
-    D3D12_STENCIL_OP_INCR,
-    D3D12_STENCIL_OP_DECR
 };
 
 constexpr UINT8 DX_ColorMask[] = {

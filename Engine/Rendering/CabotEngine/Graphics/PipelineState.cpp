@@ -153,7 +153,7 @@ void PipelineState::SetShader(const std::shared_ptr<engine::Shader> &shader)
     rt.BlendOp = DX_BlendOp[shader_setting.blend_op];
     rt.RenderTargetWriteMask = DX_ColorMask[shader_setting.color_mask];
 
-    m_desc_.BlendState.AlphaToCoverageEnable = shader_setting.alpha_to_mask == 1;
+    m_desc_.BlendState.AlphaToCoverageEnable = shader_setting.alpha_to_mask;
 
     m_desc_.NumRenderTargets = 1;
     m_desc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;

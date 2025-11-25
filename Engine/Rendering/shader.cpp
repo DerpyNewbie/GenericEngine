@@ -41,7 +41,7 @@ void Shader::DrawShaderSettings()
     ImGui::Combo("BlendOp", &m_shader_settings_.blend_op, BlendOpNames, IM_ARRAYSIZE(BlendOpNames));
 
     ImGui::Combo("ColorMask", &m_shader_settings_.color_mask, ColorMaskNames, IM_ARRAYSIZE(ColorMaskNames));
-    ImGui::Combo("AlphaToMask", &m_shader_settings_.alpha_to_mask, ZWriteNames, IM_ARRAYSIZE(ZWriteNames));
+    ImGui::Checkbox("AlphaToMask(Coverage)", &m_shader_settings_.alpha_to_mask);
 }
 
 void Shader::OnInspectorGui()
