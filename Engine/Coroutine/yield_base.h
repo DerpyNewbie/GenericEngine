@@ -34,4 +34,20 @@ struct WaitForSeconds : YieldBase
     {}
     
 };
+
+struct WaitForFrame : YieldBase
+{
+    uint32_t remaining_frames;
+
+    explicit WaitForFrame(uint32_t frames) : remaining_frames(frames)
+    {}
+    bool await_ready() const noexcept
+    {
+        return false;
+    }
+    void await_suspend(std::coroutine_handle<>) const noexcept
+    {}
+    void await_resume() const noexcept
+    {}
+};
 }

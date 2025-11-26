@@ -23,7 +23,7 @@ public:
             auto h = *it;
             auto &promise = h.promise();
 
-            if (auto *w = static_cast<WaitForSeconds *>(promise.current_yield.get()))
+            if (auto *w = dynamic_cast<WaitForSeconds *>(promise.current_yield.get()))
             {
                 w->time -= dt;
                 if (w->time > 0)
@@ -32,6 +32,17 @@ public:
                     continue;
                 }
             }
+
+            if (auto *w = dynamic_cast<WaitForFrame *>(promise.current_yield.get()))
+            {
+                w->remaining_frames--;
+                if (w->remaining_frames > 0)
+                {
+                    ++it;
+                    continue;
+                }
+            }
+            
             h.resume();
 
             if (h.done())
