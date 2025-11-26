@@ -5,6 +5,8 @@ namespace engine
 struct YieldBase
 {
     virtual ~YieldBase() = default;
+    virtual bool ShouldResume(float dt) = 0 =
+    0;
 };
 
 struct WaitForNextFrame : YieldBase
@@ -17,6 +19,11 @@ struct WaitForNextFrame : YieldBase
     {}
     void await_resume() const noexcept
     {}
+
+    bool ShouldResume(float dt) override
+    {
+        return true;
+    }
 };
 
 struct WaitForSeconds : YieldBase
@@ -32,5 +39,15 @@ struct WaitForSeconds : YieldBase
     {}
     void await_resume() const noexcept
     {}
+
+    bool ShouldResume(float dt) override
+    {
+        time -= dt;
+        if (time > 0)
+        {
+            return false;
+        }
+        return true;
+    }
 };
 }

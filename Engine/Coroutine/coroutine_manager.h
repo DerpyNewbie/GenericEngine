@@ -23,14 +23,10 @@ public:
             auto h = *it;
             auto &promise = h.promise();
 
-            if (auto *w = dynamic_cast<WaitForSeconds *>(promise.current_yield))
+            if (!promise.current_yield->ShouldResume(dt))
             {
-                w->time -= dt;
-                if (w->time > 0)
-                {
-                    ++it;
-                    continue;
-                }
+                ++it;
+                continue;
             }
 
             h.resume();
