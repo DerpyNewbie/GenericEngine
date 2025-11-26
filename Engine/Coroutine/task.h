@@ -28,7 +28,7 @@ struct Task
         {}
         void unhandled_exception()
         {
-            std::terminate();
+            Logger::Error<Task>("Coroutine exception: {}", std::current_exception());
         }
 
         auto await_transform(WaitForNextFrame w)
