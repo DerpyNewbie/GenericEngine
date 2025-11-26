@@ -1,4 +1,6 @@
 #pragma once
+#include <utility>
+
 #include "yield_base.h"
 
 namespace engine
@@ -31,16 +33,14 @@ struct Task
 
         auto await_transform(WaitForNextFrame w)
         {
-            delete current_yield;
-            current_yield = new WaitForNextFrame(w);
-            return *static_cast<WaitForNextFrame *>(current_yield);
+            current_yield = new WaitForNextFrame(std::move(w));
+            return *dynamic_cast<WaitForNextFrame *>(current_yield);
         }
 
         auto await_transform(WaitForSeconds w)
         {
-            delete current_yield;
-            current_yield = new WaitForSeconds(w);
-            return *static_cast<WaitForSeconds *>(current_yield);
+            current_yield = new WaitForSeconds(std::move(w));
+            return *dynamic_cast<WaitForSeconds *>(current_yield);
         }
     };
 
