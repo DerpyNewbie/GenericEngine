@@ -9,7 +9,7 @@ struct Task
 {
     struct promise_type
     {
-        YieldBase *current_yield = nullptr;
+        std::unique_ptr<YieldBase> current_yield = nullptr;
 
         Task get_return_object()
         {
@@ -33,14 +33,14 @@ struct Task
 
         auto await_transform(WaitForNextFrame w)
         {
-            current_yield = new WaitForNextFrame(std::move(w));
-            return *dynamic_cast<WaitForNextFrame *>(current_yield);
+            current_yield = std::make_unique<WaitForNextFrame>(std::move(w));
+            return *static_cast<WaitForNextFrame *>(current_yield.get());
         }
 
         auto await_transform(WaitForSeconds w)
         {
-            current_yield = new WaitForSeconds(std::move(w));
-            return *dynamic_cast<WaitForSeconds *>(current_yield);
+            current_yield = std::make_unique<WaitForSeconds>(std::move(w));
+            return *static_cast<WaitForSeconds *>(current_yield.get());
         }
     };
 

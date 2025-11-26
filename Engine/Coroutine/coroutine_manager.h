@@ -23,7 +23,7 @@ public:
             auto h = *it;
             auto &promise = h.promise();
 
-            if (auto *w = dynamic_cast<WaitForSeconds *>(promise.current_yield))
+            if (auto *w = static_cast<WaitForSeconds *>(promise.current_yield.get()))
             {
                 w->time -= dt;
                 if (w->time > 0)
