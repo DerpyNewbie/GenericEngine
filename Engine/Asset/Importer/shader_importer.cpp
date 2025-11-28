@@ -20,7 +20,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "vs_5_0",
         0,
         0,
-        &shader->m_pVSBlob,
+        &shader->m_vs_blob_,
         &error_blob
         );
 
@@ -38,7 +38,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         "ps_5_0",
         0,
         0,
-        &shader->m_pPSBlob,
+        &shader->m_ps_blob_,
         &error_blob
         );
 
@@ -71,6 +71,18 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
                                       descriptor->AssetPath().string().c_str());
         return false;
     }
+
+    PersistentDataStore data_store{&doc, &doc};
+
+    auto shader_settings = data_store.GetDataStore("shader_settings");
+    shader->m_shader_settings_.z_test = shader_settings.GetInt("z_test");
+    shader->m_shader_settings_.z_write = shader_settings.GetInt("z_write");
+    shader->m_shader_settings_.cull = shader_settings.GetInt("cull");
+    shader->m_shader_settings_.blend_src = shader_settings.GetInt("blend_src");
+    shader->m_shader_settings_.blend_dst = shader_settings.GetInt("blend_dst");
+    shader->m_shader_settings_.blend_op = shader_settings.GetInt("blend_op");
+    shader->m_shader_settings_.color_mask = shader_settings.GetInt("color_mask");
+    shader->m_shader_settings_.alpha_to_mask = shader_settings.GetInt("alpha_to_mask");
 
     const auto parameters_member = doc.FindMember("parameters");
     if (parameters_member == doc.MemberEnd())
@@ -242,6 +254,18 @@ void ShaderImporter::OnExport(AssetDescriptor *ctx)
     Document doc;
     doc.SetObject();
     doc.AddMember("parameters", create_shader_params_value(doc.GetAllocator()), doc.GetAllocator());
+    PersistentDataStore data_store{&doc, &doc};
+
+    auto shader_settings = data_store.GetDataStore("shader_settings");
+    shader_settings.SetInt("z_test", shader->m_shader_settings_.z_test);
+    shader_settings.SetBool("z_write", shader->m_shader_settings_.z_write);
+    shader_settings.SetInt("cull", shader->m_shader_settings_.cull);
+    shader_settings.SetInt("blend_src", shader->m_shader_settings_.blend_src);
+    shader_settings.SetInt("blend_dst", shader->m_shader_settings_.blend_dst);
+    shader_settings.SetInt("blend_op", shader->m_shader_settings_.blend_op);
+    shader_settings.SetInt("color_mask", shader->m_shader_settings_.color_mask);
+    shader_settings.SetBool("alpha_to_mask", shader->m_shader_settings_.alpha_to_mask);
+    shader_settings.SetDataStore("shader_settings", data_store);
 
     StringBuffer string_buffer;
     Writer writer(string_buffer);
