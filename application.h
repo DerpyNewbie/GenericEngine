@@ -13,10 +13,6 @@ namespace engine
 {
 class Application
 {
-    static int m_window_height_;
-    static int m_window_width_;
-    static HWND m_window_handle_;
-
     /// @brief Window initialization
     static void InitWindow();
 
@@ -26,11 +22,13 @@ public:
     static std::shared_ptr<Application> Instance();
 
     /// @brief Start application
-    static WPARAM StartApp();
+    static WPARAM Run();
 
     static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
     static int WindowWidth();
     static int WindowHeight();
     static HWND WindowHandle();
+    static std::string WindowTitle();
+    static void SetWindowTitle(const std::string &title);
 };
 }

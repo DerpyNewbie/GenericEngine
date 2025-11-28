@@ -2,7 +2,7 @@
     "guid": "7322408b-f1f4-4bb7-a310-5dd0cb5e71d1",
     "type": ".hlsl",
     "data": {
-        "shader_meta": "{\"parameters\":{\"vertex\":[{\"name\":\"DebugType\",\"type\":\"int\"},{\"name\":\"WeightIndex\",\"type\":\"int\"}],\"pixel\":[{\"name\":\"Albedo\",\"type\":\"Texture2D\"}]}}"
+        "shader_meta": "{\"parameters\":{\"vertex\":[],\"pixel\":[]},\"shader_settings\":{\"z_test\":0,\"z_write\":0,\"cull\":0,\"blend_src\":0,\"blend_dst\":0,\"blend_op\":0,\"color_mask\":0,\"alpha_to_mask\":0}}"
     },
     "objects": []
 }

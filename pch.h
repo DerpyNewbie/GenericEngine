@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <coroutine>
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
@@ -39,9 +40,12 @@
 
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include "cereal/types/utility.hpp"
 #include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
+#include <cereal/types/set.hpp>
+#include <cereal/types/map.hpp>
 /* === end cereal === */
 
 /* === begin windows === */

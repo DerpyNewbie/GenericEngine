@@ -4,10 +4,9 @@ cbuffer Transform : register (b0)
 {
     float4x4 World;
 }
-cbuffer LightCount : register (b3)
+cbuffer LightCount : register (b4)
 {
     int light_count;
-    int a[63];
 }
 
 StructuredBuffer<float4x4> LightViewProj : register(t1);
