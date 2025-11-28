@@ -12,7 +12,7 @@
 
 using namespace DirectX;
 
-std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
+std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
 {
     auto result_texture = Instantiate<Texture2D>();
     unsigned char *pixels = nullptr;
@@ -21,9 +21,12 @@ std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
     if (ai_texture->mHeight == 0)
     {
         pixels = stbi_load_from_memory(
-        reinterpret_cast<const unsigned char *>(ai_texture->pcData),
-        ai_texture->mWidth,
-        &width, &height, &channels, 4
+            reinterpret_cast<const unsigned char *>(ai_texture->pcData),
+            ai_texture->mWidth,
+            &width,
+            &height,
+            &channels,
+            4
         );
         result_texture->tex_data.reserve(width * height * sizeof(PackedVector::XMCOLOR));
     }

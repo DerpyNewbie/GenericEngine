@@ -3,6 +3,7 @@
 #include "asset_descriptor.h"
 
 #include "asset_database.h"
+#include "engine_util.h"
 #include "logger.h"
 #include "Importer/asset_importer.h"
 
@@ -44,8 +45,10 @@ path AssetDescriptor::MetaFilePath(const path &asset_path)
 bool AssetDescriptor::GetMetaJson(const path &asset_path, std::string &out_json)
 {
     const auto descriptor_file_path = MetaFilePath(asset_path);
-    if (!exists(descriptor_file_path))
+    std::error_code ec;
+    if (!exists(descriptor_file_path, ec))
     {
+        Logger::Error<AssetDescriptor>("Meta file `%s` not found! error: %d, %s", descriptor_file_path.string().c_str(), ec.value(), ec.message().c_str());
         return false;
     }
 
@@ -67,9 +70,19 @@ void AssetDescriptor::WriteMeta(const path &path)
         // off by one because the main object is also present in the objects
         for (auto it = std::next(m_objects_.begin(), 1); it != m_objects_.end(); ++it)
         {
-            auto value = (*it)->Guid().str();
-            auto object_guid = Value(value.c_str(), static_cast<SizeType>(value.size()), m_meta_json_.GetAllocator());
-            guids.PushBack(object_guid, m_meta_json_.GetAllocator());
+            Value sub_object(kObjectType);
+            auto guid = (*it)->Guid().str();
+            auto guid_value = Value(guid.c_str(), static_cast<SizeType>(guid.size()), m_meta_json_.GetAllocator());
+            auto name = (*it)->Name();
+            auto name_value = Value(name.c_str(), static_cast<SizeType>(name.size()), m_meta_json_.GetAllocator());
+            auto type_hint = std::string(typeid(*it->get()).name());
+            auto type_hint_value = Value(type_hint.c_str(), static_cast<SizeType>(type_hint.size()), m_meta_json_.GetAllocator());
+
+            sub_object.AddMember("guid", guid_value, m_meta_json_.GetAllocator());
+            sub_object.AddMember("name", name_value, m_meta_json_.GetAllocator());
+            sub_object.AddMember("type_hint", type_hint_value, m_meta_json_.GetAllocator());
+
+            guids.PushBack(sub_object, m_meta_json_.GetAllocator());
         }
     }
 
@@ -104,8 +117,6 @@ AssetDescriptor::AssetDescriptor(const path &file_path) :
         m_guid_ = xg::newGuid();
         m_meta_json_.SetObject();
         m_meta_data_store_ = PersistentDataStore{&m_meta_json_, &m_meta_json_};
-        auto data_value = Value(kObjectType);
-        m_meta_data_store_.SetValue(kDataKey, data_value);
         m_user_data_store_ = m_meta_data_store_.GetDataStore(kDataKey);
 
         WriteMeta(meta_file_path);
@@ -134,8 +145,29 @@ AssetDescriptor::AssetDescriptor(const path &file_path) :
     }
 
     const auto array = objects.GetArray();
-    for (auto i = array.begin(); i != array.end(); ++i)
-        m_sub_guids_.emplace_back(xg::Guid(i->GetString()));
+    if (array.Size() != 0)
+    {
+        if (array.begin()->IsString())
+        {
+            // sub objects format version 1: array of a string form of Guid
+            for (auto i = array.begin(); i != array.end(); ++i)
+                m_sub_guids_.emplace_back(xg::Guid(i->GetString()));
+        }
+        else
+        {
+            // sub objects format version 2: array of SubObjectMeta
+            for (auto i = array.begin(); i != array.end(); ++i)
+            {
+                SubObjectMeta meta;
+                meta.name = i->FindMember("name")->value.GetString();
+                meta.guid = xg::Guid(i->FindMember("guid")->value.GetString());
+                meta.type_hint = i->FindMember("type_hint")->value.GetString();
+
+                m_sub_object_metas_.emplace_back(meta);
+                m_sub_guids_.emplace_back(meta.guid);
+            }
+        }
+    }
 }
 
 xg::Guid AssetDescriptor::Guid() const
@@ -175,18 +207,24 @@ std::list<ImportLog> AssetDescriptor::ImportLogs() const
 
 bool AssetDescriptor::HasImportError() const
 {
-    return std::ranges::any_of(m_import_logs_, [](const auto &log) {
-        return log.type == ImportLog::kLogType::kError;
-    });
+    return std::ranges::any_of(
+        m_import_logs_,
+        [](const auto &log) {
+            return log.type == ImportLog::kLogType::kError;
+        }
+    );
 }
 
 void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
 {
     m_main_object_ = object;
 
-    std::erase_if(m_objects_, [&object](auto &item) {
-        return item == object;
-    });
+    std::erase_if(
+        m_objects_,
+        [&object](auto &item) {
+            return item == object;
+        }
+    );
 
     m_objects_.emplace_front(object);
 
@@ -203,16 +241,35 @@ void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
     }
 
     m_objects_.emplace_back(object);
-    const auto offset = m_objects_.size() - 1;
-    if (m_sub_guids_.size() < offset)
+
+    /*
+     * filter object meta that has
+     * - Same name
+     * - Same type
+     * and no existing objects with the same guid
+     */
+    auto filtered_object_metas = std::ranges::filter_view(
+        m_sub_object_metas_,
+        [&object, this](auto meta) {
+            return meta.name == object->Name() && meta.type_hint == typeid(*object).name() && std::ranges::all_of(
+                       m_objects_,
+                       [&meta](auto &item) {
+                           return item->Guid() != meta.guid;
+                       }
+                   );
+        }
+    );
+
+    // if we couldn't find matching meta
+    if (filtered_object_metas.empty())
     {
         m_sub_guids_.emplace_back(object->Guid());
+        m_sub_object_metas_.emplace_back(object->Guid(), object->Name(), typeid(*object).name());
         return;
     }
 
-    const auto it = std::next(m_sub_guids_.begin(), offset - 1);
-    object->SetGuid(*it);
-    object->SetName(object->Name() + " (" + AssetPath().filename().string() + ")");
+    // or else, we'll assign previously known guid
+    object->SetGuid(filtered_object_metas.front().guid);
 }
 
 void AssetDescriptor::LogImportError(const std::string &message)
@@ -233,8 +290,11 @@ void AssetDescriptor::Import()
     const auto asset_importer = AssetImporter::Get(m_type_);
     if (asset_importer == nullptr)
     {
-        Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
-                                      m_type_.c_str(), AssetPath().string().c_str());
+        Logger::Warn<AssetDescriptor>(
+            "Asset importer for type '%s' not found! Will ignore file '%s'",
+            m_type_.c_str(),
+            AssetPath().string().c_str()
+        );
         return;
     }
 
@@ -250,7 +310,9 @@ void AssetDescriptor::Import()
     {
         Logger::Error<AssetDescriptor>(
             "Failed to import asset '%s': %s",
-            AssetPath().string().c_str(), e.what());
+            AssetPath().string().c_str(),
+            e.what()
+        );
 
 #if defined(DEBUG) || defined(_DEBUG)
         DebugBreak();
@@ -260,7 +322,8 @@ void AssetDescriptor::Import()
     {
         Logger::Error<AssetDescriptor>(
             "Failed to import asset '%s' due to an unknown exception!",
-            AssetPath().string().c_str());
+            AssetPath().string().c_str()
+        );
 
 #if defined(DEBUG) || defined(_DEBUG)
         DebugBreak();

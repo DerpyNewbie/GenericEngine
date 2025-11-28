@@ -3,6 +3,10 @@
     "type": ".txt",
     "data": {},
     "objects": [
-        "14bb44aa-0628-4be2-8f55-57469c7bd4ee"
+        {
+            "guid": "3a7667ce-ae90-4f72-a5ae-cd4291b5be35",
+            "name": "Instantiated Object 267",
+            "type_hint": "class engine::TextAsset"
+        }
     ]
 }

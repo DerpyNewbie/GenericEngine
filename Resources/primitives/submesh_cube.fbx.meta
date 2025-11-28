@@ -3,9 +3,20 @@
     "type": ".fbx",
     "data": {},
     "objects": [
-        "d3415b3e-745f-493a-9d88-e28f842f7c65",
-        "9b39c5cd-2365-439d-8d49-41bc7dbf7f5b",
-        "4f60d3e1-8727-44b0-bd5c-1e9790d92a5e",
-        "6d9c7de6-015f-41c3-921a-4383147751b5"
+        {
+            "guid": "ff516a39-1c33-4d4b-a809-f53cb5bcdba0",
+            "name": "Cube",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "e7360cb0-f1d1-47e3-a1da-a1fa5ed34c7f",
+            "name": "FirstMaterial",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "6969e390-55e3-4ee1-a3e9-1de9bbd4226f",
+            "name": "SecondMaterial",
+            "type_hint": "class engine::Material"
+        }
     ]
 }

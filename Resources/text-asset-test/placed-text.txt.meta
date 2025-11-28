@@ -5,6 +5,10 @@
         "aadada": "dadada"
     },
     "objects": [
-        "60ef11ef-af2a-4188-a692-6eab90eac564"
+        {
+            "guid": "ad1711aa-e486-4d0f-9c14-cbb2b086d9a7",
+            "name": "Instantiated Object 285",
+            "type_hint": "class engine::TextAsset"
+        }
     ]
 }

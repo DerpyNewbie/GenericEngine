@@ -158,7 +158,13 @@ bool PersistentDataStore::GetBool(const std::string &key, const bool &default_va
 PersistentDataStore PersistentDataStore::GetDataStore(const std::string &key) const
 {
     const auto json = GetString(key);
-    const auto it = m_value_->FindMember(StringRef(key.c_str(), key.size()));
+    auto it = m_value_->FindMember(StringRef(key.c_str(), key.size()));
+
+    if (it == m_value_->MemberEnd())
+    {
+        m_value_->AddMember(StringRef(key.c_str(), key.size()), Value(kObjectType), Allocator());
+        it = m_value_->FindMember(StringRef(key.c_str(), key.size()));
+    }
 
     if (!it->value.IsObject())
     {

@@ -9,6 +9,8 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+
+#include "Asset/fbx_meta.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 
@@ -28,14 +30,14 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
 {
     Assimp::Importer importer;
     constexpr int import_settings =
-    aiProcess_CalcTangentSpace |
-    aiProcess_Triangulate |
-    aiProcess_GenSmoothNormals |
-    aiProcess_SortByPType |
-    aiProcess_OptimizeMeshes |
-    aiProcess_PopulateArmatureData |
-    aiProcess_JoinIdenticalVertices |
-    aiProcess_LimitBoneWeights;
+        aiProcess_CalcTangentSpace |
+        aiProcess_Triangulate |
+        aiProcess_GenSmoothNormals |
+        aiProcess_SortByPType |
+        aiProcess_OptimizeMeshes |
+        aiProcess_PopulateArmatureData |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_LimitBoneWeights;
     importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_PRESERVE_PIVOTS, false);
     importer.SetPropertyBool(AI_CONFIG_IMPORT_FBX_EMBEDDED_TEXTURES_LEGACY_NAMING, true);
 
@@ -47,42 +49,18 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     }
 
     // placeholder for future prefab-like implementation 
-    ctx->SetMainObject(Object::Instantiate<DummyAsset>());
+    const auto meta = Object::Instantiate<FbxMeta>();
+    ctx->SetMainObject(meta);
 
-    // TODO: implement importer in Mesh -> Material -> Animation order
-    for (UINT i = 0; i < scene->mNumMeshes; ++i)
+    // process fbx meta
     {
-        auto shared_mesh = Mesh::CreateFromAiMesh(scene->mMeshes[i]);
-        ctx->AddObject(shared_mesh);
-    }
-
-    for (UINT i = 0; i < scene->mNumMaterials; ++i)
-    {
-        auto material = Object::Instantiate<Material>();
-        aiString ai_tex_path;
-
-        if (scene->mMaterials[i]->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_tex_path) != AI_SUCCESS)
+        ConversionMap convert;
+        MeshNodes mesh_nodes;
+        meta->root_object_meta = CreateMapping(ctx, meta, scene, scene->mRootNode, convert, mesh_nodes);
+        for (const auto &mesh_node : mesh_nodes)
         {
-            scene->mMaterials[i]->GetTexture(aiTextureType_DIFFUSE, 0, &ai_tex_path);
+            meta->mesh_objects.emplace(convert.to_object.at(mesh_node), CreateMesh(ctx, scene, mesh_node, convert));
         }
-
-        if (ai_tex_path.length > 0)
-        {
-            if (ai_tex_path.C_Str()[0] == '*')
-            {
-                int index = std::stoi(ai_tex_path.C_Str() + 1);
-                aiTexture *ai_texture = scene->mTextures[index];
-                auto texture = Texture2D::LoadFromAiTexture(ai_texture);
-                ctx->AddObject(texture);
-            }
-            else
-            {
-                std::string std_tex_path = ai_tex_path.C_Str();
-                auto texture = AssetDatabase::GetAsset<Texture2D>(std_tex_path);
-                material->p_shared_material_block->SetMaterialData("Albedo", texture.CastedLock());
-            }
-        }
-        ctx->AddObject(material);
     }
 
     for (UINT i = 0; i < scene->mNumAnimations; ++i)
@@ -91,7 +69,7 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
         auto anim_clip = Object::Instantiate<AnimationClip>(animation->mName.C_Str());
 
         anim_clip->m_length_ = animation->mDuration / animation->mTicksPerSecond;
-        anim_clip->m_frame_rate_ = 1.0 / animation->mTicksPerSecond;
+        anim_clip->m_frame_rate_ = static_cast<float>(1.0 / animation->mTicksPerSecond);
 
         for (UINT j = 0; j < animation->mNumChannels; ++j)
         {
@@ -125,8 +103,12 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
                     if (ai_quaternion1.x * ai_quaternion2.x + ai_quaternion1.y * ai_quaternion2.y + ai_quaternion1.z *
                         ai_quaternion2.z + ai_quaternion1.w * ai_quaternion2.w <= 0.0f)
                     {
-                        ai_quaternion1 = aiQuaternion(-ai_quaternion1.w, -ai_quaternion1.x, -ai_quaternion1.y,
-                                                      -ai_quaternion1.z);
+                        ai_quaternion1 = aiQuaternion(
+                            -ai_quaternion1.w,
+                            -ai_quaternion1.x,
+                            -ai_quaternion1.y,
+                            -ai_quaternion1.z
+                        );
                     }
                 }
                 ai_quaternion1.Normalize();
@@ -138,5 +120,137 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
         }
         ctx->AddObject(anim_clip);
     }
+
+}
+
+std::shared_ptr<ObjectMeta> FbxImporter::CreateMapping(
+    AssetDescriptor *ctx,
+    const std::shared_ptr<FbxMeta> &fbx_meta,
+    const aiScene *ai_scene,
+    const aiNode *ai_node,
+    ConversionMap &out_conversion_mapping,
+    MeshNodes &out_mesh_nodes
+)
+{
+    auto object_meta = std::make_shared<ObjectMeta>();
+    object_meta->parent = {};
+    object_meta->name = ai_node->mName.C_Str();
+
+    // Recurse children
+    for (unsigned int i = 0; i < ai_node->mNumChildren; i++)
+    {
+        auto child = CreateMapping(ctx, fbx_meta, ai_scene, ai_node->mChildren[i], out_conversion_mapping, out_mesh_nodes);
+        child->parent = object_meta;
+        object_meta->children.push_back(child);
+    }
+
+    // Extract Transforms
+    aiVector3D scaling, position;
+    aiQuaternion rotation;
+    ai_node->mTransformation.Decompose(scaling, rotation, position);
+
+    TRS local_trs;
+    local_trs.translation = Vector3(position.x, position.y, position.z);
+    local_trs.scale = Vector3(scaling.x, scaling.y, scaling.z);
+    local_trs.rotation = Quaternion(rotation.x, rotation.y, rotation.z, rotation.w);
+
+    object_meta->local_transform = local_trs;
+
+    if (ai_node->mNumMeshes > 0)
+    {
+        out_mesh_nodes.emplace(ai_node);
+    }
+
+    out_conversion_mapping.Emplace(ai_node, object_meta);
+    return object_meta;
+}
+
+std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMesh(
+    AssetDescriptor *ctx,
+    const aiScene *ai_scene,
+    const aiNode *ai_node,
+    const ConversionMap &conversion_mapping
+)
+{
+    const auto object_meta = conversion_mapping.to_object.at(ai_node);
+    if (ai_node->mNumMeshes == 0)
+    {
+        return {};
+    }
+
+    // populate mesh & material references
+    std::vector<AssetPtr<Material>> materials;
+    for (UINT i = 0; i < ai_node->mNumMeshes; i++)
+    {
+        const auto ai_mesh_idx = ai_node->mMeshes[i];
+        const auto ai_mesh = ai_scene->mMeshes[ai_mesh_idx];
+        auto converted_mesh = Mesh::CreateFromAiMesh(ai_mesh);
+        if (const auto mesh = object_meta->mesh.instance.lock())
+        {
+            mesh->Append(*converted_mesh);
+
+            // clean up used mesh object
+            Object::Destroy(converted_mesh);
+        }
+        else
+        {
+            ctx->AddObject(converted_mesh);
+            object_meta->mesh.instance = converted_mesh;
+        }
+
+        const auto material = CreateMaterial(ctx, ai_scene, ai_scene->mMaterials[ai_mesh->mMaterialIndex]);
+        const auto material_asset = AssetPtr<Material>::FromManaged(material);
+
+        object_meta->mesh.materials.emplace_back(material);
+        materials.emplace_back(material_asset);
+    }
+
+    // populate bone references
+    const auto ai_mesh = ai_scene->mMeshes[ai_node->mMeshes[0]];
+    if (ai_mesh->HasBones())
+    {
+        for (unsigned int j = 0; j < ai_mesh->mNumBones; ++j)
+        {
+            object_meta->mesh.bones.emplace_back(conversion_mapping.to_object.at(ai_mesh->mBones[j]->mNode));
+        }
+    }
+
+    return std::make_pair(AssetPtr<Mesh>::FromManaged(object_meta->mesh.instance.lock()), materials);
+}
+
+std::shared_ptr<Material> FbxImporter::CreateMaterial(AssetDescriptor *ctx, const aiScene *ai_scene, const aiMaterial *ai_material)
+{
+    auto material_asset = Object::Instantiate<Material>();
+    material_asset->SetName(ai_material->GetName().C_Str());
+
+    aiString ai_texture_path;
+
+    if (ai_material->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_texture_path) != AI_SUCCESS)
+    {
+        ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &ai_texture_path);
+    }
+
+    if (ai_texture_path.length > 0)
+    {
+        if (ai_texture_path.C_Str()[0] == '*')
+        {
+            const int index = std::stoi(ai_texture_path.C_Str() + 1);
+            const aiTexture *ai_texture = ai_scene->mTextures[index];
+            const auto texture = Texture2D::LoadFromAiTexture(ai_texture);
+            texture->SetName(ai_texture->mFilename.C_Str());
+            ctx->AddObject(texture);
+            const auto texture_ptr = AssetPtr<Texture2D>::FromManaged(texture);
+            material_asset->p_shared_material_block->SetMaterialData("Albedo", texture_ptr);
+        }
+        else
+        {
+            const std::string file_path = ai_texture_path.C_Str();
+            const auto texture = AssetDatabase::GetAsset<Texture2D>(file_path);
+            material_asset->p_shared_material_block->SetMaterialData("Albedo", texture);
+        }
+    }
+
+    ctx->AddObject(material_asset);
+    return material_asset;
 }
 }
