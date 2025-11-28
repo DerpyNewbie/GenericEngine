@@ -8,10 +8,6 @@
 
 namespace engine
 {
-
-std::weak_ptr<CameraComponent> CameraComponent::m_main_camera_;
-std::weak_ptr<CameraComponent> CameraComponent::m_current_camera_;
-
 void CameraProperty::OnInspectorGui()
 {
     ImGui::SliderFloat("Field of View", &field_of_view, kMinFieldOfView, kMaxFieldOfView);
@@ -40,12 +36,16 @@ Matrix CameraProperty::ProjectionMatrix() const
             return DirectX::XMMatrixPerspectiveFovRH(
                 field_of_view * Mathf::kDeg2Rad,
                 aspect_ratio,
-                near_plane, far_plane);
+                near_plane,
+                far_plane
+            );
         case kViewMode::kOrthographic:
             return DirectX::XMMatrixOrthographicRH(
                 ortho_size * aspect_ratio,
                 ortho_size,
-                near_plane, far_plane);
+                near_plane,
+                far_plane
+            );
         default:
             assert(false && "Invalid ViewMode");
             return Matrix::Identity;
@@ -76,14 +76,30 @@ void CameraComponent::OnEnabled()
         SetMainCamera(shared_from_base<CameraComponent>());
     }
 
+    const auto shared_this = shared_from_base<CameraComponent>();
+    const auto find = std::ranges::find(
+        m_cameras_,
+        shared_this,
+        [](auto a) { return a.lock(); }
+    );
+
+    if (find == m_cameras_.end())
+        m_cameras_.emplace_back(shared_from_base<CameraComponent>());
+
     RenderPipeline::AddCamera(shared_from_base<CameraComponent>());
 }
 
 void CameraComponent::OnDisabled()
 {
-    if (m_main_camera_.lock() == shared_from_base<CameraComponent>())
+    auto shared_this = shared_from_base<CameraComponent>();
+    std::erase_if(
+        m_cameras_,
+        [shared_this](const std::weak_ptr<CameraComponent> &a) { return a.expired() || a.lock() == shared_this; }
+    );
+
+    if (m_main_camera_.lock() == shared_this)
     {
-        SetMainCamera({});
+        SetMainCamera(m_cameras_.begin() != m_cameras_.end() ? *m_cameras_.begin() : std::weak_ptr<CameraComponent>());
     }
 
     RenderPipeline::RemoveCamera(shared_from_base<CameraComponent>());
