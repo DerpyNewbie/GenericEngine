@@ -65,6 +65,7 @@
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_transitioner.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
+        <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
         <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
         <ClCompile Include="Engine\Components\canvas.cpp"/>
@@ -85,6 +86,9 @@
         <ClCompile Include="Engine\Components\text_asset_ref_test_component.cpp"/>
         <ClCompile Include="Engine\Components\transform.cpp"/>
         <ClCompile Include="Engine\component_factory.cpp"/>
+        <ClCompile Include="Engine\Coroutine\coroutine_manager.cpp"/>
+        <ClCompile Include="Engine\Coroutine\task.cpp"/>
+        <ClCompile Include="Engine\Coroutine\yield_base.cpp"/>
         <ClCompile Include="Engine\default_scene_generator.cpp"/>
         <ClCompile Include="Engine\engine.cpp"/>
         <ClCompile Include="Engine\engine_profiler.cpp"/>
@@ -203,6 +207,7 @@
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
+        <ClCompile Include="Engine\Rendering\shader_settings.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
@@ -266,6 +271,7 @@
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_transitioner.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
+        <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
         <ClInclude Include="Engine\Components\renderer_2d.h"/>
         <ClInclude Include="Engine\Components\canvas.h"/>
@@ -286,6 +292,9 @@
         <ClInclude Include="Engine\Components\text_asset_ref_test_component.h"/>
         <ClInclude Include="Engine\Components\transform.h"/>
         <ClInclude Include="Engine\component_factory.h"/>
+        <ClInclude Include="Engine\Coroutine\coroutine_manager.h"/>
+        <ClInclude Include="Engine\Coroutine\task.h"/>
+        <ClInclude Include="Engine\Coroutine\yield_base.h"/>
         <ClInclude Include="Engine\default_scene_generator.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
         <ClInclude Include="Engine\engine.h"/>
@@ -352,6 +361,7 @@
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_resource.h"/>
+        <ClInclude Include="Engine\Rendering\shader_settings.h"/>
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
