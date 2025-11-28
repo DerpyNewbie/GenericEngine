@@ -19,7 +19,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -90,13 +90,18 @@ void RenderPipeline::InvokeDrawCall()
 
     if (const auto main_camera = CameraComponent::Main())
     {
-        CameraComponent::SetCurrentCamera(main_camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
-        DepthRender();
+        const auto prev_property = main_camera->m_property_;
+        {
+            main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / Application::WindowHeight();
+            CameraComponent::SetCurrentCamera(main_camera);
+            Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+            DepthRender();
 
-        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(main_camera);
-        on_rendering.Invoke();
+            RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
+            Render(main_camera);
+            on_rendering.Invoke();
+        }
+        main_camera->m_property_ = prev_property;
     }
 }
 
