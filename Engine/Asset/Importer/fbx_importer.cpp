@@ -49,7 +49,7 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     }
 
     // placeholder for future prefab-like implementation 
-    const auto meta = Object::Instantiate<FbxMeta>();
+    const auto meta = Object::Instantiate<FbxMeta>(ctx->AssetPath().stem().string());
     ctx->SetMainObject(meta);
 
     // process fbx meta
@@ -219,6 +219,8 @@ std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMe
         {
             object_meta->mesh.bones.emplace_back(convert.to_object.at(ai_mesh->mBones[j]->mNode));
         }
+
+        object_meta->mesh.root_bone = convert.to_object.at(ai_mesh->mBones[0]->mNode);
     }
 
     return std::make_pair(AssetPtr<Mesh>::FromManaged(object_meta->mesh.instance.lock()), materials);

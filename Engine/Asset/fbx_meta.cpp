@@ -81,14 +81,11 @@ std::shared_ptr<GameObject> CreateGameObjects(
     std::map<std::shared_ptr<ObjectMeta>, std::shared_ptr<GameObject>> &conversion_map
 )
 {
-    const auto go = GameObject::Instantiate<GameObject>();
+    const auto go = GameObject::Instantiate<GameObject>(meta->name);
     conversion_map.emplace(meta, go);
 
     // Setup GameObject from meta data
     {
-        // populate name
-        go->SetName(meta->name);
-
         // populate transform
         const auto transform = go->Transform();
         if (parent)
@@ -124,6 +121,8 @@ std::shared_ptr<GameObject> FbxMeta::Instantiate() const
     std::map<std::shared_ptr<ObjectMeta>, std::shared_ptr<GameObject>> conversion_map;
     auto root_go = CreateGameObjects(nullptr, root_object_meta, conversion_map);
     PostProcessGameObjects(mesh_objects, conversion_map);
+
+    root_go->SetName(Name());
     return root_go;
 }
 }
