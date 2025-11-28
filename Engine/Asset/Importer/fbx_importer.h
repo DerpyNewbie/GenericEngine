@@ -10,14 +10,14 @@ class FbxImporter : public AssetImporter
 {
     using NodeToObject = std::map<const aiNode *, std::shared_ptr<ObjectMeta>>;
     using IdxToMaterial = std::map<unsigned int, std::shared_ptr<Material>>;
-    // using ObjectToNode = std::map<std::shared_ptr<ObjectMeta>, const aiNode *>;
+    using IdxToTexture = std::map<unsigned int, std::shared_ptr<Texture2D>>;
     using MeshNodes = std::set<const aiNode *>;
 
     struct ConversionMap
     {
-        // ObjectToNode to_node;
         NodeToObject to_object;
         IdxToMaterial to_material;
+        IdxToTexture to_texture;
 
         ConversionMap() = default;
 
@@ -29,6 +29,11 @@ class FbxImporter : public AssetImporter
         void EmplaceMaterial(unsigned int idx, std::shared_ptr<Material> material)
         {
             to_material.emplace(idx, material);
+        }
+
+        void EmplaceTexture(unsigned int idx, std::shared_ptr<Texture2D> texture)
+        {
+            to_texture.emplace(idx, texture);
         }
     };
 
@@ -45,18 +50,28 @@ class FbxImporter : public AssetImporter
         MeshNodes &out_mesh_nodes
     );
 
+    static void CreateTextureMappings(
+        AssetDescriptor *ctx,
+        const aiScene *ai_scene,
+        ConversionMap &out_conversion_mapping
+    );
 
     static void CreateMaterialMappings(
         AssetDescriptor *ctx,
         const aiScene *ai_scene,
-        ConversionMap &conversion_mapping
+        ConversionMap &out_conversion_mapping
     );
 
     static std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> CreateMesh(
         AssetDescriptor *ctx,
         const aiScene *ai_scene,
         const aiNode *ai_node,
-        const ConversionMap &conversion_mapping
+        const ConversionMap &convert
+    );
+
+    static std::shared_ptr<AnimationClip> CreateAnimationClip(
+        AssetDescriptor *ctx,
+        const aiAnimation *ai_animation
     );
 };
 }
