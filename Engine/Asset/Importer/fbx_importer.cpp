@@ -56,7 +56,10 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
     {
         ConversionMap convert;
         MeshNodes mesh_nodes;
-        meta->root_object_meta = CreateMapping(ctx, meta, scene, scene->mRootNode, convert, mesh_nodes);
+
+        meta->root_object_meta = CreateNodeMappings(ctx, meta, scene, scene->mRootNode, convert, mesh_nodes);
+        CreateMaterialMappings(ctx, scene, convert);
+
         for (const auto &mesh_node : mesh_nodes)
         {
             meta->mesh_objects.emplace(convert.to_object.at(mesh_node), CreateMesh(ctx, scene, mesh_node, convert));
@@ -123,7 +126,7 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
 
 }
 
-std::shared_ptr<ObjectMeta> FbxImporter::CreateMapping(
+std::shared_ptr<ObjectMeta> FbxImporter::CreateNodeMappings(
     AssetDescriptor *ctx,
     const std::shared_ptr<FbxMeta> &fbx_meta,
     const aiScene *ai_scene,
@@ -139,7 +142,7 @@ std::shared_ptr<ObjectMeta> FbxImporter::CreateMapping(
     // Recurse children
     for (unsigned int i = 0; i < ai_node->mNumChildren; i++)
     {
-        auto child = CreateMapping(ctx, fbx_meta, ai_scene, ai_node->mChildren[i], out_conversion_mapping, out_mesh_nodes);
+        auto child = CreateNodeMappings(ctx, fbx_meta, ai_scene, ai_node->mChildren[i], out_conversion_mapping, out_mesh_nodes);
         child->parent = object_meta;
         object_meta->children.push_back(child);
     }
@@ -161,8 +164,48 @@ std::shared_ptr<ObjectMeta> FbxImporter::CreateMapping(
         out_mesh_nodes.emplace(ai_node);
     }
 
-    out_conversion_mapping.Emplace(ai_node, object_meta);
+    out_conversion_mapping.EmplaceObject(ai_node, object_meta);
     return object_meta;
+}
+
+void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai_scene, ConversionMap &conversion_mapping)
+{
+    for (UINT i = 0; i < ai_scene->mNumMaterials; i++)
+    {
+        const auto ai_material = ai_scene->mMaterials[i];
+        auto material_asset = Object::Instantiate<Material>();
+        material_asset->SetName(ai_material->GetName().C_Str());
+
+        aiString ai_texture_path;
+
+        if (ai_material->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_texture_path) != AI_SUCCESS)
+        {
+            ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &ai_texture_path);
+        }
+
+        if (ai_texture_path.length > 0)
+        {
+            if (ai_texture_path.C_Str()[0] == '*')
+            {
+                const int index = std::stoi(ai_texture_path.C_Str() + 1);
+                const aiTexture *ai_texture = ai_scene->mTextures[index];
+                const auto texture = Texture2D::LoadFromAiTexture(ai_texture);
+                texture->SetName(ai_texture->mFilename.C_Str());
+                ctx->AddObject(texture);
+                const auto texture_ptr = AssetPtr<Texture2D>::FromManaged(texture);
+                material_asset->p_shared_material_block->SetMaterialData("Albedo", texture_ptr);
+            }
+            else
+            {
+                const std::string file_path = ai_texture_path.C_Str();
+                const auto texture = AssetDatabase::GetAsset<Texture2D>(file_path);
+                material_asset->p_shared_material_block->SetMaterialData("Albedo", texture);
+            }
+        }
+
+        ctx->AddObject(material_asset);
+        conversion_mapping.EmplaceMaterial(i, material_asset);
+    }
 }
 
 std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMesh(
@@ -198,7 +241,7 @@ std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMe
             object_meta->mesh.instance = converted_mesh;
         }
 
-        const auto material = CreateMaterial(ctx, ai_scene, ai_scene->mMaterials[ai_mesh->mMaterialIndex]);
+        const auto material = conversion_mapping.to_material.at(ai_mesh->mMaterialIndex);
         const auto material_asset = AssetPtr<Material>::FromManaged(material);
 
         object_meta->mesh.materials.emplace_back(material);
@@ -216,41 +259,5 @@ std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMe
     }
 
     return std::make_pair(AssetPtr<Mesh>::FromManaged(object_meta->mesh.instance.lock()), materials);
-}
-
-std::shared_ptr<Material> FbxImporter::CreateMaterial(AssetDescriptor *ctx, const aiScene *ai_scene, const aiMaterial *ai_material)
-{
-    auto material_asset = Object::Instantiate<Material>();
-    material_asset->SetName(ai_material->GetName().C_Str());
-
-    aiString ai_texture_path;
-
-    if (ai_material->GetTexture(aiTextureType_BASE_COLOR, 0, &ai_texture_path) != AI_SUCCESS)
-    {
-        ai_material->GetTexture(aiTextureType_DIFFUSE, 0, &ai_texture_path);
-    }
-
-    if (ai_texture_path.length > 0)
-    {
-        if (ai_texture_path.C_Str()[0] == '*')
-        {
-            const int index = std::stoi(ai_texture_path.C_Str() + 1);
-            const aiTexture *ai_texture = ai_scene->mTextures[index];
-            const auto texture = Texture2D::LoadFromAiTexture(ai_texture);
-            texture->SetName(ai_texture->mFilename.C_Str());
-            ctx->AddObject(texture);
-            const auto texture_ptr = AssetPtr<Texture2D>::FromManaged(texture);
-            material_asset->p_shared_material_block->SetMaterialData("Albedo", texture_ptr);
-        }
-        else
-        {
-            const std::string file_path = ai_texture_path.C_Str();
-            const auto texture = AssetDatabase::GetAsset<Texture2D>(file_path);
-            material_asset->p_shared_material_block->SetMaterialData("Albedo", texture);
-        }
-    }
-
-    ctx->AddObject(material_asset);
-    return material_asset;
 }
 }
