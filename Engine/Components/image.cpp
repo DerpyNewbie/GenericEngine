@@ -12,9 +12,9 @@ namespace engine
 {
 void Image::OnInspectorGui()
 {
-    Gui::PropertyField("Material", m_material_);
+    Gui::PropertyField("Material", shared_material);
 
-    if (auto material = m_material_.CastedLock())
+    if (auto material = shared_material.CastedLock())
     {
         material->OnInspectorGui();
     }
@@ -67,7 +67,7 @@ void Image::Render()
     if (m_vertex_buffer_[current_buffer] == nullptr)
         return;
 
-    const auto material = m_material_.CastedLock();
+    const auto material = shared_material.CastedLock();
     if (material == nullptr)
         return;
 
