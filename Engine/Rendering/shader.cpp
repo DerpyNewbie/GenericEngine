@@ -1,29 +1,47 @@
 #include "pch.h"
 #include "shader.h"
+#include "gui.h"
 
 namespace engine
 {
-std::shared_ptr<Shader> Shader::m_pDefaultShader;
+std::shared_ptr<Shader> Shader::m_default_shader_;
 
 std::shared_ptr<Shader> Shader::GetDefault()
 {
-    if (!m_pDefaultShader)
+    if (!m_default_shader_)
     {
-        m_pDefaultShader = std::make_shared<Shader>();
+        m_default_shader_ = std::make_shared<Shader>();
         std::wstring file_path = L"x64/Debug/BasicVertexShader.cso";
-        auto hr = D3DReadFileToBlob(file_path.c_str(), m_pDefaultShader->m_pVSBlob.GetAddressOf());
+        auto hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_vs_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
         file_path = L"x64/Debug/BasicPixelShader.cso";
-        hr = D3DReadFileToBlob(file_path.c_str(), m_pDefaultShader->m_pPSBlob.GetAddressOf());
+        hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_ps_blob_.GetAddressOf());
         if (FAILED(hr))
         {
             Logger::Error("Failed to create default shader");
         }
     }
-    return m_pDefaultShader;
+    return m_default_shader_;
+}
+
+void Shader::DrawShaderSettings()
+{
+    ImGui::Combo("ZTest", &m_shader_settings_.z_test, ZTestNames, IM_ARRAYSIZE(ZTestNames));
+    ImGui::Combo("ZWrite", &m_shader_settings_.z_write, ZWriteNames, IM_ARRAYSIZE(ZWriteNames));
+
+    ImGui::Combo("Cull", &m_shader_settings_.cull, CullNames, IM_ARRAYSIZE(CullNames));
+
+    ImGui::Separator();
+    ImGui::Text("Blend");
+    ImGui::Combo("SrcFactor", &m_shader_settings_.blend_src, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
+    ImGui::Combo("DstFactor", &m_shader_settings_.blend_dst, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
+    ImGui::Combo("BlendOp", &m_shader_settings_.blend_op, BlendOpNames, IM_ARRAYSIZE(BlendOpNames));
+
+    ImGui::Combo("ColorMask", &m_shader_settings_.color_mask, ColorMaskNames, IM_ARRAYSIZE(ColorMaskNames));
+    ImGui::Checkbox("AlphaToMask(Coverage)", &m_shader_settings_.alpha_to_mask);
 }
 
 void Shader::OnInspectorGui()
@@ -34,6 +52,13 @@ void Shader::OnInspectorGui()
     auto pixel_params = std::views::filter(parameters, [](auto &p) {
         return p->shader_type == kShaderType_Pixel;
     });
+
+    if (ImGui::CollapsingHeader("ShaderSettings"))
+    {
+        ImGui::Indent();
+        DrawShaderSettings();
+        ImGui::Unindent();
+    }
 
     auto draw_params = [](auto &params, auto &sources) {
         int index = 0;
@@ -98,5 +123,10 @@ void Shader::OnInspectorGui()
         ImGui::Unindent();
     }
     ImGui::PopID();
+}
+
+ShaderSettings Shader::ShaderSettings() const
+{
+    return m_shader_settings_;
 }
 }

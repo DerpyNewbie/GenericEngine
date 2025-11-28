@@ -111,45 +111,45 @@ void PersistentDataStore::SetValue(const std::string &key, Value &value) const
     Set(key, value);
 }
 
-std::string PersistentDataStore::GetString(const std::string &key) const
+std::string PersistentDataStore::GetString(const std::string &key, const std::string &default_value) const
 {
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd() || !json_value->value.IsString())
     {
-        return "";
+        return default_value;
     }
 
     return json_value->value.GetString();
 }
 
-int PersistentDataStore::GetInt(const std::string &key) const
+int PersistentDataStore::GetInt(const std::string &key, const int &default_value) const
 {
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd())
     {
-        return 0;
+        return default_value;
     }
 
     return json_value->value.GetInt();
 }
 
-float PersistentDataStore::GetFloat(const std::string &key) const
+float PersistentDataStore::GetFloat(const std::string &key, const float &default_value) const
 {
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd())
     {
-        return 0.0f;
+        return default_value;
     }
 
     return json_value->value.GetFloat();
 }
 
-bool PersistentDataStore::GetBool(const std::string &key) const
+bool PersistentDataStore::GetBool(const std::string &key, const bool &default_value) const
 {
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd())
     {
-        return false;
+        return default_value;
     }
 
     return json_value->value.GetBool();
