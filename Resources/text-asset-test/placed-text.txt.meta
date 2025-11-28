@@ -1,14 +1,15 @@
 {
-    "guid": "ef2ed590-d7e1-4a79-81d1-aa8eac77cd25",
+    "\u0000ata": {},
+    "guid": "66e99b77-828c-4a3f-875e-900bd16f4593",
     "type": ".txt",
-    "data": {
-        "aadada": "dadada"
-    },
+    "\u0000ata": {},
     "objects": [
         {
-            "guid": "f868ed3b-56d4-449f-a73e-48b144e72f85",
-            "name": "Instantiated Object 285",
+            "guid": "7c926206-36f5-4da3-b1c0-34d8d4ee2188",
+            "name": "Secondary Text",
             "type_hint": "class engine::TextAsset"
         }
-    ]
+    ],
+    "8¿6%": {},
+    "\u0000ata": {}
 }
