@@ -1,15 +1,12 @@
 {
-    "\u0000ata": {},
-    "guid": "1e7ae25a-5472-469b-902c-187ad5f5cfe6",
+    "data": {},
+    "guid": "21288196-217c-4568-8382-8c9b6677490f",
     "type": ".txt",
-    "\u0000ata": {},
     "objects": [
         {
-            "guid": "d3d8b17e-b730-4346-a7df-dd1819cdc7d9",
+            "guid": "725c8336-3f6e-4a77-8691-e9129fa167ac",
             "name": "Secondary Text",
             "type_hint": "class engine::TextAsset"
         }
-    ],
-    "8¿6%": {},
-    "\u0000ata": {}
+    ]
 }
