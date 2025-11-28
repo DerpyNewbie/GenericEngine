@@ -222,8 +222,8 @@ void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescripto
         ImGui::Text("Path: %s", asset_descriptor->AssetPath().string().c_str());
         ImGui::Text("Guid: %s", asset_descriptor->Guid().str().c_str());
 
-        const auto label = std::format("SubGuids ({0})", asset_descriptor->SubGuids().size()).c_str();
-        if (ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen))
+        const std::string label = std::format("SubGuids ({})", asset_descriptor->SubGuids().size());
+        if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent();
             for (const auto &sub_guid : asset_descriptor->SubGuids())
