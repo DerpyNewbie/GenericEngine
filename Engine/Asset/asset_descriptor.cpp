@@ -68,14 +68,14 @@ void AssetDescriptor::WriteMeta(const path &path)
     if (m_objects_.size() > 1)
     {
         // off by one because the main object is also present in the objects
-        for (auto it = std::next(m_objects_.begin(), 1); it != m_objects_.end(); ++it)
+        for (auto object_meta : m_sub_object_metas_)
         {
             Value sub_object(kObjectType);
-            auto guid = (*it)->Guid().str();
+            auto guid = object_meta.guid.str();
             auto guid_value = Value(guid.c_str(), static_cast<SizeType>(guid.size()), m_meta_json_.GetAllocator());
-            auto name = (*it)->Name();
+            auto name = object_meta.name;
             auto name_value = Value(name.c_str(), static_cast<SizeType>(name.size()), m_meta_json_.GetAllocator());
-            auto type_hint = std::string(typeid(*it->get()).name());
+            auto type_hint = object_meta.type_hint;
             auto type_hint_value = Value(type_hint.c_str(), static_cast<SizeType>(type_hint.size()), m_meta_json_.GetAllocator());
 
             sub_object.AddMember("guid", guid_value, m_meta_json_.GetAllocator());

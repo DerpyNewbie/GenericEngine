@@ -17,6 +17,11 @@
             "guid": "6969e390-55e3-4ee1-a3e9-1de9bbd4226f",
             "name": "SecondMaterial",
             "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "193af854-a358-415d-bd5b-de79ecc63588",
+            "name": "ThirdMaterial",
+            "type_hint": "class engine::Material"
         }
     ]
 }
