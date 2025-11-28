@@ -36,9 +36,11 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-    if (!RenderEngine::Instance()->Init(Application::WindowHandle(),
-                                        Application::WindowWidth(),
-                                        Application::WindowHeight()))
+    if (!RenderEngine::Instance()->Init(
+        Application::WindowHandle(),
+        Application::WindowWidth(),
+        Application::WindowHeight()
+    ))
     {
         Logger::Log<Engine>("Failed to initialize render engine");
     }
@@ -87,13 +89,13 @@ void Engine::Tick()
     RenderEngine::Instance()->EndRender();
     Profiler::End("Draw Call");
 
-    Profiler::Begin("Cleanup Objects");
-    Object::GarbageCollect();
-    Profiler::End("Cleanup Objects");
-
     Profiler::Begin("OnDeserialization");
     Object::InvokeOnDeserialized();
     Profiler::End("OnDeserialization");
+
+    Profiler::Begin("Cleanup Objects");
+    Object::GarbageCollect();
+    Profiler::End("Cleanup Objects");
 }
 
 void Engine::Finalize()
