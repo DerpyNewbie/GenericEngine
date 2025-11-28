@@ -21,15 +21,17 @@ protected:
     xg::Guid m_guid_;
     AssetPtrType m_type_ = AssetPtrType::kNull;
 
-    IAssetPtr(const std::weak_ptr<Object> &weak_ptr,
-              const std::shared_ptr<Object> &shared_ptr,
-              const xg::Guid guid,
-              const AssetPtrType type) :
+    IAssetPtr(
+        const std::weak_ptr<Object> &weak_ptr,
+        const std::shared_ptr<Object> &shared_ptr,
+        const xg::Guid guid,
+        const AssetPtrType type
+    ) :
         m_external_reference_(weak_ptr),
         m_stored_reference_(shared_ptr),
         m_guid_(guid),
         m_type_(type)
-    {}
+    { }
 
 public:
     static const xg::Guid kNullGuid;
@@ -71,16 +73,18 @@ template <typename T> requires std::is_base_of_v<Object, T>
 struct AssetPtr : IAssetPtr
 {
 private:
-    AssetPtr(const std::weak_ptr<Object> &weak_ptr,
-             const std::shared_ptr<Object> &shared_ptr,
-             const xg::Guid guid,
-             const AssetPtrType type) :
+    AssetPtr(
+        const std::weak_ptr<Object> &weak_ptr,
+        const std::shared_ptr<Object> &shared_ptr,
+        const xg::Guid guid,
+        const AssetPtrType type
+    ) :
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
-    {}
+    { }
 
     AssetPtr(const IAssetPtr &ptr) :
         IAssetPtr(ptr)
-    {}
+    { }
 
 public:
     AssetPtr() = default;
@@ -99,20 +103,20 @@ public:
     {
         auto lock = ptr.lock();
         return {
-        ptr,
-        {},
-        lock != nullptr ? lock->Guid() : kNullGuid,
-        lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
+            ptr,
+            {},
+            lock != nullptr ? lock->Guid() : kNullGuid,
+            lock != nullptr ? AssetPtrType::kExternalReference : AssetPtrType::kNull
         };
     }
 
     static AssetPtr FromInstance(const std::shared_ptr<T> &ptr)
     {
         return {
-        {},
-        ptr,
-        ptr != nullptr ? ptr->Guid() : kNullGuid,
-        ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
+            {},
+            ptr,
+            ptr != nullptr ? ptr->Guid() : kNullGuid,
+            ptr != nullptr ? AssetPtrType::kStoredReference : AssetPtrType::kNull
         };
     }
 
