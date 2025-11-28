@@ -162,7 +162,7 @@ PersistentDataStore PersistentDataStore::GetDataStore(const std::string &key) co
 
     if (it == m_value_->MemberEnd())
     {
-        m_value_->AddMember(StringRef(key.c_str(), key.size()), Value(kObjectType), Allocator());
+        m_value_->AddMember(Value(key.c_str(), static_cast<SizeType>(key.size()), Allocator()), Value(kObjectType), Allocator());
         it = m_value_->FindMember(StringRef(key.c_str(), key.size()));
     }
 
