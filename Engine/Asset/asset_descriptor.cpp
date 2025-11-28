@@ -3,7 +3,6 @@
 #include "asset_descriptor.h"
 
 #include "asset_database.h"
-#include "engine_util.h"
 #include "logger.h"
 #include "Importer/asset_importer.h"
 
@@ -67,15 +66,12 @@ void AssetDescriptor::WriteMeta(const path &path)
     guids.SetArray();
     if (m_objects_.size() > 1)
     {
-        // off by one because the main object is also present in the objects
-        for (auto object_meta : m_sub_object_metas_)
+        for (auto [guid, name, type_hint] : m_sub_object_metas_)
         {
             Value sub_object(kObjectType);
-            auto guid = object_meta.guid.str();
-            auto guid_value = Value(guid.c_str(), static_cast<SizeType>(guid.size()), m_meta_json_.GetAllocator());
-            auto name = object_meta.name;
+            auto guid_str = guid.str();
+            auto guid_value = Value(guid_str.c_str(), static_cast<SizeType>(guid_str.size()), m_meta_json_.GetAllocator());
             auto name_value = Value(name.c_str(), static_cast<SizeType>(name.size()), m_meta_json_.GetAllocator());
-            auto type_hint = object_meta.type_hint;
             auto type_hint_value = Value(type_hint.c_str(), static_cast<SizeType>(type_hint.size()), m_meta_json_.GetAllocator());
 
             sub_object.AddMember("guid", guid_value, m_meta_json_.GetAllocator());
@@ -274,11 +270,13 @@ void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
 
 void AssetDescriptor::LogImportError(const std::string &message)
 {
+    Logger::Error<AssetDescriptor>("[LogImportError]: %s", message.c_str());
     m_import_logs_.emplace_back(message, ImportLog::kLogType::kError);
 }
 
 void AssetDescriptor::LogImportWarning(const std::string &message)
 {
+    Logger::Warn<AssetDescriptor>("[LogImportWarning]: %s", message.c_str());
     m_import_logs_.emplace_back(message, ImportLog::kLogType::kWarning);
 }
 
