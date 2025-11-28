@@ -112,7 +112,12 @@ std::shared_ptr<GameObject> CreateGameObjects(
 namespace engine
 {
 void FbxMeta::OnInspectorGui()
-{ }
+{
+    if (ImGui::Button("Instantiate"))
+    {
+        auto _ = Instantiate();
+    }
+}
 
 std::shared_ptr<GameObject> FbxMeta::Instantiate() const
 {
