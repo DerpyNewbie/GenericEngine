@@ -12,12 +12,7 @@ namespace engine
 {
 void Image::OnInspectorGui()
 {
-    Gui::PropertyField("Material", shared_material);
-
-    if (auto material = shared_material.CastedLock())
-    {
-        material->OnInspectorGui();
-    }
+    Gui::ExpandablePropertyField("Material", shared_material);
 }
 
 void Image::OnAwake()

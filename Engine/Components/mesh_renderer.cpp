@@ -89,11 +89,8 @@ void MeshRenderer::OnInspectorGui()
             if (ImGui::CollapsingHeader(("Material " + std::to_string(i)).c_str()))
             {
                 ImGui::Indent();
-                auto &current_material = shared_materials[i];
-                Gui::PropertyField("Material", current_material);
                 ImGui::PushID(i);
-                if (const auto material = shared_materials[i].CastedLock())
-                    material->OnInspectorGui();
+                Gui::ExpandablePropertyField("Material" + i, shared_materials[i]);
                 ImGui::PopID();
                 ImGui::Unindent();
             }
