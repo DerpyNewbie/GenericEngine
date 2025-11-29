@@ -14,7 +14,6 @@ class Image : public Renderer2D
     std::shared_ptr<VertexBuffer> m_vertex_buffer_[RenderEngine::kFrame_Buffer_Count];
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
-    AssetPtr<Texture2D> m_texture_;
 
 public:
     AssetPtr<Material> shared_material;
@@ -27,7 +26,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Renderer2D>(this), CEREAL_NVP(m_texture_));
+        ar(cereal::base_class<Renderer2D>(this));
     }
 };
 }
