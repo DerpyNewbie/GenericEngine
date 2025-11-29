@@ -77,6 +77,10 @@ void Engine::Tick()
     UpdateManager::InvokeUpdate();
     Profiler::End("Update");
 
+    Profiler::Begin("Coroutine");
+    coroutine.Update(Time::GetDeltaTime());
+    Profiler::End("Coroutine");
+
     Profiler::Begin("Draw Call");
     RenderEngine::Instance()->BeginRender();
     RenderPipeline::Instance()->InvokeDrawCall();
