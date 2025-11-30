@@ -199,7 +199,11 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         return;
     }
 
-    const auto shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+    // `shader_meta` will be reloaded on-the-fly if
+    // 1. it didnt exist
+    // 2. it was outdated
+    auto shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+
     if (shader_meta.empty())
     {
         ctx->LogImportWarning("No shader meta data found! Generating!");
@@ -208,21 +212,25 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         WriteShaderMeta(temp_shader_obj, ctx->DataStore());
         Object::Destroy(temp_shader_obj);
 
-        // possible infinite loop, but whatever!
-        OnImport(ctx);
-        return;
+        shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
     }
 
+    // please be aware that the variable `shader_meta_version` could be outdated later in this function on version upgrade handling
     const auto shader_meta_version = ctx->DataStore().GetInt(kShaderMetaVersionKey);
     if (shader_meta_version > kShaderMetaVersion)
     {
-        ctx->LogImportError("Shader meta data version is newer than the importer!");
-        return;
+        ctx->LogImportWarning(
+            std::format(
+                "Shader meta data version ({}) is newer than importer version ({}). Possible data loss!",
+                shader_meta_version,
+                kShaderMetaVersion
+            )
+        );
     }
 
     if (shader_meta_version < kShaderMetaVersion)
     {
-        ctx->LogImportWarning("Shader meta data is outdated! will be upgraded after this import");
+        ctx->LogImportWarning("Shader meta data is outdated! Will be upgraded after this import");
 
         const auto temp_shader_obj = Object::Instantiate<Shader>();
         if (!LoadOldParameters(temp_shader_obj, ctx))
@@ -233,14 +241,17 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         WriteShaderMeta(temp_shader_obj, ctx->DataStore());
         Object::Destroy(temp_shader_obj);
 
-        // possible infinite loop, but whatever!
-        OnImport(ctx);
-        return;
+        shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
     }
 
     std::stringstream ss(shader_meta);
     Serializer serializer;
     const auto shader = serializer.Load<Shader>(ss);
+    if (!shader)
+    {
+        ctx->LogImportError("Failed to deserialize shader object");
+        return;
+    }
 
     if (!CompileShader(shader, ctx->AssetPath()))
     {
