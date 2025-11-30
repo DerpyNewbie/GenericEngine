@@ -59,7 +59,7 @@ void MeshRenderer::OnInspectorGui()
             {
                 ImGui::Indent();
                 ImGui::PushID(i);
-                shared_materials[i].CastedLock()->OnInspectorGui();
+                Gui::ExpandablePropertyField("Material" + i, shared_materials[i]);
                 ImGui::PopID();
                 ImGui::Unindent();
             }
@@ -83,7 +83,12 @@ void MeshRenderer::Render()
     }
 
     auto current_material = shared_materials[0].CastedLock();
+    if (current_material == nullptr)
+        return;
+
     auto current_shader = current_material->p_shared_shader.CastedLock();
+    if (current_shader == nullptr)
+        return;
 
     const auto cmd_list = RenderEngine::CommandList();
     const auto mesh = m_shared_mesh_.CastedLock();
@@ -120,7 +125,7 @@ void MeshRenderer::Render()
     for (int i = 0; i < mesh->sub_meshes.size(); ++i)
     {
         current_material = shared_materials[i + 1].CastedLock();
-        if (current_material->IsValid())
+        if (current_material != nullptr && current_material->IsValid())
         {
             auto next_shader = current_material->p_shared_shader.CastedLock();
             if (current_shader != next_shader && next_shader != nullptr)
