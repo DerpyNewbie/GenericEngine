@@ -6,6 +6,8 @@
 
 #include <d3dcompiler.h>
 
+#include "serializer.h"
+
 namespace engine
 {
 bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path)
@@ -22,7 +24,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         0,
         &shader->m_vs_blob_,
         &error_blob
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -40,7 +42,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         0,
         &shader->m_ps_blob_,
         &error_blob
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -52,13 +54,15 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
     return true;
 }
 
-bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, AssetDescriptor *descriptor) const
+bool ShaderImporter::LoadOldParameters(const std::shared_ptr<Shader> &shader, AssetDescriptor *descriptor) const
 {
-    const auto json = descriptor->DataStore().GetString("shader_meta");
+    auto json = descriptor->DataStore().GetString("shader_meta");
     if (json.empty())
     {
-        Logger::Warn<ShaderImporter>("No shader meta data found for shader '%s'",
-                                     descriptor->AssetPath().string().c_str());
+        Logger::Warn<ShaderImporter>(
+            "No shader meta data found for shader '%s'",
+            descriptor->AssetPath().string().c_str()
+        );
         return false;
     }
 
@@ -67,14 +71,15 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
     doc.Parse(json.c_str());
     if (doc.HasParseError())
     {
-        Logger::Error<ShaderImporter>("Failed to parse shader meta data for shader '%s'",
-                                      descriptor->AssetPath().string().c_str());
+        Logger::Error<ShaderImporter>(
+            "Failed to parse shader meta data for shader '%s'",
+            descriptor->AssetPath().string().c_str()
+        );
         return false;
     }
 
-    PersistentDataStore data_store{&doc, &doc};
-
-    auto shader_settings = data_store.GetDataStore("shader_settings");
+    const PersistentDataStore data_store{&doc, &doc};
+    const auto shader_settings = data_store.GetDataStore("shader_settings");
     shader->m_shader_settings_.z_test = shader_settings.GetInt("z_test");
     shader->m_shader_settings_.z_write = shader_settings.GetInt("z_write");
     shader->m_shader_settings_.cull = shader_settings.GetInt("cull");
@@ -160,6 +165,22 @@ bool ShaderImporter::LoadParameters(const std::shared_ptr<Shader> &shader, Asset
     return !params_load_error;
 }
 
+bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
+{
+    std::stringstream string_buffer;
+    {
+        Serializer serializer;
+        if (!serializer.Save(string_buffer, shader))
+        {
+            return false;
+        }
+    }
+
+    data_store.SetString(kShaderMetaKey, string_buffer.str());
+    data_store.SetInt(kShaderMetaVersionKey, 3);
+    return true;
+}
+
 std::vector<std::string> ShaderImporter::SupportedExtensions()
 {
     return {".hlsl"};
@@ -178,8 +199,48 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         return;
     }
 
-    const auto shader = Object::Instantiate<Shader>();
-    ctx->SetMainObject(shader);
+    const auto shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+    if (shader_meta.empty())
+    {
+        ctx->LogImportWarning("No shader meta data found! Generating!");
+
+        const auto temp_shader_obj = Object::Instantiate<Shader>();
+        WriteShaderMeta(temp_shader_obj, ctx->DataStore());
+        Object::Destroy(temp_shader_obj);
+
+        // possible infinite loop, but whatever!
+        OnImport(ctx);
+        return;
+    }
+
+    const auto shader_meta_version = ctx->DataStore().GetInt(kShaderMetaVersionKey);
+    if (shader_meta_version > kShaderMetaVersion)
+    {
+        ctx->LogImportError("Shader meta data version is newer than the importer!");
+        return;
+    }
+
+    if (shader_meta_version < kShaderMetaVersion)
+    {
+        ctx->LogImportWarning("Shader meta data is outdated! will be upgraded after this import");
+
+        const auto temp_shader_obj = Object::Instantiate<Shader>();
+        if (!LoadOldParameters(temp_shader_obj, ctx))
+        {
+            ctx->LogImportError("Failed to load shader parameters!");
+            return;
+        }
+        WriteShaderMeta(temp_shader_obj, ctx->DataStore());
+        Object::Destroy(temp_shader_obj);
+
+        // possible infinite loop, but whatever!
+        OnImport(ctx);
+        return;
+    }
+
+    std::stringstream ss(shader_meta);
+    Serializer serializer;
+    const auto shader = serializer.Load<Shader>(ss);
 
     if (!CompileShader(shader, ctx->AssetPath()))
     {
@@ -187,91 +248,24 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         return;
     }
 
-    if (!LoadParameters(shader, ctx))
-    {
-        ctx->LogImportError("Failed to load shader parameters!");
-        return;
-    }
-
     if (!PSOManager::Register(shader, ctx->AssetPath().filename().string()))
     {
         ctx->LogImportError("Failed to register shader to PSOManager!");
+        return;
     }
+
+    ctx->SetMainObject(shader);
 }
 
 void ShaderImporter::OnExport(AssetDescriptor *ctx)
 {
     const auto shader = std::dynamic_pointer_cast<Shader>(ctx->MainObject());
+    if (shader == nullptr)
+    {
+        ctx->LogImportError("This object cannot be exported with ShaderExporter");
+        return;
+    }
 
-    using namespace rapidjson;
-    auto create_shader_param_obj = [](const std::shared_ptr<ShaderParameter> &param, auto &alloc) {
-        auto result = Value(kObjectType);
-
-        auto name_value = Value{};
-        name_value.SetString(param->name.c_str(), static_cast<SizeType>(param->name.size()));
-        result.AddMember("name", name_value, alloc);
-
-        auto type_value = Value{};
-        type_value.SetString(param->type_hint.c_str(), static_cast<SizeType>(param->type_hint.size()));
-        result.AddMember("type", type_value, alloc);
-
-        if (!param->display_name.empty())
-        {
-            auto display_name_value = Value{};
-            display_name_value.SetString(param->display_name.c_str(),
-                                         static_cast<SizeType>(param->display_name.size()));
-            result.AddMember("displayName", display_name_value, alloc);
-        }
-        return result;
-    };
-
-    auto create_shader_params_list = [&](auto &params, auto &alloc) {
-        auto result = Value(kArrayType);
-        for (const auto &param : params)
-        {
-            result.PushBack(create_shader_param_obj(param, alloc), alloc);
-        }
-        return result;
-    };
-
-    auto create_shader_params_value = [&](auto &alloc) {
-        auto vertex_params = std::views::filter(shader->parameters, [](auto &p) {
-            return p->shader_type == kShaderType_Vertex;
-        });
-        auto pixel_params = std::views::filter(shader->parameters, [](auto &p) {
-            return p->shader_type == kShaderType_Pixel;
-        });
-
-        auto vertex_params_obj = create_shader_params_list(vertex_params, alloc);
-        auto pixel_params_obj = create_shader_params_list(pixel_params, alloc);
-
-        Value result(kObjectType);
-        result.AddMember("vertex", vertex_params_obj, alloc);
-        result.AddMember("pixel", pixel_params_obj, alloc);
-        return result;
-    };
-
-    Document doc;
-    doc.SetObject();
-    doc.AddMember("parameters", create_shader_params_value(doc.GetAllocator()), doc.GetAllocator());
-    PersistentDataStore data_store{&doc, &doc};
-
-    auto shader_settings = data_store.GetDataStore("shader_settings");
-    shader_settings.SetInt("z_test", shader->m_shader_settings_.z_test);
-    shader_settings.SetBool("z_write", shader->m_shader_settings_.z_write);
-    shader_settings.SetInt("cull", shader->m_shader_settings_.cull);
-    shader_settings.SetInt("blend_src", shader->m_shader_settings_.blend_src);
-    shader_settings.SetInt("blend_dst", shader->m_shader_settings_.blend_dst);
-    shader_settings.SetInt("blend_op", shader->m_shader_settings_.blend_op);
-    shader_settings.SetInt("color_mask", shader->m_shader_settings_.color_mask);
-    shader_settings.SetBool("alpha_to_mask", shader->m_shader_settings_.alpha_to_mask);
-    shader_settings.SetDataStore("shader_settings", data_store);
-
-    StringBuffer string_buffer;
-    Writer writer(string_buffer);
-    doc.Accept(writer);
-
-    ctx->DataStore().ClearKeys();
-    ctx->DataStore().SetString("shader_meta", string_buffer.GetString());
+    WriteShaderMeta(shader, ctx->DataStore());
 }
 }
