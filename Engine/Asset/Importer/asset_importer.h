@@ -31,17 +31,13 @@ public:
     /// Called when importing an object
     /// </summary>
     virtual void OnImport(AssetDescriptor *ctx)
-    {}
+    { }
 
     /// <summary>
     /// Called when writing an object
     /// </summary>
     virtual void OnExport(AssetDescriptor *ctx)
-    {
-        std::ofstream file(ctx->AssetPath());
-        file.flush();
-        file.close();
-    }
+    { }
 
     /// <summary>
     /// Add AssetImporter implementations to make impl retrievable with supported file extension.
