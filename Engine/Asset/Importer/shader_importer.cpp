@@ -170,7 +170,7 @@ bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, cons
     std::stringstream string_buffer;
     {
         Serializer serializer;
-        if (!serializer.Save(string_buffer, shader))
+        if (!serializer.Save(string_buffer, shader, false))
         {
             return false;
         }

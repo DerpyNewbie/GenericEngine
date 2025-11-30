@@ -6,13 +6,14 @@ class Serializer
 {
 public:
     template <typename T>
-    [[nodiscard]] bool Save(std::ostream &output_stream, std::shared_ptr<T> save_resource)
+    [[nodiscard]] bool Save(std::ostream &output_stream, std::shared_ptr<T> save_resource, const bool pretty = true)
     {
         static_assert(std::is_base_of<Object, T>(), "Base type is not Object.");
 
         try
         {
-            cereal::JSONOutputArchive o_archive(output_stream);
+            const cereal::JSONOutputArchive::Options options = pretty ? cereal::JSONOutputArchive::Options::Default() : cereal::JSONOutputArchive::Options::NoIndent();
+            cereal::JSONOutputArchive o_archive(output_stream, options);
             o_archive(save_resource);
             return true;
         }
