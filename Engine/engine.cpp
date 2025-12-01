@@ -61,23 +61,26 @@ bool Engine::Init()
 
 void Engine::Tick()
 {
-    Profiler::NewFrame();
-    Time::Get()->IncrementFrame();
-
-    on_tick.Invoke();
-
-    Profiler::Begin("Fixed Update");
-    const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
-    for (int i = 0; i < fixed_update_count; i++)
+    if (Application::IsPlayMode())
     {
-        UpdateManager::InvokeFixedUpdate();
-    }
-    Profiler::End("Fixed Update");
+        Profiler::NewFrame();
+        Time::Get()->IncrementFrame();
 
-    Profiler::Begin("Update");
-    Input::Instance()->Update();
-    UpdateManager::InvokeUpdate();
-    Profiler::End("Update");
+        on_tick.Invoke();
+
+        Profiler::Begin("Fixed Update");
+        const auto fixed_update_count = Time::Get()->UpdateFixedFrameCount();
+        for (int i = 0; i < fixed_update_count; i++)
+        {
+            UpdateManager::InvokeFixedUpdate();
+        }
+        Profiler::End("Fixed Update");
+
+        Profiler::Begin("Update");
+        Input::Instance()->Update();
+        UpdateManager::InvokeUpdate();
+        Profiler::End("Update");
+    }
 
     Profiler::Begin("Coroutine");
     coroutine.Update(Time::GetDeltaTime());
@@ -95,6 +98,7 @@ void Engine::Tick()
 
     Profiler::Begin("Cleanup Objects");
     Object::GarbageCollect();
+    UpdateManager::InvokeGarbageCollect();
     Profiler::End("Cleanup Objects");
 }
 

@@ -21,3 +21,9 @@ class IFixedUpdateReceiver : public IOrderable
 public:
     virtual void OnFixedUpdate() = 0;
 };
+
+class IGarbageCollectReceiver : public IOrderable
+{
+public:
+    virtual void OnGarbageCollect() = 0;
+};

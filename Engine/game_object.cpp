@@ -12,7 +12,7 @@ namespace engine
 {
 GameObject::GameObject() :
     Object()
-{}
+{ }
 void GameObject::OnConstructed()
 {
     Object::OnConstructed();
@@ -28,6 +28,8 @@ void GameObject::OnDestroy()
     {
         scene->m_has_destroying_game_object_ = true;
     }
+
+    SetActive(false);
 
     for (const auto &component : m_components_)
     {
@@ -159,6 +161,15 @@ void GameObject::InvokeFixedUpdate() const
         }
     }
 }
+
+void GameObject::InvokeOnValidate() const
+{
+    for (const auto &component : m_components_)
+    {
+        component->OnValidate();
+    }
+}
+
 void GameObject::NotifyIsActiveChanged() const
 {
     for (auto &component : m_components_)
@@ -304,10 +315,10 @@ void GameObject::SetAsRootObject(const bool is_root_object)
 
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
-    *root_objects,
-    [&shared_this](const std::shared_ptr<GameObject> &other) {
-        return shared_this == other;
-    });
+        *root_objects,
+        [&shared_this](const std::shared_ptr<GameObject> &other) {
+            return shared_this == other;
+        });
 
     if (is_root_object && pos == root_objects->end())
     {
