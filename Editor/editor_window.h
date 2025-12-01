@@ -1,5 +1,4 @@
 #pragma once
-#include "object.h"
 #include "Editor/editor.h"
 
 #include <imgui.h>
@@ -8,6 +7,9 @@ namespace editor
 {
 class EditorWindow
 {
+protected:
+    bool m_handle_window_manually_ = false;
+
 public:
     virtual ~EditorWindow() = default;
 

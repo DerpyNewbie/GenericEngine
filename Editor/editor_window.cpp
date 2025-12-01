@@ -11,9 +11,16 @@ void editor::EditorWindow::DrawGui()
     if (!is_open)
         return;
 
-    if (ImGui::Begin(Name().c_str(), nullptr, window_flags))
+    if (m_handle_window_manually_)
     {
         OnEditorGui();
     }
-    ImGui::End();
+    else
+    {
+        if (ImGui::Begin(Name().c_str(), nullptr, window_flags))
+        {
+            OnEditorGui();
+        }
+        ImGui::End();
+    }
 }

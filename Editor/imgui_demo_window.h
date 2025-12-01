@@ -6,6 +6,7 @@ namespace editor
 class ImGuiDemoWindow : public EditorWindow
 {
 public:
+    ImGuiDemoWindow();
     std::string Name() override;
     void OnEditorGui() override;
 };
