@@ -2,7 +2,8 @@
     "guid": "1f3951c5-75cc-45de-9f32-ee2ef4f2a91b",
     "type": ".hlsl",
     "data": {
-        "shader_meta": "{\"parameters\":{\"vertex\":[],\"pixel\":[{\"name\":\"Albedo\",\"type\":\"Texture2D\"}]},\"shader_settings\":{\"z_test\":0,\"z_write\":0,\"cull\":2,\"blend_src\":0,\"blend_dst\":7,\"blend_op\":0,\"color_mask\":0,\"alpha_to_mask\":0}}"
+        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"value0\": {\n\"m_guid_\": \"1f3951c5-75cc-45de-9f32-ee2ef4f2a91b\",\n\"m_name_\": \"BillboardShader.hlsl\"\n},\n\"parameters\": [\n{\n\"ptr_wrapper\": {\n\"id\": 2147483650,\n\"data\": {\n\"index\": 0,\n\"shader_type\": 1,\n\"name\": \"Albedo\",\n\"display_name\": \"\",\n\"type_hint\": \"Texture2D\"\n}\n}\n}\n],\n\"m_shader_settings_\": {\n\"z_test\": 0,\n\"z_write\": 0,\n\"cull\": 2,\n\"blend_src\": 0,\n\"blend_dst\": 7,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false\n}\n}\n}\n}\n}",
+        "shader_meta_version": 3
     },
     "objects": []
 }

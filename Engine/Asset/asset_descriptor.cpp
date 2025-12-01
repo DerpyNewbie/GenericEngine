@@ -175,18 +175,24 @@ std::list<ImportLog> AssetDescriptor::ImportLogs() const
 
 bool AssetDescriptor::HasImportError() const
 {
-    return std::ranges::any_of(m_import_logs_, [](const auto &log) {
-        return log.type == ImportLog::kLogType::kError;
-    });
+    return std::ranges::any_of(
+        m_import_logs_,
+        [](const auto &log) {
+            return log.type == ImportLog::kLogType::kError;
+        }
+    );
 }
 
 void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
 {
     m_main_object_ = object;
 
-    std::erase_if(m_objects_, [&object](auto &item) {
-        return item == object;
-    });
+    std::erase_if(
+        m_objects_,
+        [&object](auto &item) {
+            return item == object;
+        }
+    );
 
     m_objects_.emplace_front(object);
 
@@ -233,8 +239,11 @@ void AssetDescriptor::Import()
     const auto asset_importer = AssetImporter::Get(m_type_);
     if (asset_importer == nullptr)
     {
-        Logger::Warn<AssetDescriptor>("Asset importer for type '%s' not found! Will ignore file '%s'",
-                                      m_type_.c_str(), AssetPath().string().c_str());
+        Logger::Warn<AssetDescriptor>(
+            "Asset importer for type '%s' not found! Will ignore file '%s'",
+            m_type_.c_str(),
+            AssetPath().string().c_str()
+        );
         return;
     }
 
@@ -250,7 +259,9 @@ void AssetDescriptor::Import()
     {
         Logger::Error<AssetDescriptor>(
             "Failed to import asset '%s': %s",
-            AssetPath().string().c_str(), e.what());
+            AssetPath().string().c_str(),
+            e.what()
+        );
 
 #if defined(DEBUG) || defined(_DEBUG)
         DebugBreak();
@@ -260,7 +271,8 @@ void AssetDescriptor::Import()
     {
         Logger::Error<AssetDescriptor>(
             "Failed to import asset '%s' due to an unknown exception!",
-            AssetPath().string().c_str());
+            AssetPath().string().c_str()
+        );
 
 #if defined(DEBUG) || defined(_DEBUG)
         DebugBreak();
@@ -276,6 +288,18 @@ void AssetDescriptor::Save()
         return;
     }
 
+    const auto asset_importer = AssetImporter::Get(m_type_);
+    if (asset_importer == nullptr)
+    {
+        Logger::Warn<AssetDescriptor>(
+            "Asset importer for type '%s' not found! Will ignore file '%s'",
+            m_type_.c_str(),
+            AssetPath().string().c_str()
+        );
+        return;
+    }
+
+    asset_importer->OnExport(this);
     WriteMeta(MetaFilePath(AssetPath()));
 }
 

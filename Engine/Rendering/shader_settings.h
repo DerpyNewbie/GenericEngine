@@ -13,36 +13,88 @@ struct ShaderSettings
     int color_mask = 0;
 
     bool alpha_to_mask = false;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(
+            CEREAL_NVP(z_test),
+            CEREAL_NVP(z_write),
+            CEREAL_NVP(cull),
+            CEREAL_NVP(blend_src),
+            CEREAL_NVP(blend_dst),
+            CEREAL_NVP(blend_op),
+            CEREAL_NVP(color_mask),
+            CEREAL_NVP(alpha_to_mask)
+        );
+    }
 };
 
 constexpr const char *ZTestNames[] = {
-    "Less", "Greater", "LEqual", "GEqual", "Equal", "NotEqual", "Always", "Never",
+    "Less",
+    "Greater",
+    "LEqual",
+    "GEqual",
+    "Equal",
+    "NotEqual",
+    "Always",
+    "Never",
 };
 constexpr const char *ZWriteNames[] = {
-    "On(All)", "Off(Zero)",
+    "On(All)",
+    "Off(Zero)",
 };
 constexpr const char *CullNames[] = {
-    "Back", "Front", "Off",
+    "Back",
+    "Front",
+    "Off",
 };
 constexpr const char *BlendFactorNames[] = {
-    "One", "Zero", "SrcColor", "SrcAlpha", "DstColor", "DstAlpha",
-    "OneMinusSrcColor", "OneMinusSrcAlpha",
-    "OneMinusDstColor", "OneMinusDstAlpha"
+    "One",
+    "Zero",
+    "SrcColor",
+    "SrcAlpha",
+    "DstColor",
+    "DstAlpha",
+    "OneMinusSrcColor",
+    "OneMinusSrcAlpha",
+    "OneMinusDstColor",
+    "OneMinusDstAlpha"
 };
 constexpr const char *BlendOpNames[] = {
-    "Add", "Subtract", "ReverseSubtract", "Min", "Max"
+    "Add",
+    "Subtract",
+    "ReverseSubtract",
+    "Min",
+    "Max"
 };
 constexpr const char *ColorMaskNames[] = {
-    "RGBA", "RGB", "A", "R", "G", "B", "0"
+    "RGBA",
+    "RGB",
+    "A",
+    "R",
+    "G",
+    "B",
+    "0"
 };
 constexpr const char *LightModeNames[] = {
-    "UniversalForward", "ShadowCaster", "DepthOnly", "Meta", "UniversalGBuffer"
+    "UniversalForward",
+    "ShadowCaster",
+    "DepthOnly",
+    "Meta",
+    "UniversalGBuffer"
 };
 constexpr const char *RenderTypeNames[] = {
-    "Opaque", "Transparent", "TransparentCutout"
+    "Opaque",
+    "Transparent",
+    "TransparentCutout"
 };
 constexpr const char *RenderQueueNames[] = {
-    "Background", "Geometry", "AlphaTest", "Transparent", "Overlay"
+    "Background",
+    "Geometry",
+    "AlphaTest",
+    "Transparent",
+    "Overlay"
 };
 
 constexpr D3D12_COMPARISON_FUNC DX_ZTest[] = {

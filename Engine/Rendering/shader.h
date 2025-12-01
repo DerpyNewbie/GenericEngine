@@ -14,17 +14,18 @@ class ShaderImporter;
 /// <remarks>
 /// Base of all shaders used in the engine. Shaders such as PS, VS inherits from here.
 /// </remarks>
-class Shader : public InspectableAsset
+class Shader : public Object, public Inspectable
 {
     friend ShaderImporter;
     static std::shared_ptr<Shader> m_default_shader_;
-    
+
     ComPtr<ID3DBlob> m_vs_blob_;
     ComPtr<ID3DBlob> m_ps_blob_;
 
     ShaderSettings m_shader_settings_;
 
     void DrawShaderSettings();
+
 public:
     std::vector<std::shared_ptr<ShaderParameter>> parameters;
 
@@ -36,13 +37,19 @@ public:
     {
         switch (type)
         {
-        case kShaderType_Vertex:
-            return m_vs_blob_.Get();
-        case kShaderType_Pixel:
-            return m_ps_blob_.Get();
-        default:
-            throw std::runtime_error("Invalid shader type");
+            case kShaderType_Vertex:
+                return m_vs_blob_.Get();
+            case kShaderType_Pixel:
+                return m_ps_blob_.Get();
+            default:
+                throw std::runtime_error("Invalid shader type");
         }
+    }
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Object>(this), CEREAL_NVP(parameters), CEREAL_NVP(m_shader_settings_));
     }
 };
 
