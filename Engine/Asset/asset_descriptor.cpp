@@ -264,7 +264,7 @@ void AssetDescriptor::Import()
         );
 
 #if defined(DEBUG) || defined(_DEBUG)
-        DebugBreak();
+        //      DebugBreak();
 #endif
     }
     catch (...)

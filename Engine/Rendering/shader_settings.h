@@ -1,11 +1,14 @@
 #pragma once
 
+namespace engine
+{
 struct ShaderSettings
 {
     int z_test = 0;
     int z_write = 1;
     int cull = 0;
 
+    bool use_blend = false;
     int blend_src = 0;
     int blend_dst = 0;
     int blend_op = 0;
@@ -15,7 +18,7 @@ struct ShaderSettings
     bool alpha_to_mask = false;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const std::uint32_t version)
     {
         ar(
             CEREAL_NVP(z_test),
@@ -26,9 +29,13 @@ struct ShaderSettings
             CEREAL_NVP(blend_op),
             CEREAL_NVP(color_mask),
             CEREAL_NVP(alpha_to_mask)
-        );
+            );
+
+        if (4 <= version)
+            ar(CEREAL_NVP(use_blend));
     }
 };
+}
 
 constexpr const char *ZTestNames[] = {
     "Less",
