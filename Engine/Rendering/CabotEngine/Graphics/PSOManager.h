@@ -7,6 +7,8 @@ struct PSOSetting
     std::wstring VSPath;
     std::wstring PSPath;
     std::wstring GSPath;
+    bool IsTransparent;
+    D3D12_CULL_MODE CullMode;
     D3D12_INPUT_LAYOUT_DESC InputLayout;
     D3D12_PRIMITIVE_TOPOLOGY_TYPE PrimitiveType;
     D3D12_RASTERIZER_DESC RasterizerDesc;
@@ -14,7 +16,8 @@ struct PSOSetting
     UINT NumRenderTarget;
 };
 
-class PSOManager
+class
+PSOManager
 {
     std::unordered_map<std::string, std::shared_ptr<PipelineState>> m_pso_cache_;
 

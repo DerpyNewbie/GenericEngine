@@ -10,6 +10,7 @@
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
 #include "Components/controller.h"
+#include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
@@ -65,6 +66,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<AnimationComponent>("Animation");
     RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
+    RegisterComponentFactory<CoroutineTest>("Debug");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :

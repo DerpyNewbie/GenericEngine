@@ -155,7 +155,7 @@ void DefaultEditorMenu::DrawObjectMenu(const std::shared_ptr<engine::GameObject>
 
     if (ImGui::MenuItem("Delete", nullptr, false, go != nullptr))
     {
-        go->DestroyThis();
+        engine::Object::DestroyImmediate(go);
     }
 
     if (EditorPrefs::show_editor_debug)

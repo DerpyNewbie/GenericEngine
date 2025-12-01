@@ -18,10 +18,10 @@ void Billboard::Update()
         vertices[2].vertex = Vector3(5, -5, 0.0f);
         vertices[3].vertex = Vector3(5, 5, 0.0f);
 
-        vertices[0].uvs[0] = Vector2(0, 0);
-        vertices[1].uvs[0] = Vector2(0, 1);
-        vertices[2].uvs[0] = Vector2(1, 0);
-        vertices[3].uvs[0] = Vector2(1, 1);
+        vertices[0].uvs[0] = Vector2(0, 1);
+        vertices[1].uvs[0] = Vector2(0, 0);
+        vertices[2].uvs[0] = Vector2(1, 1);
+        vertices[3].uvs[0] = Vector2(1, 0);
 
         vertex_buffer = std::make_shared<engine::VertexBuffer>(vertices.size(), vertices.data());
         if (!vertex_buffer->IsValid())

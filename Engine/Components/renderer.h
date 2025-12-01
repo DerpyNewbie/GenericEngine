@@ -21,6 +21,7 @@ public:
     DirectX::BoundingBox bounds;
 
     void OnInspectorGui() override;
+    void OnValidate() override;
     void OnEnabled() override;
     void OnDisabled() override;
     void OnDestroy() override;

@@ -46,8 +46,10 @@ Matrix Transform::LocalMatrix() const
     return m_local_matrix_;
 }
 
-Matrix Transform::WorldMatrix() const
+Matrix Transform::WorldMatrix()
 {
+    if (m_is_dirty_)
+        RecalculateMatrices();
     return m_world_matrix_;
 }
 
@@ -57,33 +59,33 @@ Matrix Transform::ParentMatrix() const
     return parent == nullptr ? Matrix::Identity : parent->WorldMatrix();
 }
 
-Matrix Transform::WorldToLocal() const
+Matrix Transform::WorldToLocal()
 {
     return WorldMatrix().Invert();
 }
 
-Matrix Transform::LocalToWorld() const
+Matrix Transform::LocalToWorld()
 {
     return WorldMatrix();
 }
 
-Vector3 Transform::Position() const
+Vector3 Transform::Position()
 {
-    return m_world_matrix_.Translation();
+    return WorldMatrix().Translation();
 }
 
-Quaternion Transform::Rotation() const
+Quaternion Transform::Rotation()
 {
-    auto world = m_world_matrix_;
+    auto world = WorldMatrix();
     Vector3 scale, translation;
     Quaternion rotation;
     world.Decompose(scale, rotation, translation);
     return rotation;
 }
 
-Vector3 Transform::Scale() const
+Vector3 Transform::Scale()
 {
-    auto world = m_world_matrix_;
+    auto world = WorldMatrix();
     Vector3 scale, translation;
     Quaternion rotation;
     world.Decompose(scale, rotation, translation);
@@ -177,6 +179,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
         parent->m_children_.emplace_back(shared_from_base<Transform>());
     }
 
+    SetDirty();
     RecalculateMatrices();
     GameObject()->SetAsRootObject(m_parent_.expired());
 }
@@ -287,26 +290,26 @@ void Transform::SetPositionAndRotation(const Vector3 &position, const Quaternion
 void Transform::SetLocalPosition(const Vector3 &local_position)
 {
     m_local_position_ = local_position;
-    RecalculateMatrices();
+    SetDirty();
 }
 
 void Transform::SetLocalRotation(const Quaternion &local_rotation)
 {
     m_local_rotation_ = local_rotation;
-    RecalculateMatrices();
+    SetDirty();
 }
 
 void Transform::SetLocalPositionAndRotation(const Vector3 &local_position, const Quaternion &local_rotation)
 {
     m_local_position_ = local_position;
     m_local_rotation_ = local_rotation;
-    RecalculateMatrices();
+    SetDirty();
 }
 
 void Transform::SetLocalScale(const Vector3 &local_scale)
 {
     m_local_scale_ = local_scale;
-    RecalculateMatrices();
+    SetDirty();
 }
 
 void Transform::SetLocalMatrix(const Matrix &matrix)
@@ -320,7 +323,7 @@ void Transform::SetLocalMatrix(const Matrix &matrix)
         m_local_scale_ = Vector3::One;
     }
 
-    RecalculateMatrices();
+    SetDirty();
 }
 
 void Transform::TransformGui(const bool is_local)
@@ -392,10 +395,25 @@ void Transform::RecalculateMatrices()
         m_world_matrix_ = m_local_matrix_ * parent->WorldMatrix();
     }
 
-    for (const auto child : m_children_)
+    m_is_dirty_ = false;
+}
+
+void Transform::SetDirty()
+{
+    if (m_is_dirty_)
+        return;
+
+    m_is_dirty_ = true;
+
+    for (const auto &child : m_children_)
     {
-        child->RecalculateMatrices();
+        child->SetDirty();
     }
+}
+
+void Transform::OnValidate()
+{
+    RecalculateMatrices();
 }
 
 void Transform::OnAwake()
