@@ -337,6 +337,18 @@ void AssetDescriptor::Save()
         return;
     }
 
+    const auto asset_importer = AssetImporter::Get(m_type_);
+    if (asset_importer == nullptr)
+    {
+        Logger::Warn<AssetDescriptor>(
+            "Asset importer for type '%s' not found! Will ignore file '%s'",
+            m_type_.c_str(),
+            AssetPath().string().c_str()
+        );
+        return;
+    }
+
+    asset_importer->OnExport(this);
     WriteMeta(MetaFilePath(AssetPath()));
 }
 

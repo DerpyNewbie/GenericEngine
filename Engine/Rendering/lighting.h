@@ -41,7 +41,7 @@ class Lighting
 public:
     static Lighting *Instance();
 
-    void UpdateLightsViewProjMatrixBuffer();
+    void UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix &proj);
     void SetCascadeSlicesBuffer();
     void SetLightsViewProjMatrix() const;
     void SetShadowMap();

@@ -10,8 +10,8 @@ std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &
 {
     const Vector3 ndc_corners[8] =
     {
-        {-1, -1, 0}, {-1, 1, 0}, {1, 1, 0}, {1, -1, 0},
-        {-1, -1, 1}, {-1, 1, 1}, {1, 1, 1}, {1, -1, 1}
+        { -1, -1, 0 }, { -1, 1, 0 }, { 1, 1, 0 }, { 1, -1, 0 },
+        { -1, -1, 1 }, { -1, 1, 1 }, { 1, 1, 1 }, { 1, -1, 1 }
     };
 
     const Matrix inv_view_proj = (cam_view * cam_proj).Invert();
@@ -145,7 +145,7 @@ Lighting *Lighting::Instance()
     return instance;
 }
 
-void Lighting::UpdateLightsViewProjMatrixBuffer()
+void Lighting::UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix &proj)
 {
     int light_vp_idx = 0;
     for (const auto light : m_lights_)
@@ -154,10 +154,7 @@ void Lighting::UpdateLightsViewProjMatrixBuffer()
             continue;
 
         const auto shadow_map_count = light->ShadowMapCount();
-        const auto camera = CameraComponent::Current();
-        const auto camera_property = camera->m_property_;
-
-        auto frustum_corners = CalcFrustumCorners(camera->ViewMatrix(), camera->m_property_.ProjectionMatrix());
+        auto frustum_corners = CalcFrustumCorners(view, proj);
         auto light_vp = light->CalcViewProj(frustum_corners);
 
         for (int i = 0; i < shadow_map_count; ++i)
@@ -270,7 +267,7 @@ void Lighting::RemoveShadow(const std::shared_ptr<Light> &light)
         auto camera_pos = CameraComponent::Main()->GameObject()->Transform()->Position();
         auto it = std::ranges::min_element(m_waiting_lights_,
                                            [camera_pos](const std::shared_ptr<Light> &a,
-                                                        const std::shared_ptr<Light> &b) {
+                                           const std::shared_ptr<Light> &b) {
                                                return (camera_pos - a->GetPos()).Length() < (camera_pos - b->GetPos()).
                                                       Length();
                                            });

@@ -36,8 +36,7 @@ public:
     [[nodiscard]] rapidjson::Value &GetValue(const std::string &key) const;
 
     [[nodiscard]] bool IsString(const std::string &key) const;
-    [[nodiscard]] bool IsInt(const std::string &key) const;
-    [[nodiscard]] bool IsFloat(const std::string &key) const;
+    [[nodiscard]] bool IsNumber(const std::string &key) const;
     [[nodiscard]] bool IsBool(const std::string &key) const;
     [[nodiscard]] bool IsDataStore(const std::string &key) const;
 

@@ -15,6 +15,7 @@ int window_height = 1080;
 int window_width = 1920;
 HWND window_handle = nullptr;
 std::string window_title = "GenericEngine";
+bool play_mode = false;
 }
 
 namespace engine
@@ -25,24 +26,24 @@ LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
 {
     switch (msg)
     {
-    case WM_DESTROY:
-        Logger::Log<Application>("Window destroyed");
-        PostQuitMessage(0);
-        break;
-    case WM_SIZE:
-        if (wparam == SIZE_MINIMIZED)
+        case WM_DESTROY:
+            Logger::Log<Application>("Window destroyed");
+            PostQuitMessage(0);
             break;
+        case WM_SIZE:
+            if (wparam == SIZE_MINIMIZED)
+                break;
 
-        window_width = LOWORD(lparam);
-        window_height = HIWORD(lparam);
+            window_width = LOWORD(lparam);
+            window_height = HIWORD(lparam);
 
-        on_window_resized.Invoke();
-        break;
-    case WM_MOUSEACTIVATE:
-        Logger::Log<Application>("Mouse activated");
-        return MA_ACTIVATEANDEAT;
-    default:
-        break;
+            on_window_resized.Invoke();
+            break;
+        case WM_MOUSEACTIVATE:
+            Logger::Log<Application>("Mouse activated");
+            return MA_ACTIVATEANDEAT;
+        default:
+            break;
     }
 
     if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
@@ -90,6 +91,10 @@ int Application::WindowHeight()
 {
     return window_height;
 }
+float Application::WindowAspectRatio()
+{
+    return static_cast<float>(window_width) / static_cast<float>(window_height);
+}
 
 HWND Application::WindowHandle()
 {
@@ -111,6 +116,11 @@ void Application::SetWindowTitle(const std::string &title)
     SetWindowText(window_handle, window_title.c_str());
 }
 
+bool Application::IsPlayMode()
+{
+    return play_mode;
+}
+
 void Application::InitWindow()
 {
     // SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
@@ -124,22 +134,29 @@ void Application::InitWindow()
 
     RegisterClassEx(&w);
 
-    RECT wrc = {0, 0, static_cast<LONG>(window_width), static_cast<LONG>(window_height)};
+    RECT wrc = { 0, 0, static_cast<LONG>(window_width), static_cast<LONG>(window_height) };
 
     AdjustWindowRect(&wrc,WS_OVERLAPPEDWINDOW, false);
 
-    window_handle = CreateWindow(w.lpszClassName,
-                                 _T(window_title.c_str()),
-                                 WS_OVERLAPPEDWINDOW,
-                                 CW_USEDEFAULT,
-                                 CW_USEDEFAULT,
-                                 wrc.right - wrc.left,
-                                 wrc.bottom - wrc.top,
-                                 nullptr,
-                                 nullptr,
-                                 w.hInstance,
-                                 nullptr);
+    window_handle = CreateWindow(
+        w.lpszClassName,
+        _T(window_title.c_str()),
+        WS_OVERLAPPEDWINDOW,
+        CW_USEDEFAULT,
+        CW_USEDEFAULT,
+        wrc.right - wrc.left,
+        wrc.bottom - wrc.top,
+        nullptr,
+        nullptr,
+        w.hInstance,
+        nullptr
+    );
 
     ShowWindow(window_handle,SW_SHOW);
+}
+
+void Application::SetPlayMode(const bool play)
+{
+    play_mode = play;
 }
 }
