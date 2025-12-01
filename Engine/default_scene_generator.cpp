@@ -31,7 +31,7 @@ void SampleSceneGenerator::CreateDefaultCamera()
 void SampleSceneGenerator::CreateDefaultFloor()
 {
     Object::Instantiate<GameObject>("Floor")->AddComponent<PlaneCollider>();
-    const auto floor_cube = ModelImporter::LoadModelFromFBX("Resources/primitives/Cube.fbx");
+    const auto floor_cube = ModelImporter::LoadModelFromFBX("primitives/Cube.fbx");
     const auto floor_transform = floor_cube->Transform();
     floor_transform->SetLocalPosition({0, 0.0f, 0});
     floor_transform->SetLocalScale({10, 0.001f, 10});
@@ -39,13 +39,13 @@ void SampleSceneGenerator::CreateDefaultFloor()
 
 void SampleSceneGenerator::CreateHackadoll()
 {
-    auto go = ModelImporter::LoadModelFromFBX("Resources/hackadoll/hackadoll.fbx");
+    auto go = ModelImporter::LoadModelFromFBX("hackadoll/hackadoll.fbx");
     go->Transform()->SetLocalScale({0.01f, 0.01f, 0.01f});
 }
 
 void SampleSceneGenerator::CreateYBot()
 {
-    auto go = ModelImporter::LoadModelFromFBX("Resources/Y Bot.fbx");
+    auto go = ModelImporter::LoadModelFromFBX("Y Bot.fbx");
     go->Transform()->SetLocalScale({0.01f, 0.01f, 0.01f});
 }
 void SampleSceneGenerator::CreateRenderingSettings()

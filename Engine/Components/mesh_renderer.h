@@ -17,7 +17,7 @@ class MeshRenderer : public Renderer
 protected:
     static bool m_draw_bounds_;
 
-    std::shared_ptr<Mesh> m_shared_mesh_;
+    AssetPtr<Mesh> m_shared_mesh_;
     std::shared_ptr<VertexBuffer> m_vertex_buffer_;
     std::vector<std::shared_ptr<IndexBuffer>> m_index_buffers_;
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
@@ -42,9 +42,9 @@ public:
     void Render() override;
     void DepthRender() override;
 
-    void SetSharedMesh(const std::shared_ptr<Mesh> &mesh);
+    void SetSharedMesh(const AssetPtr<Mesh> &mesh);
 
-    std::shared_ptr<Mesh> GetSharedMesh()
+    AssetPtr<Mesh> GetSharedMesh()
     {
         return m_shared_mesh_;
     }

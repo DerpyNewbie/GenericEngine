@@ -31,7 +31,7 @@ void TxtImporter::OnImport(AssetDescriptor *ctx)
 
     ctx->SetMainObject(text);
 
-    const auto secondary = Object::Instantiate<TextAsset>();
+    const auto secondary = Object::Instantiate<TextAsset>("Secondary Text");
     ctx->AddObject(secondary);
 }
 
@@ -40,8 +40,10 @@ void TxtImporter::OnExport(AssetDescriptor *ctx)
     const auto text = std::dynamic_pointer_cast<TextAsset>(ctx->MainObject());
     if (text == nullptr)
     {
-        Logger::Warn<TxtImporter>("Asset '%s' has not been imported or not a TextAsset",
-                                  ctx->AssetPath().string().c_str());
+        Logger::Warn<TxtImporter>(
+            "Asset '%s' has not been imported or not a TextAsset",
+            ctx->AssetPath().string().c_str()
+        );
         return;
     }
 

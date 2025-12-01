@@ -14,5 +14,11 @@ struct TRS
     [[nodiscard]] Matrix GetMatrix() const;
 
     static TRS Blend(const TRS &from, const TRS &to, float t);
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(CEREAL_NVP(translation), CEREAL_NVP(scale), CEREAL_NVP(rotation));
+    }
 };
 }

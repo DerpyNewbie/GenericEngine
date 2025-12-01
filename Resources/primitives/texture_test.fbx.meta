@@ -1,0 +1,22 @@
+{
+    "data": {},
+    "guid": "9da337fb-28ad-4c4a-af2f-3a04525af95b",
+    "type": ".fbx",
+    "objects": [
+        {
+            "guid": "df086cad-2397-45d7-b02e-7b249a04e33a",
+            "name": "texture_test.fbm\\TestTexture",
+            "type_hint": "class Texture2D"
+        },
+        {
+            "guid": "60e23789-4e40-48e7-ab2f-b8e17d56b5f7",
+            "name": "Material",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "930595c5-4a55-4352-af99-65939a302ede",
+            "name": "Cube",
+            "type_hint": "class engine::Mesh"
+        }
+    ]
+}

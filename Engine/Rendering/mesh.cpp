@@ -15,6 +15,39 @@
 namespace engine
 {
 
+void Mesh::OnInspectorGui()
+{
+    ImGui::Text("Vertices: %llu", vertices.size());
+    ImGui::Text("Indices : %llu", indices.size());
+    ImGui::Text("Faces(calc): %llu", !indices.empty() ? indices.size() / 3 : 0);
+    ImGui::Text("UVs : %llu", uvs[0].size());
+    ImGui::Text("UV2s: %llu", uvs[1].size());
+    ImGui::Text("Colors  : %llu", colors.size());
+    ImGui::Text("Normals : %llu", normals.size());
+    ImGui::Text("Tangents: %llu", tangents.size());
+    ImGui::Text("Bone Weights: %llu", bone_weights.size());
+    ImGui::Text("Bind Poses  : %llu", bind_poses.size());
+    ImGui::Text("Sub Meshes  : %llu", sub_meshes.size());
+
+    if (ImGui::CollapsingHeader("Sub Meshes"))
+    {
+        ImGui::Indent();
+        for (auto i = 0; i < sub_meshes.size(); i++)
+        {
+            if (ImGui::CollapsingHeader(("Sub Mesh " + std::to_string(i)).c_str()))
+            {
+                ImGui::Indent();
+                ImGui::Text("Base Index: %d", sub_meshes[i].base_index);
+                ImGui::Text("Base Vert : %d", sub_meshes[i].base_vertex);
+                ImGui::Text("Index Count: %d", sub_meshes[i].index_count);
+                ImGui::Text("Vert Count : %d", sub_meshes[i].vertex_count);
+                ImGui::Unindent();
+            }
+        }
+        ImGui::Unindent();
+    }
+}
+
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
 {
     const auto result = Instantiate<Mesh>(mesh->mName.C_Str());
@@ -46,8 +79,12 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
         result->colors.resize(mesh->mNumVertices);
         for (unsigned int i = 0; i < mesh->mNumVertices; ++i)
         {
-            result->colors[i] = Color(mesh->mColors[0][i].r, mesh->mColors[0][i].g, mesh->mColors[0][i].b,
-                                      mesh->mColors[0][i].a);
+            result->colors[i] = Color(
+                mesh->mColors[0][i].r,
+                mesh->mColors[0][i].g,
+                mesh->mColors[0][i].b,
+                mesh->mColors[0][i].a
+            );
         }
     }
 
@@ -151,7 +188,8 @@ void Mesh::Append(Mesh other)
     SubMesh sub_mesh = {.base_vertex = static_cast<int>(vertices.size()),
                         .vertex_count = static_cast<int>(other.vertices.size()),
                         .base_index = static_cast<int>(indices.size()),
-                        .index_count = static_cast<int>(other.indices.size())};
+                        .index_count = static_cast<int>(other.indices.size())
+    };
     sub_meshes.emplace_back(sub_mesh);
 
     for (auto &index : other.indices)

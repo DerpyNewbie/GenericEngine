@@ -21,7 +21,7 @@ void StructuredBuffer::CreateBuffer()
         D3D12_RESOURCE_STATE_COMMON,
         nullptr,
         IID_PPV_ARGS(&m_default_buffer_)
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -45,7 +45,7 @@ void StructuredBuffer::CreateBuffer()
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&m_upload_buffer_)
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -67,11 +67,17 @@ void StructuredBuffer::CreateBuffer()
 
 void StructuredBuffer::UpdateBuffer(void *data)
 {
+    if (m_upload_buffer_ == nullptr || m_default_buffer_ == nullptr)
+    {
+        Logger::Error<StructuredBuffer>("UpdateBuffer failed: StructuredBuffer is not initialized");
+        return;
+    }
+
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,
         D3D12_RESOURCE_STATE_COPY_DEST
-        );
+    );
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     void *mapped = nullptr;
@@ -79,13 +85,18 @@ void StructuredBuffer::UpdateBuffer(void *data)
     memcpy(mapped, data, m_stride_ * m_element_count_);
     m_upload_buffer_->Unmap(0, nullptr);
 
-    RenderEngine::CommandList()->CopyBufferRegion(m_default_buffer_.Get(), 0, m_upload_buffer_.Get(), 0,
-                                                  m_stride_ * m_element_count_);
+    RenderEngine::CommandList()->CopyBufferRegion(
+        m_default_buffer_.Get(),
+        0,
+        m_upload_buffer_.Get(),
+        0,
+        m_stride_ * m_element_count_
+    );
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
         D3D12_RESOURCE_STATE_COMMON
-        );
+    );
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 

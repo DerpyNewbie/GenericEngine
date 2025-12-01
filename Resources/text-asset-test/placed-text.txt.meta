@@ -1,10 +1,12 @@
 {
-    "guid": "ef2ed590-d7e1-4a79-81d1-aa8eac77cd25",
+    "data": {},
+    "guid": "4ee2f754-65cf-4148-ba22-af3a47c5dece",
     "type": ".txt",
-    "data": {
-        "aadada": "dadada"
-    },
     "objects": [
-        "60ef11ef-af2a-4188-a692-6eab90eac564"
+        {
+            "guid": "9d585983-32f9-42f6-8f90-87c9e2f858ca",
+            "name": "Secondary Text",
+            "type_hint": "class engine::TextAsset"
+        }
     ]
 }
