@@ -38,7 +38,7 @@ void Material::OnInspectorGui()
 void Material::OnConstructed()
 {
     InspectableAsset::OnConstructed();
-    auto default_shader = AssetDatabase::GetAsset(xg::Guid("00214c87-b0e4-40ce-bef6-f7bfb3425888"));
+    auto default_shader = AssetDatabase::GetAsset(xg::Guid("b2a77a9b-591f-4a2b-a01b-170a73c3201e"));
     p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(default_shader);
     CreateMaterialBlock();
 }
