@@ -3,5 +3,5 @@
 #include "Asset/Importer/shader_importer.h"
 
 
-CEREAL_CLASS_VERSION(engine::ShaderSettings, engine::ShaderImporter::kShaderMetaVersion)
+CEREAL_CLASS_VERSION(engine::ShaderSettings, engine::ShaderSettings::kSerializationVersion)
 

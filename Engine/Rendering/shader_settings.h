@@ -4,6 +4,8 @@ namespace engine
 {
 struct ShaderSettings
 {
+    static constexpr std::uint32_t kSerializationVersion = 4;
+    
     int z_test = 0;
     int z_write = 1;
     int cull = 0;
