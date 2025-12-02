@@ -8,7 +8,13 @@ namespace editor
 class EditorWindow
 {
 protected:
-    virtual bool ShouldHandleWindowAutomatically() const
+    /// <summary>
+    /// When true, DrawGui() will call OnEditorGui() without wrapping it in ImGui::Begin/End.
+    /// The derived class is fully responsible for ImGui window management in OnEditorGui().
+    /// Example: Used by ImGuiDemoWindow which calls ImGui::ShowDemoWindow().
+    /// </summary>
+    /// <returns></returns>
+    [[nodiscard]] virtual bool ShouldHandleWindowAutomatically() const
     {
         return true;
     }
