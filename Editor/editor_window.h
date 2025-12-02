@@ -8,7 +8,10 @@ namespace editor
 class EditorWindow
 {
 protected:
-    bool m_handle_window_manually_ = false;
+    virtual bool ShouldHandleWindowAutomatically() const
+    {
+        return true;
+    }
 
 public:
     virtual ~EditorWindow() = default;

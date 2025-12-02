@@ -3,9 +3,9 @@
 
 namespace editor
 {
-ImGuiDemoWindow::ImGuiDemoWindow()
+bool ImGuiDemoWindow::ShouldHandleWindowAutomatically() const
 {
-    m_handle_window_manually_ = true;
+    return false;
 }
 
 std::string ImGuiDemoWindow::Name()
