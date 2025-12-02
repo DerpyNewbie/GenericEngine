@@ -2,11 +2,14 @@
 
 #include "editor_window.h"
 
-std::string editor::EditorWindow::Name()
+namespace editor
+{
+std::string EditorWindow::Name()
 {
     return typeid(*this).name();
 }
-void editor::EditorWindow::DrawGui()
+
+void EditorWindow::DrawGui()
 {
     if (!is_open)
         return;
@@ -24,4 +27,5 @@ void editor::EditorWindow::DrawGui()
     {
         OnEditorGui();
     }
+}
 }
