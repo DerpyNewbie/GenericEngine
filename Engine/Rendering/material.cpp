@@ -38,8 +38,13 @@ void Material::OnInspectorGui()
 void Material::OnConstructed()
 {
     InspectableAsset::OnConstructed();
-    auto default_shader = AssetDatabase::GetAsset(xg::Guid("b2a77a9b-591f-4a2b-a01b-170a73c3201e"));
+    auto default_shader = AssetDatabase::GetAsset("BasicShader.hlsl");
+    if (default_shader.Lock() == nullptr)
+    {
+        Logger::Warn<Material>("Failed to find Engine Assets");
+    }
     p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(default_shader);
+    
     CreateMaterialBlock();
 }
 
