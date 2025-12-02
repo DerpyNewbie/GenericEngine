@@ -73,8 +73,8 @@ void DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
     {
-        { L"Scene Files (*.scene)", L"*.scene" },
-        { L"All Files (*.*)", L"*.*" }
+        {L"Scene Files (*.scene)", L"*.scene"},
+        {L"All Files (*.*)", L"*.*"}
     };
 
     if (ImGui::MenuItem("Load Scene"))
@@ -87,9 +87,10 @@ void DefaultEditorMenu::DrawFilesMenu()
             return;
         }
 
-        engine::Serializer serializer;
         std::ifstream ifs(file_path);
-        engine::SceneManager::AddScene(serializer.Load<engine::Scene>(ifs));
+        std::stringstream ss;
+        ss << ifs.rdbuf();
+        engine::SceneManager::DeserializeScene(ss.str());
     }
 
     if (ImGui::MenuItem("Save Scene"))
@@ -108,11 +109,11 @@ void DefaultEditorMenu::DrawFilesMenu()
         std::ofstream ofs(file_path);
         if (serializer.Save(ofs, target_scene))
         {
-            engine::Gui::OkDialog("Scene saved", "Scene saved successfully", { engine::Gui::MbDialogIcon::kInfo });
+            engine::Gui::OkDialog("Scene saved", "Scene saved successfully", {engine::Gui::MbDialogIcon::kInfo});
         }
         else
         {
-            engine::Gui::OkDialog("Scene save failed", "Failed to save a scene!\nCheck logs for more details.", { engine::Gui::MbDialogIcon::kError });
+            engine::Gui::OkDialog("Scene save failed", "Failed to save a scene!\nCheck logs for more details.", {engine::Gui::MbDialogIcon::kError});
         }
 
     }
