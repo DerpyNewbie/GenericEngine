@@ -177,7 +177,7 @@ bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, cons
     }
 
     data_store.SetString(kShaderMetaKey, string_buffer.str());
-    data_store.SetInt(kShaderMetaVersionKey, kShaderMetaVersion);
+    data_store.SetInt(kShaderMetaVersionKey, 3);
     return true;
 }
 
