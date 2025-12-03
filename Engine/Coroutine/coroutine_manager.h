@@ -1,6 +1,7 @@
 #pragma once
 #include "task.h"
 #include "yield_base.h"
+#include "Math/trs.h"
 
 namespace engine
 {
@@ -41,6 +42,14 @@ public:
                     ++it;
                     continue;
                 }
+            }
+
+            if (auto *w = dynamic_cast<Tween *>(promise.current_yield.get()))
+            {
+                w->time += dt;
+                auto t = w->time / w->duration;
+                auto blended = TRS::Blend(w->from, w->to, t);
+                w->transform->SetLocalMatrix(blended.GetMatrix());
             }
             
             h.resume();
