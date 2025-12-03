@@ -7,7 +7,7 @@ struct aiScene;
 
 namespace engine
 {
-class Mesh : public Object
+class Mesh : public Object, public Inspectable
 {
 public:
     size_t max_bones_in_vertex = 0;
@@ -21,6 +21,8 @@ public:
     std::vector<std::vector<BoneWeight>> bone_weights; // per-vertex
     std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
+
+    void OnInspectorGui() override;
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
 
@@ -43,10 +45,12 @@ public:
             CEREAL_NVP(colors),
             CEREAL_NVP(uvs),
             CEREAL_NVP(indices),
-            CEREAL_NVP(normals), CEREAL_NVP(tangents),
+            CEREAL_NVP(normals),
+            CEREAL_NVP(tangents),
             CEREAL_NVP(bone_weights),
             CEREAL_NVP(bind_poses),
-            CEREAL_NVP(sub_meshes));
+            CEREAL_NVP(sub_meshes)
+        );
     }
 };
 }

@@ -50,10 +50,17 @@ public:
         UINT Flags() const;
     };
 
+    struct NothingToShowInspectable : Inspectable
+    {
+        void OnInspectorGui() override;
+    };
+
     static bool OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters = {});
 
-    static bool SaveFileDialog(std::string &file_path, const std::string &default_name,
-                               const std::vector<FilterSpec> &filters = {});
+    static bool SaveFileDialog(
+        std::string &file_path, const std::string &default_name,
+        const std::vector<FilterSpec> &filters = {}
+    );
 
     static bool OkDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
     static bool OkCancelDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
@@ -154,6 +161,9 @@ public:
 
     template <typename T> requires is_inspectable<T>
     static bool ExpandablePropertyField(const char *label, AssetPtr<T> &value);
+
+    template <typename T> requires is_inspectable<T>
+    static void Expand(const char *label, T *inspectable);
 };
 
 template <typename T>
@@ -338,22 +348,17 @@ template <typename T> requires is_inspectable<T>
 bool Gui::ExpandablePropertyField(const char *label, IAssetPtr &value)
 {
     const bool result = PropertyField<T>(label, value);
-    ImGui::PushID(label);
-    if (ImGui::CollapsingHeader(label))
+    auto inspectable = std::dynamic_pointer_cast<T>(value.Lock());
+    if (inspectable == nullptr)
     {
-        ImGui::Indent();
-        const auto locked = std::dynamic_pointer_cast<T>(value.Lock());
-        if (locked == nullptr)
-        {
-            ImGui::Text("There is nothing to show...");
-        }
-        else
-        {
-            locked->OnInspectorGui();
-        }
-        ImGui::Unindent();
+        static NothingToShowInspectable nothing_to_show;
+        Expand(label, &nothing_to_show);
     }
-    ImGui::PopID();
+    else
+    {
+        Expand(label, inspectable.get());
+    }
+
     return result;
 }
 
@@ -361,5 +366,18 @@ template <typename T> requires is_inspectable<T>
 bool Gui::ExpandablePropertyField(const char *label, AssetPtr<T> &value)
 {
     return ExpandablePropertyField<T>(label, static_cast<IAssetPtr &>(value));
+}
+
+template <typename T> requires is_inspectable<T>
+void Gui::Expand(const char *label, T *inspectable)
+{
+    ImGui::PushID(label);
+    if (ImGui::CollapsingHeader(label))
+    {
+        ImGui::Indent();
+        inspectable->OnInspectorGui();
+        ImGui::Unindent();
+    }
+    ImGui::PopID();
 }
 }

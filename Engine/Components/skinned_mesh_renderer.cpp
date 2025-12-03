@@ -49,7 +49,12 @@ void SkinnedMeshRenderer::DrawBones() const
 
 std::shared_ptr<Transform> SkinnedMeshRenderer::BoundsOrigin()
 {
-    return root_bone.CastedLock()->Parent();
+    if (const auto root = root_bone.CastedLock())
+    {
+        return root->Parent();
+    }
+
+    return GameObject()->Transform();
 }
 
 void SkinnedMeshRenderer::OnInspectorGui()

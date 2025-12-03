@@ -3,6 +3,7 @@
 #include "inspector.h"
 
 #include "default_editor_menus.h"
+#include "editor_prefs.h"
 #include "imgui_stdlib.h"
 #include "game_object.h"
 #include "gui.h"
@@ -177,28 +178,27 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
     }
 
     ImGui::PushID(asset_hierarchy.get());
-
+    if (ImGui::CollapsingHeader(asset_hierarchy->Name().c_str(), root ? ImGuiTreeNodeFlags_DefaultOpen : ImGuiTreeNodeFlags_None))
     {
-        if (asset_hierarchy->IsFile())
-            ImGui::Text("File");
+        ImGui::Indent();
+        if (EditorPrefs::show_editor_debug)
+        {
+            if (asset_hierarchy->IsFile())
+                ImGui::Text("File");
+            if (asset_hierarchy->IsDirectory())
+                ImGui::Text("Directory");
+            if (!asset_hierarchy->children.empty())
+                ImGui::Text("Children: %d", asset_hierarchy->children.size());
+            ImGui::Separator();
+        }
+
+        if (asset_hierarchy->asset != nullptr)
+        {
+            DrawAssetDescriptor(asset_hierarchy->asset);
+            ImGui::Separator();
+        }
+
         if (asset_hierarchy->IsDirectory())
-            ImGui::Text("Directory");
-        if (!asset_hierarchy->children.empty())
-            ImGui::Text("Children: %d", asset_hierarchy->children.size());
-    }
-
-    if (asset_hierarchy->asset != nullptr)
-    {
-        ImGui::Separator();
-
-        DrawAssetDescriptor(asset_hierarchy->asset);
-    }
-
-    if (asset_hierarchy->IsDirectory())
-    {
-        ImGui::Separator();
-
-        if (!root || ImGui::CollapsingHeader("Show Children"))
         {
             ImGui::Indent();
             for (const auto &child : asset_hierarchy->children)
@@ -206,15 +206,18 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
                 DrawAssetHierarchy(child, false);
             }
             ImGui::Unindent();
-        }
-    }
 
+            ImGui::Separator();
+        }
+
+        ImGui::Unindent();
+    }
     ImGui::PopID();
 }
 
 void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescriptor> &asset_descriptor)
 {
-    if (ImGui::CollapsingHeader("Metadata", ImGuiTreeNodeFlags_DefaultOpen))
+    if (EditorPrefs::show_editor_debug && ImGui::CollapsingHeader("Metadata", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Indent();
 
@@ -222,8 +225,8 @@ void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescripto
         ImGui::Text("Path: %s", asset_descriptor->AssetPath().string().c_str());
         ImGui::Text("Guid: %s", asset_descriptor->Guid().str().c_str());
 
-        const auto label = std::format("SubGuids ({0})", asset_descriptor->SubGuids().size()).c_str();
-        if (ImGui::CollapsingHeader(label, ImGuiTreeNodeFlags_DefaultOpen))
+        const std::string label = std::format("SubGuids ({})", asset_descriptor->SubGuids().size());
+        if (ImGui::CollapsingHeader(label.c_str(), ImGuiTreeNodeFlags_DefaultOpen))
         {
             ImGui::Indent();
             for (const auto &sub_guid : asset_descriptor->SubGuids())
@@ -236,26 +239,33 @@ void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescripto
         ImGui::Unindent();
     }
 
-    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen))
+    const auto main_object = asset_descriptor->MainObject();
+    if (main_object != nullptr)
+    {
+        ImGui::PushID(main_object.get());
+        DrawObject(main_object);
+        ImGui::PopID();
+    }
+
+    if (asset_descriptor->Objects().size() > 1 && ImGui::CollapsingHeader("Objects"))
     {
         ImGui::Indent();
-
-        if (asset_descriptor->Objects().empty())
-        {
-            ImGui::Text("No objects found...");
-        }
-
         for (auto &object : asset_descriptor->Objects())
         {
+            if (object == main_object)
+                continue;
+
             ImGui::PushID(object.get());
 
             if (engine::Gui::ObjectHeader(object))
             {
                 ImGui::Indent();
 
-                ImGui::Text("Guid: %s", object->Guid().str().c_str());
-
-                ImGui::Separator();
+                if (EditorPrefs::show_editor_debug)
+                {
+                    ImGui::Text("Guid: %s", object->Guid().str().c_str());
+                    ImGui::Separator();
+                }
 
                 DrawObject(object);
 
@@ -264,7 +274,6 @@ void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescripto
 
             ImGui::PopID();
         }
-
         ImGui::Unindent();
     }
 }

@@ -26,9 +26,11 @@ void MeshRenderer::RecalculateBoundingBox()
 {
     auto min_pos = Vector3(0, 0, 0);
     auto max_pos = Vector3(0, 0, 0);
-    for (int i = 0; i < m_shared_mesh_->vertices.size(); ++i)
+    const auto mesh = m_shared_mesh_.CastedLock();
+
+    for (int i = 0; i < mesh->vertices.size(); ++i)
     {
-        auto vertex = m_shared_mesh_->vertices[i];
+        auto vertex = mesh->vertices[i];
         min_pos.x = std::min(min_pos.x, vertex.x);
         min_pos.y = std::min(min_pos.y, vertex.y);
         min_pos.z = std::min(min_pos.z, vertex.z);
@@ -46,40 +48,7 @@ void MeshRenderer::OnInspectorGui()
     ImGui::Checkbox("Draw Bounds", &m_draw_bounds_);
     Renderer::OnInspectorGui();
 
-    if (ImGui::CollapsingHeader("Mesh"))
-    {
-        ImGui::Indent();
-        ImGui::Text("Vertices: %llu", m_shared_mesh_->vertices.size());
-        ImGui::Text("Indices : %llu", m_shared_mesh_->indices.size());
-        ImGui::Text("Faces(calc): %llu", !m_shared_mesh_->indices.empty() ? m_shared_mesh_->indices.size() / 3 : 0);
-        ImGui::Text("UVs : %llu", m_shared_mesh_->uvs[0].size());
-        ImGui::Text("UV2s: %llu", m_shared_mesh_->uvs[1].size());
-        ImGui::Text("Colors  : %llu", m_shared_mesh_->colors.size());
-        ImGui::Text("Normals : %llu", m_shared_mesh_->normals.size());
-        ImGui::Text("Tangents: %llu", m_shared_mesh_->tangents.size());
-        ImGui::Text("Bone Weights: %llu", m_shared_mesh_->bone_weights.size());
-        ImGui::Text("Bind Poses  : %llu", m_shared_mesh_->bind_poses.size());
-        ImGui::Text("Sub Meshes  : %llu", m_shared_mesh_->sub_meshes.size());
-
-        if (ImGui::CollapsingHeader("Sub Meshes"))
-        {
-            ImGui::Indent();
-            for (auto i = 0; i < m_shared_mesh_->sub_meshes.size(); i++)
-            {
-                if (ImGui::CollapsingHeader(("Sub Mesh " + std::to_string(i)).c_str()))
-                {
-                    ImGui::Indent();
-                    ImGui::Text("Base Index: %d", m_shared_mesh_->sub_meshes[i].base_index);
-                    ImGui::Text("Base Vert : %d", m_shared_mesh_->sub_meshes[i].base_vertex);
-                    ImGui::Text("Index Count: %d", m_shared_mesh_->sub_meshes[i].index_count);
-                    ImGui::Text("Vert Count : %d", m_shared_mesh_->sub_meshes[i].vertex_count);
-                    ImGui::Unindent();
-                }
-            }
-            ImGui::Unindent();
-        }
-        ImGui::Unindent();
-    }
+    Gui::ExpandablePropertyField("Mesh", m_shared_mesh_);
 
     if (ImGui::CollapsingHeader("Materials"))
     {
@@ -106,6 +75,13 @@ void MeshRenderer::UpdateBuffer()
 
 void MeshRenderer::Render()
 {
+    // TODO: fallback to error material
+    if (shared_materials.empty())
+    {
+        Logger::Error<MeshRenderer>("No materials assigned!");
+        return;
+    }
+
     auto current_material = shared_materials[0].CastedLock();
     if (current_material == nullptr)
         return;
@@ -115,6 +91,12 @@ void MeshRenderer::Render()
         return;
 
     const auto cmd_list = RenderEngine::CommandList();
+    const auto mesh = m_shared_mesh_.CastedLock();
+    if (mesh == nullptr)
+    {
+        Logger::Error<MeshRenderer>("Mesh is null!");
+        return;
+    }
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
@@ -132,18 +114,18 @@ void MeshRenderer::Render()
         const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
 
         cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
-        const auto index_count = m_shared_mesh_->HasSubMeshes()
-                                     ? m_shared_mesh_->sub_meshes[0].base_index
-                                     : m_shared_mesh_->indices.size();
+        const auto index_count = mesh->HasSubMeshes()
+            ? mesh->sub_meshes[0].base_index
+            : mesh->indices.size();
 
         cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
     }
 
     // sub-meshes
-    for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
+    for (int i = 0; i < mesh->sub_meshes.size(); ++i)
     {
         current_material = shared_materials[i + 1].CastedLock();
-        if (current_material->IsValid())
+        if (current_material != nullptr && current_material->IsValid())
         {
             auto next_shader = current_material->p_shared_shader.CastedLock();
             if (current_shader != next_shader && next_shader != nullptr)
@@ -155,7 +137,7 @@ void MeshRenderer::Render()
             cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
             SetDescriptorTable(cmd_list, i + 1);
 
-            const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
+            const auto sub_mesh = mesh->sub_meshes[i];
             cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
         }
     }
@@ -166,6 +148,12 @@ void MeshRenderer::Render()
 void MeshRenderer::DepthRender()
 {
     const auto cmd_list = RenderEngine::CommandList();
+    const auto mesh = m_shared_mesh_.CastedLock();
+    if (mesh == nullptr)
+    {
+        Logger::Error<MeshRenderer>("Mesh is null!");
+        return;
+    }
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
@@ -176,25 +164,25 @@ void MeshRenderer::DepthRender()
 
     cmd_list->IASetIndexBuffer(m_index_buffers_[0]->View());
 
-    const auto index_count = m_shared_mesh_->HasSubMeshes()
-                                 ? m_shared_mesh_->sub_meshes[0].base_index
-                                 : m_shared_mesh_->indices.size();
+    const auto index_count = mesh->HasSubMeshes()
+        ? mesh->sub_meshes[0].base_index
+        : mesh->indices.size();
 
     cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
 
     // sub-meshes
-    for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
+    for (int i = 0; i < mesh->sub_meshes.size(); ++i)
     {
         cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 
         cmd_list->IASetIndexBuffer(m_index_buffers_[i + 1]->View());
 
-        const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
+        const auto sub_mesh = mesh->sub_meshes[i];
         cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
     }
 }
 
-void MeshRenderer::SetSharedMesh(const std::shared_ptr<Mesh> &mesh)
+void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)
 {
     m_shared_mesh_ = mesh;
     RecalculateBoundingBox();
@@ -253,7 +241,8 @@ void MeshRenderer::ReconstructMeshesBuffer()
     }
 
     // create vertex buffer
-    m_vertex_buffer_ = std::make_shared<VertexBuffer>(m_shared_mesh_.get());
+    const auto mesh = m_shared_mesh_.CastedLock();
+    m_vertex_buffer_ = std::make_shared<VertexBuffer>(mesh.get());
     if (!m_vertex_buffer_->IsValid())
     {
         Logger::Error<MeshRenderer>("Failed to create vertex buffer!: %s", GameObject()->Name().c_str());
@@ -262,17 +251,20 @@ void MeshRenderer::ReconstructMeshesBuffer()
     }
 
     // create index buffer
-    const auto index_buffer_size = m_shared_mesh_->HasSubMeshes()
-                                       ? m_shared_mesh_->sub_meshes[0].base_index
-                                       : m_shared_mesh_->indices.size();
-    const auto indices = m_shared_mesh_->indices.data();
+    const auto index_buffer_size = mesh->HasSubMeshes()
+        ? mesh->sub_meshes[0].base_index
+        : mesh->indices.size();
+    const auto indices = mesh->indices.data();
 
     auto ib = std::make_shared<IndexBuffer>(index_buffer_size * sizeof(uint32_t), indices);
 
     if (!ib->IsValid())
     {
-        Logger::Error<MeshRenderer>("Failed to create index buffer of '%d' for '%s'", index_buffer_size,
-                                    GameObject()->Path().c_str());
+        Logger::Error<MeshRenderer>(
+            "Failed to create index buffer of '%d' for '%s'",
+            index_buffer_size,
+            GameObject()->Path().c_str()
+        );
         buffer_creation_failed = true;
         return;
     }
@@ -280,15 +272,17 @@ void MeshRenderer::ReconstructMeshesBuffer()
     m_index_buffers_.emplace_back(ib);
 
     // create index buffers for sub meshes
-    for (auto i = 0; i < m_shared_mesh_->sub_meshes.size(); i++)
+    for (auto i = 0; i < mesh->sub_meshes.size(); i++)
     {
-        const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
+        const auto sub_mesh = mesh->sub_meshes[i];
 
         const auto sub_index_buffer_size = sub_mesh.index_count * sizeof(uint32_t);
         std::vector<uint32_t> sub_indices;
-        sub_indices.insert(sub_indices.begin(),
-                           m_shared_mesh_->indices.begin() + sub_mesh.base_index,
-                           m_shared_mesh_->indices.begin() + sub_mesh.base_index + sub_mesh.index_count);
+        sub_indices.insert(
+            sub_indices.begin(),
+            mesh->indices.begin() + sub_mesh.base_index,
+            mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count
+        );
 
         const auto sub_index_buffer = std::make_shared<IndexBuffer>(sub_index_buffer_size, sub_indices.data());
         if (!sub_index_buffer->IsValid())
