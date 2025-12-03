@@ -73,8 +73,8 @@ void DefaultEditorMenu::DrawFilesMenu()
 {
     static std::vector<engine::FilterSpec> scene_filter =
     {
-        {L"Scene Files (*.scene)", L"*.scene"},
-        {L"All Files (*.*)", L"*.*"}
+{ L"Scene Files (*.scene)", L"*.scene" },
+        { L"All Files (*.*)", L"*.*" }
     };
 
     if (ImGui::MenuItem("Load Scene"))
