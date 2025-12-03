@@ -15,17 +15,12 @@ Matrix TRS::GetMatrix() const
            Matrix::CreateTranslation(translation);
 }
 
-TRS TRS::Blend(const TRS &from, const TRS &to, float t)
+TRS TRS::Blend(const TRS &from, const TRS &to, const float t)
 {
     TRS final_trs = {};
-    final_trs.translation += to.translation * t;
-    final_trs.scale += to.scale * t;
+    final_trs.translation += Mathf::Lerp(from.translation, to.translation, t);
+    final_trs.scale = Mathf::Lerp(from.scale, to.scale, t);
     final_trs.rotation = Mathf::Slerp(final_trs.rotation, to.rotation, t);
-
-    t = 1.f - t;
-    final_trs.translation += from.translation * t;
-    final_trs.scale += from.scale * t;
-    final_trs.rotation = Mathf::Slerp(final_trs.rotation, from.rotation, t);
 
     return final_trs;
 }
