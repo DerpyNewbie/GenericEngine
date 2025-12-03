@@ -221,7 +221,7 @@ void AnimationComponent::Sample()
                 final_trs.translation += default_matrix.translation * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
-                final_trs.rotation = Mathf::Slerp(final_trs.rotation, default_matrix.rotation, t);
+                final_trs.rotation = Mathf::Lerp(final_trs.rotation, default_matrix.rotation, t);
                 continue;
             }
 
@@ -230,7 +230,7 @@ void AnimationComponent::Sample()
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
+            final_trs.rotation = Mathf::Lerp(final_trs.rotation, rot, t);
 
         }
 
