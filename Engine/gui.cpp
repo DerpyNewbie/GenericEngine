@@ -280,6 +280,12 @@ std::string Gui::NameOf(const std::shared_ptr<Object> &object)
         return component->GameObject()->Name() + " (" + component->Name() + ")";
     }
 
+    const auto asset_desc = AssetDatabase::GetAssetDescriptor(object->Guid());
+    if (asset_desc != nullptr)
+    {
+        return object->Name() + " (" + asset_desc->AssetPath().filename().string() + ")";
+    }
+
     return object->Name();
 }
 
