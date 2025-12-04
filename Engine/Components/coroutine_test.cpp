@@ -21,3 +21,5 @@ void CoroutineTest::OnAwake()
     Engine::coroutine.Start(Move());
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::CoroutineTest)

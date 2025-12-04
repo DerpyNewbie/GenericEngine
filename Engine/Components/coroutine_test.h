@@ -10,5 +10,11 @@ class CoroutineTest : public Component
 
 public:
     void OnAwake() override;
+
+    template <class Archive>
+    void serialize(Archive &ar)
+    {
+        ar(cereal::base_class<Component>(this));
+    }
 };
 }
