@@ -55,14 +55,15 @@ struct WaitForFrame : YieldBase
 
 struct Tween : YieldBase
 {
-    std::shared_ptr<Transform> transform;
+    std::weak_ptr<Transform> transform;
     TRS from;
     TRS to;
     float time;
     float duration;
 
-    explicit Tween(const std::shared_ptr<Transform> &transform, const TRS &from, const TRS &to, const float duration) : transform(transform), from(from), to(to), time(0), duration(duration)
+    explicit Tween(const std::weak_ptr<Transform> &transform, const TRS &from, const TRS &to, const float duration) : transform(transform), from(from), to(to), time(0), duration(duration)
     {}
+    
     bool await_ready() const noexcept
     {
         return false;
