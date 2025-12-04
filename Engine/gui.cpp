@@ -25,30 +25,41 @@ UINT Gui::MbDialogOption::Flags() const
 
     switch (icon)
     {
-    case MbDialogIcon::kNone:
-        break;
-    case MbDialogIcon::kError:
-        result |= MB_ICONERROR;
-        break;
-    case MbDialogIcon::kWarning:
-        result |= MB_ICONEXCLAMATION;
-        break;
-    case MbDialogIcon::kInfo:
-        result |= MB_ICONINFORMATION;
-        break;
-    case MbDialogIcon::kHelp:
-        result |= MB_ICONQUESTION;
-        break;
+        case MbDialogIcon::kNone:
+            break;
+        case MbDialogIcon::kError:
+            result |= MB_ICONERROR;
+            break;
+        case MbDialogIcon::kWarning:
+            result |= MB_ICONEXCLAMATION;
+            break;
+        case MbDialogIcon::kInfo:
+            result |= MB_ICONINFORMATION;
+            break;
+        case MbDialogIcon::kHelp:
+            result |= MB_ICONQUESTION;
+            break;
     }
 
     return result;
 }
 
+void Gui::NothingToShowInspectable::OnInspectorGui()
+{
+    ImGui::Text("Nothing to show...");
+}
+
 bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters)
 {
+    Logger::Log<Gui>("Opening file dialog at '%s'", file_path.c_str());
     IFileOpenDialog *p_file_open;
-    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_ALL,
-                                  IID_IFileOpenDialog, reinterpret_cast<void **>(&p_file_open));
+    HRESULT hr = CoCreateInstance(
+        CLSID_FileOpenDialog,
+        nullptr,
+        CLSCTX_ALL,
+        IID_IFileOpenDialog,
+        reinterpret_cast<void **>(&p_file_open)
+    );
 
     if (FAILED(hr))
     {
@@ -65,8 +76,11 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
     }
 
     IShellItem *p_default_folder = nullptr;
-    hr = SHCreateItemFromParsingName(StringUtil::ConvertToWString(file_path).c_str(), nullptr,
-                                     IID_PPV_ARGS(&p_default_folder));
+    hr = SHCreateItemFromParsingName(
+        StringUtil::ConvertToWString(file_path).c_str(),
+        nullptr,
+        IID_PPV_ARGS(&p_default_folder)
+    );
     if (SUCCEEDED(hr))
     {
         p_file_open->SetDefaultFolder(p_default_folder);
@@ -107,13 +121,21 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
 
 }
 
-bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name,
-                         const std::vector<FilterSpec> &filters)
+bool Gui::SaveFileDialog(
+    std::string &file_path, const std::string &default_name,
+    const std::vector<FilterSpec> &filters
+)
 {
+    Logger::Log<Gui>("Opening file save dialog at '%s'", file_path.c_str());
     IFileSaveDialog *p_file_save;
 
-    HRESULT hr = CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_ALL,
-                                  IID_IFileSaveDialog, reinterpret_cast<void **>(&p_file_save));
+    HRESULT hr = CoCreateInstance(
+        CLSID_FileSaveDialog,
+        nullptr,
+        CLSCTX_ALL,
+        IID_IFileSaveDialog,
+        reinterpret_cast<void **>(&p_file_save)
+    );
 
     if (FAILED(hr))
     {

@@ -27,6 +27,8 @@ protected:
     bool m_IsValid = false;
 
 public:
+    static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);
+
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;

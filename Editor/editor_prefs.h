@@ -6,10 +6,10 @@ namespace editor
 class EditorPrefs final : public EditorWindow
 {
 public:
-    static bool show_editor_debug;
-    static bool show_grid;
-    static bool show_physics_debug;
-    static int theme;
+    inline static bool show_editor_debug = false;
+    inline static bool show_grid = true;
+    inline static bool show_physics_debug = true;
+    inline static int theme = 0;
 
     std::string Name() override;
     void OnEditorGui() override;
