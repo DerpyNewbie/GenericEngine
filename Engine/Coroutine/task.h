@@ -47,6 +47,12 @@ struct Task
             current_yield = std::make_unique<WaitForFrame>(std::move(w));
             return *static_cast<WaitForFrame *>(current_yield.get());
         }
+
+        auto await_transform(Tween w)
+        {
+            current_yield = std::make_unique<Tween>(std::move(w));
+            return *static_cast<Tween *>(current_yield.get());
+        }
     };
 
     std::coroutine_handle<promise_type> handle;

@@ -1,4 +1,5 @@
 #pragma once
+#include "Components/transform.h"
 #include "task.h"
 #include "yield_base.h"
 #include "Math/trs.h"
@@ -48,17 +49,17 @@ public:
             {
                 w->time += dt;
                 //もしもdurationが0だった場合ここで抜けるから大丈夫！
-                if (w->time >= w->duration)
+                if (w->time < w->duration)
                 {
-                    w->transform.lock()->SetLocalMatrix(w->to.GetMatrix());
+                    auto t = std::clamp(w->time / w->duration, 0.0f, 1.0f);
+                    auto blended = TRS::Blend(w->from, w->to, t);
+
+                    w->transform.lock()->SetLocalMatrix(blended.GetMatrix());
+                    ++it;
                     continue;
                 }
-                
-                auto t = std::clamp(w->time / w->duration, 0.0f, 1.0f);
-                auto blended = TRS::Blend(w->from, w->to, t);
+                w->transform.lock()->SetLocalMatrix(w->to.GetMatrix());
 
-                w->transform.lock()->SetLocalMatrix(blended.GetMatrix());
-                ++it;
             }
             
             h.resume();

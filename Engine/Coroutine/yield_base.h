@@ -1,9 +1,9 @@
 #pragma once
-#include "Components/transform.h"
 #include "Math/trs.h"
 
 namespace engine
 {
+class Transform;
 struct YieldBase
 {
     virtual ~YieldBase() = default;
