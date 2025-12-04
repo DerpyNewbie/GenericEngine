@@ -47,9 +47,17 @@ public:
             if (auto *w = dynamic_cast<Tween *>(promise.current_yield.get()))
             {
                 w->time += dt;
-                auto t = w->time / w->duration;
+                if (w->time >= w->duration)
+                {
+                    w->transform->SetLocalMatrix(w->to.GetMatrix());
+                    continue;
+                }
+
+                auto t = std::clamp(w->time / w->duration, 0.0f, 1.0f);
                 auto blended = TRS::Blend(w->from, w->to, t);
+                
                 w->transform->SetLocalMatrix(blended.GetMatrix());
+                ++it;
             }
             
             h.resume();
