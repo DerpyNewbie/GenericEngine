@@ -3,7 +3,7 @@
         "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"value0\": {\n\"m_guid_\": \"0deb0691-bb24-432f-9fc5-489bf9d953c7\",\n\"m_name_\": \"DebugShader.hlsl\"\n},\n\"parameters\": [],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 1,\n\"cull\": 0,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
         "shader_meta_version": 3
     },
-    "guid": "0deb0691-bb24-432f-9fc5-489bf9d953c7",
+    "guid": "3f09c620-c30f-46ef-8726-dae4350091ee",
     "type": ".hlsl",
     "objects": []
 }
