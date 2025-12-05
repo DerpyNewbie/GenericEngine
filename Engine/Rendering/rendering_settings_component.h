@@ -14,7 +14,7 @@ class RenderingSettingsComponent final : public Component
 
 public:
     void OnInspectorGui() override;
-    void OnStart() override;
+    void OnAwake() override;
 
     void ApplySettings();
 

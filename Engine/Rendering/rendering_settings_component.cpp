@@ -24,8 +24,7 @@ void RenderingSettingsComponent::OnInspectorGui()
     if (has_changed)
         ApplySettings();
 }
-
-void RenderingSettingsComponent::OnStart()
+void RenderingSettingsComponent::OnAwake()
 {
     ApplySettings();
 }
