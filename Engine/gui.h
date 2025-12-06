@@ -244,10 +244,13 @@ bool Gui::AssetPicker(IAssetPtr &asset_ptr)
 
     for (auto &object : objects)
     {
+        ImGui::PushID(object.get());
+
         auto obj_asset_ptr = IAssetPtr::FromManaged(object);
-        if (ImGui::MenuItem(obj_asset_ptr.Name().c_str()))
+        if (ImGui::MenuItem(NameOf(object).c_str()))
         {
             asset_ptr = obj_asset_ptr;
+            ImGui::PopID();
             ImGui::CloseCurrentPopup();
             return true;
         }
@@ -257,6 +260,8 @@ bool Gui::AssetPicker(IAssetPtr &asset_ptr)
             ImGui::Text(("GUID: " + object->Guid().str()).c_str());
             ImGui::EndTooltip();
         }
+
+        ImGui::PopID();
     }
     return false;
 }
