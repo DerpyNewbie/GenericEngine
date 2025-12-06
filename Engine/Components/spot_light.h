@@ -9,8 +9,8 @@ class SpotLight : public Light
 public:
     void OnConstructed() override;
     void OnInspectorGui() override;
-    void OnUpdate() override;
 
+    void UpdateData() override;
     bool InCameraView(const std::array<Vector3, 8> &frustum) override;
     Vector3 GetPos() override;
     int ShadowMapCount() override;

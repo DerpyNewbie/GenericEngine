@@ -30,6 +30,7 @@ public:
     void OnDisabled() override;
     void OnDestroy() override;
 
+    virtual void UpdateData() = 0;
     virtual bool InCameraView(const std::array<Vector3, 8> &frustum) = 0;
     virtual Vector3 GetPos() = 0;
     virtual int ShadowMapCount() = 0;
