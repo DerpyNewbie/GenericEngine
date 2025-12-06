@@ -147,7 +147,7 @@ void PipelineState::SetShader(const std::shared_ptr<engine::Shader> &shader)
 
     m_desc_.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
     auto &rt = m_desc_.BlendState.RenderTarget[0];
-    rt.BlendEnable = TRUE;
+    rt.BlendEnable = shader_setting.use_blend;
     rt.SrcBlend = DX_BlendFactor[shader_setting.blend_src];
     rt.DestBlend = DX_BlendFactor[shader_setting.blend_dst];
     rt.BlendOp = DX_BlendOp[shader_setting.blend_op];
