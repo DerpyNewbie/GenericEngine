@@ -1,9 +1,9 @@
 {
     "data": {
-        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"value0\": {\n\"m_guid_\": \"da5e8f6a-6a41-4ddf-a4b2-4caa51c4986f\",\n\"m_name_\": \"BasicShader.hlsl\"\n},\n\"parameters\": [\n{\n\"ptr_wrapper\": {\n\"id\": 2147483650,\n\"data\": {\n\"index\": 0,\n\"shader_type\": 1,\n\"name\": \"Albedo\",\n\"display_name\": \"\",\n\"type_hint\": \"Texture2D\"\n}\n}\n}\n],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 0,\n\"cull\": 1,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
+        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"value0\": {\n\"m_guid_\": \"00214c87-b0e4-40ce-bef6-f7bfb3425888\",\n\"m_name_\": \"BasicShader.hlsl\"\n},\n\"parameters\": [\n{\n\"ptr_wrapper\": {\n\"id\": 2147483650,\n\"data\": {\n\"index\": 0,\n\"shader_type\": 1,\n\"name\": \"Albedo\",\n\"display_name\": \"\",\n\"type_hint\": \"Texture2D\"\n}\n}\n}\n],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 0,\n\"cull\": 1,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
         "shader_meta_version": 3
     },
-    "guid": "b2a77a9b-591f-4a2b-a01b-170a73c3201e",
+    "guid": "00214c87-b0e4-40ce-bef6-f7bfb3425888",
     "type": ".hlsl",
     "objects": []
 }
