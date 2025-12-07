@@ -9,5 +9,6 @@ struct Rect
 
     Rect(Vector2 pos, Vector2 size);
 
+    bool Contains(Vector2 pos) const;
 };
 }

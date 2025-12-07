@@ -127,6 +127,12 @@ AssetDescriptor::AssetDescriptor(const path &file_path) :
     m_meta_json_ = Document();
     m_meta_json_.Parse(meta_json.c_str());
 
+    if (m_meta_json_.HasParseError())
+    {
+        Logger::Error<AssetDescriptor>("Could not parse meta json properly for '%s'", m_asset_path_.string().c_str());
+        throw std::runtime_error("Failed to parse asset .meta json");
+    }
+
     m_meta_data_store_ = PersistentDataStore{&m_meta_json_, &m_meta_json_};
     m_user_data_store_ = m_meta_data_store_.GetDataStore(kDataKey);
     m_type_ = m_meta_data_store_.GetString(kTypeKey);
@@ -208,7 +214,7 @@ bool AssetDescriptor::HasImportError() const
         [](const auto &log) {
             return log.type == ImportLog::kLogType::kError;
         }
-    );
+        );
 }
 
 void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
@@ -220,7 +226,7 @@ void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
         [&object](auto &item) {
             return item == object;
         }
-    );
+        );
 
     m_objects_.emplace_front(object);
 
@@ -252,9 +258,9 @@ void AssetDescriptor::AddObject(std::shared_ptr<Object> object)
                        [&meta](auto &item) {
                            return item->Guid() != meta.guid;
                        }
-                   );
+                       );
         }
-    );
+        );
 
     // if we couldn't find matching meta
     if (filtered_object_metas.empty())
@@ -292,17 +298,20 @@ void AssetDescriptor::Import()
             "Asset importer for type '%s' not found! Will ignore file '%s'",
             m_type_.c_str(),
             AssetPath().string().c_str()
-        );
+            );
         return;
     }
 
+#ifdef USE_TRY_CATCH_FOR_IMPORT
     try
     {
-        asset_importer->OnImport(this);
-        if (HasImportError())
-            throw std::runtime_error("Contains import error. Will not proceed to save!");
+#endif
+    asset_importer->OnImport(this);
+    if (HasImportError())
+        throw std::runtime_error("Contains import error. Will not proceed to save!");
 
-        Save();
+    Save();
+#ifdef USE_TRY_CATCH_FOR_IMPORT
     }
     catch (const std::runtime_error &e)
     {
@@ -327,6 +336,7 @@ void AssetDescriptor::Import()
         DebugBreak();
 #endif
     }
+#endif
 }
 
 void AssetDescriptor::Save()
@@ -344,7 +354,7 @@ void AssetDescriptor::Save()
             "Asset importer for type '%s' not found! Will ignore file '%s'",
             m_type_.c_str(),
             AssetPath().string().c_str()
-        );
+            );
         return;
     }
 

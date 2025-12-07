@@ -230,7 +230,12 @@ void AnimationComponent::Sample()
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            final_trs.rotation = Mathf::Lerp(final_trs.rotation, rot, t);
+            if (final_trs.rotation.Dot(rot) < 0.0f)
+            {
+                rot = -rot;
+            }
+            
+            final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
 
         }
 

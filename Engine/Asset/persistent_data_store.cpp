@@ -140,7 +140,6 @@ bool PersistentDataStore::GetBool(const std::string &key, const bool &default_va
 
 PersistentDataStore PersistentDataStore::GetDataStore(const std::string &key) const
 {
-    const auto json = GetString(key);
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd() || !json_value->value.IsObject())
     {

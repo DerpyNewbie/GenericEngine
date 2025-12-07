@@ -24,7 +24,7 @@ void Canvas::OnAwake()
 {
     Renderer::OnAwake();
     m_canvas_size_ = Vector2{static_cast<float>(Application::WindowWidth()),
-                             static_cast<float>(Application::WindowHeight())};
+                             static_cast<float>(Application::WindowHeight())} * 0.5f;
     if (m_target_camera_.Lock() == nullptr)
         m_target_camera_ = AssetPtr<CameraComponent>::FromManaged(CameraComponent::Main());
 }

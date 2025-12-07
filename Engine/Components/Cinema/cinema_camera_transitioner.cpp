@@ -17,3 +17,5 @@ void CinemaCameraTransitioner::OnInspectorGui()
     }
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::CinemaCameraTransitioner)

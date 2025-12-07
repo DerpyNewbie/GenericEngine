@@ -36,7 +36,7 @@ void CinemaBrainComponent::DoBlending(const float delta_time)
         return;
     }
 
-    const float t = m_blend_.time / m_blend_.duration;
+    const float t = 1.0f - m_blend_.time / m_blend_.duration;
 
     m_blend_.from->ApplyTransform();
     m_blend_.to->ApplyTransform();
@@ -58,6 +58,11 @@ void CinemaBrainComponent::OnInspectorGui()
 void CinemaBrainComponent::OnUpdate()
 {
     DoBlending(Time::GetDeltaTime());
+}
+
+bool CinemaBrainComponent::Blending()
+{
+    return m_is_blending_;
 }
 
 void CinemaBrainComponent::Blend(const std::shared_ptr<CinemaCameraComponent> &from, const std::shared_ptr<CinemaCameraComponent> &to, float duration, float time)
