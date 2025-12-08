@@ -139,7 +139,7 @@ public:
            CEREAL_NVP(m_linear_damping_), CEREAL_NVP(m_angular_damping_),
            CEREAL_NVP(m_friction_), CEREAL_NVP(m_rolling_friction_), CEREAL_NVP(m_spinning_friction_),
            CEREAL_NVP(m_bounciness_),
-           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_), CEREAL_NVP(m_use_gravity_));
+           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_), CEREAL_NVP(m_use_gravity_), CEREAL_NVP(m_lock_axis_));
 
         RegisterToPhysics();
     }
