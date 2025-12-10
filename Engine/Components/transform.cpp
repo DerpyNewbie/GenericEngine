@@ -249,8 +249,7 @@ void Transform::SetPosition(const Vector3 &position)
         return;
     }
 
-    const Vector3 local_position;
-    position.Transform(local_position, m_parent_.lock()->WorldToLocal());
+    const Vector3 local_position = Vector3::Transform(position, m_parent_.lock()->WorldToLocal());
     SetLocalPosition(local_position);
 }
 
