@@ -51,7 +51,51 @@ xg::Guid IAssetPtr::Guid() const
     return m_guid_;
 }
 
-std::shared_ptr<Object> IAssetPtr::Lock()
+std::string IAssetPtr::Name() const
+{
+    switch (m_type_)
+    {
+        case AssetPtrType::kNull: {
+            return "(None)";
+        }
+        case AssetPtrType::kStoredReference: {
+            if (m_stored_reference_ == nullptr)
+                return "(Null)";
+            return m_stored_reference_->Name();
+        }
+        case AssetPtrType::kExternalReference: {
+            const auto referencing_object = Lock();
+            if (referencing_object == nullptr)
+            {
+                return "(Missing)";
+            }
+
+            // component will retrieve its attached game object's name. e.x. "BarGo (FooComponent)"
+            const auto component = std::dynamic_pointer_cast<Component>(referencing_object);
+            if (component != nullptr && component->GameObject() != nullptr)
+            {
+                return component->GameObject()->Name() + " (" + component->Name() + ")";
+            }
+
+            return referencing_object->Name();
+        }
+        default: {
+            return "(Unknown)";
+        }
+    }
+}
+
+bool IAssetPtr::IsNull() const
+{
+    return m_guid_ == kNullGuid;
+}
+
+bool IAssetPtr::IsLoaded() const
+{
+    return Lock() != nullptr;
+}
+
+std::shared_ptr<Object> IAssetPtr::Lock() const
 {
     switch (m_type_)
     {
@@ -86,48 +130,6 @@ std::shared_ptr<Object> IAssetPtr::Lock()
             return lock;
         }
     }
-}
-
-std::string IAssetPtr::Name() const
-{
-    switch (m_type_)
-    {
-        case AssetPtrType::kNull: {
-            return "(None)";
-        }
-        case AssetPtrType::kStoredReference: {
-            if (m_stored_reference_ == nullptr)
-                return "(Null)";
-            return m_stored_reference_->Name();
-        }
-        case AssetPtrType::kExternalReference: {
-            const auto referencing_object = Object::Find(m_guid_);
-            if (referencing_object == nullptr)
-            {
-                return "(Missing)";
-            }
-
-            // component will retrieve its attached game object's name. e.x. "BarGo (FooComponent)"
-            const auto component = std::dynamic_pointer_cast<Component>(referencing_object);
-            if (component != nullptr && component->GameObject() != nullptr)
-            {
-                return component->GameObject()->Name() + " (" + component->Name() + ")";
-            }
-
-            return referencing_object->Name();
-        }
-        default: {
-            return "(Unknown)";
-        }
-    }
-}
-bool IAssetPtr::IsNull() const
-{
-    return m_guid_ == kNullGuid;
-}
-bool IAssetPtr::IsLoaded()
-{
-    return Lock() != nullptr;
 }
 }
 

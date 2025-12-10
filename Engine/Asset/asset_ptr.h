@@ -16,7 +16,7 @@ enum class AssetPtrType
 struct IAssetPtr
 {
 protected:
-    std::weak_ptr<Object> m_external_reference_;
+    mutable std::weak_ptr<Object> m_external_reference_;
     std::shared_ptr<Object> m_stored_reference_;
     xg::Guid m_guid_;
     AssetPtrType m_type_ = AssetPtrType::kNull;
@@ -52,9 +52,9 @@ public:
 
     [[nodiscard]] bool IsNull() const;
 
-    [[nodiscard]] bool IsLoaded();
+    [[nodiscard]] bool IsLoaded() const;
 
-    [[nodiscard]] virtual std::shared_ptr<Object> Lock();
+    [[nodiscard]] virtual std::shared_ptr<Object> Lock() const;
 
     bool operator==(const IAssetPtr &other) const
     {
