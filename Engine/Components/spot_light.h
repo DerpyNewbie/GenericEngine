@@ -17,10 +17,14 @@ public:
     std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_light_data_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_light_data_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::SpotLight, 1)

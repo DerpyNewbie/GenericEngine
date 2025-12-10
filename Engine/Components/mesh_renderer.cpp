@@ -35,9 +35,9 @@ void MeshRenderer::RecalculateBoundingBox()
         min_pos.y = std::min(min_pos.y, vertex.y);
         min_pos.z = std::min(min_pos.z, vertex.z);
 
-        max_pos.x = max(max_pos.x, vertex.x);
-        max_pos.y = max(max_pos.y, vertex.y);
-        max_pos.z = max(max_pos.z, vertex.z);
+        max_pos.x = std::max(max_pos.x, vertex.x);
+        max_pos.y = std::max(max_pos.y, vertex.y);
+        max_pos.z = std::max(max_pos.z, vertex.z);
     }
 
     DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);

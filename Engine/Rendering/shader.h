@@ -1,7 +1,6 @@
 #pragma once
 #include "shader_parameter.h"
 #include "shader_settings.h"
-#include "Asset/inspectable_asset.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 
 namespace engine
@@ -47,10 +46,15 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Object>(this), CEREAL_NVP(parameters), CEREAL_NVP(m_shader_settings_));
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(parameters),
+            CEREAL_NVP(m_shader_settings_)
+        );
     }
 };
-
 }
+
+CEREAL_CLASS_VERSION(engine::Shader, 1)

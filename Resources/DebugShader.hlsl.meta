@@ -1,6 +1,6 @@
 {
     "data": {
-        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"value0\": {\n\"m_guid_\": \"7322408b-f1f4-4bb7-a310-5dd0cb5e71d1\",\n\"m_name_\": \"DebugShader.hlsl\"\n},\n\"parameters\": [],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 1,\n\"cull\": 0,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
+        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"cereal_class_version\": 1,\n\"value0\": {\n\"cereal_class_version\": 1,\n\"m_guid_\": \"7322408b-f1f4-4bb7-a310-5dd0cb5e71d1\",\n\"m_name_\": \"DebugShader.hlsl\"\n},\n\"parameters\": [],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 1,\n\"cull\": 0,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
         "shader_meta_version": 3
     },
     "guid": "7322408b-f1f4-4bb7-a310-5dd0cb5e71d1",

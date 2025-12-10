@@ -1,7 +1,6 @@
 #pragma once
 #include "material_block.h"
 #include "shader.h"
-#include <assimp/scene.h>
 
 namespace engine
 {
@@ -12,7 +11,7 @@ namespace engine
 /// <remarks>
 /// Contains all necessary information for render pass on the Renderer, except for the actual Mesh and Bone transform information.
 /// </remarks>
-class Material : public InspectableAsset
+class Material : public Object, public Inspectable
 {
 public:
     AssetPtr<Shader> p_shared_shader;
@@ -29,9 +28,15 @@ public:
     void SetDescriptorTable();
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Object>(this), CEREAL_NVP(p_shared_shader), CEREAL_NVP(p_shared_material_block));
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(p_shared_shader),
+            CEREAL_NVP(p_shared_material_block)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Material, 1)

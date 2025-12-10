@@ -20,9 +20,14 @@ public:
     void SetRadius(float radius);
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Collider>(this), m_radius_);
+        ar(
+            cereal::base_class<Collider>(this),
+            CEREAL_NVP(m_radius_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::SphereCollider, 1)

@@ -18,14 +18,18 @@ public:
     [[nodiscard]] Rect CalculateScreenRect() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(anchor_min),
-           CEREAL_NVP(anchor_max),
-           CEREAL_NVP(pivot),
-           CEREAL_NVP(size_delta),
-           CEREAL_NVP(anchored_position));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(anchor_min),
+            CEREAL_NVP(anchor_max),
+            CEREAL_NVP(pivot),
+            CEREAL_NVP(size_delta),
+            CEREAL_NVP(anchored_position)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::RectTransform, 1)

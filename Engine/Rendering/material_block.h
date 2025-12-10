@@ -2,7 +2,6 @@
 #include "material_data.h"
 #include "shader.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
-#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {
@@ -42,7 +41,7 @@ struct ShaderDataIndex
 /// <remarks>
 /// Used by Material for better memory-management among the same objects
 /// </remarks>
-class MaterialBlock : public InspectableAsset
+class MaterialBlock : public Object, public Inspectable
 {
 public:
     ShaderDataIndex pixel_shader_index = {};
@@ -58,8 +57,10 @@ public:
     template <typename T>
     bool SetMaterialData(const std::string &name, T material_data);
 
-    void LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
-                              const std::vector<MaterialDataPair> &resource_material_data = {});
+    void LoadShaderParameters(
+        const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+        const std::vector<MaterialDataPair> &resource_material_data = {}
+    );
 
     ShaderDataIndex *GetShaderDataIndex(kShaderType type);
     int GetOffset(kShaderType type) const;
@@ -75,10 +76,14 @@ public:
     bool IsDirty();
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Object>(this),
-           CEREAL_NVP(material_data), CEREAL_NVP(pixel_shader_index), CEREAL_NVP(vertex_shader_index));
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(material_data),
+            CEREAL_NVP(pixel_shader_index),
+            CEREAL_NVP(vertex_shader_index)
+        );
     }
 };
 
@@ -100,3 +105,5 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 }
 
 }
+
+CEREAL_CLASS_VERSION(engine::MaterialBlock, 1)

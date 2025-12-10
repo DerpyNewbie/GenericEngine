@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "animation_component.h"
 
-#include "engine_time.h"
 #include "game_object.h"
 #include "gui.h"
 #include "Components/transform.h"
@@ -141,8 +140,10 @@ void AnimationComponent::Stop()
     }
 }
 
-std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(const std::shared_ptr<AnimationClip> &clip,
-                                                                               const std::string &name)
+std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(
+    const std::shared_ptr<AnimationClip> &clip,
+    const std::string &name
+)
 {
     const auto state = std::make_shared<AnimationState>();
     state->SetClip(clip);
@@ -214,8 +215,8 @@ void AnimationComponent::Sample()
 
             total_rot_weight += state->weight;
             const float t = Mathf::Approximately(total_rot_weight, 0)
-                                ? state->weight
-                                : state->weight / total_rot_weight;
+                ? state->weight
+                : state->weight / total_rot_weight;
             if (curve == nullptr)
             {
                 final_trs.translation += default_matrix.translation * state->weight;
@@ -243,3 +244,5 @@ bool AnimationComponent::IsPlaying() const
     return m_is_playing_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AnimationComponent)

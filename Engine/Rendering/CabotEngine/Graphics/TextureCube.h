@@ -5,7 +5,7 @@
 
 namespace engine
 {
-class TextureCube final : public InspectableAsset, public IBuffer, public ShaderResource
+class TextureCube final : public Object, public Inspectable, public IBuffer, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_p_resource_;
@@ -25,9 +25,14 @@ public:
     bool SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures);
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Object>(this), CEREAL_NVP(m_textures_));
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(m_textures_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::TextureCube, 1)

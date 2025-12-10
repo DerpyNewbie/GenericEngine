@@ -66,9 +66,9 @@ std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
         min_pos.y = std::min(min_pos.y, vertex.y);
         min_pos.z = std::min(min_pos.z, vertex.z);
 
-        max_pos.x = max(max_pos.x, vertex.x);
-        max_pos.y = max(max_pos.y, vertex.y);
-        max_pos.z = max(max_pos.z, vertex.z);
+        max_pos.x = std::max(max_pos.x, vertex.x);
+        max_pos.y = std::max(max_pos.y, vertex.y);
+        max_pos.z = std::max(max_pos.z, vertex.z);
 
         result->vertices[i] = Vector3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
     }
@@ -240,7 +240,7 @@ void Mesh::Append(Mesh other)
 
     assert(bind_poses.size() == other.bind_poses.size() && "Bind pose must be same");
 
-    max_bones_in_vertex = max(max_bones_in_vertex, other.max_bones_in_vertex);
+    max_bones_in_vertex = std::max(max_bones_in_vertex, other.max_bones_in_vertex);
 }
 
 std::vector<Vector2> *Mesh::GetUV(const size_t index)

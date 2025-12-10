@@ -6,7 +6,7 @@
 namespace engine
 {
 Component::Component() : Object()
-{}
+{ }
 void Component::OnInspectorGui()
 {
     ImGui::Text("OnInspectorGui not implemented for %s", typeid(*this).name());
@@ -18,17 +18,17 @@ std::shared_ptr<GameObject> Component::GameObject() const
 }
 
 template <class Archive>
-void Component::serialize(Archive &ar)
+void Component::serialize(Archive &ar, const uint32_t version)
 {
     ar(cereal::base_class<Object>(this), m_game_object_);
 }
 }
 
-template void engine::Component::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &);
-template void engine::Component::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &);
-template void engine::Component::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
-template void engine::Component::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
-template void engine::Component::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &);
-template void engine::Component::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &);
+template void engine::Component::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &, uint32_t);
+template void engine::Component::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &, uint32_t);
+template void engine::Component::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &, uint32_t);
+template void engine::Component::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &, uint32_t);
+template void engine::Component::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &, uint32_t);
+template void engine::Component::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &, uint32_t);
 
 CEREAL_REGISTER_TYPE(engine::Component)
