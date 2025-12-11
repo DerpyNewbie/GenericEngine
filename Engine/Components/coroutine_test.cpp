@@ -11,14 +11,22 @@ Task CoroutineTest::Move()
     auto transform = GameObject()->Transform();
     while (transform->LocalPosition().x < 100.0f)
     {
-        transform->SetLocalPosition(transform->LocalPosition() + Vector3(0.01f, 0, 0));
-        co_await WaitForNextFrame();
+        transform->SetLocalPosition(transform->LocalPosition() + Vector3(0.1f, 0, 0));
+        co_await WaitForFrame(1);
     }
-    Logger::Log<CoroutineTest>("Coroutine has complete!");
+    co_return;
 }
+
+Task CoroutineTest::MoveWrap()
+{
+    co_await WaitForTask(Move());
+    Logger::Log<CoroutineTest>("Coroutine has complete!");
+    co_return;
+}
+
 void CoroutineTest::OnAwake()
 {
-    Engine::coroutine.Start(Move());
+    Engine::coroutine.Start(MoveWrap());
 }
 }
 

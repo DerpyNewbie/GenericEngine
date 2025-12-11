@@ -1,11 +1,13 @@
 #pragma once
-#include "Math/trs.h"
+#include "engine_time.h"
 
 namespace engine
 {
+struct Task;
 class Transform;
 struct YieldBase
 {
+    virtual bool should_resume() = 0;
     virtual ~YieldBase() = default;
 };
 
@@ -15,6 +17,10 @@ struct WaitForNextFrame : YieldBase
     {
         return false;
     }
+    bool should_resume() override
+    {
+        return true;
+    }
     void await_suspend(std::coroutine_handle<>) const noexcept
     {}
     void await_resume() const noexcept
@@ -23,9 +29,16 @@ struct WaitForNextFrame : YieldBase
 
 struct WaitForSeconds : YieldBase
 {
-    float time;
-    explicit WaitForSeconds(float t) : time(t)
-    {}
+    float end_time;
+    explicit WaitForSeconds(const float t)
+    {
+        end_time = t + static_cast<float>(Time::Get()->TimeSinceStartUp());
+    }
+
+    bool should_resume() override
+    {
+        return end_time <= static_cast<float>(Time::Get()->TimeSinceStartUp());
+    }
     bool await_ready() const noexcept
     {
         return false;
@@ -39,10 +52,17 @@ struct WaitForSeconds : YieldBase
 
 struct WaitForFrame : YieldBase
 {
-    uint32_t remaining_frames;
+    uint32_t end_frame_count;
 
-    explicit WaitForFrame(uint32_t frames) : remaining_frames(frames)
-    {}
+    explicit WaitForFrame(uint32_t frames)
+    {
+        end_frame_count = frames + Time::Get()->Frames(); 
+    }
+
+    bool should_resume() override
+    {
+        return end_frame_count <= Time::Get()->Frames();
+    }
     bool await_ready() const noexcept
     {
         return false;
@@ -53,24 +73,20 @@ struct WaitForFrame : YieldBase
     {}
 };
 
-struct Tween : YieldBase
+struct WaitForTask : YieldBase
 {
-    std::weak_ptr<Transform> transform;
-    TRS from;
-    TRS to;
-    float time;
-    float duration;
+    Task &task;
 
-    explicit Tween(const std::weak_ptr<Transform> &transform, const TRS &from, const TRS &to, const float duration) : transform(transform), from(from), to(to), time(0), duration(duration)
+    WaitForTask(Task &&t) : task(t)
     {}
-    
-    bool await_ready() const noexcept
-    {
-        return false;
-    }
-    void await_suspend(std::coroutine_handle<>) const noexcept
-    {}
-    void await_resume() const noexcept
+
+    bool should_resume() override;
+
+    bool await_ready() const noexcept;
+
+    void await_suspend(std::coroutine_handle<> awaiting);
+
+    void await_resume() noexcept
     {}
 };
 }

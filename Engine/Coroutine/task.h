@@ -9,6 +9,8 @@ struct Task
 {
     struct promise_type
     {
+        bool completed = false;
+        std::vector<std::coroutine_handle<>> waiters;
         std::unique_ptr<YieldBase> current_yield = nullptr;
 
         Task get_return_object()
@@ -48,10 +50,10 @@ struct Task
             return *static_cast<WaitForFrame *>(current_yield.get());
         }
 
-        auto await_transform(Tween w)
+        auto await_transform(WaitForTask w)
         {
-            current_yield = std::make_unique<Tween>(std::move(w));
-            return *static_cast<Tween *>(current_yield.get());
+            current_yield = std::make_unique<WaitForTask>(std::move(w));
+            return *static_cast<WaitForTask *>(current_yield.get());
         }
     };
 

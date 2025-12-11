@@ -25,43 +25,15 @@ public:
             auto h = *it;
             auto &promise = h.promise();
 
-            if (auto *w = dynamic_cast<WaitForSeconds *>(promise.current_yield.get()))
+            if (auto yield = promise.current_yield.get())
             {
-                w->time -= dt;
-                if (w->time > 0)
+                if (!yield->should_resume())
                 {
                     ++it;
                     continue;
                 }
             }
 
-            if (auto *w = dynamic_cast<WaitForFrame *>(promise.current_yield.get()))
-            {
-                w->remaining_frames--;
-                if (w->remaining_frames > 0)
-                {
-                    ++it;
-                    continue;
-                }
-            }
-
-            if (auto *w = dynamic_cast<Tween *>(promise.current_yield.get()))
-            {
-                w->time += dt;
-                //もしもdurationが0だった場合ここで抜けるから大丈夫！
-                if (w->time < w->duration)
-                {
-                    auto t = std::clamp(w->time / w->duration, 0.0f, 1.0f);
-                    auto blended = TRS::Blend(w->from, w->to, t);
-
-                    w->transform.lock()->SetLocalMatrix(blended.GetMatrix());
-                    ++it;
-                    continue;
-                }
-                w->transform.lock()->SetLocalMatrix(w->to.GetMatrix());
-
-            }
-            
             h.resume();
 
             if (h.done())
