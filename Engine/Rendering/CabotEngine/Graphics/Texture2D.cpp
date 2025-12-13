@@ -125,7 +125,7 @@ bool Texture2D::IsValid()
 
 ID3D12Resource *Texture2D::Resource()
 {
-    if (IsValid())
+    if (!IsValid())
     {
         CreateBuffer();
     }
