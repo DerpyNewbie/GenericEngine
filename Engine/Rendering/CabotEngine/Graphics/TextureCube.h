@@ -9,7 +9,6 @@ class TextureCube final : public Object, public Inspectable, public IBuffer, pub
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_p_resource_;
-    bool m_is_valid_ = false;
 
 public:
     void OnInspectorGui() override;

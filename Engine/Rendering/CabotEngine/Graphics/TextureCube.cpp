@@ -15,7 +15,7 @@ void TextureCube::OnInspectorGui()
         constexpr const char *dir_labels[] = { "Right", "Left", "Top", "Bottom", "Front", "Back" };
         if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
         {
-            m_is_valid_ = false;
+            m_p_resource_ = nullptr;
             CreateBuffer();
         }
     }
@@ -30,7 +30,7 @@ void TextureCube::CreateBuffer()
         if (locked_textures[i] == nullptr)
         {
             Logger::Error<TextureCube>("Texture at index %d was invalid", i);
-            m_is_valid_ = false;
+            m_p_resource_ = nullptr;
             return;
         }
 
@@ -38,7 +38,7 @@ void TextureCube::CreateBuffer()
             locked_textures[0]->Height() != locked_textures[i]->Height())
         {
             Logger::Error<TextureCube>("Texture at index %d was not the same size as the first texture", i);
-            m_is_valid_ = false;
+            m_p_resource_ = nullptr;
             return;
         }
     }
@@ -62,14 +62,14 @@ void TextureCube::CreateBuffer()
 
     if (FAILED(hr))
     {
-        m_is_valid_ = false;
+        m_p_resource_ = nullptr;
         return;
     }
 
     hr = m_p_resource_->SetName(L"TextureCube");
     if (FAILED(hr))
     {
-        m_is_valid_ = false;
+        m_p_resource_ = nullptr;
         return;
     }
 
@@ -96,7 +96,6 @@ void TextureCube::CreateBuffer()
     );
 
     cmd_list->ResourceBarrier(1, &barrier);
-    m_is_valid_ = true;
 }
 
 void TextureCube::UpdateBuffer(void *data)
@@ -116,12 +115,12 @@ bool TextureCube::CanUpdate()
 
 bool TextureCube::IsValid()
 {
-    return m_is_valid_;
+    return m_p_resource_ != nullptr;
 }
 
 ID3D12Resource *TextureCube::Resource()
 {
-    if (!m_is_valid_)
+    if (!IsValid())
         CreateBuffer();
     return m_p_resource_.Get();
 }
@@ -141,9 +140,9 @@ D3D12_SHADER_RESOURCE_VIEW_DESC TextureCube::ViewDesc()
 bool TextureCube::SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures)
 {
     m_textures_ = textures;
-    m_is_valid_ = false;
+    m_p_resource_ = nullptr;
     CreateBuffer();
-    return m_is_valid_;
+    return IsValid();
 }
 }
 
