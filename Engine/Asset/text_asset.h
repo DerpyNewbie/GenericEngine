@@ -1,9 +1,8 @@
 #pragma once
-#include "inspectable_asset.h"
 
 namespace engine
 {
-class TextAsset final : public InspectableAsset
+class TextAsset final : public Object, public Inspectable
 {
 public:
     std::string content;
@@ -12,9 +11,11 @@ public:
     void OnInspectorGui() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(content);
+        ar(CEREAL_NVP(content));
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::TextAsset, 1)

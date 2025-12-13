@@ -62,7 +62,7 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_type_), CEREAL_NVP(m_stored_reference_));
         auto _ = Lock(); // try to import the object associated with guid
@@ -128,3 +128,5 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::IAssetPtr, 1)

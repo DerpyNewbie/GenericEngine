@@ -10,22 +10,31 @@ using MaterialFactory =
 std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
 
 std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-{"int", [](const ShaderParameter &param) {
-    return std::make_shared<MaterialData<int>>(0, param);
-}},
-{"float", [](const ShaderParameter &param) {
-    return std::make_shared<MaterialData<float>>(0.0F, param);
-}},
-{"vector<Matrix>", [](const ShaderParameter &param) {
-    auto identity = std::vector{Matrix::Identity};
-    return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
-}},
-{"Texture2D", [](const ShaderParameter &param) {
-    auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
-    return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
-    AssetPtr<Texture2D>::FromIAssetPtr(texture),
-    param);
-}}
+    {"int",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<int>>(0, param);
+     }
+    },
+    {"float",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<float>>(0.0F, param);
+     }
+    },
+    {"vector<Matrix>",
+     [](const ShaderParameter &param) {
+         auto identity = std::vector{Matrix::Identity};
+         return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
+     }
+    },
+    {"Texture2D",
+     [](const ShaderParameter &param) {
+         auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
+         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
+             AssetPtr<Texture2D>::FromIAssetPtr(texture),
+             param
+         );
+     }
+    }
 };
 
 std::shared_ptr<IMaterialData> CreateMaterialData(const std::weak_ptr<ShaderParameter> &shader_param)
@@ -42,15 +51,15 @@ int *ShaderDataIndex::GetLengthField(kParameterBufferType type)
 {
     switch (type)
     {
-    case kParameterBufferType_CBV:
-        return &cbv_length;
-    case kParameterBufferType_SRV:
-        return &srv_length;
-    case kParameterBufferType_UAV:
-        return &uav_length;
-    default:
-        static_assert("Invalid buffer type");
-        return nullptr;
+        case kParameterBufferType_CBV:
+            return &cbv_length;
+        case kParameterBufferType_SRV:
+            return &srv_length;
+        case kParameterBufferType_UAV:
+            return &uav_length;
+        default:
+            static_assert("Invalid buffer type");
+            return nullptr;
     }
 }
 
@@ -58,15 +67,15 @@ int ShaderDataIndex::GetLength(const kParameterBufferType type) const
 {
     switch (type)
     {
-    case kParameterBufferType_CBV:
-        return cbv_length;
-    case kParameterBufferType_SRV:
-        return srv_length;
-    case kParameterBufferType_UAV:
-        return uav_length;
-    default:
-        static_assert("Invalid buffer type");
-        return 0;
+        case kParameterBufferType_CBV:
+            return cbv_length;
+        case kParameterBufferType_SRV:
+            return srv_length;
+        case kParameterBufferType_UAV:
+            return uav_length;
+        default:
+            static_assert("Invalid buffer type");
+            return 0;
     }
 }
 
@@ -77,13 +86,13 @@ int ShaderDataIndex::GetOffset(kParameterBufferType type) const
     // fall-through
     switch (type)
     {
-    case kParameterBufferType_UAV:
-        offset += srv_length;
-    case kParameterBufferType_SRV:
-        offset += cbv_length;
-    case kParameterBufferType_CBV:
-    default:
-        break;
+        case kParameterBufferType_UAV:
+            offset += srv_length;
+        case kParameterBufferType_SRV:
+            offset += cbv_length;
+        case kParameterBufferType_CBV:
+        default:
+            break;
     }
 
     return offset;
@@ -113,8 +122,10 @@ void MaterialBlock::OnInspectorGui()
     }
 }
 
-void MaterialBlock::LoadShaderParameters(const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
-                                         const std::vector<MaterialDataPair> &resource_material_data)
+void MaterialBlock::LoadShaderParameters(
+    const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+    const std::vector<MaterialDataPair> &resource_material_data
+)
 {
     for (auto &param : shader_params)
     {
@@ -145,13 +156,13 @@ ShaderDataIndex *MaterialBlock::GetShaderDataIndex(const kShaderType type)
 {
     switch (type)
     {
-    case kShaderType_Vertex:
-        return &vertex_shader_index;
-    case kShaderType_Pixel:
-        return &pixel_shader_index;
-    default:
-        static_assert("Unreachable");
-        return nullptr;
+        case kShaderType_Vertex:
+            return &vertex_shader_index;
+        case kShaderType_Pixel:
+            return &pixel_shader_index;
+        default:
+            static_assert("Unreachable");
+            return nullptr;
     }
 }
 
@@ -159,13 +170,13 @@ int MaterialBlock::GetOffset(const kShaderType type) const
 {
     switch (type)
     {
-    case kShaderType_Pixel:
-        return 0;
-    case kShaderType_Vertex:
-        return pixel_shader_index.GetFullLength();
-    default:
-        static_assert("Unreachable");
-        return 0;
+        case kShaderType_Pixel:
+            return 0;
+        case kShaderType_Vertex:
+            return pixel_shader_index.GetFullLength();
+        default:
+            static_assert("Unreachable");
+            return 0;
     }
 }
 
@@ -188,16 +199,20 @@ bool MaterialBlock::Empty(const kShaderType shader_type, const kParameterBufferT
     return GetShaderDataIndex(shader_type)->GetLength(buffer_type) == 0;
 }
 
-std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(const kShaderType shader_type,
-                                                             const kParameterBufferType buffer_type)
+std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(
+    const kShaderType shader_type,
+    const kParameterBufferType buffer_type
+)
 {
     const auto shader_offset = GetOffset(shader_type);
     const auto buffer_offset = GetShaderDataIndex(shader_type)->GetOffset(buffer_type);
     return material_data.begin() + shader_offset + buffer_offset;
 }
 
-std::vector<MaterialDataPair>::iterator MaterialBlock::End(const kShaderType shader_type,
-                                                           const kParameterBufferType buffer_type)
+std::vector<MaterialDataPair>::iterator MaterialBlock::End(
+    const kShaderType shader_type,
+    const kParameterBufferType buffer_type
+)
 {
     return Begin(shader_type, buffer_type) + GetShaderDataIndex(shader_type)->GetLength(buffer_type);
 }

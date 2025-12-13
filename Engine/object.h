@@ -106,7 +106,7 @@ public:
     static std::shared_ptr<Object> Instantiate(const std::shared_ptr<Object> &original);
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         bool was_just_deserialized = false;
         if constexpr (Archive::is_loading::value)
@@ -137,3 +137,5 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Object, 1)

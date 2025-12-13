@@ -126,3 +126,5 @@ std::shared_ptr<GameObject> FbxMeta::Instantiate() const
     return root_go;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::FbxMeta)

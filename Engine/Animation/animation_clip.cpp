@@ -38,3 +38,5 @@ float AnimationClip::FrameRate() const
     return m_frame_rate_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AnimationClip)
