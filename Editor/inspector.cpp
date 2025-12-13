@@ -188,24 +188,24 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<AssetHierarchy> &asset_
         ImGui::Indent();
         if (EditorPrefs::show_editor_debug)
         {
-            bool should_show_separator = false;
+            bool debug_info_shown = false;
             if (asset_hierarchy->IsFile())
             {
                 ImGui::Text("File");
-                should_show_separator = true;
+                debug_info_shown = true;
             }
             if (asset_hierarchy->IsDirectory())
             {
                 ImGui::Text("Directory");
-                should_show_separator = true;
+                debug_info_shown = true;
             }
             if (!asset_hierarchy->children.empty())
             {
                 ImGui::Text("Children: %d", asset_hierarchy->children.size());
-                should_show_separator = true;
+                debug_info_shown = true;
             }
 
-            if (should_show_separator)
+            if (debug_info_shown)
             {
                 ImGui::Separator();
             }
