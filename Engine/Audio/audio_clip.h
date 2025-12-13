@@ -1,10 +1,9 @@
 #pragma once
-#include "Asset/inspectable_asset.h"
 #include <directxtk12/Audio.h>
 
 namespace engine
 {
-class AudioClip : public InspectableAsset
+class AudioClip : public Object, public Inspectable
 {
     friend class Audio;
 

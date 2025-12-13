@@ -3,8 +3,9 @@
 
 namespace engine
 {
-class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
+class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver, public IGarbageCollectReceiver
 {
+    friend class ObjectUtil;
     friend class GameObject;
     friend class SceneManager;
     friend class Transform;
@@ -17,11 +18,14 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
     void OnUpdate() override;
     void OnFixedUpdate() override;
     void OnDestroy() override;
+    void OnGarbageCollect() override;
 
 public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
 
     template <class Archive>
-    void serialize(Archive &ar);
+    void serialize(Archive &ar, uint32_t version);
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Scene, 1)

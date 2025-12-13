@@ -1,6 +1,7 @@
 #pragma once
 #include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/material.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/Texture2D.h"
@@ -13,18 +14,21 @@ class Image : public Renderer2D
     std::shared_ptr<VertexBuffer> m_vertex_buffer_[RenderEngine::kFrame_Buffer_Count];
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
-    AssetPtr<Texture2D> m_texture_;
 
 public:
+    AssetPtr<Material> shared_material;
+
     void OnInspectorGui() override;
     void OnAwake() override;
     void OnUpdate() override;
     void Render() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Renderer2D>(this), CEREAL_NVP(m_texture_));
+        ar(cereal::base_class<Renderer2D>(this));
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Image, 1)

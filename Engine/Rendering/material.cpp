@@ -6,7 +6,6 @@
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 
-
 namespace engine
 {
 void Material::OnInspectorGui()
@@ -37,9 +36,13 @@ void Material::OnInspectorGui()
 
 void Material::OnConstructed()
 {
-    InspectableAsset::OnConstructed();
-    auto default_shader = AssetDatabase::GetAsset(xg::Guid("00214c87-b0e4-40ce-bef6-f7bfb3425888"));
+    auto default_shader = AssetDatabase::GetAsset("BasicShader.hlsl");
+    if (default_shader.Lock() == nullptr)
+    {
+        Logger::Warn<Material>("Failed to find Engine Assets");
+    }
     p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(default_shader);
+
     CreateMaterialBlock();
 }
 

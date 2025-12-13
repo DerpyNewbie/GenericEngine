@@ -7,6 +7,8 @@ public:
     PipelineState();
     bool IsValid() const;
 
+    void SetTransparent(bool is_transparent);
+    void SetCullMode(D3D12_CULL_MODE cull_mode);
     void SetInputLayout(D3D12_INPUT_LAYOUT_DESC layout);
     void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type);
     void SetRasterizerState(const D3D12_RASTERIZER_DESC &rasterizer_desc);

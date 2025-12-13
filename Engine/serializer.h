@@ -6,11 +6,22 @@ class Serializer
 {
 public:
     template <typename T>
-    void Save(std::ostream &output_stream, std::shared_ptr<T> save_resource)
+    [[nodiscard]] bool Save(std::ostream &output_stream, std::shared_ptr<T> save_resource, const bool pretty = true)
     {
         static_assert(std::is_base_of<Object, T>(), "Base type is not Object.");
-        cereal::JSONOutputArchive o_archive(output_stream);
-        o_archive(save_resource);
+
+        try
+        {
+            const cereal::JSONOutputArchive::Options options = pretty ? cereal::JSONOutputArchive::Options::Default() : cereal::JSONOutputArchive::Options::NoIndent();
+            cereal::JSONOutputArchive o_archive(output_stream, options);
+            o_archive(save_resource);
+            return true;
+        }
+        catch (const std::exception &e)
+        {
+            Logger::Error<Serializer>("Failed to save resource: %s", e.what());
+            return false;
+        }
     }
 
     template <typename T>
@@ -26,9 +37,9 @@ public:
             i_archive(load_resource);
             return load_resource;
         }
-        catch (std::exception)
+        catch (const std::exception &e)
         {
-            Logger::Error("Failed to load resource.");
+            Logger::Error("Failed to load resource: %s", e.what());
             return nullptr;
         }
     }

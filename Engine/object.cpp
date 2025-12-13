@@ -1,5 +1,6 @@
 #include "pch.h"
-
+#include "serializer.h"
+#include "object_util.h"
 #include "update_manager.h"
 
 namespace
@@ -10,12 +11,6 @@ std::vector<std::shared_ptr<engine::Object>> g_destroyed_objects;
 
 namespace engine
 {
-
-bool Object::m_in_gc_time_ = false;
-unsigned int Object::m_last_instantiated_name_count_ = 0;
-unsigned int Object::m_last_immediately_destroyed_objects_ = 0;
-std::unordered_map<xg::Guid, std::shared_ptr<Object>> Object::m_objects_;
-
 void Object::GarbageCollect()
 {
     m_in_gc_time_ = true;
@@ -44,6 +39,20 @@ void Object::GarbageCollect()
     {
         Logger::Log<Object>("Destroyed %d objects.", g_destroyed_objects.size());
     }
+}
+
+void Object::InvokeOnDeserialized()
+{
+    const auto deserialized_objects = m_deserialized_objects_;
+    for (const auto &weak_obj : deserialized_objects)
+    {
+        if (const auto obj = weak_obj.lock())
+        {
+            obj->OnDeserialized();
+        }
+    }
+
+    m_deserialized_objects_.clear();
 }
 
 std::string Object::GenerateName()
@@ -115,8 +124,10 @@ void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
 
     if (m_in_gc_time_)
     {
-        Logger::Warn<Object>("Cannot immediately destroy object `%s` during GC cycle. Use Object::Destroy instead.",
-                             obj->Name().c_str());
+        Logger::Warn<Object>(
+            "Cannot immediately destroy object `%s` during GC cycle. Use Object::Destroy instead.",
+            obj->Name().c_str()
+        );
         Destroy(obj);
         return;
     }
@@ -124,8 +135,9 @@ void Object::DestroyImmediate(const std::shared_ptr<Object> &obj)
     if (UpdateManager::InUpdateCycle() || UpdateManager::InFixedUpdateCycle())
     {
         Logger::Warn<Object>(
-        "Cannot immediately destroy object `%s` during UpdateManager cycle. Use Object::Destroy instead.",
-        obj->Name().c_str());
+            "Cannot immediately destroy object `%s` during UpdateManager cycle. Use Object::Destroy instead.",
+            obj->Name().c_str()
+        );
         Destroy(obj);
         return;
     }
@@ -147,5 +159,38 @@ std::shared_ptr<Object> Object::Find(const xg::Guid &guid)
     if (m_objects_.contains(guid))
         return m_objects_.at(guid);
     return nullptr;
+}
+
+std::shared_ptr<Object> Object::Instantiate(const std::shared_ptr<Object> &original)
+{
+    try
+    {
+        std::stringstream ss;
+        {
+            Serializer serializer;
+            serializer.Save(ss, original);
+        }
+
+        const std::string serialized_object(ss.view());
+        const auto serialized_clone_object = ObjectUtil::MakeClone(serialized_object);
+
+        std::istringstream is(serialized_clone_object);
+        Serializer deserializer;
+        auto cloned_object = deserializer.Load<Object>(is);
+        if (!cloned_object)
+        {
+            Logger::Error<Object>("Failed to deserialize cloned object");
+            return nullptr;
+        }
+
+        cloned_object->SetName(ObjectUtil::GetDeduplicatedName(cloned_object));
+        cloned_object->OnConstructed();
+        return cloned_object;
+    }
+    catch (std::exception &e)
+    {
+        Logger::Error<Object>("Cloning failed: %s", e.what());
+        return nullptr;
+    }
 }
 }

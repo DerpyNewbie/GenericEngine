@@ -6,13 +6,60 @@
 
 #include <shobjidl_core.h>
 
+#include "application.h"
+
+namespace
+{
+bool ShowWindowsDialog(const std::string &title, const std::string &content, const UINT flags)
+{
+    const int result = MessageBox(engine::Application::WindowHandle(), content.c_str(), title.c_str(), flags);
+    return result == IDOK;
+}
+}
+
 namespace engine
 {
+UINT Gui::MbDialogOption::Flags() const
+{
+    int result = 0;
+
+    switch (icon)
+    {
+        case MbDialogIcon::kNone:
+            break;
+        case MbDialogIcon::kError:
+            result |= MB_ICONERROR;
+            break;
+        case MbDialogIcon::kWarning:
+            result |= MB_ICONEXCLAMATION;
+            break;
+        case MbDialogIcon::kInfo:
+            result |= MB_ICONINFORMATION;
+            break;
+        case MbDialogIcon::kHelp:
+            result |= MB_ICONQUESTION;
+            break;
+    }
+
+    return result;
+}
+
+void Gui::NothingToShowInspectable::OnInspectorGui()
+{
+    ImGui::Text("Nothing to show...");
+}
+
 bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters)
 {
+    Logger::Log<Gui>("Opening file dialog at '%s'", file_path.c_str());
     IFileOpenDialog *p_file_open;
-    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, nullptr, CLSCTX_ALL,
-                                  IID_IFileOpenDialog, reinterpret_cast<void **>(&p_file_open));
+    HRESULT hr = CoCreateInstance(
+        CLSID_FileOpenDialog,
+        nullptr,
+        CLSCTX_ALL,
+        IID_IFileOpenDialog,
+        reinterpret_cast<void **>(&p_file_open)
+    );
 
     if (FAILED(hr))
     {
@@ -29,8 +76,11 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
     }
 
     IShellItem *p_default_folder = nullptr;
-    hr = SHCreateItemFromParsingName(StringUtil::ConvertToWString(file_path).c_str(), nullptr,
-                                     IID_PPV_ARGS(&p_default_folder));
+    hr = SHCreateItemFromParsingName(
+        StringUtil::ConvertToWString(file_path).c_str(),
+        nullptr,
+        IID_PPV_ARGS(&p_default_folder)
+    );
     if (SUCCEEDED(hr))
     {
         p_file_open->SetDefaultFolder(p_default_folder);
@@ -71,13 +121,21 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
 
 }
 
-bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name,
-                         const std::vector<FilterSpec> &filters)
+bool Gui::SaveFileDialog(
+    std::string &file_path, const std::string &default_name,
+    const std::vector<FilterSpec> &filters
+)
 {
+    Logger::Log<Gui>("Opening file save dialog at '%s'", file_path.c_str());
     IFileSaveDialog *p_file_save;
 
-    HRESULT hr = CoCreateInstance(CLSID_FileSaveDialog, nullptr, CLSCTX_ALL,
-                                  IID_IFileSaveDialog, reinterpret_cast<void **>(&p_file_save));
+    HRESULT hr = CoCreateInstance(
+        CLSID_FileSaveDialog,
+        nullptr,
+        CLSCTX_ALL,
+        IID_IFileSaveDialog,
+        reinterpret_cast<void **>(&p_file_save)
+    );
 
     if (FAILED(hr))
     {
@@ -122,6 +180,17 @@ bool Gui::SaveFileDialog(std::string &file_path, const std::string &default_name
     file_path = StringUtil::Utf16ToUtf8(std::wstring(path));
     CoTaskMemFree(path);
     return true;
+}
+bool Gui::OkDialog(const std::string &title, const std::string &content, const MbDialogOption options)
+{
+    const auto flags = MB_OK | options.Flags();
+    return ShowWindowsDialog(title, content, flags);
+}
+
+bool Gui::OkCancelDialog(const std::string &title, const std::string &content, const MbDialogOption options)
+{
+    const auto flags = MB_OKCANCEL | options.Flags();
+    return ShowWindowsDialog(title, content, flags);
 }
 
 bool Gui::ObjectHeader(const std::shared_ptr<Object> &object, std::string name)
@@ -209,6 +278,12 @@ std::string Gui::NameOf(const std::shared_ptr<Object> &object)
     if (component != nullptr && component->GameObject() != nullptr)
     {
         return component->GameObject()->Name() + " (" + component->Name() + ")";
+    }
+
+    const auto asset_desc = AssetDatabase::GetAssetDescriptor(object->Guid());
+    if (asset_desc != nullptr)
+    {
+        return object->Name() + " (" + asset_desc->AssetPath().filename().string() + ")";
     }
 
     return object->Name();

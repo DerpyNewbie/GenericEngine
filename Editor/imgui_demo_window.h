@@ -5,7 +5,7 @@ namespace editor
 {
 class ImGuiDemoWindow : public EditorWindow
 {
-public:
+    bool ShouldHandleWindowAutomatically() const override;
     std::string Name() override;
     void OnEditorGui() override;
 };

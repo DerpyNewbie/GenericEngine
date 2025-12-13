@@ -12,7 +12,7 @@ void TextureCube::OnInspectorGui()
 {
     for (int i = 0; i < 6; ++i)
     {
-        constexpr const char *dir_labels[] = {"Right", "Left", "Top", "Bottom", "Front", "Back"};
+        constexpr const char *dir_labels[] = { "Right", "Left", "Top", "Bottom", "Front", "Back" };
         if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
         {
             m_is_valid_ = false;
@@ -58,7 +58,7 @@ void TextureCube::CreateBuffer()
         D3D12_RESOURCE_STATE_COPY_DEST,
         nullptr,
         IID_PPV_ARGS(&m_p_resource_)
-        );
+    );
 
     if (FAILED(hr))
     {
@@ -93,7 +93,7 @@ void TextureCube::CreateBuffer()
         m_p_resource_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-        );
+    );
 
     cmd_list->ResourceBarrier(1, &barrier);
     m_is_valid_ = true;
@@ -146,3 +146,5 @@ bool TextureCube::SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures
     return m_is_valid_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::TextureCube)

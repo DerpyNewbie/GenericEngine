@@ -14,14 +14,17 @@ class RenderingSettingsComponent final : public Component
 
 public:
     void OnInspectorGui() override;
-    void OnStart() override;
+    void OnAwake() override;
 
     void ApplySettings();
 
     template <class Archive>
     void serialize(Archive &ar)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_skybox_cube_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_skybox_cube_)
+        );
     }
 };
 }

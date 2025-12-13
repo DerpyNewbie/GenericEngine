@@ -84,26 +84,9 @@ void PersistentDataStore::SetBool(const std::string &key, const bool value) cons
 
 void PersistentDataStore::SetDataStore(const std::string &key, const PersistentDataStore &value) const
 {
-    const auto it = Find(key);
-    if (it == m_value_->MemberEnd())
-    {
-        auto json_value = Value(kObjectType);
-        json_value.CopyFrom(*value.m_value_, Allocator());
-        m_value_->AddMember(StringRef(key.c_str(), key.size()), Value(kObjectType), Allocator());
-        return;
-    }
-
-    if (!it->value.IsObject())
-    {
-        it->value.SetObject();
-    }
-
-    if (it->value == *value.m_value_)
-    {
-        return;
-    }
-
-    it->value.CopyFrom(*value.m_value_, Allocator());
+    auto json_value = Value(kObjectType);
+    json_value.CopyFrom(*value.m_value_, Allocator());
+    Set(key, json_value);
 }
 
 void PersistentDataStore::SetValue(const std::string &key, Value &value) const
@@ -111,45 +94,45 @@ void PersistentDataStore::SetValue(const std::string &key, Value &value) const
     Set(key, value);
 }
 
-std::string PersistentDataStore::GetString(const std::string &key) const
+std::string PersistentDataStore::GetString(const std::string &key, const std::string &default_value) const
 {
     const auto json_value = Find(key);
     if (json_value == m_value_->MemberEnd() || !json_value->value.IsString())
     {
-        return "";
+        return default_value;
     }
 
     return json_value->value.GetString();
 }
 
-int PersistentDataStore::GetInt(const std::string &key) const
+int PersistentDataStore::GetInt(const std::string &key, const int &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsNumber())
     {
-        return 0;
+        return default_value;
     }
 
     return json_value->value.GetInt();
 }
 
-float PersistentDataStore::GetFloat(const std::string &key) const
+float PersistentDataStore::GetFloat(const std::string &key, const float &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsNumber())
     {
-        return 0.0f;
+        return default_value;
     }
 
     return json_value->value.GetFloat();
 }
 
-bool PersistentDataStore::GetBool(const std::string &key) const
+bool PersistentDataStore::GetBool(const std::string &key, const bool &default_value) const
 {
     const auto json_value = Find(key);
-    if (json_value == m_value_->MemberEnd())
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsBool())
     {
-        return false;
+        return default_value;
     }
 
     return json_value->value.GetBool();
@@ -158,14 +141,15 @@ bool PersistentDataStore::GetBool(const std::string &key) const
 PersistentDataStore PersistentDataStore::GetDataStore(const std::string &key) const
 {
     const auto json = GetString(key);
-    const auto it = m_value_->FindMember(StringRef(key.c_str(), key.size()));
-
-    if (!it->value.IsObject())
+    const auto json_value = Find(key);
+    if (json_value == m_value_->MemberEnd() || !json_value->value.IsObject())
     {
-        it->value.SetObject();
+        auto object = Value(kObjectType);
+        Set(key, object);
+        return GetDataStore(key);
     }
 
-    const PersistentDataStore data_store{m_document_, &it->value};
+    const PersistentDataStore data_store{m_document_, &json_value->value};
     return data_store;
 }
 
@@ -180,16 +164,10 @@ bool PersistentDataStore::IsString(const std::string &key) const
     return json_value != m_value_->MemberEnd() && json_value->value.IsString();
 }
 
-bool PersistentDataStore::IsInt(const std::string &key) const
+bool PersistentDataStore::IsNumber(const std::string &key) const
 {
     const auto json_value = Find(key);
-    return json_value != m_value_->MemberEnd() && json_value->value.IsInt();
-}
-
-bool PersistentDataStore::IsFloat(const std::string &key) const
-{
-    const auto json_value = Find(key);
-    return json_value != m_value_->MemberEnd() && json_value->value.IsFloat();
+    return json_value != m_value_->MemberEnd() && json_value->value.IsNumber();
 }
 
 bool PersistentDataStore::IsBool(const std::string &key) const

@@ -10,48 +10,51 @@ class Object : public enable_shared_from_base<Object>
     friend struct AssetDescriptor;
     friend cereal::access;
 
-    static bool m_in_gc_time_;
-    static unsigned int m_last_instantiated_name_count_;
-    static unsigned int m_last_immediately_destroyed_objects_;
-    static std::unordered_map<xg::Guid, std::shared_ptr<Object>> m_objects_;
+    inline static bool m_in_gc_time_;
+    inline static unsigned int m_last_instantiated_name_count_;
+    inline static unsigned int m_last_immediately_destroyed_objects_;
+    inline static std::unordered_map<xg::Guid, std::shared_ptr<Object>> m_objects_;
+    inline static std::vector<std::weak_ptr<Object>> m_deserialized_objects_;
 
     xg::Guid m_guid_;
     bool m_is_destroying_ = false;
     std::string m_name_ = "Unknown Object";
 
     static void GarbageCollect();
+    static void InvokeOnDeserialized();
     static std::string GenerateName();
     static xg::Guid GenerateGuid();
 
     void SetGuid(xg::Guid new_guid);
 
-protected:
-    Object() = default;
-
 public:
+    Object() = default;
     virtual ~Object() = default;
 
     virtual void OnConstructed()
-    {}
+    { }
+
+    virtual void OnDeserialized()
+    { }
 
     virtual void OnDestroy()
-    {}
+    { }
 
-    xg::Guid Guid() const;
+    [[nodiscard]] xg::Guid Guid() const;
 
-    std::string Name() const;
+    [[nodiscard]] std::string Name() const;
     void SetName(const std::string &name);
 
-    bool IsDestroying() const;
+    [[nodiscard]] bool IsDestroying() const;
     void DestroyThis();
 
     static void Destroy(const std::shared_ptr<Object> &obj);
     static void DestroyImmediate(const std::shared_ptr<Object> &obj);
 
-    static std::shared_ptr<Object> Find(const xg::Guid &guid);
+    [[nodiscard]] static std::shared_ptr<Object> Find(const xg::Guid &guid);
 
     template <class T>
-    static std::vector<std::shared_ptr<T>> FindByType()
+    [[nodiscard]] static std::vector<std::shared_ptr<T>> FindByType()
     {
         static_assert(std::is_base_of<Object, T>(), "Base type is not Object.");
         std::vector<std::shared_ptr<T>> result;
@@ -100,26 +103,39 @@ public:
         return Instantiate<T>(GenerateName(), GenerateGuid());
     }
 
+    static std::shared_ptr<Object> Instantiate(const std::shared_ptr<Object> &original);
+
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        bool is_loading = m_guid_ == xg::Guid() && m_name_ == "";
+        bool was_just_deserialized = false;
+        if constexpr (Archive::is_loading::value)
+        {
+            was_just_deserialized = m_guid_ == xg::Guid() && m_name_ == "Unknown Object";
+        }
+
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_name_));
 
-        if (is_loading)
+        if constexpr (Archive::is_loading::value)
         {
             m_objects_[m_guid_] = shared_from_this();
+            if (was_just_deserialized)
+            {
+                m_deserialized_objects_.emplace_back(shared_from_this());
+            }
         }
     }
 
-    bool Equals(const Object *rhs) const
+    [[nodiscard]] bool Equals(const Object *rhs) const
     {
         return Equals(this, rhs);
     }
 
-    static bool Equals(const Object *a, const Object *b)
+    [[nodiscard]] static bool Equals(const Object *a, const Object *b)
     {
         return a == b || (a != nullptr && b != nullptr && a->Guid() == b->Guid());
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Object, 1)

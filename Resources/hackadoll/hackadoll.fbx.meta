@@ -3,152 +3,1000 @@
     "type": ".fbx",
     "data": {},
     "objects": [
-        "099ee895-a576-466e-bd90-1fd0f4426abe",
-        "0018eaa1-6165-452a-8deb-0678cf351999",
-        "825f69e6-cfbb-4c27-9776-b600ff00a74d",
-        "7e803075-3c1e-49f1-98cd-a0f9284c0646",
-        "395d720b-82e3-42f2-afd6-a1ec99ba5613",
-        "f913bfd8-044d-47bb-8cf0-4cecbcce9f94",
-        "e6efa190-41a8-4064-a410-42e7c97e24b6",
-        "21d5b2ce-6dbf-4b54-a82e-7c39b085d757",
-        "4c98da33-fae6-40a3-8c6e-a941abc3a681",
-        "953e5f6a-0c55-4bb2-9207-6ac0eab6ac05",
-        "a5d6e546-8ded-4ec7-96f3-1c96ab5a6c31",
-        "7183ed52-3919-4496-b64d-4af7c1b04800",
-        "a0c94912-ef64-4f5c-acc1-566805436483",
-        "423af7bc-29c7-4e60-94e0-d41fa7d5aeb1",
-        "bd97d698-7e18-4e00-8e6d-9e7a665b6e7f",
-        "80d43dc9-1fff-4422-99e3-7a455dc86b00",
-        "d7ad2a73-c7db-4892-837c-0ce916c40870",
-        "ec40018d-b0e1-406b-b5c2-9519b80ec4c2",
-        "17607115-e109-4c30-abcc-766ebb92ebab",
-        "a1249c7f-a59e-488b-adea-b08fe77bd79f",
-        "90667d34-a272-4448-a1be-71feded0a5b5",
-        "e6e6ebad-f034-4496-81c3-7207da62f74e",
-        "c511e645-eedb-42e2-a68b-7a46d289616e",
-        "7649cb56-d077-4093-a379-ddd6e5f73da0",
-        "89c86d2e-b4e7-4298-99d4-25a6d8b7051b",
-        "82f560ae-4d83-4eba-8084-339733513527",
-        "2e86b41d-1cee-4a21-806c-cd1a51599a31",
-        "ded06c91-e0a9-46e0-b388-71f6d4aa9ee5",
-        "489ab527-fb82-4246-8e9a-105fa2e5678a",
-        "8cd936cf-e64b-43aa-b809-d90d71673a45",
-        "236de6f3-2ac1-4a15-9b62-38f390250faa",
-        "8016a631-82ef-4917-8d0a-5c93f2dbddae",
-        "f1f0ef73-a3b4-47f7-9de5-9e1764846aee",
-        "e2c08435-d54f-4bd5-b2b5-bbf04eed99d2",
-        "15ca018b-435d-4849-bf92-53692b7b49ac",
-        "f0129a3c-08db-4f0e-8750-67bcbbddebfe",
-        "ab084051-e700-46f4-aed1-ea4bdb6fc948",
-        "d860cfe9-d8c4-4cf1-bb53-97dd9852ff46",
-        "4c99a322-ad96-4f04-b39e-44c973c5fdf8",
-        "8f947bda-cc4c-4446-938d-c3169fcc51ab",
-        "b3636e1a-b79f-44bb-88f0-b83628159de4",
-        "9e4a2d92-8cb7-46cc-a834-4f20d69c557d",
-        "eacdcc9d-2c49-4a80-b695-c33bb54084ce",
-        "93449d60-7e0d-4dcb-9440-86aeebca656c",
-        "9a176b76-7926-4c60-9f94-9a18b272cfc3",
-        "aa338bee-ee8a-460a-b1f6-6ab2a01add4d",
-        "13753bd8-44eb-482f-9abc-fa845b293504",
-        "513a035a-36da-41bc-a714-c073dad2fb12",
-        "299ac9c5-7b75-45f5-b74d-f1cb494676da",
-        "7e39b30a-bd9f-4e95-a7ad-12bfa6cf7d92",
-        "9bd91bdc-944c-4d55-abd1-52110a7466f1",
-        "3ddaac11-a06b-49f5-9d05-fcbd69153305",
-        "7c4b7ee2-38dc-4e4a-9e0a-7ec8929b2c0d",
-        "ef1d4491-cfda-40e8-bf6e-8cb3c73dcb57",
-        "a59a929d-bae5-4361-b6ad-d5cbc5c7eaee",
-        "3e9a5922-8c43-48fd-882b-5541d8c496bf",
-        "a1a1f347-5fbe-409b-9926-12b5a13e7bd9",
-        "d91c6e4c-0690-45e1-afcd-0630556b5c13",
-        "0ebab508-88fb-4813-b614-8dcddfa766e2",
-        "b7691df7-a246-44d8-b6a2-1b510c8bb122",
-        "92ea8071-8a88-4223-aef6-07d0fe28b3d2",
-        "4cc837bf-0414-4c21-af36-d029d0d2a775",
-        "b7f685d6-20b9-49aa-b252-473b5ad0b174",
-        "5b8b1e21-5c27-4789-a3fc-ebb288655ad6",
-        "ce7c12b0-ac40-491d-bb19-b5a4a045fe2d",
-        "fc34a126-382d-4f4c-bcbe-e190b848e54a",
-        "5df9c86d-927b-4bc0-84a3-f2f7fa6d1a21",
-        "9d851499-d804-435d-ae70-dad647a679be",
-        "bbbb57ba-fd27-403d-bc2e-41bc3f08954e",
-        "ed5126c2-254f-4d4a-ac2f-54a111958b27",
-        "12a432f6-6b93-43ca-bf6b-9f904660aa21",
-        "06ad7c3e-61c0-4433-a592-49723a7d51ed",
-        "d9646512-8e0b-4c95-bc7e-1e9140790198",
-        "7b0a557e-8680-4a92-8580-7345d821b3f9",
-        "15eb80c0-6c07-4b6e-895b-9e1b5cdef0af",
-        "30c70605-f2b3-45a3-81bc-b7d4cca90c59",
-        "2cd77dde-07f6-4b3d-a6a0-32de74982437",
-        "c447f57f-00bf-4424-83a3-9e5ab33ed784",
-        "4f8ef6a4-1e04-48a9-8952-974711e25a96",
-        "ecc15c39-e2c9-49ae-8baf-0f4f68dbf624",
-        "e3834222-bca0-4429-b7d6-c12f74936d1c",
-        "a155dbe4-b537-41d7-9566-6f2e00037bd8",
-        "d6c5aec3-342f-4332-9148-1b9083d09957",
-        "66883b97-e79e-402e-808a-ea4d01041ce5",
-        "fdf7acfc-6647-4140-92e6-9094dcd90d84",
-        "5004fad4-7965-42b7-ad3d-1650593c7ba2",
-        "21f162eb-1e6f-474d-95fc-fcb9cd1d2c2f",
-        "3def02c5-368a-46fe-a9ad-e39ce77bbfa7",
-        "f749f473-f127-48ad-90da-617d0cdc55e3",
-        "e0abda5d-fb7c-4f26-ab84-87d634f40c14",
-        "41aca7d8-6830-450e-a756-a1d7045c98c0",
-        "9fa27333-ab9e-4da0-a355-0df5dd1aa4d9",
-        "e8392eda-103c-4473-9652-9d496dfd674c",
-        "6355a96b-e557-4063-b9c5-049a4876e6d6",
-        "f237488c-0ac4-44d2-9b9f-eae98abe3d3b",
-        "c78b3229-b69d-47e6-b8a9-24b3a9e0de33",
-        "43b47ada-b134-434f-9788-ff687200e2c5",
-        "657a6069-b56d-4a99-86be-ad376638c722",
-        "b4760196-23b5-4b35-9fd6-c0e4238f3398",
-        "6f42845a-a1ea-4cb3-a224-762f19169f42",
-        "204373b9-ad69-428a-b6e4-10ac69e6a50c",
-        "d66e7314-95bd-4b0f-86d8-9a354638ed20",
-        "67c829bb-a7ca-4122-b47b-fc3de98f29cc",
-        "a859b409-7b32-4d59-bd97-8b2a8c75d77a",
-        "e4ccf6dc-c664-4740-aba2-549a3ea76c61",
-        "a322aec6-fb8f-4b91-ae70-055b4e6b237d",
-        "642e9a64-4ea9-4894-9017-5b276a187d7b",
-        "631c843e-373d-481d-872e-4dedb35e9050",
-        "34a8ce0f-43e9-4644-8b69-60d964af5340",
-        "cd4a2cc0-ef06-4c34-907a-158e6f3916bf",
-        "c478e4a1-ca7a-41ea-8396-0cfd9f8e2612",
-        "7bbeb62a-3dc4-4c92-9b78-26fa72917c56",
-        "4569a1c2-32dd-407c-9f13-4342fd250045",
-        "79176ece-971a-4cc8-9837-f7688a4cfeff",
-        "3a1fe7b4-88ed-4bd0-bc25-bfc588a10887",
-        "adddc831-01dc-42fb-80fa-f2c3bb437b87",
-        "47f78550-1749-49f7-803a-b2ebfa57be1b",
-        "74bda219-f36a-4124-abb0-27e10a2883e5",
-        "8b15f5d5-979f-4d4b-a45c-ef165b71bc72",
-        "d4fdbb31-9369-47e2-a19f-e4bd00abc53d",
-        "e2886442-09da-43a3-933b-795179aaed2f",
-        "a8ae113f-8b0c-43eb-ae1a-adad7512372e",
-        "238a8e08-a535-4556-acf7-f63ae7adca2b",
-        "9baf5d11-2dac-4ed3-8064-1a5a010ea262",
-        "b8447eaa-92a5-4acf-8294-97ec90ce3091",
-        "8e043656-0ec3-429a-8c2d-acec9d03e49a",
-        "c171d0b5-8869-4ed7-b5a7-905acae5ef7f",
-        "cce94835-82c8-431f-bb0a-124002bb90c0",
-        "a787994a-3989-4cdc-b807-4d4110ff3925",
-        "4d39273f-9f68-41eb-bcb8-bb8aa9803027",
-        "2325fddf-7ecd-4a1b-a4a5-c862ea019a20",
-        "0cf614b8-0876-44d4-b57e-45411a78c354",
-        "b9ab02b4-6718-47da-a720-93e53601c807",
-        "baf96638-514c-492c-9d4c-b8a15b6ff52e",
-        "1edb8a11-bbfa-4d85-a3c9-2ed76fbe6264",
-        "d47d5d73-29d1-4491-b6b7-0ba533fe51e4",
-        "696c3e90-8c42-4150-b9b4-7bbf2d8d2ca6",
-        "e3a71fd4-5271-4fdf-96e7-22bc0806b468",
-        "8bfd2d51-48cf-4941-9f67-51670a5f70d3",
-        "d5f5015c-ae46-4da4-9e1d-496381723920",
-        "5de1ad3f-0b4e-4b23-8a98-73c1c2cd0e65",
-        "50955036-85a6-4430-b0cb-d84e3eec75a6",
-        "0ef42679-f488-46f2-adaa-615694e65887",
-        "a29b6d9f-8cdb-447c-b21c-431e4c788611",
-        "55f9affb-fd52-4fa8-88fe-0a732d5ab1e3",
-        "ed4aa354-d5ae-4815-b211-f873c6e87408",
-        "6fc605f4-2d4a-49dd-82e6-0887cd38b987"
+        {
+            "guid": "af25e5ce-e64c-442c-bc2a-5c2893a3702f",
+            "name": "左腕",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4d4fe02c-2a52-4147-b96d-83ab82880a6c",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "ceb09ff1-c2f5-4a18-b031-25b6d74b1bc4",
+            "name": "上半身2",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "b772f67a-0aea-429c-b915-956d8844b040",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2e997adf-9b0a-4145-a660-c26a994faa3b",
+            "name": "下半身L1",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "0377ee11-056e-4dad-ab8d-f94255f0be43",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "a55c6e10-19c7-419c-a254-d96477b99dde",
+            "name": "頭",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "c6c430cb-d8b2-4db9-b186-5ada83f88767",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "1ce2cf6e-8116-48d3-b7bb-0793a50de79f",
+            "name": "左ひざ",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "bc8b0163-9653-4887-805e-61a4f905a0c3",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "5566f814-3a0b-44a6-9681-5b17d6422423",
+            "name": "下半身B1",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "3f1999f6-3e9f-4944-a0d0-ac4481e18629",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "f1461d20-1492-48b4-94ba-abaa5d4b9ee5",
+            "name": "右足2",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "aa2e2bd5-9be8-480e-90d0-151e11c308e7",
+            "name": "mmd_tools_rigid_1",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "b8a3a366-c078-4737-ad86-8c82c9b99b81",
+            "name": "左ひじ",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "44149d7c-d9c0-4082-b245-7bff6b5e561d",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "0130654c-9c22-4826-a88a-f0b8365f8032",
+            "name": "右ひじ",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "9d225614-1cbb-4052-b4b8-1ea20445f702",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "a7618a05-ddfd-4a7d-b34d-661e597b871b",
+            "name": "下半身F1",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "e23ea277-f78b-4859-8c1c-cf1b62c905a6",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "74fec4ae-f366-4264-bfc3-c6c2396c0667",
+            "name": "上半身",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f2a370da-d99d-4198-9c44-2953b5fe3f83",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "138269c2-accd-4cd5-aa3f-68a548955e66",
+            "name": "下半身R1",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "b89f773c-1c3c-4a8f-bd68-dcf96ac9d254",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2c0ac5e8-5430-4b73-b18d-ff8b21d25b30",
+            "name": "首",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4849758f-1fc7-40d1-adea-bcba7085bf92",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "a33fd832-bcea-4dd0-a081-a36a2c7f7f72",
+            "name": "左足",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "b3f0e873-ba91-4b80-baf0-f7c70923abaa",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c6009c3c-ff5b-4cc9-b18a-0207f6c58b8d",
+            "name": "左足2",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1975c23a-0e79-476c-873a-8fe7e0167c9d",
+            "name": "mmd_tools_rigid_1",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "eaf86281-83a4-43a9-8135-5f434ef97bf6",
+            "name": "右腕",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "8a6667b3-559e-452e-a1a2-4116477ebd44",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "ee1f3b82-f2b5-4671-8edd-8e6dc45247fd",
+            "name": "右足",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "84cf1223-a72a-49e4-96ab-1a3840e9d914",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "65947b7c-c52b-42fd-9099-f259190e6287",
+            "name": "右ひざ",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "42655d22-f28f-4d4f-ac65-471d5edf8637",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "5ef96f09-e3d6-49a7-b937-7b9aa3a73337",
+            "name": "左足首",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "a517dfaf-0144-4f13-947a-4e0b68d4b6d2",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "d0f009b6-f32c-4933-bf36-2a905f7e0389",
+            "name": "右足首",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "6e545d9b-1726-4eb1-a74c-393242640c49",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2e073b47-e51e-4ad0-a034-1504f77d8029",
+            "name": "左手首",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f61f3a9d-fff4-4e85-9955-ed5af05c7477",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "403e1dd8-1193-4b68-9c9f-28aa249a974b",
+            "name": "CR_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "7f21482c-0d5f-4118-8c8e-a1cfc4d52978",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e304867e-618c-4858-92e4-eb7d48b8444c",
+            "name": "CL_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4cc7f1bc-7884-4e03-b858-e23952fbb6ab",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "f38d3867-2a1c-49d9-a048-0828e56fafcd",
+            "name": "F_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "329015b1-fbb4-453e-80e5-023b0cc797c7",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c7a0b67b-a539-4b77-8e05-0fa812809900",
+            "name": "L_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "500c42a4-e3ea-4819-853c-c50143e5276e",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "f50b68ce-c1d8-424b-8135-4b21387e591d",
+            "name": "R_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "be7dde27-60b2-4781-84b6-1d8437ab70a0",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "69a19a84-bbfd-4450-b489-a29d65290394",
+            "name": "右手首",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "818c7c5b-9583-4395-9158-2c827cfb3eaa",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "0992aa4a-069d-431b-9a41-1d92a2761537",
+            "name": "R_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "a6be9f8a-e72b-4a82-ba53-b7478dba2345",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "f9b43443-65a8-4fec-a74c-74d29e8851e1",
+            "name": "R_SKT_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "fe63d699-afe9-4883-83b3-d4ac1573eb69",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "b7502419-62e0-40b2-89ec-d21e37462ca1",
+            "name": "F_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "60a1951f-0986-4567-ae80-b26f9c9dda68",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "b575bbd2-f9ad-4898-9e47-831ea86d5442",
+            "name": "L_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "0a62fc9c-0b89-4a57-86a4-36286a4c1a79",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "8fe93930-3111-4ac6-abcc-f6370f2c002b",
+            "name": "B_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "87f8ab5c-2c61-414c-b29f-49842fe310b2",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e0985d47-9aaf-4b21-80ec-3527d9408e02",
+            "name": "L_SKT_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4b423d16-bc0a-4029-a9b7-65ffd8233e7b",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "0cb7cafa-a57f-4e3d-927a-5b98747b4184",
+            "name": "B_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f73e4481-4c97-4097-955f-ca181e1823f9",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "80013037-8478-4525-86bd-747b6ad49a9b",
+            "name": "CR_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "3d7eb95b-1bfa-450e-b49f-70acfec71a58",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2b4822bc-ee83-4060-b284-9b03c89d891b",
+            "name": "LB_SKT_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "640c4023-eec6-49ab-8aeb-c164f6fc5532",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "d615c3f9-e657-4c85-b3bd-52bb33a1b832",
+            "name": "RB_SKT_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "c04b7671-98ab-4b60-95bd-9c8ddeee18fe",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "09c0bdc6-512f-45e5-a4f5-5dcce56705a6",
+            "name": "胸R01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "310cb29d-464c-4073-8d1d-608f4fe1953b",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "9a12ca0c-b78c-4e4b-a986-1f2fececa920",
+            "name": "hair_FC_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "23c00ddd-9ed4-4a61-822b-6b69e4c60738",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "950c124c-d6f2-4150-a9f6-15268ff2f5bf",
+            "name": "RB_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "dfc5afab-2ea2-4ae6-952e-b1359af94a7d",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c472bcab-03cd-494f-9372-2ed622c0b4bc",
+            "name": "hair_FC_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "990525d4-f425-4e60-bbf8-9b4e8a71ac11",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "59dbf7e2-ed5f-4adf-87e2-84aa36d74d06",
+            "name": "hair_FC_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "96c7926e-6ca2-4d97-82c1-fb6dd3fbb637",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "7a3fbbe8-1170-4956-bf0a-307ceaed75d8",
+            "name": "hair_FR_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "445dbb4f-ab74-45a9-8ee4-225ee8acdfef",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "fb0210cf-1168-4dbe-b9ad-043bc34f9f63",
+            "name": "hair_FR_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "bb6bcbc7-5020-4631-8cc7-0b60b4101b43",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "be000eea-55f6-4947-b87f-bb7d6709c4ee",
+            "name": "hair_FR_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f4d531ab-08ff-4826-a840-d92faa6ba75e",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "17d93344-78d7-4108-936b-ed81b6cb78c2",
+            "name": "CL_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "482a9bd3-7cae-4f6e-bc43-c4c414e6649d",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "7c9ebe77-4030-47df-885b-a17f705b0b05",
+            "name": "LB_SKT_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4887936c-1c84-4332-9dcd-d2b4df90b7d4",
+            "name": "mmd_tools_rigid_3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "3bd174e3-d777-4f00-9ee0-99234df7452e",
+            "name": "LB_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "712d88f9-af04-4fa2-b97a-fee4caa89e94",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2347fddd-74a7-41e2-8160-ecd9227f394e",
+            "name": "RB_SKT_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "e1957cb8-7cf2-4ea0-becf-6ccf5e2144bf",
+            "name": "mmd_tools_rigid_2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "44c19285-6b5d-4497-8b22-c6a55ddfcf4b",
+            "name": "胸L01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "177cd865-243b-4586-ad24-01115d82bbac",
+            "name": "mmd_tools_rigid_0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "973b48b0-f366-45ea-a2d6-8bf675f623ac",
+            "name": "hair_FC_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "8a98292f-f8e9-497f-beee-8e943dfda041",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "cd07aa41-207a-46e9-b229-fd33bbf4462e",
+            "name": "hair_SL_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "071ede43-3a56-4485-a6ca-7123edbe055f",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "b144a521-3e58-4386-b81d-398104378be3",
+            "name": "hair_FL_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "ebb85dff-b774-45e4-9613-414d5f34e8be",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "ee2a0d33-aacf-4a00-9a55-1c02d807fc74",
+            "name": "hair_FL_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "dfadb225-1ad1-4dda-a9a7-dece0e6f4bc2",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "44cf72c4-6bdb-40ff-b3ce-2fb1ed797344",
+            "name": "hair_SR_05",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "9cb70761-7b59-4daf-a61d-25ed2c07f900",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "5613a568-e5fd-406e-a80b-46760146f32d",
+            "name": "hair_FSR_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "b0352a8f-092d-4610-b89e-6bb6e94f64fa",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e4b0846f-e6ee-4eaf-aa01-da459bfab5fa",
+            "name": "hair_SL_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "2728d3c2-243e-4d89-ae83-a05234dce5bb",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "a78de4ca-52a6-4607-8225-e611a1e2c2b6",
+            "name": "hair_SL_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "bd8af856-cb1b-4fcb-8668-b8305759e2a8",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "80e6a614-e734-468a-967a-0568e99b708f",
+            "name": "hair_SL_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "8c510cb4-2782-4d17-a933-63c5d864c612",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "3f1eecc3-a18b-432e-bcb1-742cfec037e2",
+            "name": "hair_SL_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "744e7091-363d-4119-a650-1539aaa8ef5a",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "781a142e-f187-4387-894b-27d29a08d1d7",
+            "name": "hair_FL_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "97213804-d0a2-416b-a8d1-bd989c4e5c56",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "7f99a403-bec0-45b9-a4ab-537538603867",
+            "name": "hair_SL_05",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "70a93539-31f9-4753-8927-974aa950748a",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "43048d01-731c-448c-a8f9-747b70e9cedc",
+            "name": "hair_SR_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "ea4575d0-b749-43a8-a05e-516249b837b4",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "127132b7-721b-4940-838b-ed6d662646a9",
+            "name": "hair_SR_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1ffab0ad-f74e-4fe4-9c61-69b75e6c75a2",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "895ab27d-5604-47d2-950e-428fe673f26a",
+            "name": "hair_SR_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "13131680-797c-4aeb-869f-c50a82ff8880",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "78de9488-d419-4c2c-b48e-4d1620048896",
+            "name": "hair_SR_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "64dc1beb-0a82-4519-9a75-a154230933f6",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "86e61377-94ba-43f1-8aa1-613d247dea6e",
+            "name": "hair_SR_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "17625fb9-a342-4318-bed8-c5ac8e4ffdcb",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "ffdc52af-d83d-4455-8257-b408b6d58532",
+            "name": "hair_FSR_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "026b8573-ea10-462c-b89f-f426ffdb2d41",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e4cd8265-508f-4d4b-8e75-fe823101c524",
+            "name": "hair_TL_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "89ced3f5-964e-439e-a54f-43f74c5768c3",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "3b6d7d0d-0cc2-4c30-ba8d-06f971a6f6ab",
+            "name": "hair_FSR_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "94798ef8-9358-4712-8a1b-ccc4ec520239",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "8f05e413-b3b9-48dc-8537-7ef92a103777",
+            "name": "hair_AF_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "3fc30811-781d-4f64-82c5-c810e8f614b9",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "f4d532df-4ca7-4cf2-9ef3-594da94e628b",
+            "name": "hair_TL_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1099b636-8702-444d-a1b0-6c25a4e9641b",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "6bfde391-a483-42e0-8e74-8ff563f709f0",
+            "name": "hair_TR_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "d0a3c669-840c-4ef3-b582-cb4bdf84694f",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "5f03fbe0-a63e-45e3-ac0b-9bebccd1f7f2",
+            "name": "hair_TL_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f4a92b10-38f8-45f1-9a3e-db15394f1aa8",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "7123d4b1-1c16-42bb-9701-44b0f166ad91",
+            "name": "hair_FSL_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1c1b4c45-c311-4f4d-81b6-dab87f102b1e",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "9bd4e43b-cbe6-4e91-b2b2-bb019c6ce5d4",
+            "name": "hair_AF_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "ed4be27e-b639-4736-81a3-705d6b187473",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "5be49c07-b949-4c8f-9b6e-31e68ea9411c",
+            "name": "hair_AF_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "84a975f4-0a11-47e5-a275-51692d78b8ac",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "fce5146a-bb84-4ae7-a34b-c4db72b12aaf",
+            "name": "hair_TL_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1b65491d-abae-492b-8427-945d99d03c51",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "bf39e1a4-e7d7-44d4-8923-0e777b2ee667",
+            "name": "hair_FSL_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "9a3b8c51-c008-4f03-b991-4379c6158b2e",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "eab23418-249c-4424-95d0-e5d2cd36dfbd",
+            "name": "hair_FSL_00",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "5e100a5e-5fb5-44c8-8d90-439c90fb2b13",
+            "name": "mmd_tools_rigid_5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "38174d3b-3d20-415b-bad9-ec67595dde58",
+            "name": "hair_TL_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f89787d7-055e-4e33-a79c-f02335f899bd",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "30a0147e-c180-459c-b107-937b0490e274",
+            "name": "hair_TR_02",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "f28c6979-0b78-44fc-bcdd-3f1d0403522a",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "682b6123-fbc2-4ff6-a097-c11d318663e5",
+            "name": "hair_TR_03",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "4a6fc685-cf86-4a54-ae62-29ac88b1e7f8",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c32eb03f-c8f6-4a4e-a5f5-d8db5cf5a45b",
+            "name": "hair_TR_01",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "e4c98801-02e3-43cf-bda4-b09e98e4f7bc",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "82e6f673-51ed-4f4b-b275-928986ab0f93",
+            "name": "hair_TR_04",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "933f8b2e-b752-4487-8c8e-834254cabea4",
+            "name": "mmd_tools_rigid_4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "4f86fde7-c445-41b4-bcd4-3aab91b0528f",
+            "name": "Hackadoll",
+            "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "683f0eb1-ac1d-40e4-8224-7ea2d2583543",
+            "name": "材質0",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "07ef5ab7-3501-431a-a450-acc89da09384",
+            "name": "材質1",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "61b447d7-2284-438c-9997-c153d06b0346",
+            "name": "材質2",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "23bb44f5-56fa-4c0f-9cfd-c5cbc8a3b3f4",
+            "name": "材質3",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "0796d652-d32f-4839-b3c0-565e288c2a08",
+            "name": "材質4",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "ad5917a2-1743-40ee-b289-c11930910548",
+            "name": "材質5",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "16e12154-4fbe-478d-bff1-3a451ce90955",
+            "name": "材質6",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "4207ec15-25ad-4d98-b218-64e6e0abfd85",
+            "name": "材質7",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "701b1497-61f6-49df-85dd-ea7931a8c82f",
+            "name": "材質8",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e0241fef-4e45-48dc-9d26-0a72b6aa082d",
+            "name": "材質9",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "71cceea6-1ca1-4fce-a760-a47593a1affc",
+            "name": "材質10",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c872bc2a-9c5f-4848-a143-90524fbcc377",
+            "name": "材質11",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "781ad92e-5c3d-4374-a505-f159ec2b6310",
+            "name": "材質12",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "a24d720c-0aa2-4f88-b17c-e15965c7a7a5",
+            "name": "材質13",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "570ff4ec-b8f1-4142-a6b2-5cc9bc63ff21",
+            "name": "材質14",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "46cb7745-f8b6-459d-9dbe-129f9c5b5d88",
+            "name": "材質15",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "8bbc45ab-61fa-4a39-9380-bc4f9fe9aa49",
+            "name": "材質16",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "2e46beda-a5ed-4f41-be02-9dc66574d175",
+            "name": "材質17",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "166dd869-b2c9-4dc5-ae03-161361d15fa2",
+            "name": "材質18",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "e5cb18ae-6e67-4f57-8fde-be3aadea2a63",
+            "name": "材質19",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c33596ec-4320-47c3-a037-9e54f2d96592",
+            "name": "材質20",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "33c6ce48-5184-463c-9513-098c3ba13864",
+            "name": "材質21",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "b448f7f4-fa1b-4a0a-92cb-51d54167bd59",
+            "name": "材質22",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "45a2ddd8-adf7-4bfa-b7b0-f83df563e310",
+            "name": "材質23",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "6870ee85-d911-4644-a23b-36a933b83ee5",
+            "name": "材質24",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "cd23452e-97a1-4306-b822-70b5c13a0b9a",
+            "name": "材質25",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "6f448331-52f6-49de-9129-4f541ade3781",
+            "name": "材質26",
+            "type_hint": "class engine::Material"
+        },
+        {
+            "guid": "c23e73e8-0b5e-48e4-b471-aa764537a9f8",
+            "name": "材質27",
+            "type_hint": "class engine::Material"
+        }
     ]
 }

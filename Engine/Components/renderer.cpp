@@ -10,10 +10,10 @@
 namespace engine
 {
 void Renderer::UpdateBuffer()
-{}
+{ }
 
 void Renderer::DepthRender()
-{}
+{ }
 
 void Renderer::SetVisible(const bool visible)
 {
@@ -41,6 +41,12 @@ void Renderer::OnInspectorGui()
         m_render_queue_ = std::clamp(m_render_queue_, 0, 10000);
     }
 }
+
+void Renderer::OnValidate()
+{
+    SetVisible(GameObject()->IsActiveInHierarchy());
+}
+
 void Renderer::OnEnabled()
 {
     SetVisible(true);

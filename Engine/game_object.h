@@ -45,6 +45,8 @@ public:
         m_components_.push_back(instance);
 
         instance->OnAwake();
+        instance->m_has_called_awake_ = true;
+
         if (IsActiveInHierarchy())
         {
             instance->OnEnabled();
@@ -158,6 +160,7 @@ private:
 
     void InvokeUpdate();
     void InvokeFixedUpdate() const;
+    void InvokeOnValidate() const;
     void NotifyIsActiveChanged() const;
 
     void InvokeOnCollisionEnter(const Collision &collision) const;

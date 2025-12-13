@@ -17,13 +17,17 @@ class RenderPipeline
     friend class CameraComponent;
 
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
+
+    std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
+
     std::unordered_set<std::shared_ptr<CameraComponent>> m_cameras_;
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_;
 
     void InvokeDrawCall();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
+    void SetSceneData();
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
-    void Render(const std::shared_ptr<CameraComponent> &camera);
+    void Render(const Matrix &view, const Matrix &proj);
     void DepthRender();
 
 public:

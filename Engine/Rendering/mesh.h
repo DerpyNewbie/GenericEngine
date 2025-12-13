@@ -7,7 +7,7 @@ struct aiScene;
 
 namespace engine
 {
-class Mesh : public Object
+class Mesh : public Object, public Inspectable
 {
 public:
     size_t max_bones_in_vertex = 0;
@@ -22,6 +22,8 @@ public:
     std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
 
+    void OnInspectorGui() override;
+
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
 
     void Append(Mesh other);
@@ -35,7 +37,7 @@ public:
     bool HasSubMeshes() const;
 
     template <class Archive>
-    void serialize(Archive &archive)
+    void serialize(Archive &archive, const uint32_t version)
     {
         archive(
             cereal::base_class<Object>(this),
@@ -43,10 +45,14 @@ public:
             CEREAL_NVP(colors),
             CEREAL_NVP(uvs),
             CEREAL_NVP(indices),
-            CEREAL_NVP(normals), CEREAL_NVP(tangents),
+            CEREAL_NVP(normals),
+            CEREAL_NVP(tangents),
             CEREAL_NVP(bone_weights),
             CEREAL_NVP(bind_poses),
-            CEREAL_NVP(sub_meshes));
+            CEREAL_NVP(sub_meshes)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Mesh, 1)

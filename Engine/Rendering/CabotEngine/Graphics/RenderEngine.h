@@ -17,12 +17,12 @@ public:
 private:
     HWND m_h_wnd_ = nullptr;
     UINT m_current_back_buffer_index_ = 0;
-    Color m_background_color_ = {0.5f, 0.5f, 0.5f, 0.5f};
+    Color m_background_color_ = { 0.5f, 0.5f, 0.5f, 0.5f };
 
     ComPtr<ID3D12Device6> m_p_device_ = nullptr;
     ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
     ComPtr<IDXGISwapChain3> m_p_swap_chain_ = nullptr;
-    ComPtr<ID3D12CommandAllocator> m_p_allocator_[kFrame_Buffer_Count] = {nullptr};
+    ComPtr<ID3D12CommandAllocator> m_p_allocator_[kFrame_Buffer_Count] = { nullptr };
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
     HANDLE m_fence_event_ = nullptr;
     ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
@@ -32,7 +32,7 @@ private:
 
     UINT m_rtv_descriptor_size_ = 0;
     ComPtr<ID3D12DescriptorHeap> m_p_rtv_heap_ = nullptr;
-    ComPtr<ID3D12Resource> m_p_render_targets_[kFrame_Buffer_Count] = {nullptr};
+    ComPtr<ID3D12Resource> m_p_render_targets_[kFrame_Buffer_Count] = { nullptr };
 
     std::shared_ptr<engine::VertexBuffer> m_p_vert_buff_;
     std::shared_ptr<engine::IndexBuffer> m_p_index_buff_;
@@ -61,9 +61,10 @@ public:
     void BeginRender();
     void SetMainRenderTarget(Color background_color);
     void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
-                         Color background_color) const;
+        Color background_color, const D3D12_VIEWPORT *viewport = nullptr, const D3D12_RECT *scissor = nullptr) const;
     void EndRender();
     void WaitRender();
+    void UpdateMainRenderTarget();
 
     static ID3D12Device6 *Device()
     {

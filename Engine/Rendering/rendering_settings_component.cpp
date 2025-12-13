@@ -24,8 +24,7 @@ void RenderingSettingsComponent::OnInspectorGui()
     if (has_changed)
         ApplySettings();
 }
-
-void RenderingSettingsComponent::OnStart()
+void RenderingSettingsComponent::OnAwake()
 {
     ApplySettings();
 }
@@ -37,3 +36,5 @@ void RenderingSettingsComponent::ApplySettings()
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::RenderingSettingsComponent)

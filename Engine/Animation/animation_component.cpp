@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "animation_component.h"
 
-#include "engine_time.h"
 #include "game_object.h"
 #include "gui.h"
 #include "Components/transform.h"
@@ -11,47 +10,6 @@ namespace engine
 
 namespace
 {
-Quaternion Slerp(const Quaternion &a, const Quaternion &b, const float t)
-{
-    float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
-    Quaternion end = b;
-    if (dot < 0.0f)
-    {
-        dot = -dot;
-        end = Quaternion(-b.x, -b.y, -b.z, -b.w);
-    }
-
-    if (Mathf::Approximately(dot, 1.0F))
-    {
-        auto result = Quaternion(
-            a.x + t * (end.x - a.x),
-            a.y + t * (end.y - a.y),
-            a.z + t * (end.z - a.z),
-            a.w + t * (end.w - a.w)
-            );
-        result.Normalize();
-        return result;
-    }
-
-    const float theta_0 = acosf(dot);
-    const float theta = theta_0 * t;
-
-    const float sin_theta = sinf(theta);
-    const float sin_theta_0 = sinf(theta_0);
-
-    const float s0 = cosf(theta) - dot * sin_theta / sin_theta_0;
-    const float s1 = sin_theta / sin_theta_0;
-
-    const auto result = Quaternion(
-        (a.x * s0) + (end.x * s1),
-        (a.y * s0) + (end.y * s1),
-        (a.z * s0) + (end.z * s1),
-        (a.w * s0) + (end.w * s1)
-        );
-    return result;
-}
-
 template <typename T>
 T Lerp(float time, const std::vector<std::pair<float, T>> &keys, size_t &last_index)
 {
@@ -79,7 +37,7 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
     m_transforms_.emplace(path, node);
 
     TRS trs;
-    node->LocalMatrix().Decompose(trs.scale, trs.rotation, trs.translate);
+    node->LocalMatrix().Decompose(trs.scale, trs.rotation, trs.translation);
     m_default_poses_.emplace(path, trs);
     for (UINT i = 0; i < node->ChildCount(); ++i)
     {
@@ -182,14 +140,20 @@ void AnimationComponent::Stop()
     }
 }
 
-std::shared_ptr<AnimationState> AnimationComponent::AddClip(const std::shared_ptr<AnimationClip> &clip,
-                                                            const std::string &name)
+std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(
+    const std::shared_ptr<AnimationClip> &clip,
+    const std::string &name
+)
 {
     const auto state = std::make_shared<AnimationState>();
     state->SetClip(clip);
 
-    m_states_.insert_or_assign(name, state);
-    return state;
+    return AddState(state, name);
+}
+
+std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddState(std::shared_ptr<AnimationState> state, const std::string &name)
+{
+    return m_states_.insert_or_assign(name, state);
 }
 
 std::shared_ptr<AnimationState> AnimationComponent::FindClip(const std::string &name) const
@@ -235,7 +199,7 @@ void AnimationComponent::Sample()
     {
         auto &default_matrix = m_default_poses_[path];
         TRS final_trs;
-        final_trs.translate = default_matrix.translate * base_weight;
+        final_trs.translation = default_matrix.translation * base_weight;
         final_trs.scale = default_matrix.scale * base_weight;
 
         final_trs.rotation = default_matrix.rotation;
@@ -251,23 +215,23 @@ void AnimationComponent::Sample()
 
             total_rot_weight += state->weight;
             const float t = Mathf::Approximately(total_rot_weight, 0)
-                                ? state->weight
-                                : state->weight / total_rot_weight;
+                ? state->weight
+                : state->weight / total_rot_weight;
             if (curve == nullptr)
             {
-                final_trs.translate += default_matrix.translate * state->weight;
+                final_trs.translation += default_matrix.translation * state->weight;
                 final_trs.scale += default_matrix.scale * state->weight;
 
-                final_trs.rotation = Slerp(final_trs.rotation, default_matrix.rotation, t);
+                final_trs.rotation = Mathf::Lerp(final_trs.rotation, default_matrix.rotation, t);
                 continue;
             }
 
             const auto time = state->GetTime();
-            final_trs.translate += Lerp(time, curve->position_key, curve->position_index) * state->weight;
+            final_trs.translation += Lerp(time, curve->position_key, curve->position_index) * state->weight;
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            final_trs.rotation = Slerp(final_trs.rotation, rot, t);
+            final_trs.rotation = Mathf::Lerp(final_trs.rotation, rot, t);
 
         }
 
@@ -280,3 +244,5 @@ bool AnimationComponent::IsPlaying() const
     return m_is_playing_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::AnimationComponent)

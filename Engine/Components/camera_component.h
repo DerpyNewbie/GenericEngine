@@ -31,23 +31,26 @@ struct CameraProperty : Inspectable
     Matrix ProjectionMatrix() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(CEREAL_NVP(view_mode),
-           CEREAL_NVP(field_of_view),
-           CEREAL_NVP(near_plane),
-           CEREAL_NVP(far_plane),
-           CEREAL_NVP(ortho_size),
-           CEREAL_NVP(aspect_ratio),
-           CEREAL_NVP(background_color));
+        ar(
+            CEREAL_NVP(view_mode),
+            CEREAL_NVP(field_of_view),
+            CEREAL_NVP(near_plane),
+            CEREAL_NVP(far_plane),
+            CEREAL_NVP(ortho_size),
+            CEREAL_NVP(aspect_ratio),
+            CEREAL_NVP(background_color)
+        );
     }
 };
 
 class CameraComponent : public Component
 {
     friend RenderPipeline;
-    static std::weak_ptr<CameraComponent> m_main_camera_;
-    static std::weak_ptr<CameraComponent> m_current_camera_;
+    inline static std::weak_ptr<CameraComponent> m_main_camera_;
+    inline static std::weak_ptr<CameraComponent> m_current_camera_;
+    inline static std::list<std::weak_ptr<CameraComponent>> m_cameras_;
 
     AssetPtr<DepthTexture> m_depth_texture_;
     AssetPtr<RenderTexture> m_render_texture_;
@@ -56,6 +59,7 @@ class CameraComponent : public Component
 public:
     void OnAwake() override;
     void OnInspectorGui() override;
+    void OnValidate() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
@@ -72,10 +76,16 @@ public:
     Matrix ViewMatrix() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_property_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_property_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CameraProperty, 1)
+
+CEREAL_CLASS_VERSION(engine::CameraComponent, 1)

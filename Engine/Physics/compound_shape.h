@@ -26,11 +26,18 @@ public:
     [[nodiscard]] btCompoundShape *GetShape() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(CEREAL_NVP(m_colliders_), CEREAL_NVP(m_transform_));
+        ar(
+            CEREAL_NVP(m_colliders_),
+            CEREAL_NVP(m_transform_)
+        );
 
+        if (!m_shape_)
+            m_shape_ = std::make_unique<btCompoundShape>();
         UpdateShape();
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CompoundShape, 1)

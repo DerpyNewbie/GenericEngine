@@ -244,21 +244,6 @@ std::vector<IAssetPtr> AssetDatabase::GetAssetsByType(const std::string &type)
 
 void AssetDatabase::WriteAsset(AssetDescriptor *asset_descriptor)
 {
-    if (asset_descriptor->IsInternalAsset())
-    {
-        Logger::Warn<AssetDatabase>("Cannot write internal asset '%s'", asset_descriptor->m_guid_.str().c_str());
-        return;
-    }
-
-    const auto importer = AssetImporter::Get(asset_descriptor->m_type_);
-    if (importer == nullptr)
-    {
-        Logger::Warn<AssetDatabase>("AssetImporter for type '%s' not found! Will ignore file '%s'",
-                                    asset_descriptor->m_type_.c_str(), asset_descriptor->AssetPath().c_str());
-        return;
-    }
-
-    importer->OnExport(asset_descriptor);
     asset_descriptor->Save();
 }
 

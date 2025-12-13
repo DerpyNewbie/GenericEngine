@@ -54,3 +54,5 @@ void LineRenderer::Render()
     cmd_list->DrawIndexedInstanced(m_num_indices_, 1, 0, 0, 0);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::LineRenderer)

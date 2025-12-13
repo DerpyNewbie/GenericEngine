@@ -1,9 +1,13 @@
 #include "pch.h"
 #include "render_pipeline.h"
+
+#include "application.h"
+#include "engine_time.h"
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
+#include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -15,7 +19,7 @@ using namespace DirectX;
 namespace
 {
 std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
-const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
+    const std::vector<std::shared_ptr<engine::Renderer>> &renderers, const Matrix &view, const Matrix &proj)
 {
     BoundingFrustum frustum;
     BoundingFrustum::CreateFromMatrix(frustum, proj, true);
@@ -47,11 +51,6 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
-    for (const auto renderer : m_renderers_)
-    {
-        renderer->UpdateBuffer();
-    }
-
     for (const auto camera : m_cameras_)
     {
         ID3D12DescriptorHeap *rtv_heap = nullptr;
@@ -74,13 +73,16 @@ void RenderPipeline::InvokeDrawCall()
         if (rtv_heap == nullptr && dsv_heap == nullptr)
             continue;
 
+        const auto view = camera->ViewMatrix();
+        const auto proj = camera->m_property_.ProjectionMatrix();
+
         CameraComponent::SetCurrentCamera(camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
 
         DepthRender();
 
         RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-        Render(camera);
+        Render(view, proj);
 
         if (render_tex)
             render_tex->EndRender();
@@ -91,14 +93,36 @@ void RenderPipeline::InvokeDrawCall()
 
     if (const auto main_camera = CameraComponent::Main())
     {
+        // store previous property as we're editing aspect ratio to match window aspect ratio
+        const auto prev_property = main_camera->m_property_;
+        main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
         CameraComponent::SetCurrentCamera(main_camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer();
+        const auto view = main_camera->ViewMatrix();
+        const auto proj = main_camera->m_property_.ProjectionMatrix();
+
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(main_camera);
-        on_rendering.Invoke();
+        Render(view, proj);
+
+        // revert back to original property
+        main_camera->m_property_ = prev_property;
     }
+    else
+    {
+        const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
+        const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
+
+        CameraComponent::SetCurrentCamera({});
+        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
+        DepthRender();
+
+        RenderEngine::Instance()->SetMainRenderTarget(Color());
+        Render(view, proj);
+    }
+
+    on_rendering.Invoke();
 }
 
 void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
@@ -123,26 +147,40 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
 
+void RenderPipeline::SetSceneData()
+{
+    if (m_scene_data_buffer_ == nullptr)
+    {
+        m_scene_data_buffer_ = std::make_shared<ConstantBuffer>(sizeof(SceneData));
+        m_scene_data_buffer_->CreateBuffer();
+    }
+
+    const auto cmd_list = RenderEngine::CommandList();
+    SceneData scene_data;
+    scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
+    scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
+    scene_data.time = Time::Get()->TimeSinceStartUp();
+    scene_data.delta_time = Time::GetDeltaTime();
+
+    m_scene_data_buffer_->UpdateBuffer(&scene_data);
+
+    cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
+}
+
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(view, proj);
+    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
     lighting_instance->SetCascadeSlicesBuffer();
     lighting_instance->SetBuffers();
     Skybox::Instance()->Render();
-
-    for (const auto renderer : m_renderers_)
-    {
-        renderer->UpdateBuffer();
-    }
 }
 
-void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
+void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
 {
-    const auto view = camera->ViewMatrix();
-    const auto proj = camera->m_property_.ProjectionMatrix();
     UpdateBuffer(view, proj);
 
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
@@ -152,6 +190,7 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera)
                       });
     for (const auto renderer : renderers)
     {
+        renderer->UpdateBuffer();
         renderer->Render();
     }
 
@@ -167,8 +206,24 @@ void RenderPipeline::DepthRender()
     cmd_list->SetPipelineState(PSOManager::Get("Depth"));
 
     Lighting::Instance()->BeginDepthRender();
+
+    Vector2 shadow_map_size = RenderingConstants::kShadowMapSize;
+    D3D12_VIEWPORT viewport;
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = shadow_map_size.x;
+    viewport.Height = shadow_map_size.y;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
+
+    D3D12_RECT scissor_rect;
+    scissor_rect.left = 0;
+    scissor_rect.right = static_cast<LONG>(shadow_map_size.x);
+    scissor_rect.top = 0;
+    scissor_rect.bottom = static_cast<LONG>(shadow_map_size.y);
+
     RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
-                                              Color());
+                                              Color(), &viewport, &scissor_rect);
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
@@ -176,6 +231,7 @@ void RenderPipeline::DepthRender()
 
     for (const auto renderer : m_renderers_)
     {
+        renderer->UpdateBuffer();
         renderer->DepthRender();
     }
 
@@ -201,18 +257,21 @@ void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 {
     auto &renderers = Instance()->m_renderers_;
-    std::erase_if(renderers, [&](const auto &r) {
-        return r == renderer;
-    });
+    std::erase_if(renderers,
+                  [&](const auto &r) {
+                      return r == renderer;
+                  });
 }
 
 void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
 {
+    Logger::Log<RenderPipeline>("Adding camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.emplace(camera);
 }
 
 void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
 {
+    Logger::Log<RenderPipeline>("Removing camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.erase(camera);
 }
 }

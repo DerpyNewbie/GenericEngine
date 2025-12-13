@@ -1,10 +1,12 @@
 #pragma once
+#define NOMINMAX
 
 /* === begin C++ standard library === */
 #include <array>
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <coroutine>
 #include <cstdint>
 #include <cstdio>
 #include <filesystem>
@@ -39,9 +41,12 @@
 
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/polymorphic.hpp>
+#include "cereal/types/utility.hpp"
 #include <cereal/types/array.hpp>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/list.hpp>
+#include <cereal/types/set.hpp>
+#include <cereal/types/map.hpp>
 /* === end cereal === */
 
 /* === begin windows === */
@@ -73,8 +78,7 @@
 /* === begin engine.serializer === */
 #include "guid_serializer.h"
 #include "Math/math_serializer.h"
-#include "Rendering/rendering_serializer.h"
-/* === end engine.serialzier === */
+/* === end engine.serializer === */
 
 /* === begin engine.cabot_engine === */
 #include "Rendering/CabotEngine/Graphics/ComPtr.h"

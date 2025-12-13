@@ -29,7 +29,7 @@ Texture2DImporter::kImageFormat Texture2DImporter::GetImageFormat(const path &fi
 
 IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
-    const auto texture_2d = Object::Instantiate<Texture2D>();
+    const auto texture_2d = Object::Instantiate<Texture2D>("Generated Color Texture");
     constexpr auto width = 4;
     constexpr auto height = 4;
     constexpr auto pixel_count = width * height;
@@ -64,18 +64,18 @@ void Texture2DImporter::OnImport(AssetDescriptor *ctx)
 
     switch (format)
     {
-    case kImageFormat::kWic: {
-        hr = LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &meta, scratch);
-        break;
-    }
-    case kImageFormat::kTga: {
-        hr = LoadFromTGAFile(path.c_str(), &meta, scratch);
-        break;
-    }
-    default: {
-        ctx->LogImportError("Unsupported image format");
-        return;
-    }
+        case kImageFormat::kWic: {
+            hr = LoadFromWICFile(path.c_str(), WIC_FLAGS_NONE, &meta, scratch);
+            break;
+        }
+        case kImageFormat::kTga: {
+            hr = LoadFromTGAFile(path.c_str(), &meta, scratch);
+            break;
+        }
+        default: {
+            ctx->LogImportError("Unsupported image format");
+            return;
+        }
     }
 
     if (FAILED(hr))

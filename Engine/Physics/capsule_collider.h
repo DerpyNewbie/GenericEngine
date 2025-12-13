@@ -24,9 +24,15 @@ public:
     [[nodiscard]] float Height() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Collider>(this), m_radius_, m_height_);
+        ar(
+            cereal::base_class<Collider>(this),
+            CEREAL_NVP(m_radius_),
+            CEREAL_NVP(m_height_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CapsuleCollider, 1)

@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "event.h"
 #include "game_object.h"
 
 namespace engine
@@ -6,13 +7,17 @@ namespace engine
 class SceneManager
 {
     friend class Editor;
-    static std::vector<std::shared_ptr<Scene>> m_scenes_;
+    inline static std::vector<std::shared_ptr<Scene>> m_scenes_;
+    inline static bool m_is_deserializing_scene_;
 
 public:
+    inline static Event<std::shared_ptr<Scene>> scene_added;
+
     static std::shared_ptr<Scene> GetActiveScene();
     static const std::vector<std::shared_ptr<Scene>> &GetCurrentScenes();
     static std::shared_ptr<Scene> CreateScene(const std::string &name);
     static void AddScene(const std::shared_ptr<Scene> &scene);
+    static void DeserializeScene(const std::string &serialized_scene);
     static void DestroyScene(const std::string &name);
     static void MoveGameObject(const std::shared_ptr<GameObject> &go, const std::shared_ptr<Scene> &scene);
 };

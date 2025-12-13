@@ -22,8 +22,8 @@ void CapsuleCollider::OnInspectorGui()
 
 void CapsuleCollider::UpdateShape()
 {
-    m_radius_ = max(m_radius_, Mathf::kEpsilon);
-    m_height_ = max(m_height_, Mathf::kEpsilon);
+    m_radius_ = std::max(m_radius_, Mathf::kEpsilon);
+    m_height_ = std::max(m_height_, Mathf::kEpsilon);
     m_capsule_shape_.setLocalScaling({m_radius_, m_height_, m_radius_});
 }
 

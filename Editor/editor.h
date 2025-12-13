@@ -9,6 +9,12 @@ namespace editor
 class EditorMenu;
 class EditorWindow;
 
+enum class EditorMode
+{
+    kEdit,
+    kPlay,
+};
+
 class Editor final : public enable_shared_from_base<Editor>
 {
     struct PrioritizedEditorMenu
@@ -33,16 +39,21 @@ class Editor final : public enable_shared_from_base<Editor>
         std::function<std::shared_ptr<engine::Object>()> factory;
         int priority;
     };
-    
+
     int m_last_editor_style_ = -1;
     std::weak_ptr<engine::Object> m_selected_object_;
     std::filesystem::path m_selected_directory_ = "";
     std::unordered_map<std::string, std::shared_ptr<EditorWindow>> m_editor_windows_;
     std::vector<PrioritizedEditorMenu> m_editor_menus_;
     std::vector<PrioritizedCreateMenu> m_create_menus_;
+    std::queue<std::vector<std::string>> m_scene_snapshots_;
+
+    EditorMode m_mode_ = EditorMode::kEdit;
+    bool m_paused_ = false;
 
     void SetEditorStyle(int i);
     void Init();
+    void OnEngineTick() const;
 
 public:
     static std::shared_ptr<Editor> Instance();
@@ -51,6 +62,16 @@ public:
 
     void Attach();
     void Finalize();
+
+    void PushSceneSnapshot();
+    void PopSceneSnapshot();
+
+    void SetEditorMode(EditorMode mode);
+    EditorMode GetEditorMode() const;
+    void SetPaused(bool is_paused);
+    bool IsPaused() const;
+
+    void SingleTickStep();
 
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
     std::shared_ptr<engine::Object> SelectedObject() const;
@@ -69,7 +90,7 @@ public:
     void RemoveEditorMenu(const std::string &name);
 
     void AddCreateMenu(const std::string &name, const std::string &extension,
-                       std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
+        std::function<std::shared_ptr<engine::Object>()> factory, int priority = 0);
     std::vector<PrioritizedCreateMenu> GetCreateMenus();
     void RemoveCreateMenu(const std::string &name);
 

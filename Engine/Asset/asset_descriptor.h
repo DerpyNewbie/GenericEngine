@@ -10,6 +10,13 @@ struct AssetDescriptor : enable_shared_from_base<AssetDescriptor>
 private:
     friend class AssetDatabase;
 
+    struct SubObjectMeta
+    {
+        xg::Guid guid;
+        std::string name;
+        std::string type_hint;
+    };
+
     static constexpr auto kMetaFileExtension = ".meta";
     static constexpr auto kInternalAssetPath = "__internally_generated__";
     static constexpr auto kGuidKey = "guid";
@@ -20,6 +27,7 @@ private:
 
     xg::Guid m_guid_ = xg::Guid();
     std::list<xg::Guid> m_sub_guids_;
+    std::list<SubObjectMeta> m_sub_object_metas_;
     std::string m_type_;
     std::filesystem::path m_asset_path_;
     std::shared_ptr<Object> m_main_object_;
