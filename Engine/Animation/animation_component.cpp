@@ -226,7 +226,10 @@ void AnimationComponent::Sample()
             }
 
             const auto time = state->GetTime();
-            final_trs.translation += Lerp(time, curve->position_key, curve->position_index) * state->weight;
+            if (path != "root")
+            {
+                final_trs.translation += Lerp(time, curve->position_key, curve->position_index) * state->weight;
+            }
             final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
 
             Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
