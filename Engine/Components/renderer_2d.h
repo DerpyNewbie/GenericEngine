@@ -20,7 +20,7 @@ public:
     virtual void Render() = 0;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Component>(this),
