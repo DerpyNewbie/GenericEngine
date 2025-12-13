@@ -23,7 +23,6 @@ protected:
     DXGI_FORMAT format;
 
     ComPtr<ID3D12Resource> m_pResource;
-    bool m_IsValid = false;
 
 public:
     static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);

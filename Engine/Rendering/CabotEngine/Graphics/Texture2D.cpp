@@ -99,10 +99,8 @@ void Texture2D::CreateBuffer()
 
     if (FAILED(hr))
     {
-        return;
+        m_pResource = nullptr;
     }
-
-    m_IsValid = true;
 }
 
 void Texture2D::UpdateBuffer(void *data)
@@ -122,12 +120,12 @@ bool Texture2D::CanUpdate()
 
 bool Texture2D::IsValid()
 {
-    return m_IsValid;
+    return m_pResource != nullptr;
 }
 
 ID3D12Resource *Texture2D::Resource()
 {
-    if (m_pResource == nullptr)
+    if (IsValid())
     {
         CreateBuffer();
     }
