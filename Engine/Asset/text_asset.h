@@ -11,7 +11,7 @@ public:
     void OnInspectorGui() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(CEREAL_NVP(content));
     }
