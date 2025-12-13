@@ -296,9 +296,10 @@ ImVec2 Gui::GetFieldRect()
     return {width, height};
 }
 
-void Gui::ReadOnlyStringField(const char *label, std::string value)
+void Gui::ReadOnlyStringField(const char *label, const std::string &value)
 {
-    ImGui::InputText(label, &value, ImGuiInputTextFlags_ReadOnly);
+    auto copy = value;
+    ImGui::InputText(label, &copy, ImGuiInputTextFlags_ReadOnly);
 }
 
 bool Gui::BoolField(const char *label, bool &value)

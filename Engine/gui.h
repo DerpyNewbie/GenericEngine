@@ -90,7 +90,7 @@ public:
     template <typename T>
     static bool AssetPicker(IAssetPtr &asset_ptr);
 
-    static void ReadOnlyStringField(const char *label, std::string value);
+    static void ReadOnlyStringField(const char *label, const std::string &value);
 
     static bool BoolField(const char *label, bool &value);
 
