@@ -14,6 +14,7 @@ class CoroutineManager
 public:
     void Start(Task &&t)
     {
+        t.handle.resume();
         m_coroutines_.emplace_back(t.handle);
         t.handle = nullptr;
     }

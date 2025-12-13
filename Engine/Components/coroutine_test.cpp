@@ -3,6 +3,7 @@
 
 #include "engine.h"
 #include "game_object.h"
+#include "do.h"
 
 namespace engine
 {
@@ -26,7 +27,7 @@ Task CoroutineTest::MoveWrap()
 
 void CoroutineTest::OnAwake()
 {
-    Engine::coroutine.Start(MoveWrap());
+    Engine::coroutine.Start(Do::Move(GameObject()->Transform(), Vector3(100, 0, 0), 10.0f));
 }
 }
 
