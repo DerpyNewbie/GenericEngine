@@ -28,10 +28,14 @@ public:
     void Blend(const std::shared_ptr<CinemaCameraComponent> &from, const std::shared_ptr<CinemaCameraComponent> &to, float duration, float time = 0);
 
     template <typename Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_target_camera_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_target_camera_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CinemaBrainComponent, 1)

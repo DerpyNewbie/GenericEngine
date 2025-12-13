@@ -24,9 +24,11 @@ public:
     void Render() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<Renderer>(this));
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::LineRenderer, 1)

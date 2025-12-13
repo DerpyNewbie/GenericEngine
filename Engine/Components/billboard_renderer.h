@@ -13,6 +13,7 @@ class BillboardRenderer : public Renderer
     void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list);
 
 public:
+    // TODO: make it AssetPtr
     std::shared_ptr<Material> shared_material;
 
     void OnConstructed() override;
@@ -22,9 +23,11 @@ public:
     std::shared_ptr<Transform> BoundsOrigin() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<Renderer>(this));
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::BillboardRenderer, 1)

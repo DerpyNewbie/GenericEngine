@@ -29,7 +29,6 @@ void Light::OnInspectorGui()
 
 void Light::OnEnabled()
 {
-
     Lighting::Instance()->AddLight(shared_from_base<Light>());
     if (m_has_shadow_)
         Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());

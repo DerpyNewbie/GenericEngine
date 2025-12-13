@@ -15,16 +15,20 @@ struct alignas(16) LightData
     float outer_cos;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(CEREAL_NVP(type),
-           CEREAL_NVP(cast_shadow),
-           CEREAL_NVP(intensity),
-           CEREAL_NVP(range),
-           CEREAL_NVP(pos),
-           CEREAL_NVP(direction),
-           CEREAL_NVP(color),
-           CEREAL_NVP(inner_cos),
-           CEREAL_NVP(outer_cos));
+        ar(
+            CEREAL_NVP(type),
+            CEREAL_NVP(cast_shadow),
+            CEREAL_NVP(intensity),
+            CEREAL_NVP(range),
+            CEREAL_NVP(pos),
+            CEREAL_NVP(direction),
+            CEREAL_NVP(color),
+            CEREAL_NVP(inner_cos),
+            CEREAL_NVP(outer_cos)
+        );
     }
 };
+
+CEREAL_CLASS_VERSION(LightData, 1)

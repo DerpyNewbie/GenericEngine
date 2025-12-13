@@ -1,6 +1,4 @@
 #pragma once
-#include "Asset/inspectable_asset.h"
-
 namespace engine
 {
 class GameObject;
@@ -14,9 +12,23 @@ struct TransformAnimationCurve
     size_t position_index = 0;
     size_t scale_index = 0;
     size_t rotation_index = 0;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            CEREAL_NVP(position_key),
+            CEREAL_NVP(scale_key),
+            CEREAL_NVP(rotation_key),
+            CEREAL_NVP(position_index),
+            CEREAL_NVP(scale_index),
+            CEREAL_NVP(rotation_index)
+        );
+    }
+
 };
 
-class AnimationClip : public InspectableAsset
+class AnimationClip : public Object, public Inspectable
 {
     friend class FbxImporter;
     std::unordered_map<std::string, TransformAnimationCurve> m_curves_;
@@ -40,5 +52,20 @@ public:
     /// </summary>
     /// <returns>key-frame sample rate</returns>
     [[nodiscard]] float FrameRate() const;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(m_curves_),
+            CEREAL_NVP(m_length_),
+            CEREAL_NVP(m_frame_rate_)
+        );
+    }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::TransformAnimationCurve, 1)
+
+CEREAL_CLASS_VERSION(engine::AnimationClip, 1)

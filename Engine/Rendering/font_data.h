@@ -34,7 +34,6 @@ public:
         return m_spritefont_handle_;
     }
 
-
     FontData();
     void LoadFont(const std::wstring &font_path);
 };

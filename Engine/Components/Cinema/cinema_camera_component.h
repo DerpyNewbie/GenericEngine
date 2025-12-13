@@ -33,12 +33,18 @@ public:
     [[nodiscard]] Matrix GetLookAtMatrix();
 
     template <typename Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_property_),
-           CEREAL_NVP(m_apply_position_), CEREAL_NVP(m_apply_rotation_),
-           CEREAL_NVP(m_tracking_target_), CEREAL_NVP(m_tracking_offset_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_property_),
+            CEREAL_NVP(m_apply_position_),
+            CEREAL_NVP(m_apply_rotation_),
+            CEREAL_NVP(m_tracking_target_),
+            CEREAL_NVP(m_tracking_offset_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CinemaCameraComponent, 1)

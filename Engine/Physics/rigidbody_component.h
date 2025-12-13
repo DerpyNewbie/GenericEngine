@@ -130,18 +130,31 @@ public:
     void WakeUp() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_transform_), CEREAL_NVP(m_rigidbody_shape_), CEREAL_NVP(m_ghost_shape_),
-           CEREAL_NVP(m_velocity_), CEREAL_NVP(m_angular_velocity_), CEREAL_NVP(m_center_of_mass_),
-           CEREAL_NVP(m_mass_),
-           CEREAL_NVP(m_linear_damping_), CEREAL_NVP(m_angular_damping_),
-           CEREAL_NVP(m_friction_), CEREAL_NVP(m_rolling_friction_), CEREAL_NVP(m_spinning_friction_),
-           CEREAL_NVP(m_bounciness_),
-           CEREAL_NVP(m_is_kinematic_), CEREAL_NVP(m_is_static_), CEREAL_NVP(m_use_gravity_), CEREAL_NVP(m_lock_axis_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_transform_),
+            CEREAL_NVP(m_rigidbody_shape_),
+            CEREAL_NVP(m_ghost_shape_),
+            CEREAL_NVP(m_velocity_),
+            CEREAL_NVP(m_angular_velocity_),
+            CEREAL_NVP(m_center_of_mass_),
+            CEREAL_NVP(m_mass_),
+            CEREAL_NVP(m_linear_damping_),
+            CEREAL_NVP(m_angular_damping_),
+            CEREAL_NVP(m_friction_),
+            CEREAL_NVP(m_rolling_friction_),
+            CEREAL_NVP(m_spinning_friction_),
+            CEREAL_NVP(m_bounciness_),
+            CEREAL_NVP(m_is_kinematic_),
+            CEREAL_NVP(m_is_static_),
+            CEREAL_NVP(m_use_gravity_)
+        );
 
         RegisterToPhysics();
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::RigidbodyComponent, 1)
