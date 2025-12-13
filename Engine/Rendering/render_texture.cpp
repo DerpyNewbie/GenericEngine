@@ -31,7 +31,7 @@ void RenderTexture::CreateBuffer()
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &clearValue,
         IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
-        );
+    );
     m_p_resource_->SetName(L"RenderTexture");
 
     if (FAILED(hr))

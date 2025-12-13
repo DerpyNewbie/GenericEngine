@@ -79,7 +79,7 @@ void Texture2D::CreateBuffer()
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
         IID_PPV_ARGS(&m_p_resource_)
-        );
+    );
 
     if (FAILED(hr))
     {

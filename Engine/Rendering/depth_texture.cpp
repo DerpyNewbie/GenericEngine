@@ -46,7 +46,7 @@ void DepthTexture::CreateBuffer()
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &dsvClearValue,
         IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
-        );
+    );
 
     if (FAILED(hr))
     {
