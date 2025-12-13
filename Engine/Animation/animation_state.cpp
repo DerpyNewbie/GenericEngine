@@ -86,5 +86,3 @@ void AnimationState::Stop()
     clip.CastedLock()->Initialize();
 }
 }
-
-CEREAL_REGISTER_TYPE(engine::AnimationState)
