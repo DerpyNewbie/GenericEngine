@@ -45,8 +45,8 @@ void DepthTexture::CreateBuffer()
         // 初期状態は DSV として使うので DEPTH_WRITE
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &dsvClearValue,
-        IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
-    );
+        IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
+        );
 
     if (FAILED(hr))
     {
@@ -62,16 +62,16 @@ void DepthTexture::CreateBuffer()
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    device->CreateDepthStencilView(m_pResource.Get(), &dsvDesc, dsvHandle);
+    device->CreateDepthStencilView(m_p_resource_.Get(), &dsvDesc, dsvHandle);
 }
 
 void DepthTexture::BeginRender()
 {
-    if (m_pResource == nullptr)
+    if (m_p_resource_ == nullptr)
         CreateBuffer();
 
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        m_p_resource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -79,7 +79,7 @@ void DepthTexture::BeginRender()
 void DepthTexture::EndRender()
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pResource.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        m_p_resource_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -109,7 +109,7 @@ void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_ar
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
 
-    m_pResource = texture_array->Resource();
+    m_p_resource_ = texture_array->Resource();
 }
 
 ID3D12DescriptorHeap *DepthTexture::GetHeap()

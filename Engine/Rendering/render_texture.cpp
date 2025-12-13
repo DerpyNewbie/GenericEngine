@@ -30,9 +30,9 @@ void RenderTexture::CreateBuffer()
         &res_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &clearValue,
-        IID_PPV_ARGS(m_pResource.ReleaseAndGetAddressOf())
-    );
-    m_pResource->SetName(L"RenderTexture");
+        IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
+        );
+    m_p_resource_->SetName(L"RenderTexture");
 
     if (FAILED(hr))
     {
@@ -51,17 +51,17 @@ void RenderTexture::CreateBuffer()
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    device->CreateRenderTargetView(m_pResource.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateRenderTargetView(m_p_resource_.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTexture::BeginRender(const Color background_color)
 {
-    if (!m_pResource)
+    if (!m_p_resource_)
     {
         CreateBuffer();
     }
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pResource.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        m_p_resource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -69,7 +69,7 @@ void RenderTexture::BeginRender(const Color background_color)
 void RenderTexture::EndRender() const
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_pResource.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+        m_p_resource_.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
