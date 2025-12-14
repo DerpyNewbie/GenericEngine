@@ -168,7 +168,11 @@ std::shared_ptr<Object> Object::Instantiate(const std::shared_ptr<Object> &origi
         std::stringstream ss;
         {
             Serializer serializer;
-            serializer.Save(ss, original);
+            if (!serializer.Save(ss, original))
+            {
+                Logger::Error<Object>("Instantiate: Failed to serialize object");
+                return nullptr;
+            }
         }
 
         const std::string serialized_object(ss.view());
@@ -179,7 +183,7 @@ std::shared_ptr<Object> Object::Instantiate(const std::shared_ptr<Object> &origi
         auto cloned_object = deserializer.Load<Object>(is);
         if (!cloned_object)
         {
-            Logger::Error<Object>("Failed to deserialize cloned object");
+            Logger::Error<Object>("Instantiate: Failed to deserialize cloned object");
             return nullptr;
         }
 
@@ -189,7 +193,7 @@ std::shared_ptr<Object> Object::Instantiate(const std::shared_ptr<Object> &origi
     }
     catch (std::exception &e)
     {
-        Logger::Error<Object>("Cloning failed: %s", e.what());
+        Logger::Error<Object>("Instantiate: Cloning failed: %s", e.what());
         return nullptr;
     }
 }
