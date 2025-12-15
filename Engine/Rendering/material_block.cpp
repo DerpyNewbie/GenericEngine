@@ -20,6 +20,11 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
          return std::make_shared<MaterialData<float>>(0.0F, param);
      }
     },
+    {"color",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<Color>>(Color(), param);
+     }
+    },
     {"vector<Matrix>",
      [](const ShaderParameter &param) {
          auto identity = std::vector{Matrix::Identity};
