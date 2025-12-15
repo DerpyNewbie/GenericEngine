@@ -65,19 +65,9 @@ void Scene::OnGarbageCollect()
 {
     if (m_has_destroying_game_object_)
     {
-        std::erase_if(
-            m_root_game_objects_,
-            [](const auto &go) {
-                return go->IsDestroying();
-            }
-        );
-
-        std::erase_if(
-            m_all_game_objects_,
-            [](const auto &go) {
-                return go->IsDestroying();
-            }
-        );
+        const auto is_destroying = [](const auto &go) { return go->IsDestroying(); };
+        std::erase_if(m_root_game_objects_, is_destroying);
+        std::erase_if(m_all_game_objects_, is_destroying);
         m_has_destroying_game_object_ = false;
     }
 }
