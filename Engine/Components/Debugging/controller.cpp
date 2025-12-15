@@ -76,10 +76,17 @@ void Controller::OnInspectorGui()
     Gui::FloatField("Movement Speed", m_movement_speed_);
     Gui::FloatField("Rotation Speed", m_rotation_speed_);
 
-    ImGui::Text("Last Movement Input: {%.2f, %.2f, %.2f}",
-                m_last_movement_input_.x, m_last_movement_input_.y, m_last_movement_input_.z);
-    ImGui::Text("Last Rotation Input: {%.2f, %.2f}",
-                m_last_rotation_input_.x, m_last_rotation_input_.y);
+    ImGui::Text(
+        "Last Movement Input: {%.2f, %.2f, %.2f}",
+        m_last_movement_input_.x,
+        m_last_movement_input_.y,
+        m_last_movement_input_.z
+    );
+    ImGui::Text(
+        "Last Rotation Input: {%.2f, %.2f}",
+        m_last_rotation_input_.x,
+        m_last_rotation_input_.y
+    );
 }
 }
 

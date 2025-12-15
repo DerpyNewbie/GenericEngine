@@ -13,7 +13,8 @@ void RotatorComponent::OnUpdate()
     auto transform = GameObject()->Transform();
     auto local_rot = transform->LocalRotation();
     transform->SetLocalRotation(
-        local_rot * Quaternion::CreateFromAxisAngle(m_rotating_axis_, Time::GetDeltaTime() * m_speed_));
+        local_rot * Quaternion::CreateFromAxisAngle(m_rotating_axis_, Time::GetDeltaTime() * m_speed_)
+    );
 }
 
 void RotatorComponent::OnInspectorGui()
