@@ -63,7 +63,8 @@ public:
     static DirectX::SimpleMath::Quaternion Slerp(const DirectX::SimpleMath::Quaternion &a, const DirectX::SimpleMath::Quaternion &b, const float t)
     {
         float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
+        dot = Clamp(dot, -1.0f, 1.0f);
+        
         DirectX::SimpleMath::Quaternion end = b;
         if (dot < 0.0f)
         {
