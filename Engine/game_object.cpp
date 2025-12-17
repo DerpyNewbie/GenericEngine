@@ -110,14 +110,20 @@ void GameObject::InvokeUpdate()
         {
             component->OnAwake();
             component->m_has_called_awake_ = true;
-            component->OnEnabled();
+            if (IsActiveInHierarchy())
+            {
+                component->OnEnabled();
+            }
         }
 
         if (!component->m_has_called_start_)
         {
-            Logger::Log<GameObject>("[%s] Calling first start for %s",
-                                    Path().c_str(),
-                                    component->Name().c_str());
+            Logger::Log<GameObject>(
+                "[%s] Calling first start for %s",
+                Path().c_str(),
+                component->Name().c_str()
+            );
+
             component->OnStart();
             component->m_has_called_start_ = true;
         }
@@ -126,9 +132,10 @@ void GameObject::InvokeUpdate()
 
     if (has_destroying_component)
     {
-        std::erase_if(m_components_, [](const auto &component) {
-            return component->IsDestroying();
-        });
+        std::erase_if(
+            m_components_,
+            [](const auto &component) { return component->IsDestroying(); }
+        );
     }
 
     const auto transform = Transform();
@@ -316,9 +323,8 @@ void GameObject::SetAsRootObject(const bool is_root_object)
     const auto root_objects = &scene->m_root_game_objects_;
     const auto pos = std::ranges::find_if(
         *root_objects,
-        [&shared_this](const std::shared_ptr<GameObject> &other) {
-            return shared_this == other;
-        });
+        [&shared_this](const std::shared_ptr<GameObject> &other) { return shared_this == other; }
+    );
 
     if (is_root_object && pos == root_objects->end())
     {
