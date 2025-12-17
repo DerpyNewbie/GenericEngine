@@ -78,7 +78,7 @@ void Texture2D::CreateBuffer()
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&m_pResource)
+        IID_PPV_ARGS(&m_p_resource_)
     );
 
     if (FAILED(hr))
@@ -86,10 +86,10 @@ void Texture2D::CreateBuffer()
         return;
     }
 
-    m_pResource->SetName(L"Texture");
+    m_p_resource_->SetName(L"Texture");
 
     const D3D12_BOX dest_region = {0, 0, 0, width, height, 1};
-    hr = m_pResource->WriteToSubresource(
+    hr = m_p_resource_->WriteToSubresource(
         0,
         &dest_region, // copy all
         tex_data.data(), // origin data addr
@@ -99,10 +99,8 @@ void Texture2D::CreateBuffer()
 
     if (FAILED(hr))
     {
-        return;
+        m_p_resource_ = nullptr;
     }
-
-    m_IsValid = true;
 }
 
 void Texture2D::UpdateBuffer(void *data)
@@ -122,17 +120,17 @@ bool Texture2D::CanUpdate()
 
 bool Texture2D::IsValid()
 {
-    return m_IsValid;
+    return m_p_resource_ != nullptr;
 }
 
 ID3D12Resource *Texture2D::Resource()
 {
-    if (m_pResource == nullptr)
+    if (!IsValid())
     {
         CreateBuffer();
     }
 
-    return m_pResource != nullptr ? m_pResource.Get() : nullptr;
+    return m_p_resource_ != nullptr ? m_p_resource_.Get() : nullptr;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()

@@ -10,7 +10,7 @@
 
 namespace engine
 {
-struct IMaterialData : Inspectable
+struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
     ShaderParameter parameter;
@@ -31,19 +31,22 @@ struct IMaterialData : Inspectable
     virtual kParameterBufferType BufferType() = 0;
 
     template <typename Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(parameter);
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(parameter)
+        );
     }
 };
 
 inline IMaterialData::IMaterialData() :
     parameter()
-{}
+{ }
 
-inline IMaterialData::IMaterialData(ShaderParameter param):
+inline IMaterialData::IMaterialData(ShaderParameter param) :
     parameter(std::move(param))
-{}
+{ }
 
 template <typename T>
 struct MaterialData : IMaterialData
@@ -52,8 +55,8 @@ struct MaterialData : IMaterialData
     static constexpr bool kIsAssetPtr = std::is_base_of_v<IAssetPtr, T>;
     static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T> || std::is_same_v<Texture2D, T>;
     static constexpr kParameterBufferType kBufferType = kIsVector || kIsTexture
-                                                            ? kParameterBufferType_SRV
-                                                            : kParameterBufferType_CBV;
+        ? kParameterBufferType_SRV
+        : kParameterBufferType_CBV;
 
     T value;
 
@@ -77,7 +80,7 @@ struct MaterialData : IMaterialData
     kParameterBufferType BufferType() override;
 
     template <typename Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<IMaterialData>(this), CEREAL_NVP(value));
     }
@@ -86,17 +89,17 @@ struct MaterialData : IMaterialData
 template <typename T>
 MaterialData<T>::MaterialData() :
     MaterialData({}, {})
-{}
+{ }
 
 template <typename T>
 MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) :
     MaterialData({}, new_parameter)
-{}
+{ }
 
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
-{}
+{ }
 
 template <typename T>
 void MaterialData<T>::OnInspectorGui()
@@ -114,6 +117,13 @@ void MaterialData<T>::OnInspectorGui()
     else if constexpr (std::is_same_v<T, float>)
     {
         if (ImGui::InputFloat(name, &value))
+        {
+            is_dirty = true;
+        }
+    }
+    else if constexpr (std::is_same_v<T, Color>)
+    {
+        if (Gui::PropertyField(name, value))
         {
             is_dirty = true;
         }
@@ -259,3 +269,17 @@ kParameterBufferType MaterialData<T>::BufferType()
     return kBufferType;
 }
 }
+
+CEREAL_CLASS_VERSION(engine::IMaterialData, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<bool>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<int>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<float>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<Color>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<Matrix>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<Texture2D>>, 1)

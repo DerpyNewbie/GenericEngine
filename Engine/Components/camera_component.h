@@ -31,7 +31,7 @@ struct CameraProperty : Inspectable
     Matrix ProjectionMatrix() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             CEREAL_NVP(view_mode),
@@ -76,7 +76,7 @@ public:
     Matrix ViewMatrix() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Component>(this),
@@ -85,3 +85,7 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::CameraProperty, 1)
+
+CEREAL_CLASS_VERSION(engine::CameraComponent, 1)

@@ -17,27 +17,27 @@ void RigidbodyTesterComponent::OnFixedUpdate()
 
     switch (m_test_type_)
     {
-    case kTestType::kStarting: {
-        rb->SetPosition(Vector3::Zero);
-        rb->SetRotation(Quaternion::Identity);
-        rb->SetVelocity(Vector3::Zero);
-        rb->SetAngularVelocity(Vector3::Zero);
-        rb->ClearForces();
-        break;
-    }
-    case kTestType::kForce: {
-        rb->AddForce(m_force_, kForceMode::kForce);
-        break;
-    }
-    case kTestType::kImpulse: {
-        rb->AddForce(m_force_, kForceMode::kImpulse);
-        break;
-    }
-    case kTestType::kForceAtPosition: {
-        const auto world_position = Vector3::Transform(m_position_, rb->Transform()->LocalToWorld());
-        rb->AddForceAtPosition(m_force_, world_position, kForceMode::kForce);
-        break;
-    }
+        case kTestType::kStarting: {
+            rb->SetPosition(Vector3::Zero);
+            rb->SetRotation(Quaternion::Identity);
+            rb->SetVelocity(Vector3::Zero);
+            rb->SetAngularVelocity(Vector3::Zero);
+            rb->ClearForces();
+            break;
+        }
+        case kTestType::kForce: {
+            rb->AddForce(m_force_, kForceMode::kForce);
+            break;
+        }
+        case kTestType::kImpulse: {
+            rb->AddForce(m_force_, kForceMode::kImpulse);
+            break;
+        }
+        case kTestType::kForceAtPosition: {
+            const auto world_position = Vector3::Transform(m_position_, rb->Transform()->LocalToWorld());
+            rb->AddForceAtPosition(m_force_, world_position, kForceMode::kForce);
+            break;
+        }
     }
 }
 void RigidbodyTesterComponent::OnInspectorGui()
@@ -49,3 +49,5 @@ void RigidbodyTesterComponent::OnInspectorGui()
     Gui::PropertyField<Vector3>("Position", m_position_);
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::RigidbodyTesterComponent)

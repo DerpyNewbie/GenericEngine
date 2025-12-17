@@ -25,6 +25,8 @@ public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
 
     template <class Archive>
-    void serialize(Archive &ar);
+    void serialize(Archive &ar, uint32_t version);
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Scene, 1)

@@ -1,4 +1,5 @@
 #pragma once
+#define NOMINMAX
 
 /* === begin C++ standard library === */
 #include <array>
@@ -77,8 +78,7 @@
 /* === begin engine.serializer === */
 #include "guid_serializer.h"
 #include "Math/math_serializer.h"
-#include "Rendering/rendering_serializer.h"
-/* === end engine.serialzier === */
+/* === end engine.serializer === */
 
 /* === begin engine.cabot_engine === */
 #include "Rendering/CabotEngine/Graphics/ComPtr.h"

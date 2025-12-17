@@ -1,5 +1,4 @@
 ﻿#pragma once
-#include "Asset/inspectable_asset.h"
 #include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 
@@ -12,7 +11,7 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D : public engine::InspectableAsset, public IBuffer, public engine::ShaderResource
+class Texture2D : public engine::Object, public engine::Inspectable, public IBuffer, public engine::ShaderResource
 {
     friend class engine::Texture2DImporter;
 
@@ -23,8 +22,7 @@ protected:
     UINT16 mip_level;
     DXGI_FORMAT format;
 
-    ComPtr<ID3D12Resource> m_pResource;
-    bool m_IsValid = false;
+    ComPtr<ID3D12Resource> m_p_resource_ = nullptr;
 
 public:
     static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);
@@ -70,8 +68,17 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Object>(this), tex_data, width, height, format, mip_level);
+        ar(
+            cereal::base_class<Object>(this),
+            CEREAL_NVP(tex_data),
+            CEREAL_NVP(width),
+            CEREAL_NVP(height),
+            CEREAL_NVP(format),
+            CEREAL_NVP(mip_level)
+        );
     }
 };
+
+CEREAL_CLASS_VERSION(Texture2D, 1)

@@ -78,17 +78,17 @@ const std::vector<std::shared_ptr<GameObject>> &Scene::RootGameObjects()
 }
 
 template <class Archive>
-void Scene::serialize(Archive &ar)
+void Scene::serialize(Archive &ar, const uint32_t version)
 {
     ar(cereal::base_class<Object>(this), CEREAL_NVP(m_root_game_objects_), CEREAL_NVP(m_all_game_objects_));
 }
 }
 
-template void engine::Scene::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &);
-template void engine::Scene::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &);
-template void engine::Scene::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &);
-template void engine::Scene::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &);
-template void engine::Scene::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &);
-template void engine::Scene::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &);
+template void engine::Scene::serialize<cereal::JSONOutputArchive>(cereal::JSONOutputArchive &, uint32_t);
+template void engine::Scene::serialize<cereal::JSONInputArchive>(cereal::JSONInputArchive &, uint32_t);
+template void engine::Scene::serialize<cereal::XMLOutputArchive>(cereal::XMLOutputArchive &, uint32_t);
+template void engine::Scene::serialize<cereal::XMLInputArchive>(cereal::XMLInputArchive &, uint32_t);
+template void engine::Scene::serialize<cereal::PortableBinaryOutputArchive>(cereal::PortableBinaryOutputArchive &, uint32_t);
+template void engine::Scene::serialize<cereal::PortableBinaryInputArchive>(cereal::PortableBinaryInputArchive &, uint32_t);
 
 CEREAL_REGISTER_TYPE(engine::Scene)

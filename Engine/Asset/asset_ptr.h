@@ -16,7 +16,7 @@ enum class AssetPtrType
 struct IAssetPtr
 {
 protected:
-    std::weak_ptr<Object> m_external_reference_;
+    mutable std::weak_ptr<Object> m_external_reference_;
     std::shared_ptr<Object> m_stored_reference_;
     xg::Guid m_guid_;
     AssetPtrType m_type_ = AssetPtrType::kNull;
@@ -52,9 +52,9 @@ public:
 
     [[nodiscard]] bool IsNull() const;
 
-    [[nodiscard]] bool IsLoaded();
+    [[nodiscard]] bool IsLoaded() const;
 
-    [[nodiscard]] virtual std::shared_ptr<Object> Lock();
+    [[nodiscard]] virtual std::shared_ptr<Object> Lock() const;
 
     bool operator==(const IAssetPtr &other) const
     {
@@ -62,7 +62,7 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(CEREAL_NVP(m_guid_), CEREAL_NVP(m_type_), CEREAL_NVP(m_stored_reference_));
         auto _ = Lock(); // try to import the object associated with guid
@@ -128,3 +128,5 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::IAssetPtr, 1)

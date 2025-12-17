@@ -32,5 +32,22 @@ struct AnimationState final : Inspectable
     void SetNormalizedTime(float normalized_time);
     void SetNormalizedSpeed(float normalized_speed);
     void Stop();
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            CEREAL_NVP(enabled),
+            CEREAL_NVP(clip),
+            CEREAL_NVP(name),
+            CEREAL_NVP(speed),
+            CEREAL_NVP(time),
+            CEREAL_NVP(weight),
+            CEREAL_NVP(length),
+            CEREAL_NVP(wrap_mode)
+        );
+    }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::AnimationState, 1)

@@ -9,13 +9,16 @@ class DirectionalLight : public Light
     friend class RenderPipeline;
     static std::array<float, RenderingConstants::kShadowCascadeCount> m_cascade_slices_;
 
-    static void CascadeFrustum(const std::array<Vector3, 8> &frustum,
-                               std::array<std::array<Vector3, 8>, RenderingConstants::kShadowCascadeCount> &
-                               dst);
+    static void CascadeFrustum(
+        const std::array<Vector3, 8> &frustum,
+        std::array<std::array<Vector3, 8>, RenderingConstants::kShadowCascadeCount> &
+        dst
+    );
 
 public:
     static void SetCascadeSlices(
-    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices);
+        std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices
+    );
 
     void OnConstructed() override;
     void OnInspectorGui() override;
@@ -26,9 +29,11 @@ public:
     std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<Light>(this));
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::DirectionalLight, 1)

@@ -1,9 +1,8 @@
 #pragma once
-#include "inspectable_asset.h"
 
 namespace engine
 {
-class DummyAsset : public InspectableAsset
+class DummyAsset : public Object, public Inspectable
 {
     void OnInspectorGui() override;
 };

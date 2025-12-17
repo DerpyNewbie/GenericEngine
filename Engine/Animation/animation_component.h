@@ -47,5 +47,16 @@ public:
     void Sample();
 
     [[nodiscard]] bool IsPlaying() const;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_clip_),
+            CEREAL_NVP(m_play_automatically_),
+            CEREAL_NVP(m_is_playing_)
+        );
+    }
 };
 }
