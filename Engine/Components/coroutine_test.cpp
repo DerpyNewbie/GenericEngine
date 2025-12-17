@@ -13,7 +13,7 @@ Task CoroutineTest::Move()
     while (transform->LocalPosition().x < 100.0f)
     {
         transform->SetLocalPosition(transform->LocalPosition() + Vector3(0.1f, 0, 0));
-        co_await WaitForFrame(1);
+        co_await WaitForNextFrame();
     }
     co_return;
 }
