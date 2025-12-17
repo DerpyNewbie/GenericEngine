@@ -44,10 +44,10 @@ struct Task
             current_yield = std::make_unique<WaitForSeconds>(std::move(w));
             return *static_cast<WaitForSeconds *>(current_yield.get());
         }
-        auto await_transform(WaitForFrame w)
+        auto await_transform(WaitForFrames w)
         {
-            current_yield = std::make_unique<WaitForFrame>(std::move(w));
-            return *static_cast<WaitForFrame *>(current_yield.get());
+            current_yield = std::make_unique<WaitForFrames>(std::move(w));
+            return *static_cast<WaitForFrames *>(current_yield.get());
         }
 
         auto await_transform(WaitForTask w)

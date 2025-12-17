@@ -50,11 +50,11 @@ struct WaitForSeconds : YieldBase
     
 };
 
-struct WaitForFrame : YieldBase
+struct WaitForFrames : YieldBase
 {
     uint32_t end_frame_count;
 
-    explicit WaitForFrame(uint32_t frames)
+    explicit WaitForFrames(uint32_t frames)
     {
         end_frame_count = frames + Time::Get()->Frames(); 
     }
