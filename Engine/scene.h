@@ -15,6 +15,7 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
     bool m_has_destroying_game_object_ = false;
 
     void OnConstructed() override;
+    void OnDeserialized() override;
     void OnUpdate() override;
     void OnFixedUpdate() override;
     void OnDestroy() override;

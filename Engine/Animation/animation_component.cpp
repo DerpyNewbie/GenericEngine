@@ -247,7 +247,9 @@ void AnimationComponent::Sample()
 
         }
 
-        transform->SetLocalMatrix(final_trs.GetMatrix());
+        transform->SetLocalPosition(final_trs.translation);
+        transform->SetLocalRotation(final_trs.rotation);
+        transform->SetLocalScale(final_trs.scale);
     }
 }
 
