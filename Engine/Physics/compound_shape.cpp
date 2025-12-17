@@ -5,7 +5,7 @@
 
 namespace engine
 {
-void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) const
+void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider)
 {
     const auto collider_matrix = Matrix::CreateTranslation(collider->Offset()) *
                                  collider->GameObject()->Transform()->WorldMatrix();
@@ -17,15 +17,24 @@ void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) con
     relative_matrix.Decompose(sca, rot, pos);
 
     btTransform bt_transform = btTransform::getIdentity();
-    bt_transform.setOrigin({ pos.x, pos.y, pos.z });
-    bt_transform.setRotation({ rot.x, rot.y, rot.z, rot.w });
+    bt_transform.setOrigin({pos.x, pos.y, pos.z});
+    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
 
-    m_shape_->addChildShape(bt_transform, collider->GetShape());
+    const auto shape = collider->GetShape();
+    m_shape_->addChildShape(bt_transform, shape);
+    m_colliders_.emplace_back(collider, shape);
 }
 
-void CompoundShape::RemoveChildShape(const std::shared_ptr<Collider> &collider) const
+void CompoundShape::RemoveChildShape(const std::shared_ptr<Collider> &collider)
 {
-    m_shape_->removeChildShape(collider->GetShape());
+    auto colliders = m_colliders_;
+    for (auto [col, shape] : colliders)
+    {
+        if (collider != col.lock())
+            continue;
+
+        m_shape_->removeChildShape(collider->GetShape());
+    }
 }
 
 CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
@@ -41,9 +50,12 @@ void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
 
 void CompoundShape::RemoveChild(const std::shared_ptr<Collider> &collider)
 {
-    std::erase_if(m_colliders_, [collider](auto &other) {
-        return other.lock() == collider;
-    });
+    std::erase_if(
+        m_colliders_,
+        [collider](auto &other) {
+            return other.lock() == collider;
+        }
+    );
 
     RemoveChildShape(collider);
 }

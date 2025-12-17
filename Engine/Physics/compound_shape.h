@@ -9,11 +9,11 @@ class Collider;
 class CompoundShape
 {
     std::unique_ptr<btCompoundShape> m_shape_;
-    std::list<std::weak_ptr<Collider>> m_colliders_;
+    std::list<std::pair<std::weak_ptr<Collider>, btCollisionShape *>> m_colliders_;
     std::weak_ptr<Transform> m_transform_;
 
-    void AddChildShape(const std::shared_ptr<Collider> &collider) const;
-    void RemoveChildShape(const std::shared_ptr<Collider> &collider) const;
+    void AddChildShape(const std::shared_ptr<Collider> &collider);
+    void RemoveChildShape(const std::shared_ptr<Collider> &collider);
 
 public:
     CompoundShape() = default;
