@@ -22,8 +22,7 @@ protected:
     UINT16 mip_level;
     DXGI_FORMAT format;
 
-    ComPtr<ID3D12Resource> m_pResource;
-    bool m_IsValid = false;
+    ComPtr<ID3D12Resource> m_p_resource_ = nullptr;
 
 public:
     static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);
