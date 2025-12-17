@@ -3,8 +3,6 @@
 
 namespace engine
 {
-struct Task;
-class Transform;
 struct YieldBase
 {
     virtual bool should_resume() = 0;
