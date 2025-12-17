@@ -16,6 +16,18 @@ void Scene::OnConstructed()
 
     for (const auto &game_object : m_all_game_objects_)
     {
+        game_object->m_scene_ = self;
+        game_object->InvokeOnValidate();
+    }
+}
+
+void Scene::OnDeserialized()
+{
+    const auto self = shared_from_base<Scene>();
+
+    for (const auto &game_object : m_all_game_objects_)
+    {
+        game_object->m_scene_ = self;
         game_object->InvokeOnValidate();
     }
 }
@@ -53,19 +65,9 @@ void Scene::OnGarbageCollect()
 {
     if (m_has_destroying_game_object_)
     {
-        std::erase_if(
-            m_root_game_objects_,
-            [](const auto &go) {
-                return go->IsDestroying();
-            }
-        );
-
-        std::erase_if(
-            m_all_game_objects_,
-            [](const auto &go) {
-                return go->IsDestroying();
-            }
-        );
+        const auto is_destroying = [](const auto &go) { return go->IsDestroying(); };
+        std::erase_if(m_root_game_objects_, is_destroying);
+        std::erase_if(m_all_game_objects_, is_destroying);
         m_has_destroying_game_object_ = false;
     }
 }
