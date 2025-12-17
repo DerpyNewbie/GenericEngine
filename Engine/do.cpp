@@ -1,9 +1,5 @@
 #include "pch.h"
 #include "do.h"
-
-#include <assimp/MathFunctions.h>
-
-#include "Components/transform.h"
 #include "Math/trs.h"
 
 namespace engine

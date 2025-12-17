@@ -1,6 +1,10 @@
 #pragma once
 #include <utility>
 
+#include "wait_for_frames.h"
+#include "wait_for_next_frame.h"
+#include "wait_for_seconds.h"
+#include "wait_for_task.h"
 #include "yield_base.h"
 
 namespace engine
