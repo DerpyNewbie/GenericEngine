@@ -65,6 +65,8 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
         {
             meta->mesh_objects.emplace(convert.to_object.at(mesh_node), CreateMesh(ctx, scene, mesh_node, convert));
         }
+
+        meta->SetUpRootBone();
     }
 
     // process animations

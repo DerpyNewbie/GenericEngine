@@ -48,6 +48,7 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
 
 void AnimationComponent::OnInspectorGui()
 {
+    Gui::PropertyField("FBX Meta", m_fbx_meta_);
     Gui::PropertyField("Clip", m_clip_);
 
     if (ImGui::TreeNode("States"))
@@ -76,6 +77,7 @@ void AnimationComponent::OnInspectorGui()
         Stop();
     }
 }
+
 void AnimationComponent::OnStart()
 {
     AddTransform(GameObject()->Transform());
@@ -138,6 +140,16 @@ void AnimationComponent::Stop()
         for (auto &[path, transform] : m_transforms_)
             transform->SetLocalMatrix(m_default_poses_[path].GetMatrix());
     }
+}
+
+Vector3 AnimationComponent::GetDeltaPosition() const
+{
+    return m_delta_position_;
+}
+
+Quaternion AnimationComponent::GetDeltaRotation() const
+{
+    return m_delta_rotation_;
 }
 
 std::pair<AnimationComponent::StateIterator, bool> AnimationComponent::AddClip(

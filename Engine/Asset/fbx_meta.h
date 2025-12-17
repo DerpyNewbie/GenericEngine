@@ -54,9 +54,12 @@ struct ObjectMeta
 class FbxMeta : public Object, public Inspectable
 {
 public:
+    std::string root_bone_name;
     std::shared_ptr<ObjectMeta> root_object_meta;
     std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> mesh_objects;
 
+    void SetUpRootBone();
+    
     void OnInspectorGui() override;
 
     std::shared_ptr<GameObject> Instantiate() const;

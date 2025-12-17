@@ -108,6 +108,30 @@ std::shared_ptr<GameObject> CreateGameObjects(
 
 namespace engine
 {
+void FbxMeta::SetUpRootBone()
+{
+    int min_hierarchy = INT_MAX;
+
+    for (const auto object : mesh_objects | std::views::keys)
+    {
+        int hierarchy = 0;
+        auto root_bone = object->mesh.root_bone.lock();
+        auto parent = root_bone->parent.lock();
+        while (parent != nullptr)
+        {
+            root_bone = parent;
+            parent = root_bone->parent.lock();
+            ++hierarchy;
+        }
+
+        if (min_hierarchy > hierarchy)
+        {
+            min_hierarchy = hierarchy;
+            root_bone_name = root_bone->name;
+        }
+    }
+}
+
 void FbxMeta::OnInspectorGui()
 {
     if (ImGui::Button("Instantiate"))
