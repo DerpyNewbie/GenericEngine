@@ -23,6 +23,7 @@
         <ClCompile Include="bootstrap.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
         <ClCompile Include="Editor\audio_window.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\AssetHierarchy\asset_hierarchy_context_menu.cpp"/>
         <ClCompile Include="Editor\ContextMenu\Common\add_component_menu.cpp"/>
         <ClCompile Include="Editor\ContextMenu\Component\component_context_menu.cpp"/>
         <ClCompile Include="Editor\ContextMenu\context_menu.cpp"/>
@@ -235,6 +236,7 @@
         <ClInclude Include="bootstrap.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
         <ClInclude Include="Editor\audio_window.h"/>
+        <ClInclude Include="Editor\ContextMenu\AssetHierarchy\asset_hierarchy_context_menu.h"/>
         <ClInclude Include="Editor\ContextMenu\Common\add_component_menu.h"/>
         <ClInclude Include="Editor\ContextMenu\Component\component_context_menu.h"/>
         <ClInclude Include="Editor\ContextMenu\context_menu.h"/>
