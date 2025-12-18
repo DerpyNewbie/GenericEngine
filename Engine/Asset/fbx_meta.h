@@ -1,7 +1,8 @@
 #pragma once
 #include "inspectable.h"
 #include "object.h"
-#include "Animation/animation_component.h"
+#include "Animation/animation_clip.h"
+#include "Math/trs.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 

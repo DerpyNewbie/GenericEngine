@@ -20,6 +20,7 @@ struct AnimationState final : Inspectable
     float time = 0.0f;
     float weight = 1.0f;
     float length = 0.0f;
+    bool just_looped = false;
     kWrapMode wrap_mode = kWrapMode::kOnce;
 
     void OnInspectorGui() override;

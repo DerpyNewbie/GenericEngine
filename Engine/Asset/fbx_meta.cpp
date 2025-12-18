@@ -116,11 +116,15 @@ void FbxMeta::SetUpRootBone()
     {
         int hierarchy = 0;
         auto root_bone = object->mesh.root_bone.lock();
+        if (root_bone == nullptr)
+        {
+            return;
+        }
+        
         auto parent = root_bone->parent.lock();
         while (parent != nullptr)
         {
-            root_bone = parent;
-            parent = root_bone->parent.lock();
+            parent = parent->parent.lock();
             ++hierarchy;
         }
 

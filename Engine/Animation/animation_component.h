@@ -16,7 +16,7 @@ class AnimationComponent : public Component
     /// </summary>
     AssetPtr<AnimationClip> m_clip_;
     AssetPtr<FbxMeta> m_fbx_meta_;
-    std::string m_root_bone_name_ = "";
+    std::string m_root_bone_name_;
 
     /// <summary>
     /// Should AnimationComponent play the default animation at startup?
@@ -25,10 +25,9 @@ class AnimationComponent : public Component
     bool m_is_playing_ = false;
     bool m_apply_root_motion_ = false;
 
-    std::unordered_map<std::string, Vector3> m_previous_positions_ = {};
-    std::unordered_map<std::string, Quaternion> m_previous_rotations_ = {};
-    std::unordered_map<std::string, Vector3> m_delta_positions_ = {};
-    std::unordered_map<std::string, Quaternion> m_delta_rotations_ = {};
+    std::unordered_map<std::shared_ptr<AnimationState>, Vector3> m_previous_positions_ = {};
+    std::unordered_map<std::shared_ptr<AnimationState>, Quaternion> m_previous_rotations_ = {};
+
     Vector3 m_delta_position_;
     Quaternion m_delta_rotation_;
 
@@ -42,6 +41,7 @@ class AnimationComponent : public Component
     void AddTransform(const std::shared_ptr<Transform> &node);
     
 public:
+    void OnAwake() override;
     void OnInspectorGui() override;
     void OnStart() override;
     void OnUpdate() override;

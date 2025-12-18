@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "animation_component.h"
 
+#include <assimp/MathFunctions.h>
+
 #include "game_object.h"
 #include "gui.h"
 #include "Components/transform.h"
@@ -45,11 +47,19 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
         AddTransform(child);
     }
 }
+void AnimationComponent::OnAwake()
+{
+    if (const auto fbx_meta = m_fbx_meta_.CastedLock())
+    {
+        m_root_bone_name_ = fbx_meta->root_bone_name;
+    }
+}
 
 void AnimationComponent::OnInspectorGui()
 {
     Gui::PropertyField("FBX Meta", m_fbx_meta_);
     Gui::PropertyField("Clip", m_clip_);
+    ImGui::Checkbox("RootMotion", &m_apply_root_motion_);
 
     if (ImGui::TreeNode("States"))
     {
@@ -209,12 +219,15 @@ void AnimationComponent::Sample()
 
     for (auto &[path, transform] : m_transforms_)
     {
+        if (transform == GameObject()->Transform())
+            continue;
+        
         auto &default_matrix = m_default_poses_[path];
         TRS final_trs;
         final_trs.translation = default_matrix.translation * base_weight;
         final_trs.scale = default_matrix.scale * base_weight;
 
-        final_trs.rotation = default_matrix.rotation;
+        final_trs.rotation = Mathf::Slerp(Quaternion::Identity, default_matrix.rotation, base_weight);
         float total_rot_weight = base_weight;
 
         for (const auto &state : m_states_ | std::views::values)
@@ -239,18 +252,68 @@ void AnimationComponent::Sample()
             }
 
             const auto time = state->GetTime();
-            final_trs.translation += Lerp(time, curve->position_key, curve->position_index) * state->weight;
-            final_trs.scale += Lerp(time, curve->scale_key, curve->scale_index) * state->weight;
+            auto pos = Lerp(time, curve->position_key, curve->position_index);
+            auto rot = Lerp(time, curve->rotation_key, curve->rotation_index);
+            auto scale = Lerp(time, curve->scale_key, curve->scale_index);
 
-            Quaternion rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            final_trs.rotation = Mathf::Lerp(final_trs.rotation, rot, t);
+            if (path == m_root_bone_name_)
+            {
+                if (state->just_looped)
+                {
+                    m_previous_positions_[state] = pos;
+                    continue;
+                }
 
+                auto delta_pos = pos - m_previous_positions_[state];
+                delta_pos.y = 0;
+
+                Quaternion prev_inv;
+                m_previous_rotations_[state].Inverse(prev_inv);
+
+                auto delta_rot = rot * prev_inv;
+                auto euler = delta_rot.ToEuler();
+                Quaternion yaw_only = Quaternion::CreateFromYawPitchRoll(euler.y, 0.0f, 0.0f);
+
+                m_previous_positions_[state] = pos;
+                m_previous_rotations_[state] = rot;
+
+                m_delta_position_ += delta_pos * t;
+                m_delta_rotation_ = Mathf::Slerp(Quaternion::Identity, yaw_only, t) * m_delta_rotation_;
+
+                if (m_apply_root_motion_)
+                {
+                    pos.x = 0;
+                    pos.z = 0;
+
+                    float yaw = rot.ToEuler().y;
+
+                    Quaternion yaw_q = Quaternion::CreateFromYawPitchRoll(yaw, 0.0f, 0.0f);
+
+                    Quaternion yaw_inv;
+                    yaw_q.Inverse(yaw_inv);
+
+                    rot = rot * yaw_inv;
+                }
+            }
+
+            final_trs.translation += pos * t;
+            final_trs.rotation = Mathf::Slerp(final_trs.rotation, rot, t);
+            final_trs.scale += scale * t;
         }
 
         transform->SetLocalPosition(final_trs.translation);
         transform->SetLocalRotation(final_trs.rotation);
         transform->SetLocalScale(final_trs.scale);
     }
+
+    if (m_apply_root_motion_)
+    {
+        auto owner_transform = GameObject()->Transform();
+        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
+        owner_transform->SetLocalRotation(m_delta_rotation_ * owner_transform->LocalRotation());
+    }
+    m_delta_position_ = Vector3::Zero;
+    m_delta_rotation_ = Quaternion::Identity;
 }
 
 bool AnimationComponent::IsPlaying() const
