@@ -261,24 +261,26 @@ void AnimationComponent::Sample()
                 if (state->just_looped)
                 {
                     m_previous_positions_[state] = pos;
+                    m_previous_rotations_[state] = rot;
                     continue;
                 }
-
+                
                 auto delta_pos = pos - m_previous_positions_[state];
                 delta_pos.y = 0;
-
+                
                 Quaternion prev_inv;
                 m_previous_rotations_[state].Inverse(prev_inv);
 
-                auto delta_rot = rot * prev_inv;
+                auto delta_rot = prev_inv * rot;
                 auto euler = delta_rot.ToEuler();
                 Quaternion yaw_only = Quaternion::CreateFromYawPitchRoll(euler.y, 0.0f, 0.0f);
-
+                
                 m_previous_positions_[state] = pos;
                 m_previous_rotations_[state] = rot;
-
+                
                 m_delta_position_ += delta_pos * t;
                 m_delta_rotation_ = Mathf::Slerp(Quaternion::Identity, yaw_only, t) * m_delta_rotation_;
+                m_delta_rotation_.Normalize();
 
                 if (m_apply_root_motion_)
                 {
@@ -288,7 +290,7 @@ void AnimationComponent::Sample()
                     float yaw = rot.ToEuler().y;
 
                     Quaternion yaw_q = Quaternion::CreateFromYawPitchRoll(yaw, 0.0f, 0.0f);
-
+                
                     Quaternion yaw_inv;
                     yaw_q.Inverse(yaw_inv);
 
@@ -309,8 +311,8 @@ void AnimationComponent::Sample()
     if (m_apply_root_motion_)
     {
         auto owner_transform = GameObject()->Transform();
-        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
-        owner_transform->SetLocalRotation(m_delta_rotation_ * owner_transform->LocalRotation());
+        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_);
+        owner_transform->SetLocalRotation(owner_transform->LocalRotation() * m_delta_rotation_);
     }
     m_delta_position_ = Vector3::Zero;
     m_delta_rotation_ = Quaternion::Identity;
