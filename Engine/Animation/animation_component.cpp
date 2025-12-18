@@ -311,8 +311,9 @@ void AnimationComponent::Sample()
     if (m_apply_root_motion_)
     {
         auto owner_transform = GameObject()->Transform();
-        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
-        owner_transform->SetLocalRotation(m_delta_rotation_ * owner_transform->LocalRotation());
+        auto rotate_delta_pos = Vector3::Transform(m_delta_position_ * owner_transform->Scale(), owner_transform->Rotation());
+        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + rotate_delta_pos);
+        owner_transform->SetLocalRotation(owner_transform->LocalRotation() * m_delta_rotation_);
     }
     m_delta_position_ = Vector3::Zero;
     m_delta_rotation_ = Quaternion::Identity;
