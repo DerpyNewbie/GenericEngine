@@ -79,7 +79,6 @@ public:
                 CEREAL_NVP(m_apply_root_motion_),
                 CEREAL_NVP(m_root_bone_)
             );
-
         }
     }
 };
