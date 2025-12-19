@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "asset_hierarchy_context_menu.h"
 
 #include <imgui.h>
