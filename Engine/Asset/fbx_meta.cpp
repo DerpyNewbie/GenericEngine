@@ -118,7 +118,7 @@ void FbxMeta::SetUpRootBone()
         auto root_bone = object->mesh.root_bone.lock();
         if (root_bone == nullptr)
         {
-            return;
+            continue;
         }
         
         auto parent = root_bone->parent.lock();
