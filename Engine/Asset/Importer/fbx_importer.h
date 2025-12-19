@@ -73,5 +73,9 @@ class FbxImporter : public AssetImporter
         AssetDescriptor *ctx,
         const aiAnimation *ai_animation
     );
+
+    static std::string FindRootBone(
+        const std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> &mesh_objects
+    );
 };
 }
