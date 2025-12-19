@@ -49,19 +49,15 @@ void AnimationComponent::AddTransform(const std::shared_ptr<Transform> &node)
 }
 void AnimationComponent::OnAwake()
 {
-    if (const auto fbx_meta = m_fbx_meta_.CastedLock())
+    if (m_apply_root_motion_ && m_root_bone_.Lock() == nullptr)
     {
-        m_root_bone_name_ = fbx_meta->root_bone_name;
-    }
-    else if (m_apply_root_motion_)
-    {
-        Logger::Warn<AnimationComponent>("Root motion is enabled but no FBX Meta asset is assigned. Root motion will not function.");
+        Logger::Warn<AnimationComponent>("Root motion is enabled but no RootBone is assigned. Root motion will not function.");
     }
 }
 
 void AnimationComponent::OnInspectorGui()
 {
-    Gui::PropertyField("FBX Meta", m_fbx_meta_);
+    Gui::PropertyField("RootBone", m_root_bone_);
     Gui::PropertyField("Clip", m_clip_);
     ImGui::Checkbox("RootMotion", &m_apply_root_motion_);
 
@@ -265,7 +261,7 @@ void AnimationComponent::Sample()
             auto rot = Lerp(time, curve->rotation_key, curve->rotation_index);
             auto scale = Lerp(time, curve->scale_key, curve->scale_index);
 
-            if (path == m_root_bone_name_)
+            if (transform == m_root_bone_.CastedLock())
             {
                 if (state->just_looped || m_is_first_frames_[state])
                 {

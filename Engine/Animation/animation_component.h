@@ -15,8 +15,7 @@ class AnimationComponent : public Component
     /// Default animation clip
     /// </summary>
     AssetPtr<AnimationClip> m_clip_;
-    AssetPtr<FbxMeta> m_fbx_meta_;
-    std::string m_root_bone_name_;
+    AssetPtr<Transform> m_root_bone_;
 
     /// <summary>
     /// Should AnimationComponent play the default animation at startup?
@@ -77,19 +76,13 @@ public:
         if (version >= 2)
         {
             ar(
-                CEREAL_NVP(m_apply_root_motion_)
+                CEREAL_NVP(m_apply_root_motion_),
+                CEREAL_NVP(m_root_bone_)
             );
 
-        }
-
-        if (version >= 3)
-        {
-            ar(
-                CEREAL_NVP(m_fbx_meta_)
-            );
         }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::AnimationComponent, 3)
+CEREAL_CLASS_VERSION(engine::AnimationComponent, 2)
