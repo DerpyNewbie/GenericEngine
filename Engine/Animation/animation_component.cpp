@@ -205,8 +205,13 @@ void AnimationComponent::Sample()
     bool enabled = false;
     for (const auto &state : m_states_ | std::views::values)
     {
+        m_is_first_frames_[state] = false;
+        m_is_prev_frame_enabled_[state] = state->enabled;
         if (state->enabled)
         {
+            if (!m_is_prev_frame_enabled_[state])
+                m_is_first_frames_[state] = true;
+                
             state->UpdateTime();
             base_weight += state->weight;
             enabled = true;
@@ -258,7 +263,7 @@ void AnimationComponent::Sample()
 
             if (path == m_root_bone_name_)
             {
-                if (state->just_looped)
+                if (state->just_looped || m_is_first_frames_[state])
                 {
                     m_previous_positions_[state] = pos;
                     m_previous_rotations_[state] = rot;
@@ -311,7 +316,7 @@ void AnimationComponent::Sample()
     if (m_apply_root_motion_)
     {
         auto owner_transform = GameObject()->Transform();
-        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_);
+        owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
         owner_transform->SetLocalRotation(owner_transform->LocalRotation() * m_delta_rotation_);
     }
     m_delta_position_ = Vector3::Zero;

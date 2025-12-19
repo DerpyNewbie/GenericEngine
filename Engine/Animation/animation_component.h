@@ -25,6 +25,8 @@ class AnimationComponent : public Component
     bool m_is_playing_ = false;
     bool m_apply_root_motion_ = false;
 
+    std::unordered_map<std::shared_ptr<AnimationState>, bool> m_is_prev_frame_enabled_;
+    std::unordered_map<std::shared_ptr<AnimationState>, bool> m_is_first_frames_;
     std::unordered_map<std::shared_ptr<AnimationState>, Vector3> m_previous_positions_ = {};
     std::unordered_map<std::shared_ptr<AnimationState>, Quaternion> m_previous_rotations_ = {};
 
