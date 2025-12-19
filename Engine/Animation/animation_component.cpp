@@ -313,9 +313,14 @@ void AnimationComponent::Sample()
         transform->SetLocalScale(final_trs.scale);
     }
 
+    auto owner_transform = GameObject()->Transform();
+    if (auto parent = owner_transform->Parent())
+    {
+        m_delta_position_ = Vector3::Transform(m_delta_position_, parent->Rotation());
+    }
+    
     if (m_apply_root_motion_)
     {
-        auto owner_transform = GameObject()->Transform();
         owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
         owner_transform->SetLocalRotation(owner_transform->LocalRotation() * m_delta_rotation_);
     }
