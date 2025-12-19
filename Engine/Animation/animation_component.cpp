@@ -318,7 +318,8 @@ void AnimationComponent::Sample()
     {
         m_delta_position_ = Vector3::Transform(m_delta_position_, parent->Rotation());
     }
-    
+
+    //BUG: ローカル空間しか想定してないからよ
     if (m_apply_root_motion_)
     {
         owner_transform->SetLocalPosition(owner_transform->LocalPosition() + m_delta_position_ * owner_transform->Scale());
