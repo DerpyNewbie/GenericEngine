@@ -57,9 +57,9 @@ void AnimationComponent::OnAwake()
 
 void AnimationComponent::OnInspectorGui()
 {
-    Gui::PropertyField("RootBone", m_root_bone_);
+    Gui::PropertyField("Root Bone", m_root_bone_);
     Gui::PropertyField("Clip", m_clip_);
-    ImGui::Checkbox("RootMotion", &m_apply_root_motion_);
+    ImGui::Checkbox("Root Motion", &m_apply_root_motion_);
 
     if (ImGui::TreeNode("States"))
     {
