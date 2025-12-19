@@ -81,8 +81,15 @@ public:
             );
 
         }
+
+        if (version >= 3)
+        {
+            ar(
+                CEREAL_NVP(m_fbx_meta_)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::AnimationComponent, 2)
+CEREAL_CLASS_VERSION(engine::AnimationComponent, 3)
