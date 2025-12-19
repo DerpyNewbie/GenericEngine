@@ -53,6 +53,10 @@ void AnimationComponent::OnAwake()
     {
         m_root_bone_name_ = fbx_meta->root_bone_name;
     }
+    else if (m_apply_root_motion_)
+    {
+        Logger::Warn<AnimationComponent>("Root motion is enabled but no FBX Meta asset is assigned. Root motion will not function.");
+    }
 }
 
 void AnimationComponent::OnInspectorGui()
