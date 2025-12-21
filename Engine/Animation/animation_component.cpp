@@ -1,8 +1,5 @@
 #include "pch.h"
 #include "animation_component.h"
-
-#include <assimp/MathFunctions.h>
-
 #include "game_object.h"
 #include "gui.h"
 #include "Components/transform.h"
