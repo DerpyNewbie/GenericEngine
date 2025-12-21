@@ -1,7 +1,8 @@
 #pragma once
 #include "inspectable.h"
 #include "object.h"
-#include "Animation/animation_component.h"
+#include "Animation/animation_clip.h"
+#include "Math/trs.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 
@@ -56,7 +57,7 @@ class FbxMeta : public Object, public Inspectable
 public:
     std::shared_ptr<ObjectMeta> root_object_meta;
     std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> mesh_objects;
-
+    
     void OnInspectorGui() override;
 
     std::shared_ptr<GameObject> Instantiate() const;
