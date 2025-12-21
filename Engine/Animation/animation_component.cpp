@@ -54,13 +54,13 @@ void AnimationComponent::OnAwake()
 
 void AnimationComponent::OnInspectorGui()
 {
+    Gui::PropertyField("Clip", m_clip_);
     Gui::PropertyField("Root Bone", m_root_bone_);
+    ImGui::Checkbox("Root Motion", &m_apply_root_motion_);
     if (m_apply_root_motion_ && m_root_bone_.CastedLock() == nullptr)
     {
         ImGui::Text("Root motion is enabled but no RootBone is assigned. Root motion will not function.");
     }
-    Gui::PropertyField("Clip", m_clip_);
-    ImGui::Checkbox("Root Motion", &m_apply_root_motion_);
 
     if (ImGui::TreeNode("States"))
     {
