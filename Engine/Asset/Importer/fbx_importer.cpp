@@ -65,8 +65,6 @@ void FbxImporter::OnImport(AssetDescriptor *ctx)
         {
             meta->mesh_objects.emplace(convert.to_object.at(mesh_node), CreateMesh(ctx, scene, mesh_node, convert));
         }
-
-        FindRootBone(meta->mesh_objects);
     }
 
     // process animations
@@ -285,35 +283,5 @@ std::shared_ptr<AnimationClip> FbxImporter::CreateAnimationClip(AssetDescriptor 
 
     ctx->AddObject(anim_clip);
     return anim_clip;
-}
-std::string FbxImporter::FindRootBone(const std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> &mesh_objects)
-{
-    std::string root_bone_name;
-    int min_hierarchy = INT_MAX;
-
-    for (const auto object : mesh_objects | std::views::keys)
-    {
-        int hierarchy = 0;
-        auto root_bone = object->mesh.root_bone.lock();
-        if (root_bone == nullptr)
-        {
-            continue;
-        }
-
-        auto parent = root_bone->parent.lock();
-        while (parent != nullptr)
-        {
-            parent = parent->parent.lock();
-            ++hierarchy;
-        }
-
-        if (min_hierarchy > hierarchy)
-        {
-            min_hierarchy = hierarchy;
-            root_bone_name = root_bone->name;
-        }
-    }
-
-    return root_bone_name;
 }
 }
