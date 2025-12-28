@@ -199,6 +199,7 @@ void Physics::ProcessTriggers()
         if (m_previous_overlaps_.contains(pair))
         {
             OnTriggerStayed(pair.first, pair.second);
+            OnTriggerStayed(pair.second, pair.first);
         }
         else
         {

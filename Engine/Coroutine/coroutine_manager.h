@@ -42,6 +42,12 @@ public:
                     continue;
                 }
             }
+            if (promise.current_yield == nullptr)
+            {
+                h.destroy();
+                it = m_coroutines_.erase(it);
+                continue;
+            }
             
             h.resume();
 
