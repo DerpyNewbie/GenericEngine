@@ -15,20 +15,26 @@ class Image : public Renderer2D
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
 
+    void UpdateVertexBuffer();
+    
 public:
     AssetPtr<Material> shared_material;
 
     void OnInspectorGui() override;
     void OnAwake() override;
-    void OnUpdate() override;
     void Render() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<Renderer2D>(this));
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(shared_material));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Image, 1)
+CEREAL_CLASS_VERSION(engine::Image, 2)

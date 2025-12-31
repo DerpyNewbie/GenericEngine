@@ -10,6 +10,29 @@ using namespace DirectX::SimpleMath;
 
 namespace engine
 {
+void Image::UpdateVertexBuffer()
+{
+    Renderer2D::OnUpdate();
+    if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
+    {
+        auto rect = NormalizedRect();
+        auto min_pos = rect.pos - rect.size / 2;
+        auto max_pos = rect.pos + rect.size / 2;
+        std::array<Vertex, 4> vertices = {};
+        vertices[0].vertex = Vector3(min_pos.x, min_pos.y, 0.0f);
+        vertices[1].vertex = Vector3(min_pos.x, max_pos.y, 0.0f);
+        vertices[2].vertex = Vector3(max_pos.x, min_pos.y, 0.0f);
+        vertices[3].vertex = Vector3(max_pos.x, max_pos.y, 0.0f);
+        vertices[0].uvs[0] = Vector2(0, 0);
+        vertices[1].uvs[0] = Vector2(0, 1);
+        vertices[2].uvs[0] = Vector2(1, 0);
+        vertices[3].uvs[0] = Vector2(1, 1);
+
+        m_vertex_buffer_[RenderEngine::CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
+            vertices.size(), vertices.data());
+    }
+}
+
 void Image::OnInspectorGui()
 {
     Gui::ExpandablePropertyField("Material", shared_material);
@@ -33,31 +56,10 @@ void Image::OnAwake()
     }
 }
 
-void Image::OnUpdate()
-{
-    Renderer2D::OnUpdate();
-    if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
-    {
-        auto rect = NormalizedRect();
-        auto min_pos = rect.pos - rect.size / 2;
-        auto max_pos = rect.pos + rect.size / 2;
-        std::array<Vertex, 4> vertices = {};
-        vertices[0].vertex = Vector3(min_pos.x, min_pos.y, 0.0f);
-        vertices[1].vertex = Vector3(min_pos.x, max_pos.y, 0.0f);
-        vertices[2].vertex = Vector3(max_pos.x, min_pos.y, 0.0f);
-        vertices[3].vertex = Vector3(max_pos.x, max_pos.y, 0.0f);
-        vertices[0].uvs[0] = Vector2(0, 0);
-        vertices[1].uvs[0] = Vector2(0, 1);
-        vertices[2].uvs[0] = Vector2(1, 0);
-        vertices[3].uvs[0] = Vector2(1, 1);
-
-        m_vertex_buffer_[RenderEngine::CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
-            vertices.size(), vertices.data());
-    }
-}
-
 void Image::Render()
 {
+    UpdateVertexBuffer();
+    
     const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
     if (m_vertex_buffer_[current_buffer] == nullptr)
         return;
