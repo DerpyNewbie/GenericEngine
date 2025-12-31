@@ -68,6 +68,8 @@ public:
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const;
 
     template <class Archive>
-    void serialize(Archive &ar);
+    void serialize(Archive &ar, uint32_t version);
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Component, 1)

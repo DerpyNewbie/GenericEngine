@@ -53,8 +53,11 @@ void Lighting::UpdateLightBuffer()
 
     std::array<LightData, RenderingConstants::kMaxLightCount> properties;
     for (int i = 0; i < Instance()->m_lights_.size(); ++i)
+    {
+        m_lights_[i]->UpdateData();
         properties[i] = Instance()->m_lights_[i]->m_light_data_;
-    m_lights_buffer_->UpdateBuffer(properties.data());
+        m_lights_buffer_->UpdateBuffer(properties.data());
+    }
 }
 
 void Lighting::SetLightCountBuffer()

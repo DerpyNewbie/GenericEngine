@@ -232,16 +232,19 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
     {
         ctx->LogImportWarning("Shader meta data is outdated! Will be upgraded after this import");
 
-        const auto temp_shader_obj = Object::Instantiate<Shader>();
-        if (!LoadOldParameters(temp_shader_obj, ctx))
+        if (shader_meta_version < 3)
         {
-            ctx->LogImportError("Failed to load shader parameters!");
-            return;
-        }
-        WriteShaderMeta(temp_shader_obj, ctx->DataStore());
-        Object::Destroy(temp_shader_obj);
+            const auto temp_shader_obj = Object::Instantiate<Shader>();
+            if (!LoadOldParameters(temp_shader_obj, ctx))
+            {
+                ctx->LogImportError("Failed to load shader parameters!");
+                return;
+            }
+            WriteShaderMeta(temp_shader_obj, ctx->DataStore());
+            Object::Destroy(temp_shader_obj);
 
-        shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+            shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+        }
     }
 
     std::stringstream ss(shader_meta);

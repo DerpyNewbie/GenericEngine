@@ -53,10 +53,18 @@ public:
     {
         return std::abs(lhs - rhs) < kEpsilon;
     }
+
+    template <typename T>
+    static T Lerp(const T &a, const T &b, const float t)
+    {
+        return a + (b - a) * t;
+    }
+
     static DirectX::SimpleMath::Quaternion Slerp(const DirectX::SimpleMath::Quaternion &a, const DirectX::SimpleMath::Quaternion &b, const float t)
     {
         float dot = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
-
+        dot = Clamp(dot, -1.0f, 1.0f);
+        
         DirectX::SimpleMath::Quaternion end = b;
         if (dot < 0.0f)
         {
@@ -71,7 +79,7 @@ public:
                 a.y + t * (end.y - a.y),
                 a.z + t * (end.z - a.z),
                 a.w + t * (end.w - a.w)
-            );
+                );
             result.Normalize();
             return result;
         }
@@ -90,8 +98,9 @@ public:
             (a.y * s0) + (end.y * s1),
             (a.z * s0) + (end.z * s1),
             (a.w * s0) + (end.w * s1)
-        );
+            );
         return result;
     }
 };
+
 }

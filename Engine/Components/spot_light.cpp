@@ -23,7 +23,7 @@ void SpotLight::OnInspectorGui()
     Light::OnInspectorGui();
 }
 
-void SpotLight::OnUpdate()
+void SpotLight::UpdateData()
 {
     const auto transform = GameObject()->Transform();
     m_light_data_.pos = transform->Position();

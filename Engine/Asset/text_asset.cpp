@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "text_asset.h"
 
-void engine::TextAsset::OnInspectorGui()
+namespace engine
+{
+void TextAsset::OnInspectorGui()
 {
     ImGui::InputTextMultiline("Content", &content);
     ImGui::Separator();
@@ -29,3 +31,6 @@ void engine::TextAsset::OnInspectorGui()
         buff = "";
     }
 }
+}
+
+CEREAL_REGISTER_TYPE(engine::TextAsset)

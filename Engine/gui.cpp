@@ -280,6 +280,12 @@ std::string Gui::NameOf(const std::shared_ptr<Object> &object)
         return component->GameObject()->Name() + " (" + component->Name() + ")";
     }
 
+    const auto asset_desc = AssetDatabase::GetAssetDescriptor(object->Guid());
+    if (asset_desc != nullptr)
+    {
+        return object->Name() + " (" + asset_desc->AssetPath().filename().string() + ")";
+    }
+
     return object->Name();
 }
 
@@ -288,6 +294,12 @@ ImVec2 Gui::GetFieldRect()
     const auto height = ImGui::GetTextLineHeightWithSpacing();
     const auto width = ImGui::CalcItemWidth();
     return {width, height};
+}
+
+void Gui::ReadOnlyStringField(const char *label, const std::string &value)
+{
+    auto copy = value;
+    ImGui::InputText(label, &copy, ImGuiInputTextFlags_ReadOnly);
 }
 
 bool Gui::BoolField(const char *label, bool &value)

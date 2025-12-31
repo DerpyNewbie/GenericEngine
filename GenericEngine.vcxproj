@@ -262,7 +262,6 @@
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h"/>
-        <ClInclude Include="Engine\Asset\inspectable_asset.h"/>
         <ClInclude Include="Engine\Asset\asset_hierarchy.h"/>
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\shader_importer.h"/>
@@ -365,7 +364,6 @@
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
-        <ClInclude Include="Engine\Rendering\rendering_serializer.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\scene_data.h"/>

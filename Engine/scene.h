@@ -15,6 +15,7 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
     bool m_has_destroying_game_object_ = false;
 
     void OnConstructed() override;
+    void OnDeserialized() override;
     void OnUpdate() override;
     void OnFixedUpdate() override;
     void OnDestroy() override;
@@ -24,6 +25,8 @@ public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
 
     template <class Archive>
-    void serialize(Archive &ar);
+    void serialize(Archive &ar, uint32_t version);
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Scene, 1)

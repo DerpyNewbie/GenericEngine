@@ -11,6 +11,8 @@
 
 namespace editor
 {
+using namespace engine;
+
 std::string Inspector::Name()
 {
     return "Inspector";
@@ -32,7 +34,7 @@ void Inspector::OnEditorGui()
     DrawObject(m_last_seen_object_.lock());
 }
 
-void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
+void Inspector::DrawObject(const std::shared_ptr<Object> &object)
 {
     if (object == nullptr)
     {
@@ -40,35 +42,40 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
         return;
     }
 
-    const auto scene = std::dynamic_pointer_cast<engine::Scene>(object);
+    if (EditorPrefs::show_editor_debug)
+    {
+        Gui::ReadOnlyStringField("Guid", object->Guid().str());
+    }
+
+    const auto scene = std::dynamic_pointer_cast<Scene>(object);
     if (scene != nullptr)
     {
         DrawScene(scene);
         return;
     }
 
-    const auto game_object = std::dynamic_pointer_cast<engine::GameObject>(object);
+    const auto game_object = std::dynamic_pointer_cast<GameObject>(object);
     if (game_object != nullptr)
     {
         DrawGameObject(game_object);
         return;
     }
 
-    const auto component = std::dynamic_pointer_cast<engine::Component>(object);
+    const auto component = std::dynamic_pointer_cast<Component>(object);
     if (component != nullptr)
     {
         DrawComponent(component);
         return;
     }
 
-    const auto inspectable = std::dynamic_pointer_cast<engine::Inspectable>(object);
+    const auto inspectable = std::dynamic_pointer_cast<Inspectable>(object);
     if (inspectable != nullptr)
     {
         DrawInspectable(inspectable);
         return;
     }
 
-    const auto asset_hierarchy = std::dynamic_pointer_cast<engine::AssetHierarchy>(object);
+    const auto asset_hierarchy = std::dynamic_pointer_cast<AssetHierarchy>(object);
     if (asset_hierarchy != nullptr)
     {
         DrawAssetHierarchy(asset_hierarchy);
@@ -79,7 +86,7 @@ void Inspector::DrawObject(const std::shared_ptr<engine::Object> &object)
     ImGui::Text("Object Name: '%s'", object->Name().c_str());
 }
 
-void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
+void Inspector::DrawScene(const std::shared_ptr<Scene> &scene)
 {
     std::string buff = scene->Name();
     if (ImGui::InputText("##INSPECTOR_GAME_OBJECT_NAME", &buff))
@@ -90,15 +97,13 @@ void Inspector::DrawScene(const std::shared_ptr<engine::Scene> &scene)
     ImGui::Separator();
 }
 
-void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_object)
+void Inspector::DrawGameObject(const std::shared_ptr<GameObject> &game_object)
 {
-    // game object path info
+    if (EditorPrefs::show_editor_debug)
     {
-        std::string path = game_object->Path();
-        ImGui::InputText("##INSPECTOR_GAME_OBJECT_PATH", &path, ImGuiInputTextFlags_ReadOnly);
+        Gui::ReadOnlyStringField("Scene", game_object->Scene() ? game_object->Scene()->Name() : "!!!NULL!!!");
+        Gui::ReadOnlyStringField("Path", game_object->Path());
     }
-
-    ImGui::Separator();
 
     // game object header
     {
@@ -125,14 +130,14 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
              const auto &component : all_components)
         {
             ImGui::PushID(component.get());
-            auto component_name = engine::EngineUtil::GetTypeName(typeid(*component).name());
-            if (engine::Gui::ObjectHeader(component, component_name.c_str()))
+            auto component_name = EngineUtil::GetTypeName(typeid(*component).name());
+            if (Gui::ObjectHeader(component, component_name.c_str()))
             {
                 if (ImGui::BeginPopupContextItem("##INSPECTOR_COMPONENT_POPUP"))
                 {
                     if (ImGui::MenuItem("Remove", nullptr, false, component_name != "Transform"))
                     {
-                        engine::Object::Destroy(component);
+                        Object::Destroy(component);
                     }
 
                     ImGui::EndPopup();
@@ -159,17 +164,17 @@ void Inspector::DrawGameObject(const std::shared_ptr<engine::GameObject> &game_o
     }
 }
 
-void Inspector::DrawComponent(const std::shared_ptr<engine::Component> &component)
+void Inspector::DrawComponent(const std::shared_ptr<Component> &component)
 {
     component->OnInspectorGui();
 }
 
-void Inspector::DrawInspectable(const std::shared_ptr<engine::Inspectable> &inspectable)
+void Inspector::DrawInspectable(const std::shared_ptr<Inspectable> &inspectable)
 {
     inspectable->OnInspectorGui();
 }
 
-void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy, const bool root)
+void Inspector::DrawAssetHierarchy(const std::shared_ptr<AssetHierarchy> &asset_hierarchy, const bool root)
 {
     if (asset_hierarchy == nullptr)
     {
@@ -183,19 +188,32 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
         ImGui::Indent();
         if (EditorPrefs::show_editor_debug)
         {
+            bool debug_info_shown = false;
             if (asset_hierarchy->IsFile())
+            {
                 ImGui::Text("File");
+                debug_info_shown = true;
+            }
             if (asset_hierarchy->IsDirectory())
+            {
                 ImGui::Text("Directory");
+                debug_info_shown = true;
+            }
             if (!asset_hierarchy->children.empty())
+            {
                 ImGui::Text("Children: %d", asset_hierarchy->children.size());
-            ImGui::Separator();
+                debug_info_shown = true;
+            }
+
+            if (debug_info_shown)
+            {
+                ImGui::Separator();
+            }
         }
 
         if (asset_hierarchy->asset != nullptr)
         {
             DrawAssetDescriptor(asset_hierarchy->asset);
-            ImGui::Separator();
         }
 
         if (asset_hierarchy->IsDirectory())
@@ -206,16 +224,14 @@ void Inspector::DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy>
                 DrawAssetHierarchy(child, false);
             }
             ImGui::Unindent();
-
-            ImGui::Separator();
         }
-
         ImGui::Unindent();
+        ImGui::Separator();
     }
     ImGui::PopID();
 }
 
-void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescriptor> &asset_descriptor)
+void Inspector::DrawAssetDescriptor(const std::shared_ptr<AssetDescriptor> &asset_descriptor)
 {
     if (EditorPrefs::show_editor_debug && ImGui::CollapsingHeader("Metadata", ImGuiTreeNodeFlags_DefaultOpen))
     {
@@ -257,7 +273,7 @@ void Inspector::DrawAssetDescriptor(const std::shared_ptr<engine::AssetDescripto
 
             ImGui::PushID(object.get());
 
-            if (engine::Gui::ObjectHeader(object))
+            if (Gui::ObjectHeader(object))
             {
                 ImGui::Indent();
 

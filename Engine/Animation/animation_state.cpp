@@ -34,9 +34,12 @@ void AnimationState::UpdateTime()
     if (time > length && wrap_mode == kWrapMode::kLoop)
     {
         time = 0;
+        just_looped = true;
         clip.CastedLock()->Initialize();
         return;
     }
+    just_looped = false;
+    
     if (wrap_mode == kWrapMode::kPingPong)
     {
         if (time > length)

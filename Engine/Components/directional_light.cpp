@@ -52,7 +52,7 @@ void DirectionalLight::OnInspectorGui()
     Light::OnInspectorGui();
 }
 
-void DirectionalLight::OnUpdate()
+void DirectionalLight::UpdateData()
 {
     const auto transform = GameObject()->Transform();
     const Vector3 forward = transform->Forward();

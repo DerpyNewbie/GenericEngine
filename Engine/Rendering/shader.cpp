@@ -36,6 +36,7 @@ void Shader::DrawShaderSettings()
 
     ImGui::Separator();
     ImGui::Text("Blend");
+    ImGui::Checkbox("UseBlend", &m_shader_settings_.use_blend);
     ImGui::Combo("SrcFactor", &m_shader_settings_.blend_src, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
     ImGui::Combo("DstFactor", &m_shader_settings_.blend_dst, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
     ImGui::Combo("BlendOp", &m_shader_settings_.blend_op, BlendOpNames, IM_ARRAYSIZE(BlendOpNames));

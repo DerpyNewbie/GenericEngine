@@ -1,7 +1,8 @@
 #pragma once
 #include "inspectable.h"
 #include "object.h"
-#include "Animation/animation_component.h"
+#include "Animation/animation_clip.h"
+#include "Math/trs.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 
@@ -18,7 +19,7 @@ struct ObjectMeta
         std::weak_ptr<ObjectMeta> root_bone;
 
         template <class Archive>
-        void serialize(Archive &ar)
+        void serialize(Archive &ar, const uint32_t version)
         {
             ar(
                 CEREAL_NVP(instance),
@@ -38,7 +39,7 @@ struct ObjectMeta
     std::vector<std::shared_ptr<ObjectMeta>> children;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             CEREAL_NVP(name),
@@ -56,13 +57,13 @@ class FbxMeta : public Object, public Inspectable
 public:
     std::shared_ptr<ObjectMeta> root_object_meta;
     std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> mesh_objects;
-
+    
     void OnInspectorGui() override;
 
     std::shared_ptr<GameObject> Instantiate() const;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             CEREAL_NVP(root_object_meta)
@@ -70,3 +71,9 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::ObjectMeta, 1)
+
+CEREAL_CLASS_VERSION(engine::ObjectMeta::MeshMeta, 1)
+
+CEREAL_CLASS_VERSION(engine::FbxMeta, 1)

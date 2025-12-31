@@ -37,7 +37,7 @@ public:
     bool HasSubMeshes() const;
 
     template <class Archive>
-    void serialize(Archive &archive)
+    void serialize(Archive &archive, const uint32_t version)
     {
         archive(
             cereal::base_class<Object>(this),
@@ -54,3 +54,5 @@ public:
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Mesh, 1)

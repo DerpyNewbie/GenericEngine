@@ -35,13 +35,17 @@ public:
     void ReconstructBuffer() override;
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<MeshRenderer>(this),
-           CEREAL_NVP(m_shared_mesh_),
-           CEREAL_NVP(transforms),
-           CEREAL_NVP(inverted_bind_poses),
-           CEREAL_NVP(root_bone));
+        ar(
+            cereal::base_class<MeshRenderer>(this),
+            CEREAL_NVP(m_shared_mesh_),
+            CEREAL_NVP(transforms),
+            CEREAL_NVP(inverted_bind_poses),
+            CEREAL_NVP(root_bone)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::SkinnedMeshRenderer, 1)

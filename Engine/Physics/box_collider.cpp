@@ -17,9 +17,11 @@ void BoxCollider::OnInspectorGui()
 
 void BoxCollider::UpdateShape()
 {
-    m_extents_ = Vector3{max(m_extents_.x, Mathf::kEpsilon),
-                         max(m_extents_.y, Mathf::kEpsilon),
-                         max(m_extents_.z, Mathf::kEpsilon)};
+    m_extents_ = Vector3{
+        std::max(m_extents_.x, Mathf::kEpsilon),
+        std::max(m_extents_.y, Mathf::kEpsilon),
+        std::max(m_extents_.z, Mathf::kEpsilon)
+    };
 
     m_box_shape_.setLocalScaling({m_extents_.x, m_extents_.y, m_extents_.z});
     ApplyChanges();

@@ -19,25 +19,27 @@ public:
 
     void OnDestroy() override;
 
-    std::shared_ptr<Transform> Transform() const;
+    [[nodiscard]] std::shared_ptr<Transform> Transform() const;
 
-    bool IsActiveInHierarchy() const;
+    [[nodiscard]] bool IsActiveInHierarchy() const;
 
-    bool IsActiveSelf() const;
+    [[nodiscard]] bool IsActiveSelf() const;
 
     void SetActive(bool is_active);
 
-    std::shared_ptr<Scene> Scene() const;
+    [[nodiscard]] std::shared_ptr<Scene> Scene() const;
 
-    std::string Path() const;
+    [[nodiscard]] std::string Path() const;
 
-    std::string PathFrom(const std::shared_ptr<GameObject> &parent) const;
+    [[nodiscard]] std::string PathFrom(const std::shared_ptr<GameObject> &parent) const;
 
     template <typename T>
     std::shared_ptr<T> AddComponent()
     {
-        static_assert(std::is_base_of<Component, T>(),
-                      "Base type is not Component.");
+        static_assert(
+            std::is_base_of<Component, T>(),
+            "Base type is not Component."
+        );
 
         std::shared_ptr<T> instance = Object::Instantiate<T>(EngineUtil::GetTypeName(typeid(T).name()));
         // const std::shared_ptr<Component> converted_instance = std::dynamic_pointer_cast<Component>(instance);
@@ -51,15 +53,18 @@ public:
         {
             instance->OnEnabled();
         }
+
         Logger::Log<GameObject>("[%s]: Added component '%s'", Path().c_str(), instance->Name().c_str());
         return instance;
     }
 
     template <typename T>
-    std::shared_ptr<T> GetComponent() const
+    [[nodiscard]] std::shared_ptr<T> GetComponent() const
     {
-        static_assert(std::is_base_of<Component, T>(),
-                      "Base type is not Component.");
+        static_assert(
+            std::is_base_of<Component, T>(),
+            "Base type is not Component."
+        );
         for (const auto &comp : m_components_)
         {
             auto instance = std::dynamic_pointer_cast<T>(comp);
@@ -71,10 +76,13 @@ public:
     }
 
     template <typename T>
-    std::vector<std::shared_ptr<T>> GetComponents() const
+    [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponents() const
     {
-        static_assert(std::is_base_of<Component, T>(),
-                      "Base type is not Component.");
+        static_assert(
+            std::is_base_of<Component, T>(),
+            "Base type is not Component."
+        );
+
         std::vector<std::shared_ptr<T>> results = {};
         for (const auto &comp : m_components_)
         {
@@ -86,13 +94,13 @@ public:
         return results;
     }
 
-    std::vector<std::shared_ptr<Component>> GetComponents() const
+    [[nodiscard]] std::vector<std::shared_ptr<Component>> GetComponents() const
     {
         return m_components_;
     }
 
     template <typename T>
-    std::shared_ptr<T> GetComponentInParent()
+    [[nodiscard]] std::shared_ptr<T> GetComponentInParent()
     {
         auto result = GetComponent<T>();
         if (result != nullptr)
@@ -104,7 +112,7 @@ public:
     }
 
     template <typename T>
-    std::vector<std::shared_ptr<T>> GetComponentsInParent()
+    [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponentsInParent()
     {
         auto result = GetComponents<T>();
         const auto parent = Transform()->Parent();
@@ -116,7 +124,7 @@ public:
     }
 
     template <typename T>
-    std::shared_ptr<T> GetComponentInChildren()
+    [[nodiscard]] std::shared_ptr<T> GetComponentInChildren()
     {
         auto result = GetComponent<T>();
         if (result != nullptr)
@@ -134,7 +142,7 @@ public:
     }
 
     template <typename T>
-    std::vector<std::shared_ptr<T>> GetComponentsInChildren()
+    [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponentsInChildren()
     {
         std::vector<std::shared_ptr<T>> result = GetComponents<T>();
         const auto transform = Transform();

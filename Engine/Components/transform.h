@@ -8,7 +8,7 @@ class Transform : public Component
     bool m_is_dirty_ = true;
     Vector3 m_local_position_ = {};
     Quaternion m_local_rotation_ = Quaternion::Identity;
-    Vector3 m_local_scale_ = { 1, 1, 1 };
+    Vector3 m_local_scale_ = {1, 1, 1};
 
     Matrix m_local_matrix_ = Matrix::Identity;
     Matrix m_world_matrix_ = Matrix::Identity;
@@ -100,14 +100,18 @@ public:
     }
 
     template <class Archive>
-    void serialize(Archive &ar)
+    void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this),
-           CEREAL_NVP(m_local_position_),
-           CEREAL_NVP(m_local_rotation_),
-           CEREAL_NVP(m_local_scale_),
-           CEREAL_NVP(m_parent_),
-           CEREAL_NVP(m_children_));
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(m_local_position_),
+            CEREAL_NVP(m_local_rotation_),
+            CEREAL_NVP(m_local_scale_),
+            CEREAL_NVP(m_parent_),
+            CEREAL_NVP(m_children_)
+        );
     }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::Transform, 1)
