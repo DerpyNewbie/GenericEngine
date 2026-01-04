@@ -246,6 +246,7 @@ void AnimationComponent::Sample()
 
             const auto clip = state->clip.CastedLock();
             const auto curve = clip->FindCurve(path);
+            auto curve_cache = state->curves_cache[curve];
 
             total_rot_weight += state->weight;
             const float t = Mathf::Approximately(total_rot_weight, 0)
@@ -261,9 +262,9 @@ void AnimationComponent::Sample()
             }
 
             const auto time = state->GetTime();
-            auto pos = Lerp(time, curve->position_key, curve->position_index);
-            auto rot = Lerp(time, curve->rotation_key, curve->rotation_index);
-            auto scale = Lerp(time, curve->scale_key, curve->scale_index);
+            auto pos = Lerp(time, curve->position_key, curve_cache.position_index);
+            auto rot = Lerp(time, curve->rotation_key, curve_cache.rotation_index);
+            auto scale = Lerp(time, curve->scale_key, curve_cache.scale_index);
 
             if (transform == m_root_bone_.CastedLock())
             {
@@ -290,7 +291,7 @@ void AnimationComponent::Sample()
                 m_delta_rotation_ = Mathf::Slerp(Quaternion::Identity, yaw_only, t) * m_delta_rotation_;
                 m_delta_rotation_.Normalize();
 
-                rot = Lerp(time, curve->rotation_key, curve->rotation_index);
+                rot = Lerp(time, curve->rotation_key, curve_cache.rotation_index);
                 if (final_trs.rotation.Dot(rot) < 0.0f)
                 {
                     rot = -rot;

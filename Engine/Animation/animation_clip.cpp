@@ -10,15 +10,6 @@ void AnimationClip::OnInspectorGui()
     Gui::PropertyField("Length", m_length_);
     Gui::PropertyField("FrameRate", m_frame_rate_);
 }
-void AnimationClip::Initialize()
-{
-    for (auto &curve : m_curves_ | std::ranges::views::values)
-    {
-        curve.position_index = 0;
-        curve.rotation_index = 0;
-        curve.scale_index = 0;
-    }
-}
 
 TransformAnimationCurve *AnimationClip::FindCurve(const std::string &path)
 {

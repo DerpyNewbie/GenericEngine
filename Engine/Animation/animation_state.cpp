@@ -6,6 +6,24 @@
 
 namespace engine
 {
+void AnimationState::CreateCurvesCache(std::unordered_map<std::string, TransformAnimationCurve> &curves)
+{
+    for (auto &curve : curves | std::ranges::views::values)
+    {
+        curves_cache.emplace(&curve, AnimationCurveCache{});
+    }
+}
+
+void AnimationState::ReleaseCurvesCache()
+{
+    for (auto &cache : curves_cache | std::ranges::views::values)
+    {
+        cache.position_index = 0;
+        cache.rotation_index = 0;
+        cache.scale_index = 0;
+    }
+}
+
 void AnimationState::OnInspectorGui()
 {
     Gui::PropertyField("Enabled", enabled);
@@ -18,10 +36,12 @@ void AnimationState::OnInspectorGui()
     if (ImGui::Combo("Wrap Mode", &wrap_mode_int, "Once\0Loop\0PingPong\0\0"))
         wrap_mode = static_cast<kWrapMode>(wrap_mode_int);
 }
+
 void AnimationState::SetClip(std::shared_ptr<AnimationClip> clip)
 {
     length = clip->Length();
     this->clip = AssetPtr<AnimationClip>::FromManaged(clip);
+    CreateCurvesCache(clip->m_curves_);
 }
 
 void AnimationState::UpdateTime()
@@ -35,7 +55,7 @@ void AnimationState::UpdateTime()
     {
         time = 0;
         just_looped = true;
-        clip.CastedLock()->Initialize();
+        ReleaseCurvesCache();
         return;
     }
     just_looped = false;
@@ -44,7 +64,7 @@ void AnimationState::UpdateTime()
     {
         if (time > length)
             time += Time::GetDeltaTime();
-        clip.CastedLock()->Initialize();
+        ReleaseCurvesCache();
     }
 }
 
@@ -86,6 +106,6 @@ void AnimationState::Stop()
 {
     enabled = false;
     time = 0;
-    clip.CastedLock()->Initialize();
+    ReleaseCurvesCache();
 }
 }

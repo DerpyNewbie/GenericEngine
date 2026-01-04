@@ -11,8 +11,18 @@ enum class kWrapMode
     kPingPong
 };
 
-struct AnimationState final : Inspectable
+struct AnimationCurveCache
 {
+    size_t position_index = 0;
+    size_t scale_index = 0;
+    size_t rotation_index = 0;
+};
+
+class AnimationState final : Inspectable
+{
+    
+    void CreateCurvesCache(std::unordered_map<std::string, TransformAnimationCurve> &curves);
+public:
     bool enabled = true;
     AssetPtr<AnimationClip> clip;
     std::string name;
@@ -22,6 +32,9 @@ struct AnimationState final : Inspectable
     float length = 0.0f;
     bool just_looped = false;
     kWrapMode wrap_mode = kWrapMode::kOnce;
+
+    using CurveKey = const TransformAnimationCurve*;
+    std::unordered_map<CurveKey, AnimationCurveCache> curves_cache;
 
     void OnInspectorGui() override;
     void SetClip(std::shared_ptr<AnimationClip> clip);
@@ -33,6 +46,7 @@ struct AnimationState final : Inspectable
     void SetNormalizedTime(float normalized_time);
     void SetNormalizedSpeed(float normalized_speed);
     void Stop();
+    void ReleaseCurvesCache();
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
