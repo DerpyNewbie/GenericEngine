@@ -7,6 +7,7 @@ namespace engine
 class CoroutineTest : public Component
 {
     Task Move();
+    Task MoveWrap();
 
 public:
     void OnAwake() override;
