@@ -10,9 +10,8 @@ using namespace DirectX::SimpleMath;
 
 namespace engine
 {
-void Image::UpdateVertexBuffer()
+void Image::UpdateBuffer()
 {
-    Renderer2D::OnUpdate();
     if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
     {
         auto rect = NormalizedRect();
@@ -31,17 +30,7 @@ void Image::UpdateVertexBuffer()
         m_vertex_buffer_[RenderEngine::CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
             vertices.size(), vertices.data());
     }
-}
 
-void Image::OnInspectorGui()
-{
-    Gui::ExpandablePropertyField("Material", shared_material);
-}
-
-void Image::OnAwake()
-{
-    Renderer2D::OnAwake();
-    //create index buffer
     if (!m_index_buffer_)
     {
         std::vector<uint32_t> indices =
@@ -56,9 +45,14 @@ void Image::OnAwake()
     }
 }
 
+void Image::OnInspectorGui()
+{
+    Gui::ExpandablePropertyField("Material", shared_material);
+}
+
 void Image::Render()
 {
-    UpdateVertexBuffer();
+    UpdateBuffer();
     
     const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
     if (m_vertex_buffer_[current_buffer] == nullptr)

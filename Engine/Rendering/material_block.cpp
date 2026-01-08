@@ -191,7 +191,7 @@ void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
 
     const auto shader_type = data->parameter.shader_type;
     const auto buffer_type = data->BufferType();
-    data->CreateBuffer();
+    data->buffer = data->CreateBuffer();
     material_data.insert(End(shader_type, buffer_type), {data, nullptr});
     data->is_dirty = false;
 
@@ -241,6 +241,11 @@ void MaterialBlock::UpdateBuffer()
         {
             Logger::Log<MaterialBlock>("Updating data in MaterialBlock: %s", data->parameter.name.c_str());
 
+            if (data->buffer == nullptr)
+            {
+                data->buffer = data->CreateBuffer();
+            }
+            
             if (data->CanUpdateBuffer())
             {
                 data->UpdateBuffer();

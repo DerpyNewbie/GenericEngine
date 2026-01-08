@@ -16,6 +16,7 @@ bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const 
 
 void Canvas::OnInspectorGui()
 {
+    Renderer::OnInspectorGui();
     Gui::PropertyField("Canvas Size", m_canvas_size_);
     Gui::PropertyField("Target Camera", m_target_camera_);
 }

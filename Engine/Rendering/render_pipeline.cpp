@@ -13,6 +13,7 @@
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/light.h"
+#include "Components/text_renderer.h"
 
 using namespace DirectX;
 
@@ -195,6 +196,11 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     }
 
     Gizmos::Render();
+    //HACK: あんまりよくないかも
+    for (auto text_renderer : TextRenderer::m_text_renderers_)
+    {
+        text_renderer->Render();
+    }
 }
 
 void RenderPipeline::DepthRender()

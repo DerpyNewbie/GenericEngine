@@ -11,25 +11,12 @@ namespace engine
 {
 void TextRenderer::OnInspectorGui()
 {
-    Renderer::OnInspectorGui();
-    float pos[2];
-    EngineUtil::ToFloat2(pos, position);
-    if (ImGui::InputFloat2("position", pos))
-    {
-        position.x = pos[0];
-        position.y = pos[1];
-    }
-    float col[4];
-    EngineUtil::ToFloat4(col, color);
-    if (ImGui::InputFloat4("color", col))
-    {
-        color.x = col[0];
-        color.y = col[1];
-        color.z = col[2];
-        color.w = col[3];
-    }
+    Gui::PropertyField("Position", position);
+    Gui::PropertyField("Rotation", rotation);
+    Gui::PropertyField("Origin", origin);
+    Gui::PropertyField("Scale", scale);
 
-    Gui::PropertyField<FontData>("font data", font_data);
+    Gui::PropertyField("font data", font_data);
     char buf[256];
     strncpy_s(buf, sizeof(buf), string.c_str(), _TRUNCATE);
     buf[sizeof(buf) - 1] = '\0';
@@ -38,6 +25,16 @@ void TextRenderer::OnInspectorGui()
     {
         string = buf;
     }
+    Gui::PropertyField("Color", color);
+}
+
+void TextRenderer::OnEnabled()
+{
+    m_text_renderers_.emplace(shared_from_base<TextRenderer>());
+}
+void TextRenderer::OnDisabled()
+{
+    m_text_renderers_.erase(shared_from_base<TextRenderer>());
 }
 
 void TextRenderer::Render()
@@ -49,14 +46,9 @@ void TextRenderer::Render()
     auto sprite_batch = FontData::SpriteBatch();
     auto sprite_font = font_data.CastedLock()->SpriteFont();
     sprite_batch->Begin(RenderEngine::CommandList());
-    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
+    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color, rotation, origin, scale);
     sprite_batch->End();
     RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-}
-
-std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
-{
-    return CameraComponent::Current()->GameObject()->Transform();
 }
 }
 

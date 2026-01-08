@@ -33,7 +33,7 @@ struct ShaderSettings
             CEREAL_NVP(alpha_to_mask)
             );
 
-        if (4 <= version)
+        if (2 <= version)
             ar(CEREAL_NVP(use_blend));
     }
 };
@@ -158,3 +158,5 @@ constexpr UINT8 DX_ColorMask[] = {
     D3D12_COLOR_WRITE_ENABLE_BLUE,
     0
 };
+
+CEREAL_CLASS_VERSION(engine::ShaderSettings, 2)

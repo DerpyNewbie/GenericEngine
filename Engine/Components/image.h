@@ -15,13 +15,12 @@ class Image : public Renderer2D
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_handle_;
 
-    void UpdateVertexBuffer();
+    void UpdateBuffer();
     
 public:
     AssetPtr<Material> shared_material;
 
     void OnInspectorGui() override;
-    void OnAwake() override;
     void Render() override;
 
     template <class Archive>

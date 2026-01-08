@@ -65,6 +65,8 @@ struct MaterialData : IMaterialData
     explicit MaterialData(T new_value, const ShaderParameter &new_parameter);
     ~MaterialData() override = default;
 
+    void OnDeserialized() override;
+
     void OnInspectorGui() override;
     void SetValue(T value);
 
@@ -100,6 +102,12 @@ template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
 { }
+
+template <typename T>
+void MaterialData<T>::OnDeserialized()
+{
+    SetValue(value);
+}
 
 template <typename T>
 void MaterialData<T>::OnInspectorGui()
@@ -147,7 +155,10 @@ void MaterialData<T>::SetValue(T value)
 {
     this->value = value;
     is_dirty = true;
-    buffer = CreateBuffer();
+    if constexpr (kIsTexture)
+    {
+        buffer = CreateBuffer();
+    }
 }
 
 template <typename T>
