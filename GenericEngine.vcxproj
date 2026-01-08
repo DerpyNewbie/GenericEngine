@@ -89,6 +89,10 @@
         <ClCompile Include="Engine\component_factory.cpp"/>
         <ClCompile Include="Engine\Coroutine\coroutine_manager.cpp"/>
         <ClCompile Include="Engine\Coroutine\task.cpp"/>
+        <ClCompile Include="Engine\Coroutine\wait_for_frames.cpp"/>
+        <ClCompile Include="Engine\Coroutine\wait_for_next_frame.cpp"/>
+        <ClCompile Include="Engine\Coroutine\wait_for_seconds.cpp"/>
+        <ClCompile Include="Engine\Coroutine\wait_for_task.cpp"/>
         <ClCompile Include="Engine\Coroutine\yield_base.cpp"/>
         <ClCompile Include="Engine\default_scene_generator.cpp"/>
         <ClCompile Include="Engine\engine.cpp"/>
@@ -219,6 +223,7 @@
         <ClCompile Include="Engine\scene_manager.cpp"/>
         <ClCompile Include="Engine\serializer.cpp"/>
         <ClCompile Include="Engine\engine_time.cpp"/>
+        <ClCompile Include="Engine\do.cpp"/>
         <ClCompile Include="Engine\update_manager.cpp"/>
         <ClCompile Include="main.cpp"/>
         <ClCompile Include="pch.cpp">
@@ -295,6 +300,10 @@
         <ClInclude Include="Engine\component_factory.h"/>
         <ClInclude Include="Engine\Coroutine\coroutine_manager.h"/>
         <ClInclude Include="Engine\Coroutine\task.h"/>
+        <ClInclude Include="Engine\Coroutine\wait_for_frames.h"/>
+        <ClInclude Include="Engine\Coroutine\wait_for_next_frame.h"/>
+        <ClInclude Include="Engine\Coroutine\wait_for_seconds.h"/>
+        <ClInclude Include="Engine\Coroutine\wait_for_task.h"/>
         <ClInclude Include="Engine\Coroutine\yield_base.h"/>
         <ClInclude Include="Engine\default_scene_generator.h"/>
         <ClInclude Include="Engine\enable_shared_from_base.h"/>
@@ -373,6 +382,7 @@
         <ClInclude Include="Engine\serializer.h"/>
         <ClInclude Include="Engine\engine_time.h"/>
         <ClInclude Include="Engine\str_util.h"/>
+        <ClInclude Include="Engine\do.h"/>
         <ClInclude Include="Engine\update_manager.h"/>
         <ClInclude Include="pch.h"/>
     </ItemGroup>

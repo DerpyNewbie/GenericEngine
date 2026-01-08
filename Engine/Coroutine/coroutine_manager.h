@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "task.h"
 #include "yield_base.h"
 
@@ -12,6 +12,7 @@ class CoroutineManager
 public:
     void Start(Task &&t)
     {
+        t.handle.resume();
         m_coroutines_.emplace_back(t.handle);
         t.handle = nullptr;
     }
@@ -23,20 +24,9 @@ public:
             auto h = *it;
             auto &promise = h.promise();
 
-            if (auto *w = dynamic_cast<WaitForSeconds *>(promise.current_yield.get()))
+            if (auto yield = promise.current_yield.get())
             {
-                w->time -= dt;
-                if (w->time > 0)
-                {
-                    ++it;
-                    continue;
-                }
-            }
-
-            if (auto *w = dynamic_cast<WaitForFrame *>(promise.current_yield.get()))
-            {
-                w->remaining_frames--;
-                if (w->remaining_frames > 0)
+                if (!yield->should_resume())
                 {
                     ++it;
                     continue;
