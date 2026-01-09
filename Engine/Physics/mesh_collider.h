@@ -19,7 +19,6 @@ class MeshCollider : public Collider
     std::shared_ptr<btConvexHullShape> m_convex_hull_shape_;
 
     void OnInspectorGui() override;
-    void OnConstructed() override;
 
     std::shared_ptr<btCollisionShape> GetShape() override;
     void UpdateShape() override;
