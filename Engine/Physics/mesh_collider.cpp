@@ -71,18 +71,6 @@ void MeshCollider::OnInspectorGui()
     }
 }
 
-void MeshCollider::OnConstructed()
-{
-    if (m_mesh_.IsNull())
-    {
-        const auto mesh_renderer = GameObject()->GetComponent<MeshRenderer>();
-        if (mesh_renderer != nullptr)
-        {
-            m_mesh_ = mesh_renderer->GetSharedMesh();
-        }
-    }
-}
-
 void MeshCollider::SetMesh(const AssetPtr<Mesh> &mesh)
 {
     m_mesh_ = mesh;
