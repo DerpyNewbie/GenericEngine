@@ -8,8 +8,10 @@ namespace engine
 {
 namespace
 {
-std::string DeduplicatedName(const std::shared_ptr<GameObject> &object,
-                             const std::vector<std::shared_ptr<GameObject>> &siblings)
+std::string DeduplicatedName(
+    const std::shared_ptr<GameObject> &object,
+    const std::vector<std::shared_ptr<GameObject>> &siblings
+)
 {
     std::set<int> dedupe_indices;
     auto [original_name, dedupe_index] = ObjectUtil::GetOriginalName(object->Name());
@@ -55,12 +57,10 @@ std::string ObjectUtil::GetDeduplicatedName(const std::shared_ptr<Object> &objec
     const auto parent = transform->Parent();
     if (parent == nullptr)
     {
-        auto siblings = go->Scene()->m_root_game_objects_;
-        erase_if(siblings, [&go](auto a) {
-            return a == go;
-        });
+        auto siblings = go->Scene()->RootGameObjects();
+        erase_if(siblings, [&go](auto a) { return a == go; });
 
-        return DeduplicatedName(go, go->Scene()->m_root_game_objects_);
+        return DeduplicatedName(go, go->Scene()->RootGameObjects());
     }
 
     const auto child_count = parent->ChildCount();
@@ -161,7 +161,8 @@ bool ObjectUtil::IsAssetPtr(const rapidjson::Document::Object &object)
 }
 
 std::vector<rapidjson::Document::Object> ObjectUtil::FindMatchingObjects(
-const rapidjson::Document::Object &object, const std::function<bool(rapidjson::Document::Object)> &pred)
+    const rapidjson::Document::Object &object, const std::function<bool(rapidjson::Document::Object)> &pred
+)
 {
     std::vector<rapidjson::Document::Object> matching_object;
     std::queue<rapidjson::Document::Object> to_process;

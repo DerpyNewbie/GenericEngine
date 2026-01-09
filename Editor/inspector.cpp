@@ -103,6 +103,8 @@ void Inspector::DrawGameObject(const std::shared_ptr<GameObject> &game_object)
     {
         Gui::ReadOnlyStringField("Scene", game_object->Scene() ? game_object->Scene()->Name() : "!!!NULL!!!");
         Gui::ReadOnlyStringField("Path", game_object->Path());
+        Gui::ReadOnlyStringField("Parent", game_object->Transform()->Parent() ? game_object->Transform()->Parent()->GameObject()->Name() : "!!!NULL!!!");
+        Gui::ReadOnlyStringField("Child Count", std::to_string(game_object->Transform()->ChildCount()));
     }
 
     // game object header

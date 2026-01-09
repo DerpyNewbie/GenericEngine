@@ -49,9 +49,7 @@ void SceneManager::DeserializeScene(const std::string &serialized_scene)
 
 void SceneManager::DestroyScene(const std::string &name)
 {
-    auto pos = std::ranges::find_if(m_scenes_, [&](std::shared_ptr<Scene> scene) {
-        return scene->Name() == name;
-    });
+    const auto pos = std::ranges::find_if(m_scenes_, [&](const std::shared_ptr<Scene> &scene) { return scene->Name() == name; });
     if (pos == m_scenes_.end())
         return;
 
@@ -64,20 +62,12 @@ void SceneManager::MoveGameObject(const std::shared_ptr<GameObject> &go, const s
     if (m_is_deserializing_scene_)
         return;
 
-    // NOTE: transform could be nullptr at this point
-    const auto transform = go->Transform();
-    if (const auto prev_scene = go->m_scene_.lock())
+    if (scene == nullptr)
     {
-        if (transform != nullptr && transform->Parent() == nullptr)
-            go->SetAsRootObject(false);
-
-        const auto pos = std::ranges::find(prev_scene->m_all_game_objects_, go);
-        if (pos != prev_scene->m_all_game_objects_.end())
-            prev_scene->m_all_game_objects_.erase(pos);
+        Logger::Warn("MoveGameObject: moving to null scene. this is not allowed");
+        return;
     }
 
-    go->m_scene_ = scene;
-    scene->m_all_game_objects_.emplace_back(go);
-    go->SetAsRootObject(transform == nullptr || transform->Parent() == nullptr);
+    scene->MoveGameObject(go);
 }
 }
