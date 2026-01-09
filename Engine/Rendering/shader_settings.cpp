@@ -3,5 +3,3 @@
 #include "Asset/Importer/shader_importer.h"
 
 
-CEREAL_CLASS_VERSION(engine::ShaderSettings, engine::ShaderSettings::kSerializationVersion)
-
