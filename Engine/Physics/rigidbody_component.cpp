@@ -225,17 +225,17 @@ void RigidbodyComponent::UpdatePhysics()
 
 void RigidbodyComponent::OnPrePhysicsUpdate()
 {
-    if (m_should_write_)
-    {
-        WriteRigidbody();
-    }
-
     if (Transform()->WorldMatrix() != m_last_world_matrix_)
     {
         WriteTransform();
     }
 
     m_bt_ghost_object_->setWorldTransform(m_bt_rigidbody_->getWorldTransform());
+
+    if (m_should_write_)
+    {
+        WriteRigidbody();
+    }
 }
 
 void RigidbodyComponent::OnPostPhysicsUpdate()
