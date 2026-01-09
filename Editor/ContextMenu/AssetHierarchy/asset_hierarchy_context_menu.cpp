@@ -14,7 +14,6 @@ bool AssetHierarchyContextMenu::OnContextMenu(std::shared_ptr<AssetHierarchy> ob
     if (object->asset == nullptr)
     {
         ImGui::Text("There is nothing you can do here...");
-        ImGui::EndPopup();
         return false;
     }
 
@@ -26,7 +25,6 @@ bool AssetHierarchyContextMenu::OnContextMenu(std::shared_ptr<AssetHierarchy> ob
         // HACK: early-return on asset creation to workaround iterator issues
         if (created)
         {
-            ImGui::EndPopup();
             return true;
         }
     }
