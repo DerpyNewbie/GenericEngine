@@ -7,14 +7,14 @@ namespace engine
 {
 class SphereCollider final : public Collider
 {
-    btSphereShape m_shape_ = {1.0F};
+    std::shared_ptr<btSphereShape> m_shape_ = std::make_shared<btSphereShape>(1.0F);
     float m_radius_ = 1.0F;
 
 public:
     void OnInspectorGui() override;
 
     void UpdateShape() override;
-    btCollisionShape *GetShape() override;
+    std::shared_ptr<btCollisionShape> GetShape() override;
 
     [[nodiscard]] float Radius() const;
     void SetRadius(float radius);

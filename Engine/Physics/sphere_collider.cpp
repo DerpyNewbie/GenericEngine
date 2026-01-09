@@ -20,12 +20,12 @@ void SphereCollider::UpdateShape()
 {
     m_radius_ = std::max(m_radius_, Mathf::kEpsilon);
 
-    m_shape_.setUnscaledRadius(m_radius_);
+    m_shape_->setUnscaledRadius(m_radius_);
 }
 
-btCollisionShape *SphereCollider::GetShape()
+std::shared_ptr<btCollisionShape> SphereCollider::GetShape()
 {
-    return &m_shape_;
+    return m_shape_;
 }
 
 float SphereCollider::Radius() const

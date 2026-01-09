@@ -30,6 +30,7 @@
 #include "Components/Cinema/cinema_brain_component.h"
 #include "Components/Cinema/cinema_camera_component.h"
 #include "Components/Cinema/cinema_camera_transitioner.h"
+#include "Physics/mesh_collider.h"
 #include "Rendering/rendering_settings_component.h"
 
 namespace engine
@@ -57,6 +58,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<PlaneCollider>("Physics");
     RegisterComponentFactory<BoxCollider>("Physics");
     RegisterComponentFactory<CapsuleCollider>("Physics");
+    RegisterComponentFactory<MeshCollider>("Physics");
     RegisterComponentFactory<RigidbodyTesterComponent>("Debug");
     RegisterComponentFactory<AudioSourceComponent>("Audio");
     RegisterComponentFactory<AudioListenerComponent>("Audio");

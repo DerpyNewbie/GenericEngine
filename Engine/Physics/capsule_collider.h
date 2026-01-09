@@ -7,7 +7,7 @@ namespace engine
 {
 class CapsuleCollider : public Collider
 {
-    btCapsuleShape m_capsule_shape_ = {1, 0.5F};
+    std::shared_ptr<btCapsuleShape> m_capsule_shape_ = std::make_shared<btCapsuleShape>(1.0F, 0.5F);
     float m_radius_ = 1.0F;
     float m_height_ = 1.0F;
 
@@ -15,7 +15,7 @@ public:
     void OnInspectorGui() override;
 
     void UpdateShape() override;
-    btCollisionShape *GetShape() override;
+    std::shared_ptr<btCollisionShape> GetShape() override;
 
     void SetRadius(float radius);
     void SetHeight(float height);
