@@ -129,9 +129,7 @@ int Transform::GetSiblingIndex() const
 
     auto children = parent->m_children_;
     auto guid = Guid();
-    const auto itr = std::ranges::find_if(children, [&guid](auto &other) {
-        return other->Guid() == guid;
-    });
+    const auto itr = std::ranges::find_if(children, [&guid](auto &other) { return other->Guid() == guid; });
     return static_cast<int>(std::distance(children.begin(), itr));
 }
 
@@ -165,10 +163,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
     if (current_parent)
     {
         auto this_ptr = shared_from_base<Transform>();
-        const auto it = std::ranges::find_if(current_parent->m_children_,
-                                             [&this_ptr](const auto &ptr) {
-                                                 return ptr == this_ptr;
-                                             });
+        const auto it = std::ranges::find_if(current_parent->m_children_, [&this_ptr](const auto &ptr) { return ptr == this_ptr; });
         current_parent->m_children_.erase(it);
     }
 
@@ -181,7 +176,7 @@ void Transform::SetParent(const std::shared_ptr<Transform> &next_parent)
 
     SetDirty();
     RecalculateMatrices();
-    GameObject()->SetAsRootObject(m_parent_.expired());
+    SceneManager::MoveGameObject(GameObject(), GameObject()->Scene());
 }
 
 void Transform::SetSiblingIndex(const int index)
@@ -189,32 +184,14 @@ void Transform::SetSiblingIndex(const int index)
     const auto parent = Parent();
     if (parent == nullptr)
     {
-        const auto game_object = GameObject();
-        const auto scene = GameObject()->Scene();
-        auto &root_objects = scene->m_root_game_objects_;;
-        std::erase(root_objects, game_object);
-        if (index <= 0)
-        {
-            root_objects.insert(root_objects.begin(), game_object);
-            return;
-        }
-
-        if (root_objects.size() < index)
-        {
-            root_objects.emplace_back(game_object);
-            return;
-        }
-
-        root_objects.insert(root_objects.begin() + index, game_object);
+        GameObject()->Scene()->ReorderRootObject(GameObject(), index);
         return;
     }
 
     const auto transform = shared_from_base<Transform>();
     auto &children = parent->m_children_;
     auto guid = Guid();
-    std::erase_if(children, [&guid](auto &other) {
-        return other->Guid() == guid;
-    });
+    std::erase_if(children, [&guid](auto &other) { return other->Guid() == guid; });
 
     if (index <= 0)
     {
