@@ -29,6 +29,7 @@
 #include "Components/Cinema/cinema_brain_component.h"
 #include "Components/Cinema/cinema_camera_component.h"
 #include "Components/Cinema/cinema_camera_transitioner.h"
+#include "Physics/mesh_collider.h"
 #include "Rendering/rendering_settings_component.h"
 
 namespace engine
@@ -55,6 +56,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<PlaneCollider>("Physics");
     RegisterComponentFactory<BoxCollider>("Physics");
     RegisterComponentFactory<CapsuleCollider>("Physics");
+    RegisterComponentFactory<MeshCollider>("Physics");
     RegisterComponentFactory<RigidbodyTesterComponent>("Debug");
     RegisterComponentFactory<AudioSourceComponent>("Audio");
     RegisterComponentFactory<AudioListenerComponent>("Audio");
@@ -101,6 +103,6 @@ std::shared_ptr<IComponentFactory> IComponentFactory::Get(const std::string &nam
 std::vector<std::string> IComponentFactory::GetNames()
 {
     auto view = m_factories_ | std::views::keys;
-    return { view.begin(), view.end() };
+    return {view.begin(), view.end()};
 }
 }

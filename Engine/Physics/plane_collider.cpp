@@ -10,9 +10,9 @@ void PlaneCollider::UpdateShape()
     // NOTE(derpy): Plane has no need to be updated
 }
 
-btCollisionShape *PlaneCollider::GetShape()
+std::shared_ptr<btCollisionShape> PlaneCollider::GetShape()
 {
-    return &m_plane_;
+    return m_plane_;
 }
 }
 

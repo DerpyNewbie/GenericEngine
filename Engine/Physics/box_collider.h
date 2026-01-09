@@ -7,14 +7,14 @@ namespace engine
 {
 class BoxCollider : public Collider
 {
-    btBoxShape m_box_shape_ = {{1, 1, 1}};
-    Vector3 m_extents_ = {1, 1, 1};
+    std::shared_ptr<btBoxShape> m_box_shape_ = std::make_shared<btBoxShape>(btVector3{1.0F, 1.0F, 1.0F});
+    Vector3 m_extents_ = {1.0F, 1.0F, 1.0F};
 
 public:
     void OnInspectorGui() override;
 
     void UpdateShape() override;
-    btCollisionShape *GetShape() override;
+    std::shared_ptr<btCollisionShape> GetShape() override;
 
     [[nodiscard]] Vector3 Extents() const;
 

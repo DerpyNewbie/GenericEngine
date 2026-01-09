@@ -8,12 +8,9 @@ class Transform;
 class Collider;
 class CompoundShape
 {
-    std::unique_ptr<btCompoundShape> m_shape_;
-    std::list<std::weak_ptr<Collider>> m_colliders_;
-    std::weak_ptr<Transform> m_transform_;
-
-    void AddChildShape(const std::shared_ptr<Collider> &collider) const;
-    void RemoveChildShape(const std::shared_ptr<Collider> &collider) const;
+    std::unique_ptr<btCompoundShape> m_shape_ = {};
+    std::list<std::pair<std::weak_ptr<Collider>, std::shared_ptr<btCollisionShape>>> m_colliders_ = {};
+    std::weak_ptr<Transform> m_transform_ = {};
 
 public:
     CompoundShape() = default;
@@ -21,7 +18,7 @@ public:
 
     void AddChild(const std::shared_ptr<Collider> &collider);
     void RemoveChild(const std::shared_ptr<Collider> &collider);
-    void UpdateShape() const;
+    void UpdateShape();
 
     [[nodiscard]] btCompoundShape *GetShape() const;
 
@@ -29,7 +26,6 @@ public:
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            CEREAL_NVP(m_colliders_),
             CEREAL_NVP(m_transform_)
         );
 
@@ -40,4 +36,4 @@ public:
 };
 }
 
-CEREAL_CLASS_VERSION(engine::CompoundShape, 1)
+CEREAL_CLASS_VERSION(engine::CompoundShape, 2)

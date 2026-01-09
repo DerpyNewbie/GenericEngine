@@ -5,8 +5,15 @@
 
 namespace engine
 {
-void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) const
+CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
+    m_shape_(std::make_unique<btCompoundShape>()),
+    m_transform_(target)
+{ }
+
+void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
 {
+    RemoveChild(collider);
+
     const auto collider_matrix = Matrix::CreateTranslation(collider->Offset()) *
                                  collider->GameObject()->Transform()->WorldMatrix();
     const auto this_matrix = m_transform_.lock()->WorldMatrix();
@@ -17,50 +24,49 @@ void CompoundShape::AddChildShape(const std::shared_ptr<Collider> &collider) con
     relative_matrix.Decompose(sca, rot, pos);
 
     btTransform bt_transform = btTransform::getIdentity();
-    bt_transform.setOrigin({ pos.x, pos.y, pos.z });
-    bt_transform.setRotation({ rot.x, rot.y, rot.z, rot.w });
+    bt_transform.setOrigin({pos.x, pos.y, pos.z});
+    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
 
-    m_shape_->addChildShape(bt_transform, collider->GetShape());
-}
-
-void CompoundShape::RemoveChildShape(const std::shared_ptr<Collider> &collider) const
-{
-    m_shape_->removeChildShape(collider->GetShape());
-}
-
-CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
-    m_shape_(std::make_unique<btCompoundShape>()),
-    m_transform_(target)
-{ }
-
-void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
-{
-    m_colliders_.emplace_back(collider);
-    AddChildShape(collider);
+    const auto shape = collider->GetShape();
+    if (shape != nullptr)
+    {
+        m_shape_->addChildShape(bt_transform, shape.get());
+        m_colliders_.emplace_back(collider, shape);
+    }
 }
 
 void CompoundShape::RemoveChild(const std::shared_ptr<Collider> &collider)
 {
-    std::erase_if(m_colliders_, [collider](auto &other) {
-        return other.lock() == collider;
-    });
+    auto colliders = m_colliders_;
+    for (auto [col, shape] : colliders)
+    {
+        if (!col.expired() && collider != col.lock())
+            continue;
 
-    RemoveChildShape(collider);
+        m_shape_->removeChildShape(shape.get());
+    }
+
+    std::erase_if(
+        m_colliders_,
+        [collider](auto &other) {
+            return other.first.lock() == collider || other.first.expired();
+        }
+    );
 }
 
-void CompoundShape::UpdateShape() const
+void CompoundShape::UpdateShape()
 {
     if (m_shape_ == nullptr)
         return;
 
-    for (auto &weak_collider : m_colliders_)
+    auto snapshot = m_colliders_;
+    for (const auto &weak_collider : snapshot | std::views::keys)
     {
         auto collider = weak_collider.lock();
         if (collider == nullptr)
             continue;
 
-        RemoveChildShape(collider);
-        AddChildShape(collider);
+        AddChild(collider);
     }
 }
 
@@ -68,5 +74,4 @@ btCompoundShape *CompoundShape::GetShape() const
 {
     return m_shape_.get();
 }
-
 }

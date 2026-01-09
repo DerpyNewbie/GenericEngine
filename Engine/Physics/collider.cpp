@@ -29,6 +29,7 @@ void Collider::RemoveFromRigidbody()
 
     m_is_registered_ = false;
 }
+
 void Collider::ApplyChanges()
 {
     if (!m_is_registered_)
