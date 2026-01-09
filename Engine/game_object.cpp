@@ -68,6 +68,7 @@ void GameObject::SetActive(const bool is_active)
     m_is_active_self_ = is_active;
     NotifyIsActiveChanged();
 }
+
 std::shared_ptr<Scene> GameObject::Scene() const
 {
     return m_scene_.lock();
@@ -92,7 +93,7 @@ std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent) cons
 
 void GameObject::InvokeUpdate()
 {
-    if (IsDestroying())
+    if (IsDestroying() || IsActiveInHierarchy() == false)
     {
         return;
     }
@@ -151,6 +152,11 @@ void GameObject::InvokeUpdate()
 
 void GameObject::InvokeFixedUpdate() const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (auto &component : m_components_)
     {
         if (!component->m_has_called_start_)
@@ -204,6 +210,11 @@ void GameObject::NotifyIsActiveChanged() const
 
 void GameObject::InvokeOnCollisionEnter(const Collision &collision) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnCollisionEnter(collision);
@@ -222,6 +233,11 @@ void GameObject::InvokeOnCollisionEnter(const Collision &collision) const
 
 void GameObject::InvokeOnCollisionStay(const Collision &collision) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnCollisionStay(collision);
@@ -240,6 +256,11 @@ void GameObject::InvokeOnCollisionStay(const Collision &collision) const
 
 void GameObject::InvokeOnCollisionExit(const Collision &collision) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnCollisionExit(collision);
@@ -258,6 +279,11 @@ void GameObject::InvokeOnCollisionExit(const Collision &collision) const
 
 void GameObject::InvokeOnTriggerEnter(const std::shared_ptr<GameObject> &other) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnTriggerEnter(other);
@@ -276,6 +302,11 @@ void GameObject::InvokeOnTriggerEnter(const std::shared_ptr<GameObject> &other) 
 
 void GameObject::InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnTriggerStay(other);
@@ -294,6 +325,11 @@ void GameObject::InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) c
 
 void GameObject::InvokeOnTriggerExit(const std::shared_ptr<GameObject> &other) const
 {
+    if (IsActiveInHierarchy() == false)
+    {
+        return;
+    }
+
     for (const auto &component : m_components_)
     {
         component->OnTriggerExit(other);

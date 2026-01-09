@@ -9,6 +9,7 @@
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
+#include "Components/component_event_tester.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
@@ -42,6 +43,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CameraComponent>("Rendering");
     RegisterComponentFactory<Controller>("Debug");
     RegisterComponentFactory<FrameMetaData>("Debug");
+    RegisterComponentFactory<ComponentEventTester>("Debug");
     RegisterComponentFactory<MeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<SkinnedMeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<BillboardRenderer>("Rendering/Renderer");
@@ -101,6 +103,6 @@ std::shared_ptr<IComponentFactory> IComponentFactory::Get(const std::string &nam
 std::vector<std::string> IComponentFactory::GetNames()
 {
     auto view = m_factories_ | std::views::keys;
-    return { view.begin(), view.end() };
+    return {view.begin(), view.end()};
 }
 }
