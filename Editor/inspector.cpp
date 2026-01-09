@@ -8,6 +8,7 @@
 #include "game_object.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
+#include "ContextMenu/Common/add_component_menu.h"
 
 namespace editor
 {
@@ -156,7 +157,7 @@ void Inspector::DrawGameObject(const std::shared_ptr<GameObject> &game_object)
     ImGui::Separator();
     if (ImGui::BeginPopup("##INSPECTOR_ADD_COMPONENT_POPUP"))
     {
-        DefaultEditorMenu::DrawComponentMenu(game_object);
+        AddComponentMenu::Draw(game_object);
         ImGui::EndPopup();
     }
 
