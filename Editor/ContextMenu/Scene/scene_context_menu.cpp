@@ -4,7 +4,7 @@
 
 namespace editor
 {
-bool SceneContextMenu::OnContextMenu(std::shared_ptr<Scene> object)
+bool SceneContextMenu::OnContextMenu(const std::shared_ptr<Scene> object)
 {
     if (ImGui::MenuItem("Remove", nullptr, false, object != nullptr))
     {
