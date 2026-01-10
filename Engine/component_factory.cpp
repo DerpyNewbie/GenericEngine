@@ -9,6 +9,7 @@
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
+#include "Components/component_event_tester.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
@@ -43,6 +44,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CameraComponent>("Rendering");
     RegisterComponentFactory<Controller>("Debug");
     RegisterComponentFactory<FrameMetaData>("Debug");
+    RegisterComponentFactory<ComponentEventTester>("Debug");
     RegisterComponentFactory<MeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<SkinnedMeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<BillboardRenderer>("Rendering/Renderer");

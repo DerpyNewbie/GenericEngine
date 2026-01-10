@@ -43,7 +43,10 @@ void RigidbodyComponent::ConstructRigidbody()
     if (m_bt_rigidbody_ == nullptr)
     {
         auto ctor_info = btRigidBody::btRigidBodyConstructionInfo(
-            IsKinematicOrStatic() ? 0 : m_mass_, m_bt_motion_state_.get(), m_rigidbody_shape_->GetShape());
+            IsKinematicOrStatic() ? 0 : m_mass_,
+            m_bt_motion_state_.get(),
+            m_rigidbody_shape_->GetShape()
+        );
         m_bt_rigidbody_ = std::make_unique<btRigidBody>(ctor_info);
         m_bt_rigidbody_->setUserPointer(this);
         m_is_registered_ = false;
@@ -58,7 +61,8 @@ void RigidbodyComponent::ConstructRigidbody()
         m_bt_ghost_object_->setWorldTransform(m_bt_rigidbody_->getWorldTransform());
         m_bt_ghost_object_->setUserPointer(this);
         m_bt_ghost_object_->setCollisionFlags(
-            m_bt_ghost_object_->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
+            m_bt_ghost_object_->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE
+        );
     }
 }
 
@@ -76,13 +80,7 @@ void RigidbodyComponent::RegisterToPhysics()
 
 void RigidbodyComponent::ReadRigidbody()
 {
-    btTransform bt_transform = m_bt_rigidbody_->getWorldTransform();
-
-    const auto pos = bt_transform.getOrigin();
-    const auto rot = bt_transform.getRotation();
-    const auto transform = Transform();
-    transform->SetPositionAndRotation({pos.x(), pos.y(), pos.z()}, {rot.x(), rot.y(), rot.z(), rot.w()});
-    m_last_world_matrix_ = transform->WorldMatrix();
+    ReadTransform();
 
     const auto bt_vel = m_bt_rigidbody_->getLinearVelocity();
     const auto bt_ang_vel = m_bt_rigidbody_->getAngularVelocity();
@@ -94,17 +92,8 @@ void RigidbodyComponent::ReadRigidbody()
 void RigidbodyComponent::WriteRigidbody()
 {
     UpdateCompoundShape();
+    WriteTransform();
 
-    const auto transform = GameObject()->Transform();
-    const auto pos = transform->Position();
-    const auto rot = transform->Rotation();
-    const auto center_of_mass = Vector3::Transform(m_center_of_mass_, transform->LocalToWorld());
-
-    btTransform bt_transform = btTransform::getIdentity();
-    bt_transform.setOrigin({pos.x, pos.y, pos.z});
-    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
-
-    m_bt_rigidbody_->setWorldTransform(bt_transform);
     m_bt_rigidbody_->setLinearVelocity({m_velocity_.x, m_velocity_.y, m_velocity_.z});
     m_bt_rigidbody_->setAngularVelocity({m_angular_velocity_.x, m_angular_velocity_.y, m_angular_velocity_.z});
     m_bt_rigidbody_->setFriction(m_friction_);
@@ -113,9 +102,12 @@ void RigidbodyComponent::WriteRigidbody()
     m_bt_rigidbody_->setRestitution(m_bounciness_);
     m_bt_rigidbody_->setDamping(m_linear_damping_, m_angular_damping_);
 
+    const auto transform = GameObject()->Transform();
+    const auto rot = transform->Rotation();
+    const auto center_of_mass = Vector3::Transform(m_center_of_mass_, transform->LocalToWorld());
     auto bt_center_of_mass = btTransform::getIdentity();
     bt_center_of_mass.setOrigin({center_of_mass.x, center_of_mass.y, center_of_mass.z});
-    bt_center_of_mass.setRotation(bt_transform.getRotation());
+    bt_center_of_mass.setRotation({rot.x, rot.y, rot.z, rot.w});
 
     m_bt_rigidbody_->setCenterOfMassTransform(bt_center_of_mass);
 
@@ -132,11 +124,13 @@ void RigidbodyComponent::WriteRigidbody()
 
     m_bt_rigidbody_->setFlags(IsKinematicOrStatic() ? BT_DISABLE_WORLD_GRAVITY : 0);
     m_bt_rigidbody_->setCollisionFlags(flags);
-    m_bt_rigidbody_->setActivationState(!m_is_kinematic_ && !m_is_static_
-                                            ? ACTIVE_TAG
-                                            : m_is_kinematic_
-                                            ? DISABLE_DEACTIVATION
-                                            : ISLAND_SLEEPING);
+    m_bt_rigidbody_->setActivationState(
+        !m_is_kinematic_ && !m_is_static_
+        ? ACTIVE_TAG
+        : m_is_kinematic_
+        ? DISABLE_DEACTIVATION
+        : ISLAND_SLEEPING
+    );
     m_bt_rigidbody_->activate();
 
     // Update inertia
@@ -182,6 +176,31 @@ void RigidbodyComponent::WriteRigidbody()
     m_should_write_ = false;
 }
 
+void RigidbodyComponent::ReadTransform()
+{
+    btTransform bt_transform = m_bt_rigidbody_->getWorldTransform();
+
+    const auto pos = bt_transform.getOrigin();
+    const auto rot = bt_transform.getRotation();
+    const auto transform = Transform();
+    transform->SetPositionAndRotation({pos.x(), pos.y(), pos.z()}, {rot.x(), rot.y(), rot.z(), rot.w()});
+    m_last_world_matrix_ = transform->WorldMatrix();
+}
+
+void RigidbodyComponent::WriteTransform()
+{
+    const auto transform = GameObject()->Transform();
+    const auto pos = transform->Position();
+    const auto rot = transform->Rotation();
+
+    btTransform bt_transform = btTransform::getIdentity();
+    bt_transform.setOrigin({pos.x, pos.y, pos.z});
+    bt_transform.setRotation({rot.x, rot.y, rot.z, rot.w});
+
+    m_bt_rigidbody_->setWorldTransform(bt_transform);
+    m_last_world_matrix_ = Transform()->WorldMatrix();
+}
+
 void RigidbodyComponent::UnregisterFromPhysics()
 {
     Physics::RemoveRigidbody(shared_from_base<RigidbodyComponent>());
@@ -206,13 +225,17 @@ void RigidbodyComponent::UpdatePhysics()
 
 void RigidbodyComponent::OnPrePhysicsUpdate()
 {
-    if (m_should_write_ || Transform()->WorldMatrix() != m_last_world_matrix_)
+    if (Transform()->WorldMatrix() != m_last_world_matrix_)
     {
-        WriteRigidbody();
-        m_last_world_matrix_ = Transform()->WorldMatrix();
+        WriteTransform();
     }
 
     m_bt_ghost_object_->setWorldTransform(m_bt_rigidbody_->getWorldTransform());
+
+    if (m_should_write_)
+    {
+        WriteRigidbody();
+    }
 }
 
 void RigidbodyComponent::OnPostPhysicsUpdate()
@@ -526,13 +549,11 @@ bool RigidbodyComponent::IsDynamic() const
 void RigidbodyComponent::SetPosition(const Vector3 &position)
 {
     Transform()->SetPosition(position);
-    m_should_write_ = true;
 }
 
 void RigidbodyComponent::SetRotation(const Quaternion &rotation)
 {
     Transform()->SetRotation(rotation);
-    m_should_write_ = true;
 }
 
 void RigidbodyComponent::SetVelocity(const Vector3 &velocity)
@@ -625,12 +646,12 @@ void RigidbodyComponent::AddForce(const Vector3 &force, const kForceMode mode)
 {
     switch (mode)
     {
-    case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
-        m_bt_rigidbody_->applyCentralForce({force.x, force.y, force.z});
-        break;
-    case kForceMode::kImpulse:
-        m_bt_rigidbody_->applyCentralImpulse({force.x, force.y, force.z});
-        break;
+        case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
+            m_bt_rigidbody_->applyCentralForce({force.x, force.y, force.z});
+            break;
+        case kForceMode::kImpulse:
+            m_bt_rigidbody_->applyCentralImpulse({force.x, force.y, force.z});
+            break;
     }
 
     ReadRigidbody();
@@ -642,12 +663,12 @@ void RigidbodyComponent::AddForceAtPosition(const Vector3 &force, const Vector3 
     auto rel = Vector3::Transform(world_position, m_transform_.lock()->WorldToLocal());
     switch (mode)
     {
-    case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
-        m_bt_rigidbody_->applyForce({force.x, force.y, force.z}, {rel.x, rel.y, rel.z});
-        break;
-    case kForceMode::kImpulse:
-        m_bt_rigidbody_->applyImpulse({force.x, force.y, force.z}, {rel.x, rel.y, rel.z});
-        break;
+        case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
+            m_bt_rigidbody_->applyForce({force.x, force.y, force.z}, {rel.x, rel.y, rel.z});
+            break;
+        case kForceMode::kImpulse:
+            m_bt_rigidbody_->applyImpulse({force.x, force.y, force.z}, {rel.x, rel.y, rel.z});
+            break;
     }
 
     ReadRigidbody();
@@ -658,12 +679,12 @@ void RigidbodyComponent::AddTorque(const Vector3 &torque, const kForceMode mode)
 {
     switch (mode)
     {
-    case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
-        m_bt_rigidbody_->applyTorque({torque.x, torque.y, torque.z});
-        break;
-    case kForceMode::kImpulse:
-        m_bt_rigidbody_->applyTorqueImpulse({torque.x, torque.y, torque.z});
-        break;
+        case kForceMode::kForce: // NOLINT(bugprone-branch-clone)
+            m_bt_rigidbody_->applyTorque({torque.x, torque.y, torque.z});
+            break;
+        case kForceMode::kImpulse:
+            m_bt_rigidbody_->applyTorqueImpulse({torque.x, torque.y, torque.z});
+            break;
     }
 
     ReadRigidbody();
