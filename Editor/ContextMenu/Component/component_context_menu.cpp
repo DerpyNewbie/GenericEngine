@@ -20,3 +20,5 @@ bool ComponentContextMenu::OnContextMenu(const std::shared_ptr<Component> compon
     return false;
 }
 }
+
+REGISTER_CONTEXT_MENU(editor::ComponentContextMenu)

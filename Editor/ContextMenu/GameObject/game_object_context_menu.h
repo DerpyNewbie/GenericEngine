@@ -10,5 +10,3 @@ class GameObjectContextMenu : public ContextMenu<GameObject>
     bool OnContextMenu(std::shared_ptr<GameObject> object) override;
 };
 }
-
-REGISTER_CONTEXT_MENU(editor::GameObjectContextMenu)
