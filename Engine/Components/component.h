@@ -16,6 +16,8 @@ class Component : public Object
 
     bool m_has_called_awake_ = false;
     bool m_has_called_start_ = false;
+    bool m_has_called_enabled_ = false;
+    bool m_has_called_disabled_ = false;
     std::weak_ptr<GameObject> m_game_object_ = {};
 
 public:
