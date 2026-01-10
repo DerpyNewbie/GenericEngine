@@ -3,12 +3,10 @@
 
 namespace engine
 {
+class GameObject;
 class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver, public IGarbageCollectReceiver
 {
-    friend class ObjectUtil;
-    friend class GameObject;
     friend class SceneManager;
-    friend class Transform;
 
     std::vector<std::shared_ptr<GameObject>> m_root_game_objects_;
     std::vector<std::shared_ptr<GameObject>> m_all_game_objects_;
@@ -23,6 +21,11 @@ class Scene : public Object, public IUpdateReceiver, public IFixedUpdateReceiver
 
 public:
     const std::vector<std::shared_ptr<GameObject>> &RootGameObjects();
+    const std::vector<std::shared_ptr<GameObject>> &AllGameObjects();
+
+    void MarkDestroyingGameObject();
+    void MoveGameObject(const std::shared_ptr<GameObject> &go);
+    void ReorderRootObject(std::shared_ptr<GameObject> target_object, int dst_idx);
 
     template <class Archive>
     void serialize(Archive &ar, uint32_t version);

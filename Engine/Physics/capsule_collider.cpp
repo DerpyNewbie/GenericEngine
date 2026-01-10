@@ -24,12 +24,12 @@ void CapsuleCollider::UpdateShape()
 {
     m_radius_ = std::max(m_radius_, Mathf::kEpsilon);
     m_height_ = std::max(m_height_, Mathf::kEpsilon);
-    m_capsule_shape_.setLocalScaling({m_radius_, m_height_, m_radius_});
+    m_capsule_shape_->setLocalScaling({m_radius_, m_height_, m_radius_});
 }
 
-btCollisionShape *CapsuleCollider::GetShape()
+std::shared_ptr<btCollisionShape> CapsuleCollider::GetShape()
 {
-    return &m_capsule_shape_;
+    return m_capsule_shape_;
 }
 
 void CapsuleCollider::SetRadius(const float radius)

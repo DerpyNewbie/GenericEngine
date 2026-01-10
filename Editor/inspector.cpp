@@ -8,6 +8,7 @@
 #include "game_object.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
+#include "ContextMenu/Common/add_component_menu.h"
 
 namespace editor
 {
@@ -103,6 +104,8 @@ void Inspector::DrawGameObject(const std::shared_ptr<GameObject> &game_object)
     {
         Gui::ReadOnlyStringField("Scene", game_object->Scene() ? game_object->Scene()->Name() : "!!!NULL!!!");
         Gui::ReadOnlyStringField("Path", game_object->Path());
+        Gui::ReadOnlyStringField("Parent", game_object->Transform()->Parent() ? game_object->Transform()->Parent()->GameObject()->Name() : "!!!NULL!!!");
+        Gui::ReadOnlyStringField("Child Count", std::to_string(game_object->Transform()->ChildCount()));
     }
 
     // game object header
@@ -154,7 +157,7 @@ void Inspector::DrawGameObject(const std::shared_ptr<GameObject> &game_object)
     ImGui::Separator();
     if (ImGui::BeginPopup("##INSPECTOR_ADD_COMPONENT_POPUP"))
     {
-        DefaultEditorMenu::DrawComponentMenu(game_object);
+        AddComponentMenu::Draw(game_object);
         ImGui::EndPopup();
     }
 

@@ -23,6 +23,13 @@
         <ClCompile Include="bootstrap.cpp"/>
         <ClCompile Include="Editor\asset_browser.cpp"/>
         <ClCompile Include="Editor\audio_window.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\AssetHierarchy\asset_hierarchy_context_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\Common\add_component_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\Component\component_context_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\context_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\GameObject\game_object_create_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\GameObject\game_object_context_menu.cpp"/>
+        <ClCompile Include="Editor\ContextMenu\Scene\scene_context_menu.cpp"/>
         <ClCompile Include="Editor\default_editor_menus.cpp"/>
         <ClCompile Include="Editor\editor_menu.cpp"/>
         <ClCompile Include="Editor\editor_prefs.cpp"/>
@@ -66,6 +73,7 @@
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_transitioner.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
+        <ClCompile Include="Engine\Components\component_event_tester.cpp"/>
         <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
         <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
@@ -111,6 +119,7 @@
         <ClCompile Include="Engine\Physics\collider.cpp"/>
         <ClCompile Include="Engine\Physics\box_collider.cpp"/>
         <ClCompile Include="Engine\Physics\compound_shape.cpp"/>
+        <ClCompile Include="Engine\Physics\mesh_collider.cpp"/>
         <ClCompile Include="Engine\Physics\physics.cpp"/>
         <ClCompile Include="Engine\Physics\plane_collider.cpp"/>
         <ClCompile Include="Engine\Physics\rigidbody_component.cpp"/>
@@ -234,6 +243,13 @@
         <ClInclude Include="bootstrap.h"/>
         <ClInclude Include="Editor\asset_browser.h"/>
         <ClInclude Include="Editor\audio_window.h"/>
+        <ClInclude Include="Editor\ContextMenu\AssetHierarchy\asset_hierarchy_context_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\Common\add_component_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\Component\component_context_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\context_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\GameObject\game_object_create_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\GameObject\game_object_context_menu.h"/>
+        <ClInclude Include="Editor\ContextMenu\Scene\scene_context_menu.h"/>
         <ClInclude Include="Editor\default_editor_menus.h"/>
         <ClInclude Include="Editor\editor_menu.h"/>
         <ClInclude Include="Editor\editor_prefs.h"/>
@@ -277,6 +293,7 @@
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_transitioner.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
+        <ClInclude Include="Engine\Components\component_event_tester.h"/>
         <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
         <ClInclude Include="Engine\Components\renderer_2d.h"/>
@@ -330,6 +347,7 @@
         <ClInclude Include="Engine\Physics\collider.h"/>
         <ClInclude Include="Engine\Physics\box_collider.h"/>
         <ClInclude Include="Engine\Physics\compound_shape.h"/>
+        <ClInclude Include="Engine\Physics\mesh_collider.h"/>
         <ClInclude Include="Engine\Physics\physics.h"/>
         <ClInclude Include="Engine\Physics\plane_collider.h"/>
         <ClInclude Include="Engine\Physics\rigidbody_component.h"/>

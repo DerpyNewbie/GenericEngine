@@ -15,7 +15,7 @@ class Collider : public Component
     bool m_is_registered_ = false;
 
     virtual void UpdateShape() = 0;
-    virtual btCollisionShape *GetShape() = 0;
+    virtual std::shared_ptr<btCollisionShape> GetShape() = 0;
 
     void AddToRigidbody();
     void RemoveFromRigidbody();

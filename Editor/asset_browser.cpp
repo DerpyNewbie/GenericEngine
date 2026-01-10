@@ -4,61 +4,12 @@
 #include "default_editor_menus.h"
 #include "gui.h"
 #include "Asset/asset_database.h"
-#include "logger.h"
+#include "ContextMenu/context_menu.h"
 
 namespace editor
 {
 namespace
 {
-bool DrawAssetHierarchyPopup(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
-{
-    if (!ImGui::BeginPopupContextItem("##ASSET_BROWSER_FILE_CONTEXT"))
-    {
-        return false;
-    }
-
-    if (asset_hierarchy->asset == nullptr)
-    {
-        ImGui::Text("There is nothing you can do here...");
-        ImGui::EndPopup();
-        return false;
-    }
-
-    if (ImGui::BeginMenu("Create"))
-    {
-        const bool created = DefaultEditorMenu::DrawAssetMenu(asset_hierarchy->asset->AssetPath().parent_path());
-        ImGui::EndMenu();
-
-        // HACK: early-return on asset creation to workaround iterator issues
-        if (created)
-        {
-            ImGui::EndPopup();
-            return true;
-        }
-    }
-
-    if (ImGui::MenuItem("Save"))
-    {
-        engine::Logger::Log<AssetBrowser>("Saving %s", asset_hierarchy->asset->AssetPath().string().c_str());
-        engine::AssetDatabase::WriteAsset(asset_hierarchy->asset->Guid());
-    }
-
-    if (ImGui::MenuItem("Reimport"))
-    {
-        engine::Logger::Log<AssetBrowser>("Reimporting %s", asset_hierarchy->asset->AssetPath().string().c_str());
-        engine::AssetDatabase::Reimport(asset_hierarchy->asset->Guid());
-    }
-
-    if (ImGui::MenuItem("Delete"))
-    {
-        engine::Logger::Log<AssetBrowser>("Deleting %s", asset_hierarchy->asset->AssetPath().string().c_str());
-        engine::AssetDatabase::DeleteAsset(asset_hierarchy->asset->AssetPath());
-    }
-
-    ImGui::EndPopup();
-    return false;
-}
-
 bool DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hierarchy)
 {
     ImGui::TableNextRow();
@@ -105,13 +56,7 @@ bool DrawAssetHierarchy(const std::shared_ptr<engine::AssetHierarchy> &asset_hie
         Editor::Instance()->SetSelectedDirectory(path);
     }
 
-    if (DrawAssetHierarchyPopup(asset_hierarchy))
-    {
-        if (open)
-            ImGui::TreePop();
-        ImGui::PopID();
-        return true;
-    }
+    ContextMenuRegistry::DrawPopup(asset_hierarchy);
 
     if (asset_hierarchy->IsDirectory() && open)
     {

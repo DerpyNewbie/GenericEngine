@@ -8,6 +8,7 @@
 #include "scene.h"
 #include "scene_manager.h"
 #include "str_util.h"
+#include "ContextMenu/context_menu.h"
 
 namespace editor
 {
@@ -18,7 +19,7 @@ std::string Hierarchy::Name()
 
 void Hierarchy::OnEditorGui()
 {
-    for (const auto &current_scenes = engine::SceneManager::GetCurrentScenes();
+    for (const auto &current_scenes = SceneManager::GetCurrentScenes();
          const auto &scene : current_scenes)
     {
         ImGui::PushID(scene.get());
@@ -26,31 +27,27 @@ void Hierarchy::OnEditorGui()
         ImGui::PopID();
     }
 
-    auto available_space = ImGui::GetContentRegionAvail();
+    if (SceneManager::GetCurrentScenes().empty())
+    {
+        return;
+    }
+
+    const auto available_space = ImGui::GetContentRegionAvail();
     ImGui::PushID("HIERARCHY_EMPTY_SPACE");
     ImGui::Dummy(available_space);
-    if (ImGui::BeginPopupContextItem("HIERARCHY_EMPTY_SPACE"))
-    {
-        DefaultEditorMenu::DrawObjectMenu();
-        ImGui::EndPopup();
-    }
+    ContextMenuRegistry::DrawPopup<GameObject>(nullptr, "HIERARCHY_EMPTY_SPACE");
     ImGui::PopID();
 }
 
-void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
+void Hierarchy::DrawScene(const std::shared_ptr<Scene> &scene)
 {
-    auto draw = ImGui::CollapsingHeader(scene->Name().c_str());
+    const auto draw = Gui::ObjectHeader(scene);
     if (ImGui::IsItemClicked())
     {
         Editor::Instance()->SetSelectedObject(scene);
     }
 
-    if (ImGui::BeginPopupContextItem())
-    {
-        if (ImGui::MenuItem("Unload"))
-            engine::SceneManager::DestroyScene(scene->Name());
-        ImGui::EndPopup();
-    }
+    ContextMenuRegistry::DrawPopup(scene);
 
     if (draw)
     {
@@ -66,7 +63,7 @@ void Hierarchy::DrawScene(const std::shared_ptr<engine::Scene> &scene)
     }
 }
 
-void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object)
+void Hierarchy::DrawObjectRecursive(const std::shared_ptr<GameObject> &game_object)
 {
     ImGui::TableNextRow();
     ImGui::TableNextColumn();
@@ -117,7 +114,7 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &g
     ImGui::PopID();
 }
 
-bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_object)
+bool Hierarchy::DrawObject(const std::shared_ptr<GameObject> &game_object)
 {
     ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
     flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
@@ -145,48 +142,53 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
 
     if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
     {
-        engine::Gui::SetDragDropPayload(game_object);
+        Gui::SetDragDropPayload(game_object);
         ImGui::EndDragDropSource();
     }
 
-    if (ImGui::BeginPopupContextItem())
-    {
-        DefaultEditorMenu::DrawObjectMenu(game_object);
-        ImGui::EndPopup();
-    }
+    ContextMenuRegistry::DrawPopup(game_object);
 
     if (ImGui::BeginDragDropTarget())
     {
-        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
-                                                                       ImGuiDragDropFlags_AcceptBeforeDelivery))
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(
+            Gui::DragDropTarget::kObjectGuid,
+            ImGuiDragDropFlags_AcceptBeforeDelivery
+        ))
         {
-            const auto payload_object = engine::Gui::GetDragDropPayload(payload);
+            const auto payload_object = Gui::GetDragDropPayload(payload);
             if (payload_object == nullptr)
             {
-                engine::Logger::Log<Hierarchy>("Cannot drag and drop object as payload is null");
+                Logger::Log<Hierarchy>("Cannot drag and drop object as payload is null");
             }
-            else if (const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object))
+            else if (const auto payload_go = Gui::MakeCompatible<GameObject>(payload_object))
             {
                 const bool can_be_child = !game_object->Transform()->IsChildOf(payload_go->Transform());
 
-                ImGui::SetTooltip(can_be_child
-                                      ? "Make '%s' child of '%s'"
-                                      : "Cannot make '%s' child of '%s' as its parent of child",
-                                  payload_go->Name().c_str(),
-                                  game_object->Name().c_str());
+                ImGui::SetTooltip(
+                    can_be_child
+                    ? "Make '%s' child of '%s'"
+                    : "Cannot make '%s' child of '%s' as its parent of child",
+                    payload_go->Name().c_str(),
+                    game_object->Name().c_str()
+                );
 
                 if (can_be_child && payload->IsDelivery())
                 {
-                    engine::Logger::Log<Hierarchy>("appending %s to %s as child",
-                                                   game_object->Path().c_str(), payload_go->Path().c_str());
+                    Logger::Log<Hierarchy>(
+                        "appending %s to %s as child",
+                        game_object->Path().c_str(),
+                        payload_go->Path().c_str()
+                    );
 
                     payload_go->Transform()->SetParent(game_object->Transform());
                 }
             }
             else
             {
-                ImGui::SetTooltip("Cannot drag and drop object %s as this is not GameObject",
-                                  payload_object->Name().c_str());
+                ImGui::SetTooltip(
+                    "Cannot drag and drop object %s as this is not GameObject",
+                    payload_object->Name().c_str()
+                );
             }
         }
 
@@ -196,7 +198,7 @@ bool Hierarchy::DrawObject(const std::shared_ptr<engine::GameObject> &game_objec
     return open;
 }
 
-void Hierarchy::DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &game_object, const int offset)
+void Hierarchy::DrawReorderingTarget(const std::shared_ptr<GameObject> &game_object, const int offset)
 {
     constexpr float reorder_target_height = 0.0001F;
 
@@ -205,11 +207,13 @@ void Hierarchy::DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &
     ImGui::Dummy(reorder_target_size);
     if (ImGui::BeginDragDropTarget())
     {
-        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(engine::Gui::DragDropTarget::kObjectGuid,
-                                                                       ImGuiDragDropFlags_AcceptBeforeDelivery))
+        if (const ImGuiPayload *payload = ImGui::AcceptDragDropPayload(
+            Gui::DragDropTarget::kObjectGuid,
+            ImGuiDragDropFlags_AcceptBeforeDelivery
+        ))
         {
-            const auto payload_object = engine::Gui::GetDragDropPayload(payload);
-            const auto payload_go = engine::Gui::MakeCompatible<engine::GameObject>(payload_object);
+            const auto payload_object = Gui::GetDragDropPayload(payload);
+            const auto payload_go = Gui::MakeCompatible<GameObject>(payload_object);
             if (payload_go != nullptr)
             {
                 const bool can_be_parent = !game_object->Transform()->IsChildOf(payload_go->Transform());

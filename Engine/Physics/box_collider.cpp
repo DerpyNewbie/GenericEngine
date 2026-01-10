@@ -23,13 +23,13 @@ void BoxCollider::UpdateShape()
         std::max(m_extents_.z, Mathf::kEpsilon)
     };
 
-    m_box_shape_.setLocalScaling({m_extents_.x, m_extents_.y, m_extents_.z});
+    m_box_shape_->setLocalScaling({m_extents_.x, m_extents_.y, m_extents_.z});
     ApplyChanges();
 }
 
-btCollisionShape *BoxCollider::GetShape()
+std::shared_ptr<btCollisionShape> BoxCollider::GetShape()
 {
-    return &m_box_shape_;
+    return m_box_shape_;
 }
 
 Vector3 BoxCollider::Extents() const

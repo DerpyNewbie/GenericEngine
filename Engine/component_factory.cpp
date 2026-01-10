@@ -9,6 +9,7 @@
 #include "Components/text_renderer.h"
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
+#include "Components/component_event_tester.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
@@ -29,6 +30,7 @@
 #include "Components/Cinema/cinema_brain_component.h"
 #include "Components/Cinema/cinema_camera_component.h"
 #include "Components/Cinema/cinema_camera_transitioner.h"
+#include "Physics/mesh_collider.h"
 #include "Rendering/rendering_settings_component.h"
 
 namespace engine
@@ -42,6 +44,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CameraComponent>("Rendering");
     RegisterComponentFactory<Controller>("Debug");
     RegisterComponentFactory<FrameMetaData>("Debug");
+    RegisterComponentFactory<ComponentEventTester>("Debug");
     RegisterComponentFactory<MeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<SkinnedMeshRenderer>("Rendering/Renderer");
     RegisterComponentFactory<BillboardRenderer>("Rendering/Renderer");
@@ -55,6 +58,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<PlaneCollider>("Physics");
     RegisterComponentFactory<BoxCollider>("Physics");
     RegisterComponentFactory<CapsuleCollider>("Physics");
+    RegisterComponentFactory<MeshCollider>("Physics");
     RegisterComponentFactory<RigidbodyTesterComponent>("Debug");
     RegisterComponentFactory<AudioSourceComponent>("Audio");
     RegisterComponentFactory<AudioListenerComponent>("Audio");
@@ -101,6 +105,6 @@ std::shared_ptr<IComponentFactory> IComponentFactory::Get(const std::string &nam
 std::vector<std::string> IComponentFactory::GetNames()
 {
     auto view = m_factories_ | std::views::keys;
-    return { view.begin(), view.end() };
+    return {view.begin(), view.end()};
 }
 }

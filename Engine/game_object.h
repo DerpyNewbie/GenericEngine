@@ -179,8 +179,6 @@ private:
     void InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) const;
     void InvokeOnTriggerExit(const std::shared_ptr<GameObject> &other) const;
 
-    void SetAsRootObject(bool is_root_object);
-
 public:
     template <class Archive>
     void serialize(Archive &ar);

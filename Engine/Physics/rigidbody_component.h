@@ -66,6 +66,8 @@ class RigidbodyComponent : public Component
     void RegisterToPhysics();
     void ReadRigidbody();
     void WriteRigidbody();
+    void ReadTransform();
+    void WriteTransform();
     void UnregisterFromPhysics();
     void UpdateCompoundShape() const;
     void UpdatePhysics();
