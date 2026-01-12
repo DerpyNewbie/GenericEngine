@@ -56,3 +56,5 @@ bool GameObjectContextMenu::OnContextMenu(std::shared_ptr<GameObject> object)
     return false;
 }
 }
+
+REGISTER_CONTEXT_MENU(editor::GameObjectContextMenu)

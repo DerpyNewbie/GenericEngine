@@ -14,3 +14,5 @@ bool SceneContextMenu::OnContextMenu(const std::shared_ptr<Scene> object)
     return false;
 }
 }
+
+REGISTER_CONTEXT_MENU(editor::SceneContextMenu)
