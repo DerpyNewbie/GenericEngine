@@ -7,7 +7,9 @@ namespace engine
 {
 void ComponentEventTester::Log(const std::string &message) const
 {
-    Logger::Log((Name() + "::" + message).c_str());
+    const auto go = GameObject();
+    const auto name = go == nullptr ? "null" : go->Name();
+    Logger::Log((name + "::" + message).c_str());
 }
 void ComponentEventTester::OnInspectorGui()
 {

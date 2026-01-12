@@ -51,4 +51,4 @@ bool AssetHierarchyContextMenu::OnContextMenu(std::shared_ptr<AssetHierarchy> ob
 }
 }
 
-REGISTER_CONTEXT_MENU(AssetHierarchyContextMenu)
+REGISTER_CONTEXT_MENU(editor::AssetHierarchyContextMenu)
