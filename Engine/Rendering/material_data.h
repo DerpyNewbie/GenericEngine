@@ -106,7 +106,10 @@ MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter)
 template <typename T>
 void MaterialData<T>::OnDeserialized()
 {
-    SetValue(value);
+    is_dirty = true;
+    if constexpr (kIsAssetPtr)
+        if (value.Lock())
+            CreateBuffer();
 }
 
 template <typename T>

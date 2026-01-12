@@ -1,19 +1,19 @@
 #pragma once
 #include "renderer.h"
+#include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/font_data.h"
 
 namespace engine
 {
 
-class TextRenderer : public Component
+class TextRenderer : public Renderer2D
 {
     friend class RenderPipeline;
     //HACK: あんまりよくないかも
     inline static std::unordered_set<std::shared_ptr<TextRenderer>> m_text_renderers_;
 
 public:
-    Vector2 position;
     std::string string;
     Color color;
     float rotation;
@@ -26,14 +26,14 @@ public:
     void OnEnabled() override;
     void OnDisabled() override;
 
-    void Render();
+    void RenderText();
+    void Render() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Component>(this),
-            CEREAL_NVP(position),
             CEREAL_NVP(font_data),
             CEREAL_NVP(color),
             CEREAL_NVP(string)

@@ -199,7 +199,7 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     //HACK: あんまりよくないかも
     for (auto text_renderer : TextRenderer::m_text_renderers_)
     {
-        text_renderer->Render();
+        text_renderer->RenderText();
     }
 }
 

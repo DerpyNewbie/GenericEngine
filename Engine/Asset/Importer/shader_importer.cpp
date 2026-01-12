@@ -28,7 +28,12 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
 
     if (FAILED(hr))
     {
-        Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
+        if (error_blob)
+        {
+            Logger::Error<ShaderImporter>(
+                reinterpret_cast<const char*>(error_blob->GetBufferPointer())
+            );
+        }
         return false;
     }
 
@@ -46,7 +51,12 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
 
     if (FAILED(hr))
     {
-        Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
+        if (error_blob)
+        {
+            Logger::Error<ShaderImporter>(
+                reinterpret_cast<const char*>(error_blob->GetBufferPointer())
+            );
+        }
         return false;
     }
 

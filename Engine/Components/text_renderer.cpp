@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
-#include "Components/camera_component.h"
+
+#include "rect_transform.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -11,7 +12,6 @@ namespace engine
 {
 void TextRenderer::OnInspectorGui()
 {
-    Gui::PropertyField("Position", position);
     Gui::PropertyField("Rotation", rotation);
     Gui::PropertyField("Origin", origin);
     Gui::PropertyField("Scale", scale);
@@ -30,25 +30,35 @@ void TextRenderer::OnInspectorGui()
 
 void TextRenderer::OnEnabled()
 {
+    Renderer2D::OnEnabled();
     m_text_renderers_.emplace(shared_from_base<TextRenderer>());
 }
+
 void TextRenderer::OnDisabled()
 {
+    Renderer2D::OnDisabled();
     m_text_renderers_.erase(shared_from_base<TextRenderer>());
 }
 
-void TextRenderer::Render()
+void TextRenderer::RenderText()
 {
     if (!font_data.Lock())
     {
         return;
     }
-    auto sprite_batch = FontData::SpriteBatch();
-    auto sprite_font = font_data.CastedLock()->SpriteFont();
+
+    const auto position = GameObject()->GetComponent<RectTransform>()->CalculateScreenRect().pos;
+
+    const auto sprite_batch = FontData::SpriteBatch();
+    const auto sprite_font = font_data.CastedLock()->SpriteFont();
     sprite_batch->Begin(RenderEngine::CommandList());
     sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color, rotation, origin, scale);
     sprite_batch->End();
     RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+}
+
+void TextRenderer::Render()
+{
 }
 }
 

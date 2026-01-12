@@ -10,3 +10,4 @@ public:
     bool OnContextMenu(std::shared_ptr<AssetHierarchy> object) override;
 };
 }
+

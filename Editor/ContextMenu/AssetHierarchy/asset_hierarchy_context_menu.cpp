@@ -50,3 +50,5 @@ bool AssetHierarchyContextMenu::OnContextMenu(std::shared_ptr<AssetHierarchy> ob
     return false;
 }
 }
+
+REGISTER_CONTEXT_MENU(AssetHierarchyContextMenu)

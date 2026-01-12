@@ -43,3 +43,5 @@ void ComponentEventTester::OnCollisionExit(const Collision &collision)
     Log("OnCollisionExit(" + collision.other->Name() + ")");
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::ComponentEventTester)
