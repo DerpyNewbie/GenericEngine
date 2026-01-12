@@ -65,6 +65,7 @@ public:
             std::is_base_of<Component, T>(),
             "Base type is not Component."
         );
+
         for (const auto &comp : m_components_)
         {
             auto instance = std::dynamic_pointer_cast<T>(comp);
@@ -163,8 +164,13 @@ private:
     friend class Physics;
 
     bool m_is_active_self_ = true;
+    mutable bool m_is_active_in_hierarchy_ = true;
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
+
+    static void EnsureComponentPrepared(const std::shared_ptr<Component> &component);
+    static void InvokeComponentOnEnabled(const std::shared_ptr<Component> &component);
+    static void InvokeComponentOnDisabled(const std::shared_ptr<Component> &component);
 
     void InvokeUpdate();
     void InvokeFixedUpdate() const;
