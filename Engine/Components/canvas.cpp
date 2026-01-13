@@ -23,7 +23,6 @@ void Canvas::OnInspectorGui()
 
 void Canvas::OnAwake()
 {
-    Renderer::OnAwake();
     m_canvas_size_ = Vector2{static_cast<float>(Application::WindowWidth()),
                              static_cast<float>(Application::WindowHeight())} * 0.5f;
     if (m_target_camera_.Lock() == nullptr)
@@ -32,7 +31,6 @@ void Canvas::OnAwake()
 
 void Canvas::OnStart()
 {
-    Renderer::OnStart();
     const auto renderers = GameObject()->GetComponentsInChildren<Renderer2D>();
 
     for (auto renderer : renderers)
@@ -52,10 +50,6 @@ void Canvas::Render()
 Vector2 Canvas::CanvasSize() const
 {
     return m_canvas_size_;
-}
-std::shared_ptr<Transform> Canvas::BoundsOrigin()
-{
-    return CameraComponent::Main()->GameObject()->Transform();
 }
 
 void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)

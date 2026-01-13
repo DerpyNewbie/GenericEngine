@@ -12,6 +12,7 @@
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
+#include "Components/canvas.h"
 #include "Components/light.h"
 #include "Components/text_renderer.h"
 
@@ -196,10 +197,9 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     }
 
     Gizmos::Render();
-    //HACK: あんまりよくないかも
-    for (auto text_renderer : TextRenderer::m_text_renderers_)
+    for (auto &canvas : Canvas::m_canvasses_)
     {
-        text_renderer->RenderText();
+        canvas->Render();
     }
 }
 

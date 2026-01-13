@@ -10,19 +10,25 @@ struct RendererComparator
 {
     bool operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const;
 };
-class Canvas : public Renderer
+
+class Canvas : public Component
 {
+    friend class RenderPipeline;
+    
     Vector2 m_canvas_size_;
     AssetPtr<CameraComponent> m_target_camera_;
     std::set<std::shared_ptr<Renderer2D>, RendererComparator> m_child_renderers_;
 
+    //HACK: あんまりよくないかも
+    inline static std::unordered_set<std::shared_ptr<Canvas>> m_canvasses_;
+
 public:
+    
     void OnInspectorGui() override;
     void OnAwake() override;
     void OnStart() override;
-    void Render() override;
+    void Render();
     [[nodiscard]] Vector2 CanvasSize() const;
-    std::shared_ptr<Transform> BoundsOrigin() override;
 
     void AddRenderer(const std::shared_ptr<Renderer2D> &renderer);
     void RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer);
