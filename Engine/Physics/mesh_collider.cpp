@@ -49,6 +49,11 @@ std::shared_ptr<btConvexHullShape> ToBtConvexHullShape(const std::shared_ptr<eng
 
 namespace engine
 {
+void MeshCollider::OnAwake()
+{
+    UpdateShape();
+}
+
 void MeshCollider::OnInspectorGui()
 {
     bool changed = false;

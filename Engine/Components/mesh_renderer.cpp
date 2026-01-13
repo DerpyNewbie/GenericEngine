@@ -28,6 +28,9 @@ void MeshRenderer::RecalculateBoundingBox()
     auto max_pos = Vector3(0, 0, 0);
     const auto mesh = m_shared_mesh_.CastedLock();
 
+    if (mesh == nullptr)
+        return;
+
     for (int i = 0; i < mesh->vertices.size(); ++i)
     {
         auto vertex = mesh->vertices[i];
@@ -41,6 +44,12 @@ void MeshRenderer::RecalculateBoundingBox()
     }
 
     DirectX::BoundingBox::CreateFromPoints(bounds, min_pos, max_pos);
+}
+
+void MeshRenderer::OnAwake()
+{
+    Renderer::OnAwake();
+    RecalculateBoundingBox();
 }
 
 void MeshRenderer::OnInspectorGui()

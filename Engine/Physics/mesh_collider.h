@@ -24,6 +24,9 @@ class MeshCollider : public Collider
     void UpdateShape() override;
 
 public:
+    
+    void OnAwake() override;
+    
     void SetMesh(const AssetPtr<Mesh> &mesh);
 
     template <class Archive>

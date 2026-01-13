@@ -30,9 +30,17 @@ public:
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Component>(this), CEREAL_NVP(m_canvas_size_), CEREAL_NVP(m_target_camera_));
+        ar(cereal::base_class<Component>(this),
+           CEREAL_NVP(m_canvas_size_),
+           CEREAL_NVP(m_target_camera_)
+        );
+
+        if (version >= 2)
+        {
+            ar(cereal::base_class<Renderer>(this));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Canvas, 1)
+CEREAL_CLASS_VERSION(engine::Canvas, 2)

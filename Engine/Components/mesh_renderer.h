@@ -37,6 +37,7 @@ public:
 
     bool buffer_creation_failed = false;
 
+    void OnAwake() override;
     void OnInspectorGui() override;
     void UpdateBuffer() override;
     void Render() override;
