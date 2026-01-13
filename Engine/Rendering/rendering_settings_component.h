@@ -14,8 +14,9 @@ class RenderingSettingsComponent final : public Component
 
 public:
     void OnInspectorGui() override;
-    void OnAwake() override;
-
+    void OnConstructed() override;
+    void OnDeserialized() override;
+    
     void ApplySettings();
 
     template <class Archive>

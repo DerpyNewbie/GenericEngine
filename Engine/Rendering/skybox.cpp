@@ -35,15 +35,6 @@ Skybox::Skybox()
     m_texture_cube_ = std::make_shared<class TextureCube>();
 }
 
-bool Skybox::ReconstructTextureCube()
-{
-    if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
-        return false;
-
-    m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
-    return true;
-}
-
 std::shared_ptr<Skybox> Skybox::Instance()
 {
     static std::shared_ptr<Skybox> instance(new Skybox());
@@ -52,11 +43,14 @@ std::shared_ptr<Skybox> Skybox::Instance()
 
 void Skybox::Render()
 {
-    if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
+    if (m_texture_cube_ == nullptr)
         return;
 
+    if (!m_texture_cube_->IsValid())
+        m_texture_cube_->CreateBuffer();
+    
     if (m_texture_cube_handle_ == nullptr)
-        ReconstructTextureCube();
+        m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
 
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -77,6 +71,8 @@ std::shared_ptr<TextureCube> Skybox::TextureCube() const
 void Skybox::SetTextureCube(const std::shared_ptr<class TextureCube> &texture_cube)
 {
     m_texture_cube_ = texture_cube;
-    ReconstructTextureCube();
+    if (texture_cube == nullptr)
+        return;
+    
 }
 }

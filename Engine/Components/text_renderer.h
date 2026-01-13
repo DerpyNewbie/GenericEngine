@@ -9,10 +9,6 @@ namespace engine
 
 class TextRenderer : public Renderer2D
 {
-    friend class RenderPipeline;
-    //HACK: あんまりよくないかも
-    inline static std::unordered_set<std::shared_ptr<TextRenderer>> m_text_renderers_;
-
 public:
     std::string string;
     Color color;
@@ -22,11 +18,6 @@ public:
     AssetPtr<FontData> font_data;
 
     void OnInspectorGui() override;
-
-    void OnEnabled() override;
-    void OnDisabled() override;
-
-    void RenderText();
     void Render() override;
 
     template <class Archive>

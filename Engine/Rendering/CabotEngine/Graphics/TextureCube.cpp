@@ -23,6 +23,7 @@ void TextureCube::OnInspectorGui()
 
 void TextureCube::CreateBuffer()
 {
+    m_p_resource_ = nullptr;
     std::array<std::shared_ptr<Texture2D>, 6> locked_textures;
     for (int i = 0; i < 6; ++i)
     {

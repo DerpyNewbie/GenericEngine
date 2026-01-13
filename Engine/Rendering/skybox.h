@@ -13,7 +13,6 @@ class Skybox
     std::shared_ptr<DescriptorHandle> m_texture_cube_handle_;
 
     Skybox();
-    bool ReconstructTextureCube();
 
 public:
     static std::shared_ptr<Skybox> Instance();

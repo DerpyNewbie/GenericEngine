@@ -2,7 +2,6 @@
 #include "rendering_settings_component.h"
 #include "gui.h"
 #include "lighting.h"
-#include "render_pipeline.h"
 #include "skybox.h"
 #include "Components/directional_light.h"
 
@@ -24,7 +23,13 @@ void RenderingSettingsComponent::OnInspectorGui()
     if (has_changed)
         ApplySettings();
 }
-void RenderingSettingsComponent::OnAwake()
+
+void RenderingSettingsComponent::OnConstructed()
+{
+    ApplySettings();
+}
+
+void RenderingSettingsComponent::OnDeserialized()
 {
     ApplySettings();
 }

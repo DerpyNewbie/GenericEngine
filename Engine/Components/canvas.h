@@ -40,13 +40,8 @@ public:
            CEREAL_NVP(m_canvas_size_),
            CEREAL_NVP(m_target_camera_)
         );
-
-        if (version >= 2)
-        {
-            ar(cereal::base_class<Renderer>(this));
-        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Canvas, 2)
+CEREAL_CLASS_VERSION(engine::Canvas, 1)

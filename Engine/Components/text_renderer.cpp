@@ -28,19 +28,7 @@ void TextRenderer::OnInspectorGui()
     Gui::PropertyField("Color", color);
 }
 
-void TextRenderer::OnEnabled()
-{
-    Renderer2D::OnEnabled();
-    m_text_renderers_.emplace(shared_from_base<TextRenderer>());
-}
-
-void TextRenderer::OnDisabled()
-{
-    Renderer2D::OnDisabled();
-    m_text_renderers_.erase(shared_from_base<TextRenderer>());
-}
-
-void TextRenderer::RenderText()
+void TextRenderer::Render()
 {
     if (!font_data.Lock())
     {
@@ -55,10 +43,6 @@ void TextRenderer::RenderText()
     sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color, rotation, origin, scale);
     sprite_batch->End();
     RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-}
-
-void TextRenderer::Render()
-{
 }
 }
 
