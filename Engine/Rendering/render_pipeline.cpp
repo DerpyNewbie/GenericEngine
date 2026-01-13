@@ -12,6 +12,7 @@
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
+#include "Components/canvas.h"
 #include "Components/light.h"
 
 using namespace DirectX;
@@ -195,6 +196,10 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     }
 
     Gizmos::Render();
+    for (auto &canvas : Canvas::m_canvasses_)
+    {
+        canvas->Render();
+    }
 }
 
 void RenderPipeline::DepthRender()
