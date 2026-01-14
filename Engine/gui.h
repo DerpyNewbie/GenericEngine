@@ -142,6 +142,10 @@ public:
     template <>
     static bool PropertyField(const char *label, Color &value);
 
+    /// std::string specialization
+    template <>
+    static bool PropertyField(const char *label, std::string &value);
+
     /// IAssetPtr specialization
     template <typename T>
     static bool PropertyField(const char *label, IAssetPtr &value);

@@ -413,4 +413,21 @@ bool Gui::PropertyField<Color>(const char *label, Color &value)
 {
     return ImGui::ColorPicker4(label, &value.x);
 }
+
+template <>
+bool Gui::PropertyField<std::string>(const char *label, std::string &value)
+{
+    bool result = false;
+    char buf[256];
+    strncpy_s(buf, sizeof(buf), value.c_str(), _TRUNCATE);
+    buf[sizeof(buf) - 1] = '\0';
+
+    if (ImGui::InputText("text", buf, sizeof(buf), 0))
+    {
+        value = buf;
+        result = true;
+    }
+
+    return result;
+}
 }
