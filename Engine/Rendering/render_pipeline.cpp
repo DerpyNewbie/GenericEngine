@@ -84,7 +84,7 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-        Render(view, proj);
+        Render(camera, view, proj);
 
         if (render_tex)
             render_tex->EndRender();
@@ -106,7 +106,7 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(view, proj);
+        Render(main_camera, view, proj);
 
         // revert back to original property
         main_camera->m_property_ = prev_property;
@@ -121,17 +121,17 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(Color());
-        Render(view, proj);
+        Render(main_camera, view, proj);
     }
 
     on_rendering.Invoke();
 }
 
-void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
+void RenderPipeline::SetViewProjMatrix(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    if (m_view_proj_matrix_buffers_[0] == nullptr)
+    if (m_view_proj_matrix_buffers_[camera][0] == nullptr)
     {
-        for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_)
+        for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_[camera])
         {
             view_proj_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
             view_proj_matrix_buffer->CreateBuffer();
@@ -140,7 +140,7 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 
     const auto cmd_list = RenderEngine::CommandList();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
+    const auto view_projection_buffer = m_view_proj_matrix_buffers_[camera][current_buffer_idx];
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -169,9 +169,9 @@ void RenderPipeline::SetSceneData()
     cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
 }
 
-void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
+void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    SetViewProjMatrix(view, proj);
+    SetViewProjMatrix(camera, view, proj);
     SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
@@ -181,9 +181,9 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     Skybox::Instance()->Render();
 }
 
-void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
+void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    UpdateBuffer(view, proj);
+    UpdateBuffer(camera, view, proj);
 
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
     std::ranges::sort(renderers,
@@ -273,11 +273,13 @@ void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
 {
     Logger::Log<RenderPipeline>("Adding camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.emplace(camera);
+    Instance()->m_view_proj_matrix_buffers_.emplace(camera, std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count>());
 }
 
 void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
 {
     Logger::Log<RenderPipeline>("Removing camera: %s", camera->Name().c_str());
-    Instance()->m_cameras_.erase(camera);
+    auto instance = Instance();
+    instance->m_cameras_.erase(camera);
 }
 }

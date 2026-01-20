@@ -60,7 +60,12 @@ void CameraComponent::OnInspectorGui()
     m_property_.OnInspectorGui();
     Gui::PropertyField("RenderTexture", m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
+    if (ImGui::Button("Set Main"))
+    {
+        SetMainCamera(shared_from_base<CameraComponent>());
+    }
 }
+
 void CameraComponent::OnValidate()
 {
     if (GameObject()->IsActiveInHierarchy())

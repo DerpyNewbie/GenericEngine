@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "render_texture_importer.h"
+
+#include "serializer.h"
 #include "Rendering/render_texture.h"
 
 namespace engine
@@ -17,5 +19,12 @@ bool RenderTextureImporter::IsCompatibleWith(const std::shared_ptr<Object> objec
 void RenderTextureImporter::OnImport(AssetDescriptor *ctx)
 {
     ctx->SetMainObject(Object::Instantiate<RenderTexture>());
+}
+void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
+{
+    const auto render_texture = std::dynamic_pointer_cast<RenderTexture>(ctx->MainObject());
+    Serializer serializer;
+    std::ofstream os(ctx->AssetPath());
+    assert(serializer.Save<RenderTexture>(os, render_texture) && "Failed to save RenderTexture");
 }
 }

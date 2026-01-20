@@ -82,10 +82,17 @@ public:
             cereal::base_class<Component>(this),
             CEREAL_NVP(m_property_)
         );
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(m_depth_texture_),
+               CEREAL_NVP(m_render_texture_)
+            );
+        }
     }
 };
 }
 
 CEREAL_CLASS_VERSION(engine::CameraProperty, 1)
 
-CEREAL_CLASS_VERSION(engine::CameraComponent, 1)
+CEREAL_CLASS_VERSION(engine::CameraComponent, 2)

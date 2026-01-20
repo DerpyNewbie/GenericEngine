@@ -59,6 +59,7 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
     PSOManager::Initialize();
+    
     return true;
 }
 
