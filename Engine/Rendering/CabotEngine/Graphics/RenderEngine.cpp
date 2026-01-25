@@ -4,6 +4,7 @@
 #include "PSOManager.h"
 #include "application.h"
 #include "Rendering/font_data.h"
+#include "Rendering/Effect/effekseer_controller.h"
 
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
 {
