@@ -7,6 +7,3 @@
 [submodule "ThirdParty/implot"]
 	path = ThirdParty/implot
 	url = https://github.com/epezent/implot.git
-[submodule "ThirdParty/Effekseer"]
-	path = ThirdParty/Effekseer
-	url = https://github.com/effekseer/Effekseer.git
