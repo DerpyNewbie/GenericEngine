@@ -3,6 +3,7 @@
 #include "component_factory.h"
 
 #include "Animation/animation_component.h"
+#include "Asset/effekseer_effect.h"
 #include "Audio/audio_listener_component.h"
 #include "Audio/audio_source_component.h"
 #include "Components/image.h"
@@ -12,6 +13,7 @@
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
+#include "Components/effekseer_renderer.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
 #include "Components/rotator_component.h"
@@ -67,6 +69,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
     RegisterComponentFactory<CoroutineTest>("Debug");
+    RegisterComponentFactory<EffekseerRenderer>("Effect");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :
