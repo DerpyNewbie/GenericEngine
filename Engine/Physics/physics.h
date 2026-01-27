@@ -38,7 +38,6 @@ class Physics : public IFixedUpdateReceiver
 
     Physics();
 
-    static Vector3 CalculateNormalFromManifold(btPersistentManifold *manifold);
 
     static void OnCollisionStarted(const ContactPair &contact_pair, const CollisionPair &collision_pair);
     static void OnCollisionStayed(const ContactPair &contact_pair, const CollisionPair &collision_pair);
