@@ -122,7 +122,9 @@
         <ClCompile Include="Engine\Physics\capsule_collider.cpp"/>
         <ClCompile Include="Engine\Physics\collider.cpp"/>
         <ClCompile Include="Engine\Physics\box_collider.cpp"/>
+        <ClCompile Include="Engine\Physics\collision.cpp"/>
         <ClCompile Include="Engine\Physics\compound_shape.cpp"/>
+        <ClCompile Include="Engine\Physics\contact_point.cpp"/>
         <ClCompile Include="Engine\Physics\mesh_collider.cpp"/>
         <ClCompile Include="Engine\Physics\physics.cpp"/>
         <ClCompile Include="Engine\Physics\plane_collider.cpp"/>
@@ -355,7 +357,9 @@
         <ClInclude Include="Engine\Physics\capsule_collider.h"/>
         <ClInclude Include="Engine\Physics\collider.h"/>
         <ClInclude Include="Engine\Physics\box_collider.h"/>
+        <ClInclude Include="Engine\Physics\collision.h"/>
         <ClInclude Include="Engine\Physics\compound_shape.h"/>
+        <ClInclude Include="Engine\Physics\contact_point.h"/>
         <ClInclude Include="Engine\Physics\mesh_collider.h"/>
         <ClInclude Include="Engine\Physics\physics.h"/>
         <ClInclude Include="Engine\Physics\plane_collider.h"/>

@@ -33,7 +33,8 @@ Physics::Physics()
         m_dispatcher_.get(),
         m_broadphase_.get(),
         m_solver_.get(),
-        m_collision_configuration_.get());
+        m_collision_configuration_.get()
+    );
 
     m_world_->setGravity({m_gravity_.x, m_gravity_.y, m_gravity_.z});
     m_world_->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(new btGhostPairCallback());
@@ -43,45 +44,13 @@ Physics::Physics()
     m_world_->getDebugDrawer()->setDebugMode(btIDebugDraw::DBG_DrawWireframe + btIDebugDraw::DBG_DrawContactPoints);
 }
 
-Vector3 Physics::CalculateNormalFromManifold(btPersistentManifold *manifold)
-{
-    btVector3 total_normal(0, 0, 0);
-    const int num_contacts = manifold->getNumContacts();
-
-    if (num_contacts == 0)
-    {
-        // No contacts, no normal
-        return Vector3::Zero;
-    }
-
-    for (int i = 0; i < num_contacts; i++)
-    {
-        const btManifoldPoint &pt = manifold->getContactPoint(i);
-
-        // Optionally weight by penetration depth (negative distance means penetration)
-        float weight = -pt.getDistance(); // use positive penetration depth as weight
-        if (weight < 0)
-            continue; // ignore if no penetration
-
-        // Add weighted normal
-        total_normal += pt.m_normalWorldOnB * weight;
-    }
-
-    // Normalize the total vector to get an average direction
-    if (!total_normal.fuzzyZero())
-    {
-        total_normal.normalize();
-        return {total_normal.x(), total_normal.y(), total_normal.z()};
-    }
-
-    return Vector3::Zero;
-}
-
 void Physics::OnCollisionStarted(const ContactPair &contact_pair, const CollisionPair &collision_pair)
 {
-    Logger::Log<Physics>("Collision Started: %s -> %s",
-                         contact_pair.first->GameObject()->Name().c_str(),
-                         contact_pair.second->GameObject()->Name().c_str());
+    Logger::Log<Physics>(
+        "Collision Started: %s -> %s",
+        contact_pair.first->GameObject()->Name().c_str(),
+        contact_pair.second->GameObject()->Name().c_str()
+    );
     contact_pair.first->GameObject()->InvokeOnCollisionEnter(collision_pair.first);
     contact_pair.second->GameObject()->InvokeOnCollisionEnter(collision_pair.second);
 }
@@ -94,9 +63,11 @@ void Physics::OnCollisionStayed(const ContactPair &contact_pair, const Collision
 
 void Physics::OnCollisionExited(const ContactPair &contact_pair, const CollisionPair &collision_pair)
 {
-    Logger::Log<Physics>("Collision Exited: %s -> %s",
-                         contact_pair.first->GameObject()->Name().c_str(),
-                         contact_pair.second->GameObject()->Name().c_str());
+    Logger::Log<Physics>(
+        "Collision Exited: %s -> %s",
+        contact_pair.first->GameObject()->Name().c_str(),
+        contact_pair.second->GameObject()->Name().c_str()
+    );
     contact_pair.first->GameObject()->InvokeOnCollisionExit(collision_pair.first);
     contact_pair.second->GameObject()->InvokeOnCollisionExit(collision_pair.second);
 }
@@ -142,9 +113,12 @@ void Physics::RemoveRigidbody(const std::shared_ptr<RigidbodyComponent> &rb)
     m_instance_->m_world_->removeRigidBody(rb->m_bt_rigidbody_.get());
     m_instance_->m_world_->removeCollisionObject(rb->m_bt_ghost_object_.get());
 
-    std::erase_if(m_instance_->m_rigidbodies_, [&](auto a) {
-        return a.lock() == rb;
-    });
+    std::erase_if(
+        m_instance_->m_rigidbodies_,
+        [&](auto a) {
+            return a.lock() == rb;
+        }
+    );
 
     Logger::Log<Physics>("Rigidbody %s has been removed", rb->GameObject()->Name().c_str());
 }
@@ -165,13 +139,19 @@ void Physics::ProcessCollisions()
             auto rb_0 = static_cast<RigidbodyComponent *>(body_0->getUserPointer());
             auto rb_1 = static_cast<RigidbodyComponent *>(body_1->getUserPointer());
             auto contact_pair = std::minmax(rb_0, rb_1);
-            auto normal = CalculateNormalFromManifold(manifold);
             const auto first_is_zero = contact_pair.first == rb_0;
             auto collision_pair = std::make_pair(
-                Collision{first_is_zero ? rb_1->GameObject().get() : rb_0->GameObject().get(),
-                          first_is_zero ? normal : normal * -1},
-                Collision{first_is_zero ? rb_0->GameObject().get() : rb_1->GameObject().get(),
-                          first_is_zero ? normal * -1 : normal});
+                Collision{
+                    first_is_zero ? rb_1->GameObject() : rb_0->GameObject(),
+                    manifold,
+                    first_is_zero
+                },
+                Collision{
+                    first_is_zero ? rb_0->GameObject() : rb_1->GameObject(),
+                    manifold,
+                    !first_is_zero
+                }
+            );
 
             m_current_contacts_.emplace(contact_pair, collision_pair);
 
