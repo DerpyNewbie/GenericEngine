@@ -73,9 +73,13 @@ WPARAM bootstrap::Launch(const LaunchOptions &options)
     if (!options.scene_path.empty())
     {
         Application::SetWindowTitle(Application::WindowTitle() + " - Scene");
-        Serializer serializer;
-        std::ifstream ifs(options.scene_path);
-        SceneManager::AddScene(serializer.Load<Scene>(ifs));
+        Engine::on_default_scene_creation.AddListener(
+            [&options] {
+                Serializer serializer;
+                std::ifstream ifs(options.scene_path);
+                SceneManager::AddScene(serializer.Load<Scene>(ifs));
+            }
+        );
     }
     else
     {

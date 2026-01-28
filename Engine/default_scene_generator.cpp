@@ -2,6 +2,7 @@
 #include "default_scene_generator.h"
 
 #include "game_object.h"
+#include "scene_manager.h"
 #include "Audio/audio_listener_component.h"
 #include "Components/camera_component.h"
 #include "Physics/plane_collider.h"
@@ -12,6 +13,7 @@ namespace engine
 {
 void SampleSceneGenerator::CreateDefaultScene()
 {
+    SceneManager::CreateScene("Defualt Scene");
     CreateDefaultCamera();
     CreateDefaultFloor();
     CreateYBot();
