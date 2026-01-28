@@ -12,9 +12,15 @@ public:
 
         try
         {
-            const cereal::JSONOutputArchive::Options options = pretty ? cereal::JSONOutputArchive::Options::Default() : cereal::JSONOutputArchive::Options::NoIndent();
-            cereal::JSONOutputArchive o_archive(output_stream, options);
-            o_archive(save_resource);
+            std::stringstream ss;
+
+            {
+                const cereal::JSONOutputArchive::Options options = pretty ? cereal::JSONOutputArchive::Options::Default() : cereal::JSONOutputArchive::Options::NoIndent();
+                cereal::JSONOutputArchive o_archive(ss, options);
+                o_archive(save_resource);
+            }
+
+            output_stream << ss.view();
             return true;
         }
         catch (const std::exception &e)
