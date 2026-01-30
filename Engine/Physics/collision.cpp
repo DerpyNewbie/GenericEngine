@@ -60,11 +60,7 @@ size_t Collision::ContactCount() const
     return m_manifold_->getNumContacts();
 }
 
-ContactPoint Collision::GetContact(const int index) const
-{
-    assert(index < 0 || index >= ContactCount() && "Contact index out of range");
-    return ContactPoint{m_manifold_->getContactPoint(index), m_is_body_0_};
-}
+assert(index >= 0 && index < static_cast<int>(ContactCount()) && "Contact index out of range");
 
 std::vector<ContactPoint> Collision::GetContacts() const
 {
