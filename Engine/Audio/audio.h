@@ -19,6 +19,7 @@ class Audio : public IUpdateReceiver
     static void Init();
 
 public:
+    
     Audio();
 
     static std::shared_ptr<Audio> Instance();

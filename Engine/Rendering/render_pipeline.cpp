@@ -51,6 +51,8 @@ void RenderPipeline::InvokeDrawCall()
 {
     auto update_speed = 1.0f / Time::GetDeltaTime() / 60.0f;
     EffekseerController::Instance()->m_manager_->Update(update_speed);
+    EffekseerController::Instance()->m_memory_pool_->NewFrame();
+    
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();

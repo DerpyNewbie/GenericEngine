@@ -134,9 +134,12 @@ void MaterialData<T>::OnInspectorGui()
     }
     else if constexpr (std::is_same_v<T, Color>)
     {
-        if (Gui::PropertyField(name, value))
+        if (ImGui::CollapsingHeader("Color"))
         {
-            is_dirty = true;
+            if (Gui::PropertyField(name, value))
+            {
+                is_dirty = true;
+            }
         }
     }
     else if constexpr (kIsAssetPtr)
