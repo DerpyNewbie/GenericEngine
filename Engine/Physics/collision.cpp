@@ -48,6 +48,7 @@ Collision::Collision(const std::weak_ptr<GameObject> &other, btPersistentManifol
         auto cp = manifold->getContactPoint(i);
         total_impulse += cp.m_normalWorldOnB * cp.getAppliedImpulse();
     }
+    m_impulse_ = {total_impulse.x(), total_impulse.y(), total_impulse.z()};
 }
 std::shared_ptr<GameObject> Collision::Other() const
 {
