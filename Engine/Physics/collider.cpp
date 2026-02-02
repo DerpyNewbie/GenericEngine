@@ -75,6 +75,7 @@ void Collider::OnInspectorGui()
 
 void Collider::OnEnabled()
 {
+    UpdateShape();
     AddToRigidbody();
 }
 

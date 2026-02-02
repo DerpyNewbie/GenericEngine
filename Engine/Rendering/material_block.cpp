@@ -25,6 +25,11 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
          return std::make_shared<MaterialData<Color>>(Color(), param);
      }
     },
+    {"float3",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
+     }
+    },
     {"vector<Matrix>",
      [](const ShaderParameter &param) {
          auto identity = std::vector{Matrix::Identity};
@@ -245,7 +250,7 @@ void MaterialBlock::UpdateBuffer()
             {
                 data->buffer = data->CreateBuffer();
             }
-            
+
             if (data->CanUpdateBuffer())
             {
                 data->UpdateBuffer();

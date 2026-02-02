@@ -142,6 +142,13 @@ void MaterialData<T>::OnInspectorGui()
             }
         }
     }
+    else if constexpr (std::is_same_v<T, Vector3>)
+    {
+        if (Gui::PropertyField(name, value))
+        {
+            is_dirty = true;
+        }
+    }
     else if constexpr (kIsAssetPtr)
     {
         if (Gui::PropertyField(name, value))
@@ -296,6 +303,8 @@ CEREAL_CLASS_VERSION(engine::MaterialData<int>, 1)
 CEREAL_CLASS_VERSION(engine::MaterialData<float>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Color>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Matrix>, 1)
 
