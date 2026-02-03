@@ -35,6 +35,7 @@ void TextureCubeImporter::OnExport(AssetDescriptor *ctx)
     const auto texture_cube = std::dynamic_pointer_cast<TextureCube>(ctx->MainObject());
     Serializer serializer;
     std::ofstream os(ctx->AssetPath());
-    assert(serializer.Save<TextureCube>(os, texture_cube) && "Failed to save TextureCube");
+    const auto result = serializer.Save<TextureCube>(os, texture_cube);
+    assert(result && "Failed to save TextureCube");
 }
 }

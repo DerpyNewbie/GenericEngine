@@ -60,7 +60,12 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::ShaderResourc
 
     const auto device = RenderEngine::Device();
     const auto resource = shader_resource->Resource();
+
+    if (resource == nullptr)
+        return nullptr;
+    
     const auto desc = shader_resource->ViewDesc();
+    
     device->CreateShaderResourceView(resource, &desc, desc_handle->HandleCPU);
 
     return desc_handle;

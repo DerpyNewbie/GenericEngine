@@ -25,6 +25,7 @@ void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
     const auto render_texture = std::dynamic_pointer_cast<RenderTexture>(ctx->MainObject());
     Serializer serializer;
     std::ofstream os(ctx->AssetPath());
-    assert(serializer.Save<RenderTexture>(os, render_texture) && "Failed to save RenderTexture");
+    const auto result = serializer.Save<RenderTexture>(os, render_texture);
+    assert(result && "Failed to save RenderTexture");
 }
 }

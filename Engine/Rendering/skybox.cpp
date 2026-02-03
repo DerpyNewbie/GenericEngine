@@ -50,7 +50,10 @@ void Skybox::Render()
         m_texture_cube_->CreateBuffer();
     
     if (m_texture_cube_handle_ == nullptr)
+    {
         m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
+        return;
+    }
 
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
