@@ -13,7 +13,7 @@ namespace engine
 {
 void SampleSceneGenerator::CreateDefaultScene()
 {
-    SceneManager::CreateScene("Defualt Scene");
+    SceneManager::CreateScene("Default Scene");
     CreateDefaultCamera();
     CreateDefaultFloor();
     CreateYBot();
