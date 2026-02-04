@@ -14,13 +14,14 @@ struct RendererComparator
 class Canvas : public Component
 {
     friend class RenderPipeline;
-    
+
+    float m_render_queue_ = 0.0f;
     Vector2 m_canvas_size_;
     AssetPtr<CameraComponent> m_target_camera_;
     std::set<std::shared_ptr<Renderer2D>, RendererComparator> m_child_renderers_;
 
     //HACK: あんまりよくないかも
-    inline static std::unordered_set<std::shared_ptr<Canvas>> m_canvasses_;
+    inline static std::multimap<float, std::shared_ptr<Canvas>> m_canvasses_;
 
 public:
     

@@ -16,15 +16,17 @@ bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const 
 
 void Canvas::OnInspectorGui()
 {
+    Gui::PropertyField("Render Queue", m_render_queue_);
     Gui::PropertyField("Canvas Size", m_canvas_size_);
     Gui::PropertyField("Target Camera", m_target_camera_);
 }
 
 void Canvas::OnAwake()
 {
-    m_canvasses_.emplace(shared_from_base<Canvas>());
+    m_canvasses_.emplace(m_render_queue_, shared_from_base<Canvas>());
     m_canvas_size_ = Vector2{static_cast<float>(Application::WindowWidth()),
                              static_cast<float>(Application::WindowHeight())} * 0.5f;
+    
     if (m_target_camera_.Lock() == nullptr)
         m_target_camera_ = AssetPtr<CameraComponent>::FromManaged(CameraComponent::Main());
 }

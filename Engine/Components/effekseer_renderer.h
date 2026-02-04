@@ -22,6 +22,7 @@ public:
     float play_speed = 1.0f;
 
     void Play();
+    void Stop() const;
 
     void OnInspectorGui() override;
     void OnUpdate() override;

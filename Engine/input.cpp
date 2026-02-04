@@ -44,8 +44,8 @@ void Input::Update()
     if (m_mouse_mode_ == kMouseMode::kLocked && GetKeyDown(DirectX::Keyboard::Keys::Escape))
     {
         const auto next_mode = m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE
-                                   ? DirectX::Mouse::MODE_RELATIVE
-                                   : DirectX::Mouse::MODE_ABSOLUTE;
+            ? DirectX::Mouse::MODE_RELATIVE
+            : DirectX::Mouse::MODE_ABSOLUTE;
 
         Logger::Log<Input>("Mouse Lock Interrupt! %d", next_mode);
         m_mouse_->SetMode(next_mode);
@@ -130,17 +130,20 @@ void Input::SetMouseMode(const kMouseMode mode)
 
     switch (mode)
     {
-    case kMouseMode::kNormal:
-        Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
-        return;
-    case kMouseMode::kLocked:
-        Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_RELATIVE);
-        return;
+        case kMouseMode::kNormal:
+            Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+            return;
+        case kMouseMode::kLocked:
+            Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_RELATIVE);
+            return;
     }
 }
 
 void Input::SetCursorVisible(const bool is_visible)
 {
+    while (::ShowCursor(TRUE) < 0)
+    {}
+
     Instance()->m_mouse_->SetVisible(is_visible);
 }
 }

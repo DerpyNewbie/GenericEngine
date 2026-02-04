@@ -87,6 +87,8 @@ void AnimationComponent::OnInspectorGui()
     {
         Stop();
     }
+    if (ImGui::Button("Update"))
+        Sample();
 }
 
 void AnimationComponent::OnStart()
@@ -223,7 +225,7 @@ void AnimationComponent::Sample()
 
     m_delta_position_ = Vector3::Zero;
     m_delta_rotation_ = Quaternion::Identity;
-    
+
     base_weight = 1.0f - base_weight;
 
     for (auto &[path, transform] : m_transforms_)

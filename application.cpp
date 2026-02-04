@@ -6,6 +6,7 @@
 #include "application.h"
 #include <tchar.h>
 #include "engine.h"
+#include "Components/camera_component.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -17,6 +18,7 @@ HWND window_handle = nullptr;
 std::string window_title = "GenericEngine";
 bool play_mode = false;
 }
+
 
 namespace engine
 {
@@ -33,15 +35,18 @@ LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lpara
         case WM_SIZE:
             if (wparam == SIZE_MINIMIZED)
                 break;
-
             window_width = LOWORD(lparam);
             window_height = HIWORD(lparam);
-
             on_window_resized.Invoke();
             break;
         case WM_MOUSEACTIVATE:
             Logger::Log<Application>("Mouse activated");
             return MA_ACTIVATEANDEAT;
+            
+        case WM_ACTIVATEAPP:
+            Input::ProcessMessage(msg, wparam, lparam);
+            break; 
+            
         default:
             break;
     }

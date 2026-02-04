@@ -203,7 +203,7 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera, cons
     EffekseerController::Render(view, proj);
 
     Gizmos::Render();
-    for (auto &canvas : Canvas::m_canvasses_)
+    for (auto &canvas : std::ranges::views::values(Canvas::m_canvasses_))
     {
         canvas->Render();
     }
