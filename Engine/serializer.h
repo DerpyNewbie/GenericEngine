@@ -9,6 +9,11 @@ public:
     [[nodiscard]] bool Save(std::ostream &output_stream, std::shared_ptr<T> save_resource, const bool pretty = true)
     {
         static_assert(std::is_base_of<Object, T>(), "Base type is not Object.");
+        if (save_resource == nullptr)
+        {
+            Logger::Error<Serializer>("Failed to save resource: nullptr");
+            return false;
+        }
 
         try
         {
@@ -20,12 +25,13 @@ public:
                 o_archive(save_resource);
             }
 
-            output_stream << ss.view();
+            const std::string buff = ss.str();
+            output_stream.write(buff.c_str(), static_cast<std::streamsize>(buff.size()));
             return true;
         }
         catch (const std::exception &e)
         {
-            Logger::Error<Serializer>("Failed to save resource: %s", e.what());
+            Logger::Error<Serializer>("Failed to save resource '%s': %s", save_resource->Name().c_str(), e.what());
             return false;
         }
     }
