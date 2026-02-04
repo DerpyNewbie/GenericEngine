@@ -67,6 +67,10 @@ void CameraComponent::OnValidate()
     {
         OnEnabled();
     }
+    else
+    {
+        OnDisabled();
+    }
 }
 
 void CameraComponent::OnEnabled()
@@ -125,7 +129,8 @@ void CameraComponent::SetCurrentCamera(const std::weak_ptr<CameraComponent> &cam
 
 std::shared_ptr<CameraComponent> CameraComponent::Main()
 {
-    return m_main_camera_.lock();
+    auto camera = m_main_camera_.lock();
+    return camera != nullptr && !camera->IsDestroying() ? camera : nullptr;
 }
 
 std::shared_ptr<CameraComponent> CameraComponent::Current()
