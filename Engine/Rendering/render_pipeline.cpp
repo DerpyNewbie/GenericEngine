@@ -154,7 +154,7 @@ void RenderPipeline::SetViewProjMatrix(const std::shared_ptr<CameraComponent> &c
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
 
-void RenderPipeline::SetSceneData()
+void RenderPipeline::SetSceneData(const std::shared_ptr<CameraComponent> &camera)
 {
     if (m_scene_data_buffer_ == nullptr)
     {
@@ -166,6 +166,7 @@ void RenderPipeline::SetSceneData()
     SceneData scene_data;
     scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
     scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
+    scene_data.camera_pos = camera->GameObject()->Transform()->Position();
     scene_data.time = Time::Get()->TimeSinceStartUp();
     scene_data.delta_time = Time::GetDeltaTime();
 
@@ -177,7 +178,7 @@ void RenderPipeline::SetSceneData()
 void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(camera, view, proj);
-    SetSceneData();
+    SetSceneData(camera);
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
