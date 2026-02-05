@@ -166,7 +166,7 @@ void RenderPipeline::SetSceneData(const std::shared_ptr<CameraComponent> &camera
     SceneData scene_data;
     scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
     scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
-    scene_data.camera_pos = camera->GameObject()->Transform()->Position();
+    scene_data.camera_pos = camera != nullptr ? camera->GameObject()->Transform()->Position() : Vector3::Zero;
     scene_data.time = Time::Get()->TimeSinceStartUp();
     scene_data.delta_time = Time::GetDeltaTime();
 
