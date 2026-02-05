@@ -22,6 +22,28 @@ bool play_mode = false;
 
 namespace engine
 {
+
+void ToggleBorderlessFullscreen(HWND hwnd)
+{
+    // 現在のウィンドウスタイルを取得
+    LONG_PTR style = GetWindowLongPtr(hwnd, GWL_STYLE);
+
+    if (style & WS_OVERLAPPEDWINDOW)
+    {
+        HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+        MONITORINFO mi = { sizeof(mi) };
+        GetMonitorInfo(hMonitor, &mi);
+        
+        SetWindowLongPtr(hwnd, GWL_STYLE, style & ~WS_OVERLAPPEDWINDOW | WS_POPUP);
+
+        SetWindowPos(hwnd, HWND_TOP,
+            mi.rcMonitor.left, mi.rcMonitor.top,
+            mi.rcMonitor.right - mi.rcMonitor.left,
+            mi.rcMonitor.bottom - mi.rcMonitor.top,
+            SWP_NOOWNERZORDER | SWP_FRAMECHANGED);
+    }
+}
+
 Event<> Application::on_window_resized;
 
 LRESULT Application::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
@@ -158,6 +180,8 @@ void Application::InitWindow()
     );
 
     ShowWindow(window_handle,SW_SHOW);
+
+    //ToggleBorderlessFullscreen(window_handle);
 }
 
 void Application::SetPlayMode(const bool play)
