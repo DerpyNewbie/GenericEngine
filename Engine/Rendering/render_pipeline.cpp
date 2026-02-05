@@ -203,13 +203,13 @@ void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera, cons
     EffekseerController::Render(view, proj);
 
     Gizmos::Render();
-    for (auto &canvas : std::ranges::views::values(Canvas::m_canvasses_))
+    for (const auto &canvas : std::ranges::views::values(Canvas::m_canvasses_))
     {
         canvas->Render();
     }
 }
 
-void RenderPipeline::DepthRender()
+void RenderPipeline::DepthRender() const
 {
     if (Lighting::Instance()->m_lights_.empty())
         return;

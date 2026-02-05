@@ -24,7 +24,6 @@ class Canvas : public Component
     inline static std::multimap<float, std::shared_ptr<Canvas>> m_canvasses_;
 
 public:
-    
     void OnInspectorGui() override;
     void OnAwake() override;
     void OnStart() override;
@@ -41,8 +40,15 @@ public:
            CEREAL_NVP(m_canvas_size_),
            CEREAL_NVP(m_target_camera_)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(m_render_queue_)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Canvas, 1)
+CEREAL_CLASS_VERSION(engine::Canvas, 2)

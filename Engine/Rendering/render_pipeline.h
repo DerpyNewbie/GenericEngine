@@ -28,7 +28,7 @@ class RenderPipeline
     void SetSceneData();
     void UpdateBuffer(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj);
     void Render(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj);
-    void DepthRender();
+    void DepthRender() const;
 
 public:
     Event<> on_rendering;
