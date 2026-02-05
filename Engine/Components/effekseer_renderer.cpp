@@ -76,6 +76,7 @@ void engine::EffekseerRenderer::Play()
     const auto scale = transform->Scale();
 
     m_effect_handle_ = EffekseerController::Manager()->Play(m_effect_, position.x, position.y, position.z);
+    SetPosition(position);
     SetRotation(rotation);
     SetScale(scale);
     SetSpeed(play_speed);
