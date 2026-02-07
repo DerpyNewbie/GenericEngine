@@ -53,8 +53,6 @@ bool Engine::Init()
     AssetDatabase::Init();
     IComponentFactory::Init();
     on_init.Invoke();
-
-    SceneManager::CreateScene("Default Scene");
     on_default_scene_creation.Invoke();
     return true;
 }
