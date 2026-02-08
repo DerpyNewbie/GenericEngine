@@ -2,7 +2,9 @@
 #include "effekseer_controller.h"
 
 #include "effekseer_util.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
@@ -20,7 +22,7 @@ void EffekseerController::Init()
     const auto cmd_queue = RenderEngine::CommandQueue();
 
     auto graphicsDevice = EffekseerRendererDX12::CreateGraphicsDevice(device, cmd_queue, RenderEngine::kFrame_Buffer_Count);
-    instance->m_renderer_ = EffekseerRendererDX12::Create(graphicsDevice, &rtv_format, 1, DXGI_FORMAT_D32_FLOAT, true, kMaxSquareCount);
+    instance->m_renderer_ = EffekseerRendererDX12::Create(graphicsDevice, &rtv_format, 1, DXGI_FORMAT_D32_FLOAT, false, kMaxSquareCount);
 
     instance->m_memory_pool_ = EffekseerRenderer::CreateSingleFrameMemoryPool(instance->m_renderer_->GetGraphicsDevice());
     instance->m_effekseer_command_list_ = EffekseerRenderer::CreateCommandList(instance->m_renderer_->GetGraphicsDevice(), instance->m_memory_pool_);
@@ -42,8 +44,6 @@ void EffekseerController::Render(const Matrix &view, const Matrix &proj)
     const auto instance = Instance();
     const auto cmd_list = RenderEngine::CommandList();
 
-    instance->m_memory_pool_->NewFrame();
-
     EffekseerRendererDX12::BeginCommandList(instance->m_effekseer_command_list_, cmd_list);
     instance->m_renderer_->SetCommandList(instance->m_effekseer_command_list_);
 
@@ -56,6 +56,11 @@ void EffekseerController::Render(const Matrix &view, const Matrix &proj)
 
     instance->m_renderer_->SetCommandList(nullptr);
     EffekseerRendererDX12::EndCommandList(instance->m_effekseer_command_list_);
+
+    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
+    const auto descriptor_heap = DescriptorHeap::GetHeap();
+    cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
+
 }
 
 Effekseer::ManagerRef EffekseerController::Manager()

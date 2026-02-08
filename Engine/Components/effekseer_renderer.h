@@ -1,5 +1,5 @@
 #pragma once
-#include "Effekseer.h"
+#include "ThirdParty/Effekseer/include/Effekseer/Effekseer.h"
 
 #include "renderer.h"
 #include "Asset/asset_ptr.h"
@@ -22,6 +22,7 @@ public:
     float play_speed = 1.0f;
 
     void Play();
+    void Stop() const;
 
     void OnInspectorGui() override;
     void OnUpdate() override;

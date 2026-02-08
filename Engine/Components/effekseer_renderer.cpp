@@ -34,7 +34,7 @@ std::shared_ptr<engine::Transform> engine::EffekseerRenderer::BoundsOrigin()
     return GameObject()->Transform();
 }
 
-void engine::EffekseerRenderer::SetPosition(Vector3 pos) const
+void engine::EffekseerRenderer::SetPosition(const Vector3 pos) const
 {
     EffekseerController::Manager()->SetLocation(m_effect_handle_, pos.x, pos.y, pos.z);
 }
@@ -76,9 +76,15 @@ void engine::EffekseerRenderer::Play()
     const auto scale = transform->Scale();
 
     m_effect_handle_ = EffekseerController::Manager()->Play(m_effect_, position.x, position.y, position.z);
+    SetPosition(position);
     SetRotation(rotation);
     SetScale(scale);
     SetSpeed(play_speed);
+}
+
+void engine::EffekseerRenderer::Stop() const
+{
+    EffekseerController::Manager()->StopEffect(m_effect_handle_);
 }
 
 CEREAL_REGISTER_TYPE(engine::EffekseerRenderer)
