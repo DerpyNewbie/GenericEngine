@@ -155,7 +155,7 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
             const int index = std::stoi(ai_texture_path.C_Str() + 1);
             const auto texture = out_conversion_mapping.to_texture.at(index);
             const auto texture_ptr = AssetPtr<Texture2D>::FromManaged(texture);
-            material_asset->p_shared_material_block->SetMaterialData("Albedo", texture_ptr);
+            //material_asset->p_shared_material_block->SetMaterialData("Albedo", texture_ptr);
         }
         else
         {

@@ -1,5 +1,6 @@
 #pragma once
 #include "material_block.h"
+#include "render_pass.h"
 #include "shader.h"
 
 namespace engine
@@ -14,7 +15,8 @@ namespace engine
 class Material : public Object, public Inspectable
 {
 public:
-    AssetPtr<Shader> p_shared_shader;
+    uint64_t render_queue = 5000;
+    AssetPtr<RenderPass> render_pass;
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
@@ -23,7 +25,6 @@ public:
 
     void UpdateBuffer();
     bool IsDirty() const;
-    bool IsValid() const;
 
     void SetDescriptorTable();
 
@@ -32,11 +33,18 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(p_shared_shader),
             CEREAL_NVP(p_shared_material_block)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(render_queue),
+                CEREAL_NVP(render_pass)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Material, 1)
+CEREAL_CLASS_VERSION(engine::Material, 2)

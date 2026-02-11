@@ -7,6 +7,7 @@
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
+#include "render_command.h"
 #include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
@@ -40,6 +41,34 @@ std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
     }
     return results;
 }
+
+void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vector3 camera_pos)
+{
+    for (auto &command : render_commands)
+    {
+        uint64_t render_queue = 0;
+        float depth = 0.0f;
+        if (command.type == engine::CommandType::Mesh)
+        {
+            auto render_queue = command.mesh_data.material->render_queue;
+            auto depth = (*command.mesh_data.pos - camera_pos).Length();
+        }
+        else
+        {
+            render_queue = 8000;
+            depth = 0.0f;
+        }
+
+        const auto sort_key = engine::RenderPipeline::GenerateSortKey(render_queue, depth, *command.mesh_data.shader);
+        command.sort_key = sort_key;
+    }
+
+    std::ranges::sort(render_commands,
+                      [](const engine::RenderCommand &a, const engine::RenderCommand &b) {
+                          return a.sort_key < b.sort_key;
+                      });
+}
+
 }
 
 namespace engine
@@ -82,7 +111,7 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-        Render(view, proj);
+        Render(camera, view, proj);
 
         if (render_tex)
             render_tex->EndRender();
@@ -104,7 +133,7 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(view, proj);
+        Render(main_camera, view, proj);
 
         // revert back to original property
         main_camera->m_property_ = prev_property;
@@ -119,17 +148,17 @@ void RenderPipeline::InvokeDrawCall()
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(Color());
-        Render(view, proj);
+        Render(main_camera, view, proj);
     }
 
     on_rendering.Invoke();
 }
 
-void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
+void RenderPipeline::SetViewProjMatrix(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    if (m_view_proj_matrix_buffers_[0] == nullptr)
+    if (m_view_proj_matrix_buffers_[camera][0] == nullptr)
     {
-        for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_)
+        for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_[camera])
         {
             view_proj_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
             view_proj_matrix_buffer->CreateBuffer();
@@ -138,7 +167,7 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 
     const auto cmd_list = RenderEngine::CommandList();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = m_view_proj_matrix_buffers_[current_buffer_idx];
+    const auto view_projection_buffer = m_view_proj_matrix_buffers_[camera][current_buffer_idx];
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -147,7 +176,7 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
 
-void RenderPipeline::SetSceneData()
+void RenderPipeline::SetSceneData(const std::shared_ptr<CameraComponent> &camera)
 {
     if (m_scene_data_buffer_ == nullptr)
     {
@@ -167,10 +196,10 @@ void RenderPipeline::SetSceneData()
     cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
 }
 
-void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
+void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    SetViewProjMatrix(view, proj);
-    SetSceneData();
+    SetViewProjMatrix(camera, view, proj);
+    SetSceneData(camera);
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
@@ -179,25 +208,20 @@ void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
     Skybox::Instance()->Render();
 }
 
-void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
+void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
 {
-    UpdateBuffer(view, proj);
+    UpdateBuffer(camera, view, proj);
 
+    const auto camera_pos = camera->GameObject()->Transform()->Position();
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
-    std::ranges::sort(renderers,
-                      [](const std::shared_ptr<Renderer> &a, const std::shared_ptr<Renderer> &b) {
-                          return a->m_render_queue_ < b->m_render_queue_;
-                      });
-    for (const auto renderer : renderers)
-    {
-        renderer->UpdateBuffer();
-        renderer->Render();
-    }
 
+    SortCommands(m_commands_, camera_pos);
+
+    ExecuteRenderCommands();
     Gizmos::Render();
 }
 
-void RenderPipeline::DepthRender()
+void RenderPipeline::DepthRender() const
 {
     if (Lighting::Instance()->m_lights_.empty())
         return;
@@ -238,6 +262,209 @@ void RenderPipeline::DepthRender()
     Lighting::Instance()->EndDepthRender();
 }
 
+void RenderPipeline::ExecuteRenderCommands()
+{
+    const Shader *current_shader = nullptr;
+    const Material *current_material = nullptr;
+    const Mesh *current_mesh = nullptr;
+
+    auto cmd_list = RenderEngine::CommandList();
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    bool is_sprite_bath_active = false;
+    auto sprite_batch = FontData::SpriteBatch();
+
+    for (auto &command : m_commands_)
+    {
+        if (command.type == CommandType::Mesh)
+        {
+            if (is_sprite_bath_active)
+            {
+                sprite_batch->End();
+                sprite_batch->End();
+                RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+                cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+                current_material = nullptr;
+                current_shader = nullptr;
+                current_mesh = nullptr;
+            }
+
+            const auto &[pos, shader, material, mesh, sub_mesh_index, world_address, bone_handle] = command.mesh_data;
+
+            if (mesh == nullptr || shader == nullptr || material == nullptr)
+            {
+                Logger::Error<RenderPipeline>("render command is invalid!");
+                continue;
+            }
+
+            if (current_shader != shader)
+            {
+                current_shader = shader;
+                PSOManager::SetPipelineState(cmd_list, current_shader);
+            }
+
+            if (current_mesh != mesh)
+            {
+                current_mesh = mesh;
+                if (mesh->vertex_buffer == nullptr)
+                    mesh->ReconstructMeshesBuffer();
+
+                if (mesh->vertex_buffer)
+                    cmd_list->IASetVertexBuffers(0, 1, mesh->vertex_buffer->View());
+            }
+
+            if (world_address != 0)
+            {
+                cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_address);
+            }
+
+            if (bone_handle.ptr != 0)
+            {
+                cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, bone_handle);
+            }
+
+            if (current_material != material)
+            {
+                current_material = material;
+                if (material->p_shared_material_block == nullptr)
+                    material->CreateMaterialBlock();
+                
+                material->SetDescriptorTable();
+            }
+
+            if (sub_mesh_index == -1)
+            {
+                cmd_list->IASetIndexBuffer(mesh->index_buffers[0]->View());
+                const auto index_count = mesh->HasSubMeshes()
+                    ? mesh->sub_meshes[0].base_index
+                    : mesh->indices.size();
+
+                cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
+            }
+            else
+            {
+                cmd_list->IASetIndexBuffer(mesh->index_buffers[sub_mesh_index]->View());
+
+                const auto sub_mesh = mesh->sub_meshes[sub_mesh_index];
+                cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
+            }
+        }
+        else if (command.type == CommandType::Text)
+        {
+            if (!is_sprite_bath_active)
+            {
+                sprite_batch->Begin(RenderEngine::CommandList());
+                is_sprite_bath_active = true;
+
+                current_material = nullptr;
+                current_shader = nullptr;
+                current_mesh = nullptr;
+            }
+            
+            const auto [font_data, position, string, color] = command.text_data;
+            
+            const auto sprite_font = font_data->SpriteFont();
+
+            sprite_font->DrawString(sprite_batch.get(), string, *position, *color);
+        }
+    }
+
+    if (is_sprite_bath_active)
+    {
+        sprite_batch->End();
+        cmd_list->SetGraphicsRootSignature(RootSignature::Get());
+    }
+    
+    m_commands_.clear();
+}
+
+void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
+{
+    const auto instance = Instance();
+
+    if (materials.empty())
+        return;
+
+    for (auto i = 0; i < materials.size(); ++i)
+    {
+        const auto casted_material = materials[i].CastedLock();
+
+        if (casted_material == nullptr)
+            continue;
+        
+        const auto render_pass = casted_material->render_pass.CastedLock();
+        if (!render_pass)
+        {
+            continue;
+        }
+        const auto shaders = render_pass->shaders;
+
+        for (auto shader : shaders)
+        {
+            auto casted_shader = shader.CastedLock();
+
+            RenderCommand cmd;
+            cmd.type = CommandType::Mesh;
+            cmd.mesh_data.shader = casted_shader.get();
+            cmd.mesh_data.material = casted_material.get();
+            cmd.mesh_data.pos = &pos;
+            cmd.mesh_data.mesh = mesh.get();
+            cmd.mesh_data.sub_mesh_index = i - 1;
+            cmd.mesh_data.world_matrix_buffer_address = world_matrix_address;
+            cmd.mesh_data.bone_matrices_buffer_handle = bone_matrices_handle;
+
+            instance->m_commands_.emplace_back(cmd);
+        }
+    }
+}
+
+void RenderPipeline::Submit(AssetPtr<FontData> font_data, Vector2 position, const std::string &string, Color color)
+{
+    const auto casted_font_data = font_data.CastedLock();
+    if (casted_font_data == nullptr)
+        return;
+    
+    RenderCommand cmd;
+    cmd.type = CommandType::Text;
+    cmd.text_data.font_data = casted_font_data.get();
+    cmd.text_data.position = &position;
+    cmd.text_data.string = string.c_str();
+    cmd.text_data.color = &color;
+
+    Instance()->m_commands_.emplace_back(cmd);
+}
+
+uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const float depth, const Shader &shader)
+{
+    uint64_t key = 0;
+
+    key |= render_queue << 48;
+
+    const auto valid_depth = std::max(0.0f, depth);
+    uint32_t dist_bits;
+    std::memcpy(&dist_bits, &valid_depth, sizeof(uint32_t));
+
+    const uint64_t shader_id = reinterpret_cast<uintptr_t>(&shader) & 0xFFFFFFFF;
+
+    const bool is_transparent = shader.ShaderSettings().use_blend;
+
+    if (!is_transparent)
+    {
+        key |= (shader_id & 0xFFFF) << 32;
+
+        key |= static_cast<uint64_t>(dist_bits);
+    }
+    else
+    {
+        const uint64_t inverted_depth = ~dist_bits;
+        key |= inverted_depth << 16;
+
+        key |= (shader_id & 0xFFFF);
+    }
+
+    return key;
+}
+
 RenderPipeline *RenderPipeline::Instance()
 {
     static auto instance = new RenderPipeline;
@@ -267,11 +494,13 @@ void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
 {
     Logger::Log<RenderPipeline>("Adding camera: %s", camera->Name().c_str());
     Instance()->m_cameras_.emplace(camera);
+    Instance()->m_view_proj_matrix_buffers_.emplace(camera, std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count>());
 }
 
 void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
 {
     Logger::Log<RenderPipeline>("Removing camera: %s", camera->Name().c_str());
-    Instance()->m_cameras_.erase(camera);
+    auto instance = Instance();
+    instance->m_cameras_.erase(camera);
 }
 }

@@ -213,6 +213,12 @@ bool AssetDescriptor::HasImportError() const
 
 void AssetDescriptor::SetMainObject(std::shared_ptr<Object> object)
 {
+    if (object == nullptr)
+    {
+        LogImportError("Trying to set MainObject as nullptr");
+        return;
+    }
+
     m_main_object_ = object;
 
     std::erase_if(

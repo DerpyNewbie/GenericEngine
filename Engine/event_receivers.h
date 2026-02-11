@@ -22,6 +22,12 @@ public:
     virtual void OnFixedUpdate() = 0;
 };
 
+class IRenderReceiver : public IOrderable
+{
+public:
+    virtual void Render() = 0;
+};
+
 class IGarbageCollectReceiver : public IOrderable
 {
 public:

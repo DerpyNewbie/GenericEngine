@@ -1,6 +1,8 @@
 #pragma once
 #include "bone_weight.h"
 #include "sub_mesh.h"
+#include "CabotEngine/Graphics/VertexBuffer.h"
+#include "CabotEngine/Graphics/IndexBuffer.h"
 
 struct aiMesh;
 struct aiScene;
@@ -22,7 +24,11 @@ public:
     std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
 
+    std::shared_ptr<VertexBuffer> vertex_buffer;
+    std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
+
     void OnInspectorGui() override;
+    void ReconstructMeshesBuffer();
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
 

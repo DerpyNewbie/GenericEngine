@@ -48,6 +48,73 @@ void Mesh::OnInspectorGui()
     }
 }
 
+void Mesh::ReconstructMeshesBuffer()
+{
+    // clean up old buffers
+    if (vertex_buffer)
+    {
+        vertex_buffer = nullptr;
+    }
+
+    if (!index_buffers.empty())
+    {
+        for (auto &index_buffer : index_buffers)
+            index_buffer = nullptr;
+        index_buffers.clear();
+    }
+
+    // create vertex buffer
+    auto mesh = shared_from_base<Mesh>().get();
+    vertex_buffer = std::make_shared<VertexBuffer>(mesh);
+    if (!vertex_buffer->IsValid())
+    {
+        Logger::Error<Mesh>("Failed to create vertex buffer!");
+        return;
+    }
+
+    // create index buffer
+    const auto index_buffer_size = mesh->HasSubMeshes()
+        ? mesh->sub_meshes[0].base_index
+        : mesh->indices.size();
+    const auto indices = mesh->indices.data();
+
+    auto ib = std::make_shared<IndexBuffer>(index_buffer_size * sizeof(uint32_t), indices);
+
+    if (!ib->IsValid())
+    {
+        Logger::Error<Mesh>(
+            "Failed to create index buffer of '%d'",
+            index_buffer_size
+        );
+        return;
+    }
+
+    index_buffers.emplace_back(ib);
+
+    // create index buffers for sub meshes
+    for (auto i = 0; i < mesh->sub_meshes.size(); i++)
+    {
+        const auto sub_mesh = mesh->sub_meshes[i];
+
+        const auto sub_index_buffer_size = sub_mesh.index_count * sizeof(uint32_t);
+        std::vector<uint32_t> sub_indices;
+        sub_indices.insert(
+            sub_indices.begin(),
+            mesh->indices.begin() + sub_mesh.base_index,
+            mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count
+        );
+
+        const auto sub_index_buffer = std::make_shared<IndexBuffer>(sub_index_buffer_size, sub_indices.data());
+        if (!sub_index_buffer->IsValid())
+        {
+            Logger::Error<Mesh>("Failed to create sub index buffer!: sub mesh index: %d", i);
+            continue;
+        }
+
+        index_buffers.emplace_back(sub_index_buffer);
+    }
+}
+
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)
 {
     const auto result = Instantiate<Mesh>(mesh->mName.C_Str());

@@ -33,7 +33,7 @@ void LineRenderer::SetIndices(std::vector<uint32_t> indices)
     }
 }
 
-void LineRenderer::Render()
+/*void LineRenderer::Render()
 {
     const auto camera = CameraComponent::Main();
     const Matrix view = camera->ViewMatrix();
@@ -52,7 +52,7 @@ void LineRenderer::Render()
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
     cmd_list->IASetIndexBuffer(m_index_buffer_->View());
     cmd_list->DrawIndexedInstanced(m_num_indices_, 1, 0, 0, 0);
-}
+}*/
 }
 
 CEREAL_REGISTER_TYPE(engine::LineRenderer)

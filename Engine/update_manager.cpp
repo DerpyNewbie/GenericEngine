@@ -66,6 +66,16 @@ void UpdateManager::InvokeFixedUpdate()
     PostFix();
 }
 
+void UpdateManager::InvokeRender()
+{
+    m_in_render_cycle_ = true;
+    Update(m_render_receivers_, [&](const auto &receiver) {
+        receiver->Render();
+    });
+    m_in_render_cycle_ = false;
+    PostFix();
+}
+
 void UpdateManager::InvokeGarbageCollect()
 {
     m_in_garbage_collect_cycle_ = true;
@@ -138,6 +148,32 @@ void UpdateManager::UnsubscribeFixedUpdate(const std::shared_ptr<IFixedUpdateRec
     Erase(m_fixed_update_receivers_, receiver);
 }
 
+void UpdateManager::SubscribeRender(const std::shared_ptr<IRenderReceiver> &receiver)
+{
+    if (InRenderCycle())
+    {
+        m_in_cycle_buffer_.emplace([receiver] {
+            SubscribeRender(receiver);
+        });
+        return;
+    }
+
+    Subscribe(m_render_receivers_, receiver);
+}
+
+void UpdateManager::UnsubscribeRender(const std::shared_ptr<IRenderReceiver> &receiver)
+{
+    if (InRenderCycle())
+    {
+        m_in_cycle_buffer_.emplace([receiver] {
+            UnsubscribeRender(receiver);
+        });
+        return;
+    }
+
+    Erase(m_render_receivers_, receiver);
+}
+
 void UpdateManager::SubscribeGarbageCollect(const std::shared_ptr<IGarbageCollectReceiver> &receiver)
 {
     if (InGarbageCollectCycle())
@@ -171,6 +207,10 @@ bool UpdateManager::InUpdateCycle()
 bool UpdateManager::InFixedUpdateCycle()
 {
     return m_in_fixed_update_cycle_;
+}
+bool UpdateManager::InRenderCycle()
+{
+    return m_in_render_cycle_;
 }
 bool UpdateManager::InGarbageCollectCycle()
 {

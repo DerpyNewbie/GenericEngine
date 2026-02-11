@@ -4,43 +4,32 @@
 #include "Rendering/material_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 
 namespace engine
 {
 class MeshRenderer : public Renderer
 {
     std::shared_ptr<Transform> BoundsOrigin() override;
+    virtual void UpdateWorldBuffer();
 
 protected:
     static bool m_draw_bounds_;
-
+    
     AssetPtr<Mesh> m_shared_mesh_;
-    std::shared_ptr<VertexBuffer> m_vertex_buffer_;
-    std::vector<std::shared_ptr<IndexBuffer>> m_index_buffers_;
+
     std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
-
-    virtual void ReconstructBuffer();
-    virtual Matrix WorldMatrix();
-
-    void UpdateWorldBuffer();
 
     void DrawBounds();
     void RecalculateBoundingBox();
-    void ReconstructMeshesBuffer();
-    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list, int material_idx);
 
 public:
-    std::vector<AssetPtr<Material>> shared_materials;
 
+    std::vector<AssetPtr<Material>> shared_materials;
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
-    void UpdateBuffer() override;
-    void Render() override;
     void DepthRender() override;
+    void Render() override;
 
     void SetSharedMesh(const AssetPtr<Mesh> &mesh);
 

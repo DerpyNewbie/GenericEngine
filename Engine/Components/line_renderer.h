@@ -21,8 +21,6 @@ public:
     void SetVertices(std::vector<Vertex> vertices);
     void SetIndices(std::vector<uint32_t> indices);
 
-    void Render() override;
-
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {

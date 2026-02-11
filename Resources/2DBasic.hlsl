@@ -1,5 +1,14 @@
-Texture2D<float4> tex : register(t4);
-SamplerState smp : register(s0);
+#include "Light.hlsli"
+
+cbuffer Transform : register (b0)
+{
+    float4x4 World;
+}
+cbuffer Transforms : register (b1)
+{
+    float4x4 View;
+    float4x4 Proj;
+}
 
 struct VSOutput
 {
@@ -29,7 +38,10 @@ struct VSInput
 VSOutput vrt(VSInput input)
 {
     VSOutput output;
-    output.svpos = float4(input.pos, 1);
+    
+    float4 worldPos = mul(World, float4(input.pos, 1.0f));
+    
+    output.svpos = worldPos;
     output.uv = input.uv1;
 
     return output;
@@ -38,6 +50,6 @@ VSOutput vrt(VSInput input)
 float4 pix(VSOutput input) : SV_TARGET
 {
     float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
-    float4 mainColor = tex.Sample(smp, flippedUV);
+    float4 mainColor = _MainTex.Sample(smp, flippedUV);
     return mainColor;
 }

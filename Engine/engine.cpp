@@ -86,6 +86,7 @@ void Engine::Tick()
 
     Profiler::Begin("Draw Call");
     RenderEngine::Instance()->BeginRender();
+    UpdateManager::InvokeRender();
     RenderPipeline::Instance()->InvokeDrawCall();
     RenderEngine::Instance()->EndRender();
     Profiler::End("Draw Call");

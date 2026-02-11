@@ -139,6 +139,10 @@ void Editor::Init()
         AddCreateMenu("Texture Cube", ".cubemap", [] {
             return Object::Instantiate<TextureCube>("New TextureCube");
         });
+
+        AddCreateMenu("RenderPass", ".renderpass", [] {
+            return Object::Instantiate<RenderPass>("New RenderPass");
+        });
     }
     // end CreateMenu register
 

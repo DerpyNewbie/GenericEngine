@@ -4,15 +4,25 @@
 #include "camera_component.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 namespace engine
 {
 bool SkinnedMeshRenderer::m_draw_bones_ = false;
 
-void SkinnedMeshRenderer::UpdateBoneTransformsBuffer() const
+void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 {
+    for (int i = 0; i < m_bone_matrix_buffers_.size(); ++i)
+    {
+        if (!m_bone_matrix_buffers_[i])
+        {
+            m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
+            m_bone_matrix_buffers_[i]->CreateBuffer();
+            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
+        }
+    }
+    
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto bone_matrices_buffer = m_bone_matrix_buffers_[current_buffer_idx];
 
@@ -27,9 +37,21 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer() const
     bone_matrices_buffer->UpdateBuffer(matrices.data());
 }
 
-Matrix SkinnedMeshRenderer::WorldMatrix()
+void SkinnedMeshRenderer::UpdateWorldBuffer()
 {
-    return Matrix::Identity;
+    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
+    {
+        if (!world_matrix_buffer)
+        {
+            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+            world_matrix_buffer->CreateBuffer();
+        }
+    }
+    
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
+    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
+    *ptr = Matrix::Identity;
 }
 
 void SkinnedMeshRenderer::DrawBones() const
@@ -85,25 +107,11 @@ void SkinnedMeshRenderer::UpdateBuffer()
 
 void SkinnedMeshRenderer::Render()
 {
-    MeshRenderer::Render();
+    UpdateWorldBuffer();
+    UpdateBoneTransformsBuffer();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    if (m_draw_bones_)
-        DrawBones();
-}
-
-void SkinnedMeshRenderer::ReconstructBuffer()
-{
-    MeshRenderer::ReconstructBuffer();
-
-    for (int i = 0; i < m_bone_matrix_buffers_.size(); ++i)
-    {
-        if (!m_bone_matrix_buffers_[i])
-        {
-            m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
-            m_bone_matrix_buffers_[i]->CreateBuffer();
-            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
-        }
-    }
+    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->HandleGPU);
 }
 }
 

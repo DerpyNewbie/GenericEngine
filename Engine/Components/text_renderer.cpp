@@ -2,6 +2,7 @@
 #include "gui.h"
 #include "text_renderer.h"
 #include "Components/camera_component.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
@@ -42,16 +43,7 @@ void TextRenderer::OnInspectorGui()
 
 void TextRenderer::Render()
 {
-    if (!font_data.Lock())
-    {
-        return;
-    }
-    auto sprite_batch = FontData::SpriteBatch();
-    auto sprite_font = font_data.CastedLock()->SpriteFont();
-    sprite_batch->Begin(RenderEngine::CommandList());
-    sprite_font->DrawString(sprite_batch.get(), string.c_str(), position, color);
-    sprite_batch->End();
-    RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+    RenderPipeline::Submit(font_data, position, string, color);
 }
 
 std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
