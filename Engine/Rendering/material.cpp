@@ -109,7 +109,7 @@ void Material::SetDescriptorTable()
 
             const int root_param_idx = shader_type * kParameterBufferType_Count + param_i +
                                        RootSignature::kPreDefinedVariableCount;
-            const auto itr = material_block->Begin(shader_type, param_type);
+            const auto itr = material_block->Begin(param_type);
             const auto desc_handle = itr->handle->HandleGPU;
             cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
         }

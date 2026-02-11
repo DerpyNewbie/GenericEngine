@@ -1,6 +1,7 @@
 #pragma once
 #include "shader_parameter.h"
 #include "shader_settings.h"
+#include "Rendering/shader_type.h"
 #include "CabotEngine/Graphics/ComPtr.h"
 
 namespace engine

@@ -13,12 +13,9 @@ enum kRootParameterIndex
     kLightSRV,
     kLightViewProj,
     kShadowMapSRV,
-    kVertexCBV,
-    kVertexSRV,
-    kVertexUAV,
-    kPixelCBV,
-    kPixelSRV,
-    kPixelUAV,
+    kMaterialCBV,
+    kMaterialSRV,
+    kMaterialUAV,
 
     kRootParameterIndexCount
 };

@@ -47,13 +47,6 @@ void Shader::DrawShaderSettings()
 
 void Shader::OnInspectorGui()
 {
-    auto vertex_params = std::views::filter(parameters, [](auto &p) {
-        return p->shader_type == kShaderType_Vertex;
-    });
-    auto pixel_params = std::views::filter(parameters, [](auto &p) {
-        return p->shader_type == kShaderType_Pixel;
-    });
-
     if (ImGui::CollapsingHeader("ShaderSettings"))
     {
         ImGui::Indent();
@@ -61,9 +54,12 @@ void Shader::OnInspectorGui()
         ImGui::Unindent();
     }
 
-    auto draw_params = [](auto &params, auto &sources) {
+    ImGui::PushID("Vertex Shader Parameters");
+    if (ImGui::CollapsingHeader("Vertex Shader Parameters"))
+    {
+        ImGui::Indent();
         int index = 0;
-        for (auto &param : params)
+        for (auto &param : parameters)
         {
             ImGui::PushID(&param);
             const auto should_show = ImGui::CollapsingHeader(("Parameter " + std::to_string(index++)).c_str());
@@ -71,10 +67,9 @@ void Shader::OnInspectorGui()
             {
                 if (ImGui::MenuItem("Remove"))
                 {
-                    sources.erase(std::find_if(sources.begin(), sources.end(), [&](auto &p) {
-                        return p->name == param->name && p->index == param->index && p->shader_type == param->
-                               shader_type;
-                    }));
+                    std::erase_if(parameters, [&param](const auto &other) {
+                        return param == other;
+                    });
                     ImGui::EndPopup();
                     ImGui::PopID();
                     break;
@@ -93,33 +88,10 @@ void Shader::OnInspectorGui()
             }
             ImGui::PopID();
         }
-    };
-
-    ImGui::PushID("Vertex Shader Parameters");
-    if (ImGui::CollapsingHeader("Vertex Shader Parameters"))
-    {
-        ImGui::Indent();
-        draw_params(vertex_params, parameters);
-        if (ImGui::Button("Add VS Parameter"))
+        if (ImGui::Button("Add Parameter"))
         {
             auto &p = parameters.emplace_back();
             p = std::make_shared<ShaderParameter>();
-            p->shader_type = kShaderType_Vertex;
-        }
-        ImGui::Unindent();
-    }
-    ImGui::PopID();
-
-    ImGui::PushID("Pixel Shader Parameters");
-    if (ImGui::CollapsingHeader("Pixel Shader Parameters"))
-    {
-        ImGui::Indent();
-        draw_params(pixel_params, parameters);
-        if (ImGui::Button("Add PS Parameter"))
-        {
-            auto &p = parameters.emplace_back();
-            p = std::make_shared<ShaderParameter>();
-            p->shader_type = kShaderType_Pixel;
         }
         ImGui::Unindent();
     }
