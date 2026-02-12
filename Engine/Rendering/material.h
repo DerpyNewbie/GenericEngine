@@ -34,8 +34,15 @@ public:
             cereal::base_class<Object>(this),
             CEREAL_NVP(p_shared_material_block)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(p_shared_shader)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Material, 1)
+CEREAL_CLASS_VERSION(engine::Material, 2)
