@@ -94,7 +94,7 @@ std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseConstantBuffe
     reflector->GetResourceBindingDescByName(shader_desc.Name, &bind_desc);
     for (auto i = 0; i < shader_desc.Variables; ++i)
     {
-        variables.emplace_back(ParseTextureBufferShaderVariable(&bind_desc, reflector));
+        variables.emplace_back(ParseShaderVariable(bind_desc.BindPoint, reflection_buffer->GetVariableByIndex(i)));
     }
 
     return variables;
