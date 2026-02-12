@@ -44,8 +44,7 @@ void BillboardRenderer::OnInspectorGui()
 
 void BillboardRenderer::Render()
 {
-    auto world_mat = GameObject()->Transform()->WorldMatrix();
-    world_mat = Billboard::CalcMatrix(world_mat);
+    UpdateWorldBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     std::vector materials = {shared_material};
