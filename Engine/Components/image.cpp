@@ -27,8 +27,6 @@ void Image::UpdateWorldBuffer()
     if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
     {
         rect = NormalizedRect();
-        rect.pos - rect.size / 2;
-        rect.pos + rect.size / 2;
     }
 
     const auto scale_mat = Matrix::CreateScale(rect.size.x, rect.size.y, 1.0f);
