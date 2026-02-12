@@ -54,8 +54,8 @@ void Shader::OnInspectorGui()
         ImGui::Unindent();
     }
 
-    ImGui::PushID("Vertex Shader Parameters");
-    if (ImGui::CollapsingHeader("Vertex Shader Parameters"))
+    ImGui::PushID("Shader Parameters");
+    if (ImGui::CollapsingHeader("Shader Parameters"))
     {
         ImGui::Indent();
         int index = 0;
@@ -63,37 +63,17 @@ void Shader::OnInspectorGui()
         {
             ImGui::PushID(&param);
             const auto should_show = ImGui::CollapsingHeader(("Parameter " + std::to_string(index++)).c_str());
-            if (ImGui::BeginPopupContextItem())
-            {
-                if (ImGui::MenuItem("Remove"))
-                {
-                    std::erase_if(parameters, [&param](const auto &other) {
-                        return param == other;
-                    });
-                    ImGui::EndPopup();
-                    ImGui::PopID();
-                    break;
-                }
-
-                ImGui::EndPopup();
-            }
-
+            
             if (should_show)
             {
                 ImGui::Indent();
-                ImGui::InputText("Name", &param->name);
-                ImGui::InputText("Display Name", &param->display_name);
-                ImGui::InputText("Type", &param->type_hint);
+                Gui::ReadOnlyStringField("Name", param->name);
+                Gui::ReadOnlyStringField("Display Name", param->display_name);
+                Gui::ReadOnlyStringField("Type", param->type_hint);
                 ImGui::Unindent();
             }
             ImGui::PopID();
         }
-        if (ImGui::Button("Add Parameter"))
-        {
-            auto &p = parameters.emplace_back();
-            p = std::make_shared<ShaderParameter>();
-        }
-        ImGui::Unindent();
     }
     ImGui::PopID();
 }
