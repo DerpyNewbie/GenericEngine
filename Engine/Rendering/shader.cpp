@@ -63,13 +63,14 @@ void Shader::OnInspectorGui()
         {
             ImGui::PushID(&param);
             const auto should_show = ImGui::CollapsingHeader(("Parameter " + std::to_string(index++)).c_str());
-            
+
             if (should_show)
             {
                 ImGui::Indent();
-                Gui::ReadOnlyStringField("Name", param->name);
-                Gui::ReadOnlyStringField("Display Name", param->display_name);
-                Gui::ReadOnlyStringField("Type", param->type_hint);
+                Gui::ReadOnlyStringField("Index", std::to_string(param.index));
+                Gui::ReadOnlyStringField("Name", param.name);
+                ImGui::InputText("Display Name", &param.display_name);
+                Gui::ReadOnlyStringField("Type", param.type_hint);
                 ImGui::Unindent();
             }
             ImGui::PopID();

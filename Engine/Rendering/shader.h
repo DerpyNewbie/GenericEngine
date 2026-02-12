@@ -27,7 +27,7 @@ class Shader : public Object, public Inspectable
     void DrawShaderSettings();
 
 public:
-    std::vector<std::shared_ptr<ShaderParameter>> parameters;
+    std::vector<ShaderParameter> parameters;
 
     void OnInspectorGui() override;
     ShaderSettings ShaderSettings() const;

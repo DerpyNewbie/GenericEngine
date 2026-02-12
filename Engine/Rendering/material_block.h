@@ -57,7 +57,7 @@ public:
     bool SetMaterialData(const std::string &name, T material_data);
 
     void LoadShaderParameters(
-        const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+        const std::vector<ShaderParameter> &shader_params,
         const std::vector<MaterialDataPair> &resource_material_data = {}
     );
 

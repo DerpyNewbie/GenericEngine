@@ -9,6 +9,12 @@ struct ShaderParameter
     std::string display_name;
     std::string type_hint;
 
+    bool operator==(const ShaderParameter &other) const
+    {
+        // do not check for `display_name` or `type_hint` because only real parameters are `index` and `name`
+        return index == other.index && name == other.name;
+    }
+
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {

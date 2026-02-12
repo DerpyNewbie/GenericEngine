@@ -52,12 +52,12 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     }
 };
 
-std::shared_ptr<IMaterialData> CreateMaterialData(const std::weak_ptr<ShaderParameter> &shader_param)
+std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_param)
 {
-    const auto func = g_material_data_factory[shader_param.lock()->type_hint];
+    const auto func = g_material_data_factory[shader_param.type_hint];
     if (func != nullptr)
     {
-        auto material_data = func(*shader_param.lock());
+        auto material_data = func(shader_param);
         return material_data;
     }
     return nullptr;
@@ -142,7 +142,7 @@ void MaterialBlock::OnInspectorGui()
 }
 
 void MaterialBlock::LoadShaderParameters(
-    const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+    const std::vector<ShaderParameter> &shader_params,
     const std::vector<MaterialDataPair> &resource_material_data
 )
 {
@@ -153,7 +153,7 @@ void MaterialBlock::LoadShaderParameters(
         {
             for (auto material_data_pair : resource_material_data)
             {
-                if (param->name == material_data_pair.data->parameter.name)
+                if (param.name == material_data_pair.data->parameter.name)
                 {
                     Insert(material_data_pair.data);
                     found = true;
