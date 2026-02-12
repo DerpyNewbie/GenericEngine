@@ -32,7 +32,6 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(p_shared_shader),
             CEREAL_NVP(p_shared_material_block)
         );
     }

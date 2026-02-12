@@ -10,7 +10,7 @@
 
 namespace
 {
-constexpr std::array<std::string_view, 12> kEngineParameters = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "SceneData", "ShadowCascadeSlices", "LightCount", "LightViewProj", "Lights", "ShadowMaps", "_MainTex", "smp", "shadowSampler"};
+constexpr std::array<std::string_view, 11> kEngineParameters = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "SceneData", "ShadowCascadeSlices", "LightCount", "LightViewProj", "Lights", "ShadowMaps", "smp", "shadowSampler"};
 }
 
 namespace engine
@@ -18,12 +18,35 @@ namespace engine
 std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseShaderParameters(const std::shared_ptr<Shader> &shader)
 {
     std::vector<std::shared_ptr<ShaderParameter>> shader_parameters;
-
-    ComPtr<ID3D12ShaderReflection> reflector;
+    
     auto vs_blob = shader->m_vs_blob_;
     auto ps_blob = shader->m_ps_blob_;
 
-    D3DReflect(vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), IID_PPV_ARGS(&reflector));
+    auto vs_params = ParseShaderBlob(vs_blob);
+    const auto ps_params = ParseShaderBlob(ps_blob);
+
+    shader_parameters.insert(shader_parameters.end(), vs_params.begin(), vs_params.end());
+
+    for (auto ps_param : ps_params)
+    {
+        auto same_param = std::ranges::find_if(shader_parameters, [&ps_param](const auto &shader_param) {
+            return ps_param->display_name == shader_param->display_name;
+        });
+        if (same_param != shader_parameters.end())
+            continue;
+
+        shader_parameters.emplace_back(ps_param);
+    }
+
+    return shader_parameters;
+}
+
+std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseShaderBlob(const ComPtr<ID3D10Blob> &shader_blob)
+{
+    std::vector<std::shared_ptr<ShaderParameter>> shader_parameters;
+
+    ComPtr<ID3D12ShaderReflection> reflector;
+    D3DReflect(shader_blob->GetBufferPointer(), shader_blob->GetBufferSize(), IID_PPV_ARGS(&reflector));
 
     D3D12_SHADER_DESC shader_desc;
     reflector->GetDesc(&shader_desc);
@@ -35,7 +58,7 @@ std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseShaderParamet
         D3D12_SHADER_BUFFER_DESC buffer_desc;
         buffer_reflector->GetDesc(&buffer_desc);
 
-        auto is_engine_parameter = std::ranges::find(kEngineParameters, buffer_desc.Name) == kEngineParameters.end();
+        auto is_engine_parameter = std::ranges::find(kEngineParameters, buffer_desc.Name) != kEngineParameters.end();
         if (is_engine_parameter)
             continue;
 
@@ -50,7 +73,12 @@ std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseShaderParamet
 
         if (bind_desc.Type == D3D_SIT_TEXTURE)
         {
-            auto buffer_parameters = ParseTextureBufferShaderVariables(&bind_desc, reflector);
+            auto is_engine_parameter = std::ranges::find(kEngineParameters, bind_desc.Name) != kEngineParameters.end();
+            if (is_engine_parameter)
+                continue;
+
+            auto buffer_parameters = ParseTextureBufferShaderVariable(&bind_desc, reflector);
+            shader_parameters.emplace_back(buffer_parameters);
         }
     }
     return shader_parameters;
@@ -66,13 +94,13 @@ std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseConstantBuffe
     reflector->GetResourceBindingDescByName(shader_desc.Name, &bind_desc);
     for (auto i = 0; i < shader_desc.Variables; ++i)
     {
-        variables.emplace_back(ParseTextureBufferShaderVariables(&bind_desc, reflector));
+        variables.emplace_back(ParseTextureBufferShaderVariable(&bind_desc, reflector));
     }
 
     return variables;
 }
 
-std::shared_ptr<ShaderParameter> ShaderImporter::ParseTextureBufferShaderVariables(D3D12_SHADER_INPUT_BIND_DESC *bind_desc, const ComPtr<ID3D12ShaderReflection> &reflector)
+std::shared_ptr<ShaderParameter> ShaderImporter::ParseTextureBufferShaderVariable(D3D12_SHADER_INPUT_BIND_DESC *bind_desc, const ComPtr<ID3D12ShaderReflection> &reflector)
 {
     std::shared_ptr<ShaderParameter> shader_parameter;
 
@@ -372,7 +400,7 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         );
     }
 
-    if (shader_meta_version < kShaderMetaVersion)
+    /*if (shader_meta_version < kShaderMetaVersion)
     {
         ctx->LogImportWarning("Shader meta data is outdated! Will be upgraded after this import");
 
@@ -389,16 +417,16 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
 
             shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
         }
-    }
+    }*/
 
     std::stringstream ss(shader_meta);
     Serializer serializer;
     const auto shader = serializer.Load<Shader>(ss);
-    if (!shader)
+    /*if (!shader)
     {
         ctx->LogImportError("Failed to deserialize shader object");
         return;
-    }
+    }*/
 
     if (!CompileShader(shader, ctx->AssetPath()))
     {
@@ -406,7 +434,13 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         return;
     }
 
-    CreateShaderParameters(shader);
+    if (shader->parameters.empty())
+    {
+        CreateShaderParameters(shader);
+        WriteShaderMeta(shader, ctx->DataStore());
+
+        shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
+    }
 
     if (!PSOManager::Register(shader, ctx->AssetPath().filename().string()))
     {

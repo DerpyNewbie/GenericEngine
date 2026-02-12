@@ -1,9 +1,9 @@
 {
     "data": {
-        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"cereal_class_version\": 1,\n\"value0\": {\n\"cereal_class_version\": 1,\n\"m_guid_\": \"638a2b4e-f8c2-4a41-a104-15517098ac79\",\n\"m_name_\": \"2DBasic.hlsl\"\n},\n\"parameters\": [],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 1,\n\"cull\": 0,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
+        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"cereal_class_version\": 1,\n\"value0\": {\n\"cereal_class_version\": 1,\n\"m_guid_\": \"eb3e6ffa-c9dc-4bb9-905c-326b2267b405\",\n\"m_name_\": \"2DBasic.hlsl\"\n},\n\"parameters\": [\n{\n\"ptr_wrapper\": {\n\"id\": 2147483650,\n\"data\": {\n\"cereal_class_version\": 1,\n\"index\": 4,\n\"name\": \"tex\",\n\"display_name\": \"tex\",\n\"type_hint\": \"texture2d\"\n}\n}\n}\n],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 4,\n\"z_test\": 0,\n\"z_write\": 1,\n\"cull\": 0,\n\"blend_src\": 0,\n\"blend_dst\": 0,\n\"blend_op\": 0,\n\"color_mask\": 0,\n\"alpha_to_mask\": false,\n\"use_blend\": false\n}\n}\n}\n}\n}",
         "shader_meta_version": 3
     },
-    "guid": "638a2b4e-f8c2-4a41-a104-15517098ac79",
+    "guid": "eb3e6ffa-c9dc-4bb9-905c-326b2267b405",
     "type": ".hlsl",
     "objects": []
 }

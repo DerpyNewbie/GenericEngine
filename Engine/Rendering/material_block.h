@@ -62,7 +62,7 @@ public:
     );
 
     void Insert(const std::shared_ptr<IMaterialData> &data);
-    bool Empty(kShaderType shader_type, kParameterBufferType buffer_type);
+    bool Empty(kParameterBufferType buffer_type);
     std::vector<MaterialDataPair>::iterator Begin(kParameterBufferType buffer_type);
     std::vector<MaterialDataPair>::iterator End(kParameterBufferType buffer_type);
 
@@ -76,9 +76,15 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(material_data),
-            CEREAL_NVP(shader_index)
+            CEREAL_NVP(material_data)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(shader_index)
+            );
+        }
     }
 };
 
@@ -101,4 +107,4 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 
 }
 
-CEREAL_CLASS_VERSION(engine::MaterialBlock, 1)
+CEREAL_CLASS_VERSION(engine::MaterialBlock, 2)

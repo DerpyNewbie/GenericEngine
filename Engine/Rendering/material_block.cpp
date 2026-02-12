@@ -25,13 +25,23 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
          return std::make_shared<MaterialData<Color>>(Color(), param);
      }
     },
+    {"float2",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<Vector2>>(Vector2::Zero, param);
+     }
+    },
+    {"float3",
+     [](const ShaderParameter &param) {
+         return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
+     }
+    },
     {"vector<Matrix>",
      [](const ShaderParameter &param) {
          auto identity = std::vector{Matrix::Identity};
          return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
      }
     },
-    {"Texture2D",
+    {"texture2d",
      [](const ShaderParameter &param) {
          auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
          return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
@@ -45,8 +55,12 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
 std::shared_ptr<IMaterialData> CreateMaterialData(const std::weak_ptr<ShaderParameter> &shader_param)
 {
     const auto func = g_material_data_factory[shader_param.lock()->type_hint];
-    auto material_data = func(*shader_param.lock());
-    return material_data;
+    if (func != nullptr)
+    {
+        auto material_data = func(*shader_param.lock());
+        return material_data;
+    }
+    return nullptr;
 }
 }
 
@@ -151,7 +165,11 @@ void MaterialBlock::LoadShaderParameters(
         if (!found)
         {
             const auto material_data = CreateMaterialData(param);
-            Insert(material_data);
+
+            if (material_data != nullptr)
+            {
+                Insert(material_data);
+            }
         }
     }
     UpdateBuffer();
@@ -170,7 +188,7 @@ void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
     ++(*field);
 }
 
-bool MaterialBlock::Empty(const kShaderType shader_type, const kParameterBufferType buffer_type)
+bool MaterialBlock::Empty(const kParameterBufferType buffer_type)
 {
     return shader_index.GetLength(buffer_type) == 0;
 }
@@ -208,6 +226,11 @@ void MaterialBlock::UpdateBuffer()
         if (data->is_dirty)
         {
             Logger::Log<MaterialBlock>("Updating data in MaterialBlock: %s", data->parameter.name.c_str());
+
+            if (data->buffer == nullptr)
+            {
+                data->buffer = data->CreateBuffer();
+            }
 
             if (data->CanUpdateBuffer())
             {

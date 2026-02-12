@@ -10,6 +10,12 @@ CEREAL_REGISTER_TYPE(engine::MaterialData<int>)
 
 CEREAL_REGISTER_TYPE(engine::MaterialData<float>)
 
+CEREAL_REGISTER_TYPE(engine::MaterialData<Color>)
+
+CEREAL_REGISTER_TYPE(engine::MaterialData<Vector2>)
+
+CEREAL_REGISTER_TYPE(engine::MaterialData<Vector3>)
+
 CEREAL_REGISTER_TYPE(engine::MaterialData<Matrix>)
 
 CEREAL_REGISTER_TYPE(engine::MaterialData<engine::AssetPtr<Texture2D>>)

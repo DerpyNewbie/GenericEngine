@@ -12,8 +12,9 @@ class ShaderImporter : public AssetImporter
     static constexpr auto kShaderMetaKey = "shader_meta";
 
     static std::vector<std::shared_ptr<ShaderParameter>> ParseShaderParameters(const std::shared_ptr<Shader> &shader);
+    static std::vector<std::shared_ptr<ShaderParameter>> ParseShaderBlob(const ComPtr<ID3D10Blob> &shader_blob);
     static std::vector<std::shared_ptr<ShaderParameter>> ParseConstantBufferShaderVariables(ID3D12ShaderReflectionConstantBuffer *reflection_buffer, const ComPtr<ID3D12ShaderReflection> &reflector);
-    static std::shared_ptr<ShaderParameter> ParseTextureBufferShaderVariables(D3D12_SHADER_INPUT_BIND_DESC *bind_desc, const ComPtr<ID3D12ShaderReflection> &reflector);
+    static std::shared_ptr<ShaderParameter> ParseTextureBufferShaderVariable(D3D12_SHADER_INPUT_BIND_DESC *bind_desc, const ComPtr<ID3D12ShaderReflection> &reflector);
     static std::shared_ptr<ShaderParameter> ParseShaderVariable(int register_idx, ID3D12ShaderReflectionVariable *variable);
     static std::shared_ptr<ShaderParameter> ParseShaderVariable(int register_idx, D3D12_SHADER_INPUT_BIND_DESC *bind_desc);
     static std::string GetTypeHint(ID3D12ShaderReflectionVariable *variable);
