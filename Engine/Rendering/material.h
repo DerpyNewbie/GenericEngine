@@ -1,6 +1,5 @@
 #pragma once
 #include "material_block.h"
-#include "render_pass.h"
 #include "shader.h"
 
 namespace engine
@@ -16,7 +15,7 @@ class Material : public Object, public Inspectable
 {
 public:
     uint64_t render_queue = 5000;
-    AssetPtr<RenderPass> render_pass;
+    AssetPtr<Shader> shader;
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
@@ -40,7 +39,7 @@ public:
         {
             ar(
                 CEREAL_NVP(render_queue),
-                CEREAL_NVP(render_pass)
+                CEREAL_NVP(shader)
             );
         }
     }

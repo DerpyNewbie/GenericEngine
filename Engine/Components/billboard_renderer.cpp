@@ -32,7 +32,7 @@ void BillboardRenderer::OnConstructed()
 {
     shared_material = AssetPtr<Material>::FromInstance(Instantiate<Material>());
     const auto asset_ptr = AssetDatabase::GetAsset("BillboardShader.hlsl");
-    shared_material.CastedLock()->render_pass.CastedLock()->shaders.emplace_back(AssetPtr<Shader>::FromIAssetPtr(asset_ptr));
+    shared_material.CastedLock()->shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 

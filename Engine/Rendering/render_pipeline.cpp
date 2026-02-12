@@ -328,7 +328,7 @@ void RenderPipeline::ExecuteRenderCommands()
                 current_material = material;
                 if (material->p_shared_material_block == nullptr)
                     material->CreateMaterialBlock();
-                
+
                 material->SetDescriptorTable();
             }
 
@@ -360,9 +360,9 @@ void RenderPipeline::ExecuteRenderCommands()
                 current_shader = nullptr;
                 current_mesh = nullptr;
             }
-            
+
             const auto [font_data, position, string, color] = command.text_data;
-            
+
             const auto sprite_font = font_data->SpriteFont();
 
             sprite_font->DrawString(sprite_batch.get(), string, *position, *color);
@@ -374,7 +374,7 @@ void RenderPipeline::ExecuteRenderCommands()
         sprite_batch->End();
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     }
-    
+
     m_commands_.clear();
 }
 
@@ -391,30 +391,24 @@ void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<Asset
 
         if (casted_material == nullptr)
             continue;
-        
-        const auto render_pass = casted_material->render_pass.CastedLock();
-        if (!render_pass)
+
+        const auto casted_shader = casted_material->shader.CastedLock();
+        if (!casted_shader)
         {
             continue;
         }
-        const auto shaders = render_pass->shaders;
 
-        for (auto shader : shaders)
-        {
-            auto casted_shader = shader.CastedLock();
+        RenderCommand cmd;
+        cmd.type = CommandType::Mesh;
+        cmd.mesh_data.shader = casted_shader.get();
+        cmd.mesh_data.material = casted_material.get();
+        cmd.mesh_data.pos = &pos;
+        cmd.mesh_data.mesh = mesh.get();
+        cmd.mesh_data.sub_mesh_index = i - 1;
+        cmd.mesh_data.world_matrix_buffer_address = world_matrix_address;
+        cmd.mesh_data.bone_matrices_buffer_handle = bone_matrices_handle;
 
-            RenderCommand cmd;
-            cmd.type = CommandType::Mesh;
-            cmd.mesh_data.shader = casted_shader.get();
-            cmd.mesh_data.material = casted_material.get();
-            cmd.mesh_data.pos = &pos;
-            cmd.mesh_data.mesh = mesh.get();
-            cmd.mesh_data.sub_mesh_index = i - 1;
-            cmd.mesh_data.world_matrix_buffer_address = world_matrix_address;
-            cmd.mesh_data.bone_matrices_buffer_handle = bone_matrices_handle;
-
-            instance->m_commands_.emplace_back(cmd);
-        }
+        instance->m_commands_.emplace_back(cmd);
     }
 }
 
@@ -423,7 +417,7 @@ void RenderPipeline::Submit(AssetPtr<FontData> font_data, Vector2 position, cons
     const auto casted_font_data = font_data.CastedLock();
     if (casted_font_data == nullptr)
         return;
-    
+
     RenderCommand cmd;
     cmd.type = CommandType::Text;
     cmd.text_data.font_data = casted_font_data.get();

@@ -8,7 +8,6 @@
 #include "Importer/shader_importer.h"
 #include "Importer/font_importer.h"
 #include "Importer/material_importer.h"
-#include "Importer/render_pass_importer.h"
 #include "Importer/render_texture_importer.h"
 #include "Importer/texture_2d_importer.h"
 #include "Importer/texture_cube_importer.h"
@@ -42,7 +41,6 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
     AssetImporter::Register(std::make_shared<FbxImporter>());
     AssetImporter::Register(std::make_shared<TextureCubeImporter>());
-    AssetImporter::Register(std::make_shared<RenderPassImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 

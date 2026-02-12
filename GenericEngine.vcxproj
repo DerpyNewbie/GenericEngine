@@ -56,7 +56,6 @@
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\import_log.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
-        <ClCompile Include="Engine\Asset\Importer\render_pass_importer.cpp" />
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp"/>
@@ -218,7 +217,6 @@
         <ClCompile Include="Engine\Rendering\model_importer.cpp" />
         <ClCompile Include="Engine\Rendering\quad_mesh.cpp" />
         <ClCompile Include="Engine\Rendering\render_command.cpp" />
-        <ClCompile Include="Engine\Rendering\render_pass.cpp" />
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp" />
         <ClCompile Include="Engine\Rendering\render_texture.cpp" />
         <ClCompile Include="Engine\Rendering\scene_data.cpp" />
@@ -279,7 +277,6 @@
         <ClInclude Include="Engine\Asset\Importer\font_importer.h" />
         <ClInclude Include="Engine\Asset\Importer\import_log.h" />
         <ClInclude Include="Engine\Asset\Importer\material_importer.h" />
-        <ClInclude Include="Engine\Asset\Importer\render_pass_importer.h" />
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h" />
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h" />
         <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h" />
@@ -389,7 +386,6 @@
         <ClInclude Include="Engine\Rendering\quad_mesh.h" />
         <ClInclude Include="Engine\Rendering\rendering_constants.h" />
         <ClInclude Include="Engine\Rendering\render_command.h" />
-        <ClInclude Include="Engine\Rendering\render_pass.h" />
         <ClInclude Include="Engine\Rendering\render_pipeline.h" />
         <ClInclude Include="Engine\Rendering\render_texture.h" />
         <ClInclude Include="Engine\Rendering\scene_data.h" />
