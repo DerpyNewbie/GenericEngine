@@ -15,7 +15,7 @@ void Material::OnInspectorGui()
         render_queue = std::clamp(render_queue, static_cast<uint64_t>(0), static_cast<uint64_t>(10000));
     }
 
-    if (Gui::ExpandablePropertyField<RenderPass>("Shader Asset", render_pass))
+    if (Gui::ExpandablePropertyField<RenderPass>("Render Pass", render_pass))
     {
         if (!render_pass.CastedLock()->shaders.empty())
         {
