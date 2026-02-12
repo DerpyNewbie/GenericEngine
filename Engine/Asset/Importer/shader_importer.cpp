@@ -30,7 +30,7 @@ std::vector<std::shared_ptr<ShaderParameter>> ShaderImporter::ParseShaderParamet
     for (auto ps_param : ps_params)
     {
         auto same_param = std::ranges::find_if(shader_parameters, [&ps_param](const auto &shader_param) {
-            return ps_param->display_name == shader_param->display_name;
+            return std::tie(ps_param->display_name, ps_param->index) == std::tie(shader_param->display_name, shader_param->index);
         });
         if (same_param != shader_parameters.end())
             continue;
