@@ -227,116 +227,6 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
     return true;
 }
 
-bool ShaderImporter::LoadOldParameters(const std::shared_ptr<Shader> &shader, AssetDescriptor *descriptor) const
-{
-    auto json = descriptor->DataStore().GetString("shader_meta");
-    if (json.empty())
-    {
-        Logger::Warn<ShaderImporter>(
-            "No shader meta data found for shader '%s'",
-            descriptor->AssetPath().string().c_str()
-        );
-        return false;
-    }
-
-    using namespace rapidjson;
-    Document doc;
-    doc.Parse(json.c_str());
-    if (doc.HasParseError())
-    {
-        Logger::Error<ShaderImporter>(
-            "Failed to parse shader meta data for shader '%s'",
-            descriptor->AssetPath().string().c_str()
-        );
-        return false;
-    }
-
-    const PersistentDataStore data_store{&doc, &doc};
-    const auto shader_settings = data_store.GetDataStore("shader_settings");
-    shader->m_shader_settings_.z_test = shader_settings.GetInt("z_test");
-    shader->m_shader_settings_.z_write = shader_settings.GetInt("z_write");
-    shader->m_shader_settings_.cull = shader_settings.GetInt("cull");
-    shader->m_shader_settings_.blend_src = shader_settings.GetInt("blend_src");
-    shader->m_shader_settings_.blend_dst = shader_settings.GetInt("blend_dst");
-    shader->m_shader_settings_.blend_op = shader_settings.GetInt("blend_op");
-    shader->m_shader_settings_.color_mask = shader_settings.GetInt("color_mask");
-    shader->m_shader_settings_.alpha_to_mask = shader_settings.GetInt("alpha_to_mask");
-
-    const auto parameters_member = doc.FindMember("parameters");
-    if (parameters_member == doc.MemberEnd())
-    {
-        Logger::Warn<ShaderImporter>("No parameters found for shader '%s'", descriptor->AssetPath().string().c_str());
-        return false;
-    }
-
-    bool params_load_error = false;
-    auto &params_value = parameters_member->value;
-    auto construct_shader_parameter = [&](const int index, auto &object) {
-        auto param = std::make_shared<ShaderParameter>();
-        param->index = index;
-
-        auto name_member = object->FindMember("name");
-        if (name_member == object->MemberEnd())
-        {
-            Logger::Error<ShaderImporter>("No name found for parameter at index %d. which is required.", index);
-            params_load_error = true;
-        }
-        else
-        {
-            param->name = name_member->value.GetString();
-        }
-
-        auto type_member = object->FindMember("type");
-        if (type_member == object->MemberEnd())
-        {
-            Logger::Error<ShaderImporter>("No type found for parameter at index %d. which is required.", index);
-            params_load_error = true;
-        }
-        else
-        {
-            param->type_hint = type_member->value.GetString();
-        }
-
-        auto display_name_member = object->FindMember("displayName");
-        if (display_name_member == object->MemberEnd())
-        {
-            param->display_name = std::string();
-        }
-        else
-        {
-            param->display_name = display_name_member->value.GetString();
-        }
-
-        return param;
-    };
-
-    auto read_shader_params = [&](const char *name) {
-        std::vector<std::shared_ptr<ShaderParameter>> params;
-        const auto it = params_value.FindMember(name);
-        if (it == params_value.MemberEnd())
-        {
-            return params;
-        }
-
-        int index = 0;
-        const auto params_array = it->value.GetArray();
-        for (auto i = params_array.begin(); i != params_array.end(); ++i, ++index)
-        {
-            params.emplace_back(construct_shader_parameter(index, i));
-        }
-
-        return params;
-    };
-
-    auto vertex_params = read_shader_params("vertex");
-    auto pixel_params = read_shader_params("pixel");
-
-    shader->parameters.insert(shader->parameters.end(), vertex_params.begin(), vertex_params.end());
-    shader->parameters.insert(shader->parameters.end(), pixel_params.begin(), pixel_params.end());
-
-    return !params_load_error;
-}
-
 bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
 {
     std::stringstream string_buffer;
@@ -400,33 +290,9 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         );
     }
 
-    /*if (shader_meta_version < kShaderMetaVersion)
-    {
-        ctx->LogImportWarning("Shader meta data is outdated! Will be upgraded after this import");
-
-        if (shader_meta_version < 3)
-        {
-            const auto temp_shader_obj = Object::Instantiate<Shader>();
-            if (!LoadOldParameters(temp_shader_obj, ctx))
-            {
-                ctx->LogImportError("Failed to load shader parameters!");
-                return;
-            }
-            WriteShaderMeta(temp_shader_obj, ctx->DataStore());
-            Object::Destroy(temp_shader_obj);
-
-            shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
-        }
-    }*/
-
     std::stringstream ss(shader_meta);
     Serializer serializer;
     const auto shader = serializer.Load<Shader>(ss);
-    /*if (!shader)
-    {
-        ctx->LogImportError("Failed to deserialize shader object");
-        return;
-    }*/
 
     if (!CompileShader(shader, ctx->AssetPath()))
     {
