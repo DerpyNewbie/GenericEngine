@@ -315,6 +315,4 @@ CEREAL_CLASS_VERSION(engine::MaterialData<Vector2>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
 
-CEREAL_CLASS_VERSION(engine::MaterialData<Matrix>, 1)
-
 CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<Texture2D>>, 1)

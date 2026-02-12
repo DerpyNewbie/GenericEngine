@@ -35,12 +35,6 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
          return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
      }
     },
-    {"vector<Matrix>",
-     [](const ShaderParameter &param) {
-         auto identity = std::vector{Matrix::Identity};
-         return std::make_shared<MaterialData<std::vector<Matrix>>>(identity, param);
-     }
-    },
     {"texture2d",
      [](const ShaderParameter &param) {
          auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
