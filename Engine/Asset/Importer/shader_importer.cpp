@@ -8,8 +8,184 @@
 
 #include "serializer.h"
 
+namespace
+{
+constexpr std::array<std::string_view, 11> kReservedBufferNames = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "SceneData", "ShadowCascadeSlices", "LightCount", "LightViewProj", "Lights", "ShadowMaps", "smp", "shadowSampler"};
+}
+
 namespace engine
 {
+std::vector<ShaderParameter> ShaderImporter::ReadShaderParameters(const std::shared_ptr<Shader> &shader)
+{
+    const auto vs_blob = shader->m_vs_blob_;
+    const auto ps_blob = shader->m_ps_blob_;
+
+    const auto vs_params = ReadShaderBlob(vs_blob);
+    const auto ps_params = ReadShaderBlob(ps_blob);
+
+    std::vector<ShaderParameter> shader_parameters;
+    shader_parameters.reserve(vs_params.size() + ps_params.size());
+    shader_parameters.insert(shader_parameters.end(), vs_params.begin(), vs_params.end());
+
+    for (auto ps_param : ps_params)
+    {
+        auto same_param = std::ranges::find(shader_parameters, ps_param) != shader_parameters.end();
+        if (same_param)
+            continue;
+
+        shader_parameters.emplace_back(ps_param);
+    }
+
+    shader_parameters.shrink_to_fit();
+    
+    return shader_parameters;
+}
+
+std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10Blob> &shader_blob)
+{
+    std::vector<ShaderParameter> shader_parameters;
+
+    ComPtr<ID3D12ShaderReflection> shader;
+    D3DReflect(shader_blob->GetBufferPointer(), shader_blob->GetBufferSize(), IID_PPV_ARGS(&shader));
+
+    D3D12_SHADER_DESC shader_desc;
+    shader->GetDesc(&shader_desc);
+
+    for (UINT i = 0; i < shader_desc.ConstantBuffers; ++i)
+    {
+        ID3D12ShaderReflectionConstantBuffer *constant_buffer = shader->GetConstantBufferByIndex(i);
+
+        D3D12_SHADER_BUFFER_DESC buffer_desc;
+        constant_buffer->GetDesc(&buffer_desc);
+
+        if (IsReservedBufferName(buffer_desc.Name))
+            continue;
+
+        auto cb_parameters = ReadConstantBufferVariables(shader, constant_buffer);
+        shader_parameters.insert(shader_parameters.end(), cb_parameters.begin(), cb_parameters.end());
+    }
+
+    for (UINT i = 0; i < shader_desc.BoundResources; ++i)
+    {
+        D3D12_SHADER_INPUT_BIND_DESC bind_desc;
+        shader->GetResourceBindingDesc(i, &bind_desc);
+
+        if (IsReservedBufferName(bind_desc.Name))
+            continue;
+
+        auto buffer_parameters = ConvertToShaderParameter(&bind_desc);
+        shader_parameters.emplace_back(buffer_parameters);
+    }
+    return shader_parameters;
+}
+
+std::vector<ShaderParameter> ShaderImporter::ReadConstantBufferVariables(const ComPtr<ID3D12ShaderReflection> &shader, ID3D12ShaderReflectionConstantBuffer *constant_buffer)
+{
+    std::vector<ShaderParameter> result;
+
+    D3D12_SHADER_BUFFER_DESC buffer_desc;
+    constant_buffer->GetDesc(&buffer_desc);
+
+    D3D12_SHADER_INPUT_BIND_DESC bind_desc;
+    shader->GetResourceBindingDescByName(buffer_desc.Name, &bind_desc);
+
+    for (auto i = 0; i < buffer_desc.Variables; ++i)
+    {
+        const auto variable = constant_buffer->GetVariableByIndex(i);
+        D3D12_SHADER_VARIABLE_DESC variable_desc;
+        variable->GetDesc(&variable_desc);
+
+        const auto variable_type = variable->GetType();
+        D3D12_SHADER_TYPE_DESC type_desc;
+        variable_type->GetDesc(&type_desc);
+
+        result.emplace_back(ConvertToShaderParameter(bind_desc.BindPoint, variable_desc, type_desc));
+    }
+
+    return result;
+}
+
+ShaderParameter ShaderImporter::ConvertToShaderParameter(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
+{
+    return ShaderParameter{static_cast<int>(bind_desc->BindPoint), bind_desc->Name, bind_desc->Name, GetTypeHint(bind_desc)};
+}
+
+ShaderParameter ShaderImporter::ConvertToShaderParameter(const UINT register_idx, const D3D12_SHADER_VARIABLE_DESC &variable_desc, const D3D12_SHADER_TYPE_DESC &type_desc)
+{
+    return ShaderParameter{static_cast<int>(register_idx), variable_desc.Name, variable_desc.Name, GetTypeHint(type_desc)};
+}
+
+std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc)
+{
+    switch (type_desc.Type)
+    {
+        case D3D_SVT_INT:
+            switch (type_desc.Class)
+            {
+                case D3D_SVC_SCALAR:
+                    return "int";
+                default:
+                    return std::format("type_desc_not_supported_int_class_{}", static_cast<int>(type_desc.Class));
+            }
+        case D3D_SVT_FLOAT:
+            switch (type_desc.Class)
+            {
+                case D3D_SVC_SCALAR:
+                    return "float";
+                case D3D_SVC_VECTOR:
+                    switch (type_desc.Columns)
+                    {
+                        case 2:
+                            return "float2";
+                        case 3:
+                            return "float3";
+                        case 4:
+                            return "color";
+                        default:
+                            return std::format("type_desc_not_supported_float_vector_col_{}", static_cast<int>(type_desc.Columns));
+                    }
+                default:
+                    return std::format("type_desc_not_supported_float_class_{}", static_cast<int>(type_desc.Class));
+            }
+        default:
+            return std::format("type_desc_not_supported_type_{}", static_cast<int>(type_desc.Type));
+    }
+}
+
+std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
+{
+    switch (bind_desc->Type)
+    {
+        case D3D_SIT_TEXTURE:
+            switch (bind_desc->Dimension)
+            {
+                case D3D_SRV_DIMENSION_TEXTURE2D:
+                    return "texture2d";
+                default:
+                    return std::format("input_bind_not_supported_texture_dimension_{}", static_cast<int>(bind_desc->Dimension));
+            }
+        default:
+            return std::format("input_bind_not_supported_type_{}", static_cast<int>(bind_desc->Type));
+    }
+}
+
+void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shader)
+{
+    auto old_parameters = shader->parameters;
+    auto parameters = ReadShaderParameters(shader);
+    for (auto &parameter : parameters)
+    {
+        auto pos = std::ranges::find(old_parameters, parameter);
+        // its a new parameter
+        if (pos == old_parameters.end())
+            continue;
+
+        parameter.display_name = pos->display_name;
+    }
+
+    shader->parameters = parameters;
+}
+
 bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path)
 {
     ComPtr<ID3DBlob> error_blob;
@@ -54,117 +230,6 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
     return true;
 }
 
-bool ShaderImporter::LoadOldParameters(const std::shared_ptr<Shader> &shader, AssetDescriptor *descriptor) const
-{
-    auto json = descriptor->DataStore().GetString("shader_meta");
-    if (json.empty())
-    {
-        Logger::Warn<ShaderImporter>(
-            "No shader meta data found for shader '%s'",
-            descriptor->AssetPath().string().c_str()
-        );
-        return false;
-    }
-
-    using namespace rapidjson;
-    Document doc;
-    doc.Parse(json.c_str());
-    if (doc.HasParseError())
-    {
-        Logger::Error<ShaderImporter>(
-            "Failed to parse shader meta data for shader '%s'",
-            descriptor->AssetPath().string().c_str()
-        );
-        return false;
-    }
-
-    const PersistentDataStore data_store{&doc, &doc};
-    const auto shader_settings = data_store.GetDataStore("shader_settings");
-    shader->m_shader_settings_.z_test = shader_settings.GetInt("z_test");
-    shader->m_shader_settings_.z_write = shader_settings.GetInt("z_write");
-    shader->m_shader_settings_.cull = shader_settings.GetInt("cull");
-    shader->m_shader_settings_.blend_src = shader_settings.GetInt("blend_src");
-    shader->m_shader_settings_.blend_dst = shader_settings.GetInt("blend_dst");
-    shader->m_shader_settings_.blend_op = shader_settings.GetInt("blend_op");
-    shader->m_shader_settings_.color_mask = shader_settings.GetInt("color_mask");
-    shader->m_shader_settings_.alpha_to_mask = shader_settings.GetInt("alpha_to_mask");
-
-    const auto parameters_member = doc.FindMember("parameters");
-    if (parameters_member == doc.MemberEnd())
-    {
-        Logger::Warn<ShaderImporter>("No parameters found for shader '%s'", descriptor->AssetPath().string().c_str());
-        return false;
-    }
-
-    bool params_load_error = false;
-    auto &params_value = parameters_member->value;
-    auto construct_shader_parameter = [&](const int index, const kShaderType shader_type, auto &object) {
-        auto param = std::make_shared<ShaderParameter>();
-        param->index = index;
-        param->shader_type = shader_type;
-
-        auto name_member = object->FindMember("name");
-        if (name_member == object->MemberEnd())
-        {
-            Logger::Error<ShaderImporter>("No name found for parameter at index %d. which is required.", index);
-            params_load_error = true;
-        }
-        else
-        {
-            param->name = name_member->value.GetString();
-        }
-
-        auto type_member = object->FindMember("type");
-        if (type_member == object->MemberEnd())
-        {
-            Logger::Error<ShaderImporter>("No type found for parameter at index %d. which is required.", index);
-            params_load_error = true;
-        }
-        else
-        {
-            param->type_hint = type_member->value.GetString();
-        }
-
-        auto display_name_member = object->FindMember("displayName");
-        if (display_name_member == object->MemberEnd())
-        {
-            param->display_name = std::string();
-        }
-        else
-        {
-            param->display_name = display_name_member->value.GetString();
-        }
-
-        return param;
-    };
-
-    auto read_shader_params = [&](const kShaderType shader_type, const char *name) {
-        std::vector<std::shared_ptr<ShaderParameter>> params;
-        const auto it = params_value.FindMember(name);
-        if (it == params_value.MemberEnd())
-        {
-            return params;
-        }
-
-        int index = 0;
-        const auto params_array = it->value.GetArray();
-        for (auto i = params_array.begin(); i != params_array.end(); ++i, ++index)
-        {
-            params.emplace_back(construct_shader_parameter(index, shader_type, i));
-        }
-
-        return params;
-    };
-
-    auto vertex_params = read_shader_params(kShaderType_Vertex, "vertex");
-    auto pixel_params = read_shader_params(kShaderType_Pixel, "pixel");
-
-    shader->parameters.insert(shader->parameters.end(), vertex_params.begin(), vertex_params.end());
-    shader->parameters.insert(shader->parameters.end(), pixel_params.begin(), pixel_params.end());
-
-    return !params_load_error;
-}
-
 bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
 {
     std::stringstream string_buffer;
@@ -179,6 +244,11 @@ bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, cons
     data_store.SetString(kShaderMetaKey, string_buffer.str());
     data_store.SetInt(kShaderMetaVersionKey, 3);
     return true;
+}
+
+bool ShaderImporter::IsReservedBufferName(const std::string_view buffer_name)
+{
+    return std::ranges::find(kReservedBufferNames, buffer_name) != kReservedBufferNames.end();
 }
 
 std::vector<std::string> ShaderImporter::SupportedExtensions()
@@ -228,32 +298,17 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         );
     }
 
-    if (shader_meta_version < kShaderMetaVersion)
-    {
-        ctx->LogImportWarning("Shader meta data is outdated! Will be upgraded after this import");
-
-        if (shader_meta_version < 3)
-        {
-            const auto temp_shader_obj = Object::Instantiate<Shader>();
-            if (!LoadOldParameters(temp_shader_obj, ctx))
-            {
-                ctx->LogImportError("Failed to load shader parameters!");
-                return;
-            }
-            WriteShaderMeta(temp_shader_obj, ctx->DataStore());
-            Object::Destroy(temp_shader_obj);
-
-            shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
-        }
-    }
-
     std::stringstream ss(shader_meta);
     Serializer serializer;
-    const auto shader = serializer.Load<Shader>(ss);
-    if (!shader)
+    auto shader = serializer.Load<Shader>(ss);
+    if (shader == nullptr)
     {
-        ctx->LogImportError("Failed to deserialize shader object");
-        return;
+        ctx->LogImportWarning("Corrupted shader meta data found! Regenerating!");
+
+        shader = Object::Instantiate<Shader>();
+        WriteShaderMeta(shader, ctx->DataStore());
+
+        shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
     }
 
     if (!CompileShader(shader, ctx->AssetPath()))
@@ -261,6 +316,11 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         ctx->LogImportError("Failed to compile shader!");
         return;
     }
+
+    UpdateShaderParameters(shader);
+    WriteShaderMeta(shader, ctx->DataStore());
+
+    shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
 
     if (!PSOManager::Register(shader, ctx->AssetPath().filename().string()))
     {
