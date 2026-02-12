@@ -36,6 +36,8 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderParameters(const std::sha
         shader_parameters.emplace_back(ps_param);
     }
 
+    shader_parameters.shrink_to_fit();
+    
     return shader_parameters;
 }
 
