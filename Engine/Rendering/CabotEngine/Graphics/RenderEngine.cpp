@@ -20,6 +20,11 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         engine::Logger::Error<RenderEngine>("Failed to create Device");
         return false;
     }
+    if (!CreateDxrDevice())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create Dxr Device");
+        return false;
+    }
     if (!CreateCommandQueue())
     {
         engine::Logger::Error<RenderEngine>("Failed to create CommandQueue");
@@ -56,6 +61,8 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
     engine::Application::on_window_resized.AddListener([this] {
         UpdateMainRenderTarget();
     });
+
+    m_can_use_dxr_ = CheckSupportedDxr();
 
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
     PSOManager::Initialize();
@@ -194,7 +201,26 @@ bool RenderEngine::CreateDevice()
     const auto hr = D3D12CreateDevice(
         nullptr, D3D_FEATURE_LEVEL_11_0,IID_PPV_ARGS(m_p_device_.ReleaseAndGetAddressOf())
     );
+
     return SUCCEEDED(hr);
+}
+
+bool RenderEngine::CreateDxrDevice()
+{
+    const auto hr = m_p_device_.As(&m_dxr_device_);
+
+    return SUCCEEDED(hr);
+}
+
+bool RenderEngine::CheckSupportedDxr() const
+{
+    D3D12_FEATURE_DATA_D3D12_OPTIONS5 options5 = {};
+    auto hr = m_dxr_device_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS5, &options5, sizeof(options5));
+
+    if (FAILED(hr))
+        return false;
+
+    return options5.RaytracingTier >= D3D12_RAYTRACING_TIER_1_0;
 }
 
 bool RenderEngine::CreateCommandQueue()

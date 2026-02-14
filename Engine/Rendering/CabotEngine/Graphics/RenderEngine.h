@@ -18,8 +18,10 @@ private:
     HWND m_h_wnd_ = nullptr;
     UINT m_current_back_buffer_index_ = 0;
     Color m_background_color_ = { 0.5f, 0.5f, 0.5f, 0.5f };
+    bool m_can_use_dxr_ = false;
 
     ComPtr<ID3D12Device6> m_p_device_ = nullptr;
+    ComPtr<ID3D12Device5> m_dxr_device_ = nullptr;
     ComPtr<ID3D12CommandQueue> m_p_queue_ = nullptr;
     ComPtr<IDXGISwapChain3> m_p_swap_chain_ = nullptr;
     ComPtr<ID3D12CommandAllocator> m_p_allocator_[kFrame_Buffer_Count] = { nullptr };
@@ -46,6 +48,8 @@ private:
     bool Init(HWND hwnd, UINT windowWidth, UINT windowHeight);
 
     bool CreateDevice();
+    bool CreateDxrDevice();
+    bool CheckSupportedDxr() const;
     bool CreateCommandQueue();
     bool CreateSwapChain();
     bool CreateCommandList();
@@ -71,6 +75,11 @@ public:
         return Instance()->m_p_device_.Get();
     }
 
+    static ID3D12Device5 *DxrDevice()
+    {
+        return Instance()->m_dxr_device_.Get();
+    }
+    
     static ID3D12GraphicsCommandList *CommandList()
     {
         return Instance()->m_p_command_list_.Get();
