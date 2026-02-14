@@ -61,6 +61,7 @@ void CameraComponent::OnInspectorGui()
     Gui::PropertyField("RenderTexture", m_render_texture_);
     ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
 }
+
 void CameraComponent::OnValidate()
 {
     if (GameObject()->IsActiveInHierarchy())

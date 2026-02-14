@@ -19,7 +19,6 @@ public:
     AssetPtr<Material> shared_material;
 
     void OnInspectorGui() override;
-    void OnUpdate() override;
     void Render() override;
 
     template <class Archive>

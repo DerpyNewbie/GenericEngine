@@ -45,11 +45,6 @@ void Image::OnInspectorGui()
     Gui::ExpandablePropertyField("Material", shared_material);
 }
 
-void Image::OnUpdate()
-{
-    Renderer2D::OnUpdate();
-}
-
 void Image::Render()
 {
     UpdateWorldBuffer();

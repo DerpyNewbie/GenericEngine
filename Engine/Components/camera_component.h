@@ -57,6 +57,7 @@ class CameraComponent : public Component
     UINT m_drawcall_count_;
 
 public:
+
     void OnAwake() override;
     void OnInspectorGui() override;
     void OnValidate() override;

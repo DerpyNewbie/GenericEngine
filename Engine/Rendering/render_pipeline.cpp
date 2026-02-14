@@ -68,11 +68,15 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
                           return a.sort_key < b.sort_key;
                       });
 }
-
 }
 
 namespace engine
 {
+void RenderPipeline::SetCurrentCamera(const std::shared_ptr<Camera> &camera)
+{
+    m_camera_ = camera;
+}
+
 void RenderPipeline::InvokeDrawCall()
 {
     const auto cmd_list = RenderEngine::CommandList();
@@ -80,19 +84,19 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
-    for (const auto camera : m_cameras_)
+    for (const auto render_request : m_render_requests_)
     {
         ID3D12DescriptorHeap *rtv_heap = nullptr;
         ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-        auto render_tex = camera->m_render_texture_.CastedLock();
+        auto render_tex = render_request.render_texture;
         if (render_tex)
         {
-            render_tex->BeginRender(camera->m_property_.background_color);
+            render_tex->BeginRender(render_request.back_ground_color);
             rtv_heap = render_tex->GetHeap();
         }
 
-        auto depth_tex = camera->m_depth_texture_.CastedLock();
+        auto depth_tex = render_request.depth_texture;
         if (depth_tex)
         {
             depth_tex->BeginRender();
@@ -102,8 +106,8 @@ void RenderPipeline::InvokeDrawCall()
         if (rtv_heap == nullptr && dsv_heap == nullptr)
             continue;
 
-        const auto view = camera->ViewMatrix();
-        const auto proj = camera->m_property_.ProjectionMatrix();
+        const auto view = render_request.view;
+        const auto proj = render_request.proj;
 
         CameraComponent::SetCurrentCamera(camera);
         Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
@@ -484,17 +488,15 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
                   });
 }
 
-void RenderPipeline::AddCamera(std::shared_ptr<CameraComponent> camera)
+void RenderPipeline::AddRenderRequest(const Matrix &view, const Matrix &proj, const std::shared_ptr<RenderTexture> &render_texture, Color back_ground_color, std::shared_ptr<DepthTexture> depth_texture)
 {
-    Logger::Log<RenderPipeline>("Adding camera: %s", camera->Name().c_str());
-    Instance()->m_cameras_.emplace(camera);
-    Instance()->m_view_proj_matrix_buffers_.emplace(camera, std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count>());
-}
+    RenderRequest request;
+    request.view = view;
+    request.proj = proj;
+    request.render_texture = render_texture;
+    request.depth_texture = depth_texture;
+    request.back_ground_color = back_ground_color;
 
-void RenderPipeline::RemoveCamera(const std::shared_ptr<CameraComponent> &camera)
-{
-    Logger::Log<RenderPipeline>("Removing camera: %s", camera->Name().c_str());
-    auto instance = Instance();
-    instance->m_cameras_.erase(camera);
+    Instance()->m_render_requests_.emplace_back(request);
 }
 }

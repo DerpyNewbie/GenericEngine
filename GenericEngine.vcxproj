@@ -137,6 +137,7 @@
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp" />
+        <ClCompile Include="Engine\Rendering\camera.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp" />
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
             <EntryPointName>geo</EntryPointName>
@@ -218,7 +219,6 @@
         <ClCompile Include="Engine\Rendering\quad_mesh.cpp" />
         <ClCompile Include="Engine\Rendering\render_command.cpp" />
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
-        <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
@@ -358,6 +358,7 @@
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
+        <ClInclude Include="Engine\Rendering\camera.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
@@ -387,7 +388,6 @@
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
         <ClInclude Include="Engine\Rendering\render_command.h" />
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
-        <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\scene_data.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
