@@ -65,6 +65,8 @@ struct MaterialData : IMaterialData
     explicit MaterialData(T new_value, const ShaderParameter &new_parameter);
     ~MaterialData() override = default;
 
+    void OnDeserialized() override;
+
     void OnInspectorGui() override;
     void SetValue(T value);
 
@@ -102,6 +104,15 @@ MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter)
 { }
 
 template <typename T>
+void MaterialData<T>::OnDeserialized()
+{
+    is_dirty = true;
+    if constexpr (kIsAssetPtr)
+        if (value.Lock())
+            CreateBuffer();
+}
+
+template <typename T>
 void MaterialData<T>::OnInspectorGui()
 {
     auto name = parameter.display_name.empty() ? parameter.name.c_str() : parameter.display_name.c_str();
@@ -122,6 +133,23 @@ void MaterialData<T>::OnInspectorGui()
         }
     }
     else if constexpr (std::is_same_v<T, Color>)
+    {
+        if (ImGui::CollapsingHeader("Color"))
+        {
+            if (Gui::PropertyField(name, value))
+            {
+                is_dirty = true;
+            }
+        }
+    }
+    else if constexpr (std::is_same_v<T, Vector2>)
+    {
+        if (Gui::PropertyField(name, value))
+        {
+            is_dirty = true;
+        }
+    }
+    else if constexpr (std::is_same_v<T, Vector3>)
     {
         if (Gui::PropertyField(name, value))
         {
@@ -147,7 +175,10 @@ void MaterialData<T>::SetValue(T value)
 {
     this->value = value;
     is_dirty = true;
-    buffer = CreateBuffer();
+    if constexpr (kIsTexture)
+    {
+        buffer = CreateBuffer();
+    }
 }
 
 template <typename T>
@@ -280,6 +311,8 @@ CEREAL_CLASS_VERSION(engine::MaterialData<float>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Color>, 1)
 
-CEREAL_CLASS_VERSION(engine::MaterialData<Matrix>, 1)
+CEREAL_CLASS_VERSION(engine::MaterialData<Vector2>, 1)
+
+CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<Texture2D>>, 1)

@@ -44,8 +44,7 @@ struct ShaderDataIndex
 class MaterialBlock : public Object, public Inspectable
 {
 public:
-    ShaderDataIndex pixel_shader_index = {};
-    ShaderDataIndex vertex_shader_index = {};
+    ShaderDataIndex shader_index = {};
 
     std::vector<MaterialDataPair> material_data = {};
 
@@ -58,17 +57,14 @@ public:
     bool SetMaterialData(const std::string &name, T material_data);
 
     void LoadShaderParameters(
-        const std::vector<std::shared_ptr<ShaderParameter>> &shader_params,
+        const std::vector<ShaderParameter> &shader_params,
         const std::vector<MaterialDataPair> &resource_material_data = {}
     );
 
-    ShaderDataIndex *GetShaderDataIndex(kShaderType type);
-    int GetOffset(kShaderType type) const;
-
     void Insert(const std::shared_ptr<IMaterialData> &data);
-    bool Empty(kShaderType shader_type, kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator Begin(kShaderType shader_type, kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator End(kShaderType shader_type, kParameterBufferType buffer_type);
+    bool Empty(kParameterBufferType buffer_type);
+    std::vector<MaterialDataPair>::iterator Begin(kParameterBufferType buffer_type);
+    std::vector<MaterialDataPair>::iterator End(kParameterBufferType buffer_type);
 
     std::shared_ptr<IMaterialData> FindMaterialDataByName(const std::string &name);
 
@@ -80,10 +76,15 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(material_data),
-            CEREAL_NVP(pixel_shader_index),
-            CEREAL_NVP(vertex_shader_index)
+            CEREAL_NVP(material_data)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(shader_index)
+            );
+        }
     }
 };
 
@@ -106,4 +107,4 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 
 }
 
-CEREAL_CLASS_VERSION(engine::MaterialBlock, 1)
+CEREAL_CLASS_VERSION(engine::MaterialBlock, 2)
