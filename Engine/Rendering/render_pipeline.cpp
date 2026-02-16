@@ -29,7 +29,7 @@ std::vector<std::shared_ptr<engine::Renderer>> FilterVisibleObjects(
     std::vector<std::shared_ptr<engine::Renderer>> results;
     for (auto renderer : renderers)
     {
-        auto world_matrix = renderer->BoundsOrigin()->WorldMatrix();
+        auto world_matrix = renderer->BoundsOrigin();
 
         BoundingBox world_bounds;
         renderer->bounds.Transform(world_bounds, world_matrix);
@@ -72,10 +72,6 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
 
 namespace engine
 {
-void RenderPipeline::SetCurrentCamera(const std::shared_ptr<Camera> &camera)
-{
-    m_camera_ = camera;
-}
 
 void RenderPipeline::InvokeDrawCall()
 {
@@ -84,19 +80,19 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
-    for (const auto render_request : m_render_requests_)
+    for (const auto camera : m_requesting_cameras_)
     {
         ID3D12DescriptorHeap *rtv_heap = nullptr;
         ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-        auto render_tex = render_request.render_texture;
+        auto render_tex = camera.render_texture;
         if (render_tex)
         {
-            render_tex->BeginRender(render_request.back_ground_color);
+            render_tex->BeginRender(camera.background_color);
             rtv_heap = render_tex->GetHeap();
         }
 
-        auto depth_tex = render_request.depth_texture;
+        auto depth_tex = camera.depth_texture;
         if (depth_tex)
         {
             depth_tex->BeginRender();
@@ -106,16 +102,16 @@ void RenderPipeline::InvokeDrawCall()
         if (rtv_heap == nullptr && dsv_heap == nullptr)
             continue;
 
-        const auto view = render_request.view;
-        const auto proj = render_request.proj;
+        const auto view = camera.view;
+        const auto proj = camera.projection;
 
-        CameraComponent::SetCurrentCamera(camera);
+        SetCurrentCamera(camera);
         Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
 
         DepthRender();
 
-        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera->m_property_.background_color);
-        Render(camera, view, proj);
+        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
+        Render(view, proj);
 
         if (render_tex)
             render_tex->EndRender();
@@ -127,51 +123,49 @@ void RenderPipeline::InvokeDrawCall()
     if (const auto main_camera = CameraComponent::Main())
     {
         // store previous property as we're editing aspect ratio to match window aspect ratio
-        const auto prev_property = main_camera->m_property_;
-        main_camera->m_property_.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
-        CameraComponent::SetCurrentCamera(main_camera);
+        const auto prev_property = main_camera->property;
+        main_camera->property.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
+        SetCurrentCamera(main_camera->GetCamera());
         const auto view = main_camera->ViewMatrix();
-        const auto proj = main_camera->m_property_.ProjectionMatrix();
+        const auto proj = main_camera->property.ProjectionMatrix();
 
         Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
         DepthRender();
 
-        RenderEngine::Instance()->SetMainRenderTarget(main_camera->m_property_.background_color);
-        Render(main_camera, view, proj);
+        RenderEngine::Instance()->SetMainRenderTarget(main_camera->property.background_color);
+        Render(view, proj);
 
         // revert back to original property
-        main_camera->m_property_ = prev_property;
+        main_camera->property = prev_property;
     }
     else
     {
         const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
         const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
 
-        CameraComponent::SetCurrentCamera({});
+        SetCurrentCamera({});
         Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
         DepthRender();
 
         RenderEngine::Instance()->SetMainRenderTarget(Color());
-        Render(main_camera, view, proj);
+        Render(view, proj);
     }
 
     on_rendering.Invoke();
 }
 
-void RenderPipeline::SetViewProjMatrix(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
+void RenderPipeline::SetCurrentCamera(const Camera &camera)
 {
-    if (m_view_proj_matrix_buffers_[camera][0] == nullptr)
-    {
-        for (auto &view_proj_matrix_buffer : m_view_proj_matrix_buffers_[camera])
-        {
-            view_proj_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
-            view_proj_matrix_buffer->CreateBuffer();
-        }
-    }
+    m_current_camera_ = camera;
+}
 
+void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
+{
+    ResizeViewProjMatricesBuffer();
+    
     const auto cmd_list = RenderEngine::CommandList();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = m_view_proj_matrix_buffers_[camera][current_buffer_idx];
+    const auto view_projection_buffer = m_view_proj_matrices_buffers_[current_buffer_idx].Get();
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -180,7 +174,7 @@ void RenderPipeline::SetViewProjMatrix(const std::shared_ptr<CameraComponent> &c
     cmd_list->SetGraphicsRootConstantBufferView(kViewProjCBV, view_projection_buffer->GetAddress());
 }
 
-void RenderPipeline::SetSceneData(const std::shared_ptr<CameraComponent> &camera)
+void RenderPipeline::SetSceneData()
 {
     if (m_scene_data_buffer_ == nullptr)
     {
@@ -200,10 +194,10 @@ void RenderPipeline::SetSceneData(const std::shared_ptr<CameraComponent> &camera
     cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
 }
 
-void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
+void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
-    SetViewProjMatrix(camera, view, proj);
-    SetSceneData(camera);
+    SetViewProjMatrix(view, proj);
+    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
@@ -212,11 +206,11 @@ void RenderPipeline::UpdateBuffer(const std::shared_ptr<CameraComponent> &camera
     Skybox::Instance()->Render();
 }
 
-void RenderPipeline::Render(const std::shared_ptr<CameraComponent> &camera, const Matrix &view, const Matrix &proj)
+void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
 {
-    UpdateBuffer(camera, view, proj);
+    UpdateBuffer(view, proj);
 
-    const auto camera_pos = camera->GameObject()->Transform()->Position();
+    const auto camera_pos = GetCurrentCamera()->GetWorldMatrix().Translation();
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
 
     SortCommands(m_commands_, camera_pos);
@@ -474,6 +468,11 @@ size_t RenderPipeline::GetRendererCount()
     return Instance()->m_renderers_.size();
 }
 
+std::shared_ptr<Camera> RenderPipeline::GetCurrentCamera()
+{
+    return Instance()->m_current_camera_;
+}
+
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 {
     Instance()->m_renderers_.emplace_back(renderer);
@@ -488,15 +487,8 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
                   });
 }
 
-void RenderPipeline::AddRenderRequest(const Matrix &view, const Matrix &proj, const std::shared_ptr<RenderTexture> &render_texture, Color back_ground_color, std::shared_ptr<DepthTexture> depth_texture)
+void RenderPipeline::RequestRender(Camera camera)
 {
-    RenderRequest request;
-    request.view = view;
-    request.proj = proj;
-    request.render_texture = render_texture;
-    request.depth_texture = depth_texture;
-    request.back_ground_color = back_ground_color;
-
-    Instance()->m_render_requests_.emplace_back(request);
+    Instance()->m_requesting_cameras_.emplace_back(camera);
 }
 }

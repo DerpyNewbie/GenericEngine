@@ -132,13 +132,13 @@ void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)
 
 void MeshRenderer::DrawBounds()
 {
-    const auto matrix = BoundsOrigin()->WorldMatrix();
+    const auto matrix = BoundsOrigin();
     Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, matrix);
 }
 
-std::shared_ptr<Transform> MeshRenderer::BoundsOrigin()
+const Matrix &MeshRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return GameObject()->Transform()->WorldMatrix();
 }
 }
 

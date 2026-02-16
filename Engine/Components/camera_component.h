@@ -1,11 +1,11 @@
 #pragma once
 #include "renderer.h"
+#include "Rendering/camera.h"
 #include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
 
 namespace engine
 {
-class RenderPipeline;
 enum class kViewMode : unsigned char
 {
     kPerspective,
@@ -47,46 +47,42 @@ struct CameraProperty : Inspectable
 
 class CameraComponent : public Component
 {
-    friend RenderPipeline;
     inline static std::weak_ptr<CameraComponent> m_main_camera_;
-    inline static std::weak_ptr<CameraComponent> m_current_camera_;
     inline static std::list<std::weak_ptr<CameraComponent>> m_cameras_;
 
-    AssetPtr<DepthTexture> m_depth_texture_;
     AssetPtr<RenderTexture> m_render_texture_;
-    UINT m_drawcall_count_;
-
+    AssetPtr<DepthTexture> m_depth_texture_;
+    
 public:
-
-    void OnAwake() override;
+    CameraProperty property;
+    
     void OnInspectorGui() override;
     void OnValidate() override;
+    void OnUpdate() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
+    Matrix ViewMatrix() const;
+    Camera GetCamera();
+
     std::shared_ptr<RenderTexture> RenderTexture();
 
-    static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
-    static void SetCurrentCamera(const std::weak_ptr<CameraComponent> &camera);
-
-    CameraProperty m_property_;
-
     static std::shared_ptr<CameraComponent> Main();
-    static std::shared_ptr<CameraComponent> Current();
-
-    Matrix ViewMatrix() const;
+    static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
-        ar(
-            cereal::base_class<Component>(this),
-            CEREAL_NVP(m_property_)
-        );
+        if (version >= 2)
+        {
+            ar(
+                cereal::base_class<Camera>(this)
+            );
+        }
     }
 };
 }
 
 CEREAL_CLASS_VERSION(engine::CameraProperty, 1)
 
-CEREAL_CLASS_VERSION(engine::CameraComponent, 1)
+CEREAL_CLASS_VERSION(engine::CameraComponent, 2)

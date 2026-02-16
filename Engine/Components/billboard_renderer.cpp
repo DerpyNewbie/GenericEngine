@@ -52,9 +52,9 @@ void BillboardRenderer::Render()
     RenderPipeline::Submit(QuadMesh::GetMesh(), materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
-std::shared_ptr<Transform> BillboardRenderer::BoundsOrigin()
+const Matrix &BillboardRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return GameObject()->Transform()->WorldMatrix();
 }
 }
 

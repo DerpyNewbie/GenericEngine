@@ -46,9 +46,9 @@ void TextRenderer::Render()
     RenderPipeline::Submit(font_data, position, string, color);
 }
 
-std::shared_ptr<Transform> TextRenderer::BoundsOrigin()
+const Matrix &TextRenderer::BoundsOrigin()
 {
-    return CameraComponent::Current()->GameObject()->Transform();
+    return RenderPipeline::GetCurrentCamera()->GetWorldMatrix();
 }
 }
 

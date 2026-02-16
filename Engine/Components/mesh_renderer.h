@@ -9,7 +9,7 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    std::shared_ptr<Transform> BoundsOrigin() override;
+    const Matrix &BoundsOrigin() override;
     virtual void UpdateWorldBuffer();
 
 protected:

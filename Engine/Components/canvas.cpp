@@ -7,6 +7,8 @@
 #include "renderer_2d.h"
 #include "canvas.h"
 
+#include "Rendering/render_pipeline.h"
+
 namespace engine
 {
 bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const
@@ -43,7 +45,7 @@ void Canvas::OnStart()
 
 void Canvas::Render()
 {
-    if (CameraComponent::Current() == m_target_camera_.CastedLock())
+    if (RenderPipeline::GetCurrentCamera() == m_target_camera_.CastedLock())
         for (const auto it : m_child_renderers_)
             it->Render();
 }
@@ -52,9 +54,9 @@ Vector2 Canvas::CanvasSize() const
 {
     return m_canvas_size_;
 }
-std::shared_ptr<Transform> Canvas::BoundsOrigin()
+const Matrix &Canvas::BoundsOrigin()
 {
-    return CameraComponent::Main()->GameObject()->Transform();
+    return CameraComponent::Main()->GameObject()->Transform()->WorldMatrix();
 }
 
 void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)

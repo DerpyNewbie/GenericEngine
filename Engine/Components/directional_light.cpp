@@ -15,14 +15,14 @@ void DirectionalLight::CascadeFrustum(
 {
     for (int i = 0; i < RenderingConstants::kShadowCascadeCount; ++i)
     {
-        const auto camera = CameraComponent::Current();
-        const auto camera_near = camera->m_property_.near_plane;
-        const auto camera_far = camera->m_property_.far_plane;
+        const auto camera = RenderPipeline::GetCurrentCamera();
+        float cam_near, cam_far;
+        Mathf::NearFar(camera->projection, cam_near, cam_far);
 
-        const auto cascade_near = i == 0 ? camera_near : m_cascade_slices_[i - 1];
+        const auto cascade_near = i == 0 ? cam_near : m_cascade_slices_[i - 1];
         const auto cascade_far = m_cascade_slices_[i];
-        const float t_near = (cascade_near - camera_near) / (camera_far - camera_near);
-        const float t_far = (cascade_far - camera_near) / (camera_far - camera_near);
+        const float t_near = (cascade_near - cam_near) / (cam_far - cam_near);
+        const float t_far = (cascade_far - cam_near) / (cam_far - cam_near);
 
         for (int j = 0; j < 4; j++)
         {

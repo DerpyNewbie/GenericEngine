@@ -28,8 +28,8 @@ public:
     void OnEnabled() override;
     void OnDisabled() override;
     void OnDestroy() override;
-    
-    virtual std::shared_ptr<Transform> BoundsOrigin() = 0;
+
+    virtual const Matrix &BoundsOrigin() = 0;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

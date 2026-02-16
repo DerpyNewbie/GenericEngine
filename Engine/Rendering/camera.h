@@ -5,6 +5,18 @@
 
 namespace engine
 {
-class Camera
-{};
+class RenderPipeline;
+
+struct Camera
+{
+    friend class RenderPipeline;
+
+    Color background_color;
+    Matrix view;
+    Matrix projection;
+    std::shared_ptr<RenderTexture> render_texture;
+    std::shared_ptr<DepthTexture> depth_texture;
+
+    [[nodiscard]] Matrix GetWorldMatrix() const;
+};
 }

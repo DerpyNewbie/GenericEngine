@@ -219,6 +219,7 @@
         <ClCompile Include="Engine\Rendering\quad_mesh.cpp" />
         <ClCompile Include="Engine\Rendering\render_command.cpp" />
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
+        <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
@@ -388,6 +389,7 @@
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
         <ClInclude Include="Engine\Rendering\render_command.h" />
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
+        <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\scene_data.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
