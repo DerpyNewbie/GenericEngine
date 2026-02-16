@@ -1,5 +1,4 @@
 #pragma once
-#include "object_pool.h"
 #include "renderer.h"
 #include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
