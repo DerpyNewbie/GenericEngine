@@ -6,18 +6,18 @@ template <typename T>
 class ObjectPool
 {
     size_t m_max_size_ = 0;
-    std::vector<std::pair<T, bool>> m_objects_;
-
-public:
-    std::function<T()> on_create = [] {
+    std::list<std::pair<T, bool>> m_objects_;
+    std::function<T()> m_on_create_ = [] {
         return T();
     };
+
+public:
 
     size_t MaxSize() const;
     void SetMaxSize(size_t max_size);
 
     T *Get();
-    void Return(const T &object);
+    void Return(const T *object);
     void ReturnAll();
 
     explicit ObjectPool(size_t max_size, std::function<T()> on_create = [] {
@@ -34,6 +34,10 @@ size_t ObjectPool<T>::MaxSize() const
 template <typename T>
 void ObjectPool<T>::SetMaxSize(const size_t max_size)
 {
+    for (size_t i = m_objects_.size(); i < max_size; ++i)
+    {
+        m_objects_.emplace_back(m_on_create_(), true);
+    }
     m_max_size_ = max_size;
 }
 
@@ -44,21 +48,31 @@ T *ObjectPool<T>::Get()
         return a.second;
     });
     if (find_object == m_objects_.end())
-        return nullptr;
+    {
+        auto object = m_objects_.emplace_back(m_on_create_(), false);
+        return &object.first;
+    }
 
     find_object->second = false;
     return &find_object->first;
 }
 
 template <typename T>
-void ObjectPool<T>::Return(const T &object)
+void ObjectPool<T>::Return(const T *object)
 {
-    auto object_ptr = &object;
-    auto find_object = std::ranges::find_if(m_objects_, [&object_ptr](const auto &other) {
-        return object_ptr == &other.first;
+    auto find_object = std::ranges::find_if(m_objects_, [&object](const auto &other) {
+        return object == &other.first;
     });
     if (find_object == m_objects_.end())
         return;
+
+    if (m_objects_.size() > m_max_size_)
+    {
+        std::erase_if(m_objects_, [&find_object](const auto &a) {
+            return a.first == find_object->first;
+        });
+        return;
+    }
 
     find_object->second = true;
 }
@@ -74,12 +88,11 @@ void ObjectPool<T>::ReturnAll()
 template <typename T>
 ObjectPool<T>::ObjectPool(size_t max_size, std::function<T()> on_create) :
     m_max_size_(max_size),
-    on_create(on_create)
+    m_on_create_(on_create)
 {
-    m_objects_.reserve(max_size);
     for (int i = 0; i < max_size; ++i)
     {
-        m_objects_.emplace_back(on_create(), true);
+        m_objects_.emplace_back(m_on_create_(), true);
     }
 }
 }
