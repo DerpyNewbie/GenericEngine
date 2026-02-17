@@ -13,8 +13,6 @@ class BillboardRenderer : public Renderer
     void UpdateWorldBuffer();
     
 public:
-    
-    AssetPtr<Material> shared_material;
 
     void OnConstructed() override;
     void OnInspectorGui() override;
@@ -24,8 +22,7 @@ public:
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<Renderer>(this),
-            CEREAL_NVP(shared_material));
+        ar(cereal::base_class<Renderer>(this));
     }
 };
 }

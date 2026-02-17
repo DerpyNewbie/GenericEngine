@@ -4,6 +4,7 @@
 #include "Rendering/material_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
+#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
@@ -23,8 +24,7 @@ protected:
     void RecalculateBoundingBox();
 
 public:
-
-    std::vector<AssetPtr<Material>> shared_materials;
+    
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
@@ -43,8 +43,7 @@ public:
     {
         ar(
             cereal::base_class<Renderer>(this),
-            CEREAL_NVP(m_shared_mesh_),
-            CEREAL_NVP(shared_materials)
+            CEREAL_NVP(m_shared_mesh_)
         );
     }
 };

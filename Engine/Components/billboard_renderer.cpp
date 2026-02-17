@@ -30,16 +30,16 @@ void BillboardRenderer::UpdateWorldBuffer()
 
 void BillboardRenderer::OnConstructed()
 {
-    shared_material = AssetPtr<Material>::FromInstance(Instantiate<Material>());
+    shared_materials[0] = AssetPtr<Material>::FromInstance(Instantiate<Material>());
     const auto asset_ptr = AssetDatabase::GetAsset("BillboardShader.hlsl");
-    shared_material.CastedLock()->shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
+    shared_materials[0].CastedLock()->shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
 void BillboardRenderer::OnInspectorGui()
 {
     Renderer::OnInspectorGui();
-    shared_material.CastedLock()->OnInspectorGui();
+    shared_materials[0].CastedLock()->OnInspectorGui();
 }
 
 void BillboardRenderer::Render()
@@ -47,9 +47,7 @@ void BillboardRenderer::Render()
     UpdateWorldBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    std::vector materials = {shared_material};
-
-    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
 Matrix BillboardRenderer::BoundsOrigin()

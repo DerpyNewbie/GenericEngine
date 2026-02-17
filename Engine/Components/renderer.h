@@ -5,8 +5,6 @@
 #include "Asset/asset_ptr.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
@@ -23,6 +21,7 @@ protected:
 
 public:
     DirectX::BoundingBox bounds;
+    std::vector<AssetPtr<Material>> shared_materials;
     
     void OnValidate() override;
     void OnEnabled() override;
@@ -37,8 +36,13 @@ public:
         ar(
             cereal::base_class<Component>(this)
         );
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(shared_materials));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Renderer, 1)
+CEREAL_CLASS_VERSION(engine::Renderer, 2)
