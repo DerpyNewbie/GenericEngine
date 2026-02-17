@@ -111,7 +111,7 @@ void CameraComponent::OnDisabled()
 
 Camera CameraComponent::GetCamera()
 {
-    return Camera(property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
+    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
 }
 
 std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()

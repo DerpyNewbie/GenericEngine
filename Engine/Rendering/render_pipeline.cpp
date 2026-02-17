@@ -161,11 +161,9 @@ void RenderPipeline::SetCurrentCamera(const Camera &camera)
 
 void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 {
-    ResizeViewProjMatricesBuffer();
-    
     const auto cmd_list = RenderEngine::CommandList();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = m_view_proj_matrices_buffers_[current_buffer_idx].Get();
+    const auto view_projection_buffer = *m_view_proj_matrices_buffers_[current_buffer_idx].Get();
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -210,7 +208,7 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
 {
     UpdateBuffer(view, proj);
 
-    const auto camera_pos = GetCurrentCamera()->GetWorldMatrix().Translation();
+    const auto camera_pos = GetCurrentCamera().GetWorldMatrix().Translation();
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
 
     SortCommands(m_commands_, camera_pos);
@@ -457,6 +455,14 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
     return key;
 }
 
+void RenderPipeline::Init()
+{
+    const auto instance = Instance();
+    for (auto view_proj_matrices_buffers : instance->m_view_proj_matrices_buffers_)
+    {
+        view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
+    }
+}
 RenderPipeline *RenderPipeline::Instance()
 {
     static auto instance = new RenderPipeline;
@@ -468,7 +474,7 @@ size_t RenderPipeline::GetRendererCount()
     return Instance()->m_renderers_.size();
 }
 
-std::shared_ptr<Camera> RenderPipeline::GetCurrentCamera()
+Camera RenderPipeline::GetCurrentCamera()
 {
     return Instance()->m_current_camera_;
 }

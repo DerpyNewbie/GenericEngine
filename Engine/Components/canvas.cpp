@@ -45,7 +45,7 @@ void Canvas::OnStart()
 
 void Canvas::Render()
 {
-    if (RenderPipeline::GetCurrentCamera() == m_target_camera_.CastedLock())
+    if (RenderPipeline::GetCurrentCamera() == m_target_camera_.CastedLock()->GetCamera())
         for (const auto it : m_child_renderers_)
             it->Render();
 }

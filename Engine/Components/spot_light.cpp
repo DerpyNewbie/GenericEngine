@@ -81,7 +81,7 @@ std::vector<Matrix> SpotLight::CalcViewProj(const std::array<Vector3, 8> &frustu
     const auto outer_angle = acosf(m_light_data_.outer_cos);
 
     float cam_near, cam_far;
-    Mathf::NearFar(RenderPipeline::GetCurrentCamera()->projection, cam_near, cam_far);
+    Mathf::NearFar(RenderPipeline::GetCurrentCamera().projection, cam_near, cam_far);
     
     const Matrix proj = Matrix::CreatePerspective(
         Mathf::Approximately(outer_angle, 0) ? 0.1f : outer_angle * 2.0f,

@@ -76,7 +76,7 @@ public:
         if (version >= 2)
         {
             ar(
-                cereal::base_class<Camera>(this)
+                cereal::base_class<Component>(this)
             );
         }
     }

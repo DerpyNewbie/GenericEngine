@@ -48,7 +48,7 @@ void TextRenderer::Render()
 
 const Matrix &TextRenderer::BoundsOrigin()
 {
-    return RenderPipeline::GetCurrentCamera()->GetWorldMatrix();
+    return RenderPipeline::GetCurrentCamera().GetWorldMatrix();
 }
 }
 

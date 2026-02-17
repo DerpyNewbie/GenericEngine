@@ -50,6 +50,7 @@ bool Engine::Init()
     Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
+    RenderPipeline::Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     on_init.Invoke();

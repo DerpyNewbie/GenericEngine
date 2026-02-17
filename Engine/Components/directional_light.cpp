@@ -17,7 +17,7 @@ void DirectionalLight::CascadeFrustum(
     {
         const auto camera = RenderPipeline::GetCurrentCamera();
         float cam_near, cam_far;
-        Mathf::NearFar(camera->projection, cam_near, cam_far);
+        Mathf::NearFar(camera.projection, cam_near, cam_far);
 
         const auto cascade_near = i == 0 ? cam_near : m_cascade_slices_[i - 1];
         const auto cascade_far = m_cascade_slices_[i];
