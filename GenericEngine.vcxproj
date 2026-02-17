@@ -216,7 +216,7 @@
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
-        <ClCompile Include="Engine\Rendering\quad_mesh.cpp" />
+        <ClCompile Include="Engine\Rendering\primitives.cpp"/>
         <ClCompile Include="Engine\Rendering\render_command.cpp" />
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
@@ -385,7 +385,7 @@
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
-        <ClInclude Include="Engine\Rendering\quad_mesh.h" />
+        <ClInclude Include="Engine\Rendering\primitives.h"/>
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
         <ClInclude Include="Engine\Rendering\render_command.h" />
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>

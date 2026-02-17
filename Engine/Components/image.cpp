@@ -2,7 +2,7 @@
 #include "renderer_2d.h"
 #include "image.h"
 #include "rect_transform.h"
-#include "Rendering/quad_mesh.h"
+#include "Rendering/primitives.h"
 #include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
@@ -51,8 +51,8 @@ void Image::Render()
     
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     std::vector materials = {shared_material};
-    
-    RenderPipeline::Submit(QuadMesh::GetMesh(), materials, Vector3::Zero, m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 }
 

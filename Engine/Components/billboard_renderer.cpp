@@ -3,7 +3,7 @@
 #include "billboard_renderer.h"
 #include "game_object.h"
 #include "Asset/asset_database.h"
-#include "Rendering/quad_mesh.h"
+#include "Rendering/primitives.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -48,8 +48,8 @@ void BillboardRenderer::Render()
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     std::vector materials = {shared_material};
-    
-    RenderPipeline::Submit(QuadMesh::GetMesh(), materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
 const Matrix &BillboardRenderer::BoundsOrigin()
