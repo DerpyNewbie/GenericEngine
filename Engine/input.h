@@ -2,8 +2,6 @@
 #include <directxtk12/Keyboard.h>
 #include <directxtk12/Mouse.h>
 
-#include "object_pool.h"
-
 namespace engine
 {
 enum class kMouseMode
