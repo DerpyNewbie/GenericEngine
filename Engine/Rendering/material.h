@@ -14,7 +14,7 @@ namespace engine
 class Material : public Object, public Inspectable
 {
 public:
-    uint64_t render_queue = 5000;
+    uint16_t render_queue = 5000;
     AssetPtr<Shader> shader;
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
