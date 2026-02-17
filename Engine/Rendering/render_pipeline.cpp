@@ -60,12 +60,12 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
         }
 
         const auto sort_key = engine::RenderPipeline::GenerateSortKey(render_queue, depth, *command.mesh_data.shader);
-        command.sort_key = sort_key;
+        command.priority = sort_key;
     }
 
     std::ranges::sort(render_commands,
                       [](const engine::RenderCommand &a, const engine::RenderCommand &b) {
-                          return a.sort_key < b.sort_key;
+                          return a.priority < b.priority;
                       });
 }
 }

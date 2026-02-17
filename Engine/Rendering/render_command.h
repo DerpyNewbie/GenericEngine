@@ -15,7 +15,7 @@ enum class CommandType
 
 struct RenderCommand
 {
-    uint64_t sort_key;
+    uint64_t priority;
     
     CommandType type;
 
