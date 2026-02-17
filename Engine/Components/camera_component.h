@@ -18,7 +18,7 @@ struct CameraProperty : Inspectable
     static constexpr float kMaxFieldOfView = 179.0f;
     static constexpr float kMinClippingPlane = 0.01f;
     static constexpr float kMaxClippingPlane = 10000.0f;
-    
+
     kViewMode view_mode = kViewMode::kPerspective;
     float field_of_view = 70.0f;
     float near_plane = 0.1f;
