@@ -73,10 +73,16 @@ public:
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
+        ar(
+            cereal::base_class<Component>(this),
+            CEREAL_NVP(property)
+        );
+
         if (version >= 2)
         {
             ar(
-                cereal::base_class<Component>(this)
+                CEREAL_NVP(m_render_texture_),
+                CEREAL_NVP(m_depth_texture_)
             );
         }
     }
