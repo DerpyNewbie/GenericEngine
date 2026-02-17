@@ -82,6 +82,8 @@ void ObjectPool<T>::ReturnAll()
     {
         object.second = true;
     }
+
+    m_objects_.resize(m_max_size_);
 }
 template <typename T>
 ObjectPool<T>::ObjectPool(size_t max_size, std::function<T()> on_create) :
