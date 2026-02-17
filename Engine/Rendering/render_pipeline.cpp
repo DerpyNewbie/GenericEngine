@@ -12,7 +12,9 @@
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
+#include "Components/canvas.h"
 #include "Components/light.h"
+#include "Effect/effekseer_controller.h"
 
 using namespace DirectX;
 
@@ -46,6 +48,10 @@ namespace engine
 {
 void RenderPipeline::InvokeDrawCall()
 {
+    float update_speed = Time::GetDeltaTime() * 60.0f;
+    EffekseerController::Instance()->m_manager_->Update(update_speed);
+    EffekseerController::Instance()->m_memory_pool_->NewFrame();
+    
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
@@ -193,8 +199,13 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
         renderer->UpdateBuffer();
         renderer->Render();
     }
+    EffekseerController::Render(view, proj);
 
     Gizmos::Render();
+    for (auto &canvas : Canvas::m_canvasses_)
+    {
+        canvas->Render();
+    }
 }
 
 void RenderPipeline::DepthRender()
