@@ -75,6 +75,11 @@ namespace engine
 
 void RenderPipeline::InvokeDrawCall()
 {
+    for (auto view_proj_matrices_buffers : m_view_proj_matrices_buffers_)
+    {
+        view_proj_matrices_buffers.ReturnAll();
+    }
+    
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
