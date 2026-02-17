@@ -57,6 +57,7 @@ private:
     bool CreateDepthStencil();
 
 public:
+    
     static RenderEngine *Instance();
 
     void BeginRender();

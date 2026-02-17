@@ -12,7 +12,7 @@ void Material::OnInspectorGui()
 {
     if (Gui::PropertyField("RenderQueue", render_queue))
     {
-        render_queue = std::clamp(render_queue, static_cast<uint64_t>(0), static_cast<uint64_t>(10000));
+        render_queue = std::clamp(render_queue, static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
     }
 
     if (Gui::ExpandablePropertyField<Shader>("shader", shader))
