@@ -29,7 +29,7 @@ public:
     void OnDisabled() override;
     void OnDestroy() override;
 
-    virtual const Matrix &BoundsOrigin() = 0;
+    virtual Matrix BoundsOrigin() = 0;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

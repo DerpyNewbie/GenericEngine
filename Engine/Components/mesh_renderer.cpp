@@ -136,7 +136,7 @@ void MeshRenderer::DrawBounds()
     Gizmos::DrawBounds(bounds, Gizmos::kDefaultColor, matrix);
 }
 
-const Matrix &MeshRenderer::BoundsOrigin()
+Matrix MeshRenderer::BoundsOrigin()
 {
     return GameObject()->Transform()->WorldMatrix();
 }

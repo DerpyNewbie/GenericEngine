@@ -18,7 +18,7 @@ class SkinnedMeshRenderer : public MeshRenderer
     void UpdateWorldBuffer() override;
     void DrawBones() const;
     void UpdateBoneTransformsBuffer();
-    const Matrix &BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
 
 public:
     constexpr static int kMaxBonesPerVertex = 4;

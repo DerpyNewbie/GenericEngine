@@ -46,7 +46,7 @@ void TextRenderer::Render()
     RenderPipeline::Submit(font_data, position, string, color);
 }
 
-const Matrix &TextRenderer::BoundsOrigin()
+Matrix TextRenderer::BoundsOrigin()
 {
     return RenderPipeline::GetCurrentCamera().GetWorldMatrix();
 }

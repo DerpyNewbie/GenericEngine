@@ -69,7 +69,7 @@ void SkinnedMeshRenderer::DrawBones() const
     }
 }
 
-const Matrix &SkinnedMeshRenderer::BoundsOrigin()
+Matrix SkinnedMeshRenderer::BoundsOrigin()
 {
     if (const auto root = root_bone.CastedLock())
     {

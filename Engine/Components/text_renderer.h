@@ -17,7 +17,7 @@ public:
     void OnInspectorGui() override;
     void Render() override;
 
-    const Matrix &BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

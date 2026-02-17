@@ -9,7 +9,7 @@ namespace engine
 {
 class MeshRenderer : public Renderer
 {
-    const Matrix &BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
     virtual void UpdateWorldBuffer();
 
 protected:

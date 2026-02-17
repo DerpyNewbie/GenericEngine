@@ -54,7 +54,7 @@ Vector2 Canvas::CanvasSize() const
 {
     return m_canvas_size_;
 }
-const Matrix &Canvas::BoundsOrigin()
+Matrix Canvas::BoundsOrigin()
 {
     return CameraComponent::Main()->GameObject()->Transform()->WorldMatrix();
 }

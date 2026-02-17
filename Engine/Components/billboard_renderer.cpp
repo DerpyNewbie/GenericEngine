@@ -52,7 +52,7 @@ void BillboardRenderer::Render()
     RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
-const Matrix &BillboardRenderer::BoundsOrigin()
+Matrix BillboardRenderer::BoundsOrigin()
 {
     return GameObject()->Transform()->WorldMatrix();
 }

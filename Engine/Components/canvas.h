@@ -22,7 +22,7 @@ public:
     void OnStart() override;
     void Render() override;
     [[nodiscard]] Vector2 CanvasSize() const;
-    const Matrix &BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
 
     void AddRenderer(const std::shared_ptr<Renderer2D> &renderer);
     void RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer);
