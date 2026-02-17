@@ -84,7 +84,6 @@
         <ClCompile Include="Engine\Components\directional_light.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
         <ClCompile Include="Engine\Components\light.cpp"/>
-        <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\rect_transform.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
@@ -308,7 +307,6 @@
         <ClInclude Include="Engine\Components\directional_light.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
         <ClInclude Include="Engine\Components\light.h"/>
-        <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\rect_transform.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
