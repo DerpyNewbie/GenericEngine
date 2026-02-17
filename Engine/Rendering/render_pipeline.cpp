@@ -72,6 +72,77 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
 
 namespace engine
 {
+void RenderPipeline::RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera)
+{
+    // store previous property as we're editing aspect ratio to match window aspect ratio
+    const auto prev_property = main_camera->property;
+    main_camera->property.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
+    SetCurrentCamera(main_camera->GetCamera());
+    const auto view = main_camera->ViewMatrix();
+    const auto proj = main_camera->property.ProjectionMatrix();
+
+    Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
+    DepthRender();
+
+    RenderEngine::Instance()->SetMainRenderTarget(main_camera->property.background_color);
+    Render(view, proj);
+
+    // revert back to original property
+    main_camera->property = prev_property;
+}
+
+void RenderPipeline::RenderPerCamera(const Camera &camera)
+{
+    ID3D12DescriptorHeap *rtv_heap = nullptr;
+    ID3D12DescriptorHeap *dsv_heap = nullptr;
+
+    const auto render_tex = camera.render_texture;
+    if (render_tex)
+    {
+        render_tex->BeginRender(camera.background_color);
+        rtv_heap = render_tex->GetHeap();
+    }
+
+    const auto depth_tex = camera.depth_texture;
+    if (depth_tex)
+    {
+        depth_tex->BeginRender();
+        dsv_heap = depth_tex->GetHeap();
+    }
+
+    if (rtv_heap == nullptr && dsv_heap == nullptr)
+        return;
+
+    const auto view = camera.view;
+    const auto proj = camera.projection;
+
+    SetCurrentCamera(camera);
+    Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
+
+    DepthRender();
+
+    RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
+    Render(view, proj);
+
+    if (render_tex)
+        render_tex->EndRender();
+
+    if (depth_tex)
+        depth_tex->EndRender();
+}
+
+void RenderPipeline::VoidRender()
+{
+    const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
+    const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
+
+    SetCurrentCamera({});
+    Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
+    DepthRender();
+
+    RenderEngine::Instance()->SetMainRenderTarget(Color());
+    Render(view, proj);
+}
 
 void RenderPipeline::InvokeDrawCall()
 {
@@ -87,73 +158,16 @@ void RenderPipeline::InvokeDrawCall()
 
     for (const auto camera : m_requesting_cameras_)
     {
-        ID3D12DescriptorHeap *rtv_heap = nullptr;
-        ID3D12DescriptorHeap *dsv_heap = nullptr;
-
-        auto render_tex = camera.render_texture;
-        if (render_tex)
-        {
-            render_tex->BeginRender(camera.background_color);
-            rtv_heap = render_tex->GetHeap();
-        }
-
-        auto depth_tex = camera.depth_texture;
-        if (depth_tex)
-        {
-            depth_tex->BeginRender();
-            dsv_heap = depth_tex->GetHeap();
-        }
-
-        if (rtv_heap == nullptr && dsv_heap == nullptr)
-            continue;
-
-        const auto view = camera.view;
-        const auto proj = camera.projection;
-
-        SetCurrentCamera(camera);
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
-
-        DepthRender();
-
-        RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
-        Render(view, proj);
-
-        if (render_tex)
-            render_tex->EndRender();
-
-        if (depth_tex)
-            depth_tex->EndRender();
+        RenderPerCamera(camera);
     }
 
     if (const auto main_camera = CameraComponent::Main())
     {
-        // store previous property as we're editing aspect ratio to match window aspect ratio
-        const auto prev_property = main_camera->property;
-        main_camera->property.aspect_ratio = static_cast<float>(Application::WindowWidth()) / static_cast<float>(Application::WindowHeight());
-        SetCurrentCamera(main_camera->GetCamera());
-        const auto view = main_camera->ViewMatrix();
-        const auto proj = main_camera->property.ProjectionMatrix();
-
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
-        DepthRender();
-
-        RenderEngine::Instance()->SetMainRenderTarget(main_camera->property.background_color);
-        Render(view, proj);
-
-        // revert back to original property
-        main_camera->property = prev_property;
+        RenderMainRenderTarget(main_camera);
     }
     else
     {
-        const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
-        const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
-
-        SetCurrentCamera({});
-        Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
-        DepthRender();
-
-        RenderEngine::Instance()->SetMainRenderTarget(Color());
-        Render(view, proj);
+        VoidRender();
     }
 
     on_rendering.Invoke();

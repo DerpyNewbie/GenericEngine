@@ -2,7 +2,6 @@
 #include "component.h"
 #include "Rendering/light_data.h"
 #include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
 
 namespace engine

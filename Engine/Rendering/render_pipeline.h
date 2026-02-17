@@ -37,12 +37,18 @@ class RenderPipeline
     std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrices_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
 
+
     void InvokeDrawCall();
+
+    void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
+    void RenderPerCamera(const Camera &camera);
+    void VoidRender();
+    void Render(const Matrix &view, const Matrix &proj);
+    
     void SetCurrentCamera(const Camera &camera);
     void SetSceneData();
-    void Render(const Matrix &view, const Matrix &proj);
-    void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
+    void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void DepthRender() const;
     void ExecuteRenderCommands();
 
