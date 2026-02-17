@@ -68,9 +68,7 @@ void ObjectPool<T>::Return(const T *object)
 
     if (m_objects_.size() > m_max_size_)
     {
-        std::erase_if(m_objects_, [&find_object](const auto &a) {
-            return a.first == find_object->first;
-        });
+        m_objects_.erase(find_object);
         return;
     }
 
