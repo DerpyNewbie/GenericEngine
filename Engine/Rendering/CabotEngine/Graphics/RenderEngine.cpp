@@ -461,6 +461,27 @@ RenderEngine *RenderEngine::Instance()
     return instance;
 }
 
+void RenderEngine::WaitRender()
+{
+    //描画終了待ち
+    const UINT64 fence_value = m_fence_value_[m_current_back_buffer_index_];
+    m_p_queue_->Signal(m_p_fence_.Get(), fence_value);
+    m_fence_value_[m_current_back_buffer_index_]++;
+
+    // 次のフレームの描画準備がまだであれば待機する.
+    if (m_p_fence_->GetCompletedValue() < fence_value)
+    {
+        // 完了時にイベントを設定.
+        const auto hr = m_p_fence_->SetEventOnCompletion(fence_value, m_fence_event_);
+        if (FAILED(hr))
+        {
+            return;
+        }
+
+        WaitForSingleObject(m_fence_event_, INFINITE);
+    }
+}
+
 void RenderEngine::UpdateMainRenderTarget()
 {
     engine::Logger::Log<RenderEngine>("Updating main render target");
