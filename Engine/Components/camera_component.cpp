@@ -4,6 +4,7 @@
 #include "application.h"
 #include "Components/camera_component.h"
 
+#include "update_manager.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -66,8 +67,7 @@ void CameraComponent::OnValidate()
         OnEnabled();
     }
 }
-
-void CameraComponent::OnUpdate()
+void CameraComponent::Render()
 {
     RenderPipeline::RequestRender(GetCamera());
 }
@@ -91,6 +91,7 @@ void CameraComponent::OnEnabled()
     if (find == m_cameras_.end())
         m_cameras_.emplace_back(shared_from_base<CameraComponent>());
 
+    UpdateManager::SubscribeRender(shared_from_base<IRenderReceiver>());
 }
 
 void CameraComponent::OnDisabled()
@@ -107,6 +108,8 @@ void CameraComponent::OnDisabled()
     {
         SetMainCamera(m_cameras_.begin() != m_cameras_.end() ? *m_cameras_.begin() : std::weak_ptr<CameraComponent>());
     }
+
+    UpdateManager::UnsubscribeRender(shared_from_base<IRenderReceiver>());
 }
 
 Camera CameraComponent::GetCamera()

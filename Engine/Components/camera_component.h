@@ -45,7 +45,7 @@ struct CameraProperty : Inspectable
     }
 };
 
-class CameraComponent : public Component
+class CameraComponent : public Component, public IRenderReceiver
 {
     inline static std::weak_ptr<CameraComponent> m_main_camera_;
     inline static std::list<std::weak_ptr<CameraComponent>> m_cameras_;
@@ -58,7 +58,7 @@ public:
     
     void OnInspectorGui() override;
     void OnValidate() override;
-    void OnUpdate() override;
+    void Render() override;
     void OnEnabled() override;
     void OnDisabled() override;
 
@@ -69,7 +69,7 @@ public:
 
     static std::shared_ptr<CameraComponent> Main();
     static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
-
+    
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
