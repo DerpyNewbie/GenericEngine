@@ -35,7 +35,7 @@ public:
             CEREAL_NVP(p_shared_material_block)
         );
 
-        if (version >= 2)
+        if (version >= 3)
         {
             ar(
                 CEREAL_NVP(render_queue),
@@ -46,4 +46,4 @@ public:
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Material, 2)
+CEREAL_CLASS_VERSION(engine::Material, 3)
