@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "primitives.h"
 
+namespace engine
+{
 std::shared_ptr<engine::Mesh> Primitives::GetQuadMesh()
 {
     if (m_quad_mesh_)
@@ -21,4 +23,5 @@ std::shared_ptr<engine::Mesh> Primitives::GetQuadMesh()
     m_quad_mesh_->indices = {0, 1, 2, 2, 1, 3};
 
     return m_quad_mesh_;
+}
 }
