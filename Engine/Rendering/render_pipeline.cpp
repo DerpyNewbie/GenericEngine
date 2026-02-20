@@ -136,7 +136,7 @@ void RenderPipeline::RenderVoid()
     const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
     const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
 
-    SetCurrentCamera({});
+    SetCurrentCamera(Camera(UINT_MAX, Color(), view, proj, nullptr, nullptr));
     Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
     DepthRender();
 
