@@ -20,7 +20,7 @@ class RenderPipeline
     friend class Engine;
     friend class CameraComponent;
 
-    constexpr static size_t kStableCameraCount = 10;
+    constexpr static size_t kStableCameraCount = 8;
     inline const static std::function<std::shared_ptr<ConstantBuffer>()> kOnViewProjBuffCreate = [] {
         auto view_proj_buff = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
         view_proj_buff->CreateBuffer();
