@@ -5,6 +5,7 @@ namespace engine
 {
 std::shared_ptr<engine::Mesh> Primitives::GetQuadMesh()
 {
+    // TODO: Guid を固定して生成する: Issue #147
     if (m_quad_mesh_)
         return m_quad_mesh_;
 
