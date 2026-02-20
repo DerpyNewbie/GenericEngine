@@ -220,6 +220,8 @@
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_local_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_pipeline_state.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_shader.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\shader_table.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\top_level_acceleration_structure.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
@@ -231,6 +233,8 @@
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\uav_buffer.cpp"/>
+        <ClCompile Include="Engine\Rendering\uav_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
@@ -391,6 +395,8 @@
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_local_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_pipeline_state.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_shader.h"/>
+        <ClInclude Include="Engine\Rendering\raytracing\shader_table.h"/>
+        <ClInclude Include="Engine\Rendering\raytracing\top_level_acceleration_structure.h"/>
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
@@ -403,6 +409,8 @@
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
+        <ClInclude Include="Engine\Rendering\uav_buffer.h"/>
+        <ClInclude Include="Engine\Rendering\uav_texture.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>

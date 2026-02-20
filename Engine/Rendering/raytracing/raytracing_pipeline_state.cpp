@@ -4,6 +4,17 @@
 #include "raytracing_global_root_signature.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
+RaytracingPipelineState *RaytracingPipelineState::Instance()
+{
+    static auto instance = new RaytracingPipelineState;
+    return instance;
+}
+
+ComPtr<ID3D12StateObject> RaytracingPipelineState::Get()
+{
+    return Instance()->m_dxr_state_objects_[0].Get();
+}
+
 void RaytracingPipelineState::CreateDxrPipelineState(RaytracingShader raytracing_shader)
 {
     auto lib = m_dxr_pipeline_.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();

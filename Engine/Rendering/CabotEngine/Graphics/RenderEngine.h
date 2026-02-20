@@ -26,6 +26,7 @@ private:
     ComPtr<IDXGISwapChain3> m_p_swap_chain_ = nullptr;
     ComPtr<ID3D12CommandAllocator> m_p_allocator_[kFrame_Buffer_Count] = { nullptr };
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
+    ComPtr<ID3D12GraphicsCommandList4> m_dxr_command_list_;
     HANDLE m_fence_event_ = nullptr;
     ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
     UINT64 m_fence_value_[kFrame_Buffer_Count] = {};
@@ -53,6 +54,7 @@ private:
     bool CreateCommandQueue();
     bool CreateSwapChain();
     bool CreateCommandList();
+    bool CreateDxrCommandList();
     bool CreateFence();
     void CreateViewPort();
     void CreateScissorRect();
@@ -83,6 +85,11 @@ public:
     static ID3D12GraphicsCommandList *CommandList()
     {
         return Instance()->m_p_command_list_.Get();
+    }
+
+    static ID3D12GraphicsCommandList4 *DxrCommandList()
+    {
+        return Instance()->m_dxr_command_list_.Get();
     }
 
     static ID3D12CommandQueue *CommandQueue()
