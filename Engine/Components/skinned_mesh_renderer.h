@@ -10,8 +10,7 @@ class Transform;
 class SkinnedMeshRenderer : public MeshRenderer
 {
     static bool m_draw_bones_;
-
-    std::vector<Matrix> m_matrices_;
+    
     std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffers_;
     std::array<std::shared_ptr<DescriptorHandle>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffer_handles_;
 
