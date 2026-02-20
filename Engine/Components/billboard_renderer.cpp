@@ -39,7 +39,13 @@ void BillboardRenderer::OnConstructed()
 void BillboardRenderer::OnInspectorGui()
 {
     Renderer::OnInspectorGui();
-    shared_materials[0].CastedLock()->OnInspectorGui();
+
+    for (int i = 0; i < shared_materials.size(); ++i)
+    {
+        ImGui::PushID(i);
+        shared_materials[0].CastedLock()->OnInspectorGui();
+        ImGui::PopID();
+    }
 }
 
 void BillboardRenderer::Render()
