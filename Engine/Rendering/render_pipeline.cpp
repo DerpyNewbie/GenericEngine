@@ -91,7 +91,7 @@ void RenderPipeline::RenderMainRenderTarget(const std::shared_ptr<CameraComponen
     main_camera->property = prev_property;
 }
 
-void RenderPipeline::RenderPerCamera(const Camera &camera)
+void RenderPipeline::RenderCamera(const Camera &camera)
 {
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
@@ -158,7 +158,7 @@ void RenderPipeline::InvokeDrawCall()
 
     for (const auto camera : m_requesting_cameras_)
     {
-        RenderPerCamera(camera);
+        RenderCamera(camera);
     }
 
     if (const auto main_camera = CameraComponent::Main())

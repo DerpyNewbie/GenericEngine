@@ -41,7 +41,7 @@ class RenderPipeline
     void InvokeDrawCall();
 
     void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
-    void RenderPerCamera(const Camera &camera);
+    void RenderCamera(const Camera &camera);
     void VoidRender();
     void Render(const Matrix &view, const Matrix &proj);
     
