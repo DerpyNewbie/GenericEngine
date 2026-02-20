@@ -40,6 +40,12 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
         engine::Logger::Error<RenderEngine>("Failed to create CommandList");
         return false;
     }
+    if (!CreateDxrCommandList())
+    {
+        engine::Logger::Error<RenderEngine>("Failed to create DxrCommandList");
+        return false;
+    }
+        
     if (!CreateFence())
     {
         engine::Logger::Error<RenderEngine>("Failed to create CreateFence");
@@ -346,6 +352,13 @@ bool RenderEngine::CreateCommandList()
     //コマンドリストは開かれている状態で作成されるので、いったん閉じる。
     auto _ = m_p_command_list_->Close();
     return true;
+}
+
+bool RenderEngine::CreateDxrCommandList()
+{
+    const auto hr = m_p_command_list_.As(&m_dxr_command_list_);
+
+    return SUCCEEDED(hr);
 }
 
 bool RenderEngine::CreateFence()

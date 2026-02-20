@@ -13,5 +13,6 @@ public:
     static void ToFloat2(float buff[2], Vector2 vec);
     static void ToFloat3(float buff[3], Vector3 vec);
     static void ToFloat4(float buff[4], Color vec);
+    static UINT Align(UINT size, UINT alignment);
 };
 }

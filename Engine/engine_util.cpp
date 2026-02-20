@@ -41,4 +41,9 @@ void EngineUtil::ToFloat4(float buff[4], const Color vec)
     buff[2] = vec.z;
     buff[3] = vec.w;
 }
+
+UINT EngineUtil::Align(const UINT size, const UINT alignment)
+{
+    return (size + (alignment - 1)) & ~(alignment - 1);
+}
 }
