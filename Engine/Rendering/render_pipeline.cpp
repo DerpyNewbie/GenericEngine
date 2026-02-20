@@ -7,7 +7,6 @@
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
-#include "render_command.h"
 #include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
