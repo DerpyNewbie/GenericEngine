@@ -131,7 +131,7 @@ void RenderPipeline::RenderCamera(const Camera &camera)
         depth_tex->EndRender();
 }
 
-void RenderPipeline::VoidRender()
+void RenderPipeline::RenderVoid()
 {
     const auto view = Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
     const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f, 1000.0f);
@@ -167,7 +167,7 @@ void RenderPipeline::InvokeDrawCall()
     }
     else
     {
-        VoidRender();
+        RenderVoid();
     }
 
     on_rendering.Invoke();

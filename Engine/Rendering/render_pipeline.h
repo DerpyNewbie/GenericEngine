@@ -42,7 +42,7 @@ class RenderPipeline
 
     void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
     void RenderCamera(const Camera &camera);
-    void VoidRender();
+    void RenderVoid();
     void Render(const Matrix &view, const Matrix &proj);
     
     void SetCurrentCamera(const Camera &camera);
