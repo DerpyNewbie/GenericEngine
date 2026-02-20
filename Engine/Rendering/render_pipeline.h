@@ -34,7 +34,7 @@ class RenderPipeline
     Camera m_current_camera_;
     std::vector<Camera> m_requesting_cameras_;
     uint32_t m_current_view_proj_matrix_index_;
-    std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrices_buffers_
+    std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
 
 

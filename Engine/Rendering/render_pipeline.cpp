@@ -146,7 +146,7 @@ void RenderPipeline::RenderVoid()
 
 void RenderPipeline::InvokeDrawCall()
 {
-    for (auto view_proj_matrices_buffers : m_view_proj_matrices_buffers_)
+    for (auto view_proj_matrices_buffers : m_view_proj_matrix_buffers_)
     {
         view_proj_matrices_buffers.ReturnAll();
     }
@@ -182,7 +182,7 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 {
     const auto cmd_list = RenderEngine::CommandList();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = *m_view_proj_matrices_buffers_[current_buffer_idx].Get();
+    const auto view_projection_buffer = *m_view_proj_matrix_buffers_[current_buffer_idx].Get();
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -477,7 +477,7 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
-    for (auto view_proj_matrices_buffers : instance->m_view_proj_matrices_buffers_)
+    for (auto view_proj_matrices_buffers : instance->m_view_proj_matrix_buffers_)
     {
         view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
     }
