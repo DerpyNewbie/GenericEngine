@@ -3,61 +3,62 @@
 #include "billboard_renderer.h"
 #include "game_object.h"
 #include "Asset/asset_database.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
+#include "Rendering/primitives.h"
+#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
-void BillboardRenderer::SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list)
+
+void BillboardRenderer::UpdateWorldBuffer()
 {
-    shared_material->SetDescriptorTable();
+    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
+    {
+        if (!world_matrix_buffer)
+        {
+            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+            world_matrix_buffer->CreateBuffer();
+        }
+    }
+
+    auto world_matrix = GameObject()->Transform()->WorldMatrix();
+    
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
+    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
+    *ptr = Billboard::CalcMatrix(world_matrix);
 }
 
 void BillboardRenderer::OnConstructed()
 {
-    shared_material = Instantiate<Material>();
-    auto asset_ptr = AssetDatabase::GetAsset("BillboardShader.hlsl");
-    shared_material->p_shared_shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
+    shared_materials.emplace_back(AssetPtr<Material>::FromInstance(Instantiate<Material>()));
+    const auto asset_ptr = AssetDatabase::GetAsset("BillboardShader.hlsl");
+    shared_materials[0].CastedLock()->shader = AssetPtr<Shader>::FromIAssetPtr(asset_ptr);
     DirectX::BoundingBox::CreateFromPoints(bounds, Vector3(0, 0, 0), Vector3(1, 1, 1));
 }
 
 void BillboardRenderer::OnInspectorGui()
 {
     Renderer::OnInspectorGui();
-    shared_material->OnInspectorGui();
-}
 
-void BillboardRenderer::UpdateBuffer()
-{
-    m_billboard_.world_matrix = GameObject()->Transform()->WorldMatrix();
-    m_billboard_.Update();
-
-    shared_material->p_shared_material_block->UpdateBuffer();
+    for (int i = 0; i < shared_materials.size(); ++i)
+    {
+        ImGui::PushID(i);
+        shared_materials[i].CastedLock()->OnInspectorGui();
+        ImGui::PopID();
+    }
 }
 
 void BillboardRenderer::Render()
 {
-    if (shared_material->IsValid())
-    {
-        auto shader = shared_material->p_shared_shader.CastedLock();
-        const auto cmd_list = RenderEngine::CommandList();
-        auto current_buffer = RenderEngine::CurrentBackBufferIndex();
+    UpdateWorldBuffer();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-        PSOManager::SetPipelineState(cmd_list, shader);
-        cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        cmd_list->IASetVertexBuffers(0, 1, m_billboard_.vertex_buffer->View());
-        cmd_list->IASetIndexBuffer(m_billboard_.index_buffer->View());
-        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV,
-                                                    m_billboard_.wvp_buffers[current_buffer]->GetAddress());
-        SetDescriptorTable(cmd_list);
-
-        cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
-    }
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
-std::shared_ptr<Transform> BillboardRenderer::BoundsOrigin()
+Matrix BillboardRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return GameObject()->Transform()->WorldMatrix();
 }
 }
 

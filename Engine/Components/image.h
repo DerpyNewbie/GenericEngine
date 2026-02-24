@@ -2,25 +2,21 @@
 #include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/material.h"
-#include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/Texture2D.h"
-#include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 
 namespace engine
 {
 class Image : public Renderer2D
 {
-    std::shared_ptr<VertexBuffer> m_vertex_buffer_[RenderEngine::kFrame_Buffer_Count];
-    std::shared_ptr<IndexBuffer> m_index_buffer_;
-    std::shared_ptr<DescriptorHandle> m_texture_handle_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
 
+    void UpdateWorldBuffer();
+    
 public:
     AssetPtr<Material> shared_material;
 
     void OnInspectorGui() override;
-    void OnAwake() override;
-    void OnUpdate() override;
     void Render() override;
 
     template <class Archive>

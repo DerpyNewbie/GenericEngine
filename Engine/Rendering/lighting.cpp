@@ -166,11 +166,6 @@ void Lighting::UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix
         }
     }
 
-    while (light_vp_idx < RenderingConstants::kMaxShadowMapCount)
-    {
-        m_light_view_proj_matrices_[light_vp_idx++] = Matrix::Identity;
-    }
-
     if (m_light_view_proj_matrices_buffer_ == nullptr)
     {
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(

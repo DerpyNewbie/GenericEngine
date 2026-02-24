@@ -7,10 +7,5 @@
 class Billboard
 {
 public:
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> wvp_buffers;
-    std::shared_ptr<engine::VertexBuffer> vertex_buffer;
-    std::shared_ptr<engine::IndexBuffer> index_buffer;
-    Matrix world_matrix = DirectX::XMMatrixIdentity();
-
-    void Update();
+    static Matrix CalcMatrix(Matrix &mat);
 };

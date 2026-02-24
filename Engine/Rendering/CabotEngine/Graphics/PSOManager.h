@@ -35,5 +35,5 @@ public:
         return Instance()->m_pso_cache_[id]->Get();
     }
 
-    static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader);
+    static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader);
 };

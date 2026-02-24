@@ -5,6 +5,7 @@
 #include <algorithm>
 
 #include "gui.h"
+#include "update_manager.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -26,19 +27,13 @@ void Renderer::SetVisible(const bool visible)
 
     if (m_is_visible_)
     {
+        UpdateManager::SubscribeRender(shared_from_base<Renderer>());
         RenderPipeline::AddRenderer(shared_from_base<Renderer>());
     }
     else
     {
+        UpdateManager::UnsubscribeRender(shared_from_base<Renderer>());
         RenderPipeline::RemoveRenderer(shared_from_base<Renderer>());
-    }
-}
-
-void Renderer::OnInspectorGui()
-{
-    if (Gui::PropertyField("RenderQueue", m_render_queue_))
-    {
-        m_render_queue_ = std::clamp(m_render_queue_, 0, 10000);
     }
 }
 

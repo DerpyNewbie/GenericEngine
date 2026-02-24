@@ -84,7 +84,6 @@
         <ClCompile Include="Engine\Components\directional_light.cpp"/>
         <ClCompile Include="Engine\Components\frame_meta_data.cpp"/>
         <ClCompile Include="Engine\Components\light.cpp"/>
-        <ClCompile Include="Engine\Components\line_renderer.cpp"/>
         <ClCompile Include="Engine\Components\mesh_renderer.cpp"/>
         <ClCompile Include="Engine\Components\rect_transform.cpp"/>
         <ClCompile Include="Engine\Components\renderer.cpp"/>
@@ -138,6 +137,7 @@
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
+        <ClCompile Include="Engine\Rendering\camera.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
             <EntryPointName>geo</EntryPointName>
@@ -216,6 +216,8 @@
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
+        <ClCompile Include="Engine\Rendering\primitives.cpp"/>
+        <ClCompile Include="Engine\Rendering\render_command.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
@@ -223,6 +225,7 @@
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_resource.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_settings.cpp"/>
+        <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
@@ -304,7 +307,6 @@
         <ClInclude Include="Engine\Components\directional_light.h"/>
         <ClInclude Include="Engine\Components\frame_meta_data.h"/>
         <ClInclude Include="Engine\Components\light.h"/>
-        <ClInclude Include="Engine\Components\line_renderer.h"/>
         <ClInclude Include="Engine\Components\mesh_renderer.h"/>
         <ClInclude Include="Engine\Components\rect_transform.h"/>
         <ClInclude Include="Engine\Components\renderer.h"/>
@@ -357,6 +359,7 @@
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
+        <ClInclude Include="Engine\Rendering\camera.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
@@ -382,7 +385,9 @@
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
+        <ClInclude Include="Engine\Rendering\primitives.h"/>
         <ClInclude Include="Engine\Rendering\rendering_constants.h"/>
+        <ClInclude Include="Engine\Rendering\render_command.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
         <ClInclude Include="Engine\Rendering\scene_data.h"/>
@@ -390,6 +395,7 @@
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
         <ClInclude Include="Engine\Rendering\shader_resource.h"/>
         <ClInclude Include="Engine\Rendering\shader_settings.h"/>
+        <ClInclude Include="Engine\Rendering\shader_type.h"/>
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>

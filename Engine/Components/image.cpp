@@ -2,6 +2,8 @@
 #include "renderer_2d.h"
 #include "image.h"
 #include "rect_transform.h"
+#include "Rendering/primitives.h"
+#include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -10,79 +12,47 @@ using namespace DirectX::SimpleMath;
 
 namespace engine
 {
+void Image::UpdateWorldBuffer()
+{
+    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
+    {
+        if (!world_matrix_buffer)
+        {
+            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+            world_matrix_buffer->CreateBuffer();
+        }
+    }
+
+    auto rect = NormalizedRect();
+    if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
+    {
+        rect = NormalizedRect();
+    }
+
+    const auto scale_mat = Matrix::CreateScale(rect.size.x, rect.size.y, 1.0f);
+    const auto trans_mat = Matrix::CreateTranslation(rect.pos.x, rect.pos.y, 0.0f);
+
+    const auto world_mat = scale_mat * trans_mat;
+    
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
+    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
+    *ptr = world_mat;
+}
+
 void Image::OnInspectorGui()
 {
     Gui::ExpandablePropertyField("Material", shared_material);
 }
 
-void Image::OnAwake()
-{
-    Renderer2D::OnAwake();
-    //create index buffer
-    if (!m_index_buffer_)
-    {
-        std::vector<uint32_t> indices =
-        {
-            0, 1, 2, 2, 1, 3
-        };
-        m_index_buffer_ = std::make_shared<IndexBuffer>(indices.size() * sizeof(uint32_t), indices.data());
-        if (!m_index_buffer_->IsValid())
-        {
-            Logger::Error<Renderer2D>("Failed to create IndexBuffer!");
-        }
-    }
-}
-
-void Image::OnUpdate()
-{
-    Renderer2D::OnUpdate();
-    if (auto rect_transform = GameObject()->GetComponent<RectTransform>())
-    {
-        auto rect = NormalizedRect();
-        auto min_pos = rect.pos - rect.size / 2;
-        auto max_pos = rect.pos + rect.size / 2;
-        std::array<Vertex, 4> vertices = {};
-        vertices[0].vertex = Vector3(min_pos.x, min_pos.y, 0.0f);
-        vertices[1].vertex = Vector3(min_pos.x, max_pos.y, 0.0f);
-        vertices[2].vertex = Vector3(max_pos.x, min_pos.y, 0.0f);
-        vertices[3].vertex = Vector3(max_pos.x, max_pos.y, 0.0f);
-        vertices[0].uvs[0] = Vector2(0, 0);
-        vertices[1].uvs[0] = Vector2(0, 1);
-        vertices[2].uvs[0] = Vector2(1, 0);
-        vertices[3].uvs[0] = Vector2(1, 1);
-
-        m_vertex_buffer_[RenderEngine::CurrentBackBufferIndex()] = std::make_shared<VertexBuffer>(
-            vertices.size(), vertices.data());
-    }
-}
-
 void Image::Render()
 {
-    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
-    if (m_vertex_buffer_[current_buffer] == nullptr)
-        return;
+    UpdateWorldBuffer();
+    
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    std::vector materials = {shared_material};
 
-    const auto material = shared_material.CastedLock();
-    if (material == nullptr)
-        return;
-
-    const auto shader = material->p_shared_shader.CastedLock();
-    const auto cmd_list = RenderEngine::CommandList();
-
-    if (material->IsValid())
-    {
-        if (shader)
-        {
-            PSOManager::SetPipelineState(cmd_list, shader);
-        }
-
-        material->SetDescriptorTable();
-        cmd_list->IASetIndexBuffer(m_index_buffer_->View());
-        cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_[current_buffer]->View());
-
-        cmd_list->DrawIndexedInstanced(6, 1, 0, 0, 0);
-    }
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 }
 

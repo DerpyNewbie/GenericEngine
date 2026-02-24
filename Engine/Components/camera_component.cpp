@@ -4,6 +4,7 @@
 #include "application.h"
 #include "Components/camera_component.h"
 
+#include "update_manager.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -52,21 +53,23 @@ Matrix CameraProperty::ProjectionMatrix() const
     }
 }
 
-void CameraComponent::OnAwake()
-{ }
-
 void CameraComponent::OnInspectorGui()
 {
-    m_property_.OnInspectorGui();
-    Gui::PropertyField("RenderTexture", m_render_texture_);
-    ImGui::Text("DrawCall Count:%d", m_drawcall_count_);
+    property.OnInspectorGui();
+    Gui::PropertyField("Render Texture", m_render_texture_);
+    Gui::PropertyField("Depth Texture", m_depth_texture_);
 }
+
 void CameraComponent::OnValidate()
 {
     if (GameObject()->IsActiveInHierarchy())
     {
         OnEnabled();
     }
+}
+void CameraComponent::Render()
+{
+    RenderPipeline::RequestRender(GetCamera());
 }
 
 void CameraComponent::OnEnabled()
@@ -80,13 +83,15 @@ void CameraComponent::OnEnabled()
     const auto find = std::ranges::find(
         m_cameras_,
         shared_this,
-        [](auto a) { return a.lock(); }
+        [](auto a) {
+            return a.lock();
+        }
     );
 
     if (find == m_cameras_.end())
         m_cameras_.emplace_back(shared_from_base<CameraComponent>());
 
-    RenderPipeline::AddCamera(shared_from_base<CameraComponent>());
+    UpdateManager::SubscribeRender(shared_from_base<IRenderReceiver>());
 }
 
 void CameraComponent::OnDisabled()
@@ -94,7 +99,9 @@ void CameraComponent::OnDisabled()
     auto shared_this = shared_from_base<CameraComponent>();
     std::erase_if(
         m_cameras_,
-        [shared_this](const std::weak_ptr<CameraComponent> &a) { return a.expired() || a.lock() == shared_this; }
+        [shared_this](const std::weak_ptr<CameraComponent> &a) {
+            return a.expired() || a.lock() == shared_this;
+        }
     );
 
     if (m_main_camera_.lock() == shared_this)
@@ -102,7 +109,12 @@ void CameraComponent::OnDisabled()
         SetMainCamera(m_cameras_.begin() != m_cameras_.end() ? *m_cameras_.begin() : std::weak_ptr<CameraComponent>());
     }
 
-    RenderPipeline::RemoveCamera(shared_from_base<CameraComponent>());
+    UpdateManager::UnsubscribeRender(shared_from_base<IRenderReceiver>());
+}
+
+Camera CameraComponent::GetCamera()
+{
+    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
 }
 
 std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
@@ -118,20 +130,11 @@ void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera
     m_main_camera_ = camera;
 }
 
-void CameraComponent::SetCurrentCamera(const std::weak_ptr<CameraComponent> &camera)
-{
-    m_current_camera_ = camera;
-}
-
 std::shared_ptr<CameraComponent> CameraComponent::Main()
 {
     return m_main_camera_.lock();
 }
 
-std::shared_ptr<CameraComponent> CameraComponent::Current()
-{
-    return m_current_camera_.lock();
-}
 
 Matrix CameraComponent::ViewMatrix() const
 {

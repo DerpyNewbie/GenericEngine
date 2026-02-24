@@ -50,6 +50,7 @@ bool Engine::Init()
     Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
+    RenderPipeline::Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     on_init.Invoke();
@@ -86,6 +87,7 @@ void Engine::Tick()
 
     Profiler::Begin("Draw Call");
     RenderEngine::Instance()->BeginRender();
+    UpdateManager::InvokeRender();
     RenderPipeline::Instance()->InvokeDrawCall();
     RenderEngine::Instance()->EndRender();
     Profiler::End("Draw Call");

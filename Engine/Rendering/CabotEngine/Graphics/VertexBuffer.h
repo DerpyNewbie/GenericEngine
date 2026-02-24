@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../../mesh.h"
 #include "Rendering/vertex.h"
 
 namespace engine
 {
+class Mesh;
 class VertexBuffer
 {
     bool m_IsValid = false; // バッファの生成に成功したかを取得

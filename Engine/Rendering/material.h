@@ -14,7 +14,8 @@ namespace engine
 class Material : public Object, public Inspectable
 {
 public:
-    AssetPtr<Shader> p_shared_shader;
+    uint16_t render_queue = 5000;
+    AssetPtr<Shader> shader;
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
@@ -23,7 +24,6 @@ public:
 
     void UpdateBuffer();
     bool IsDirty() const;
-    bool IsValid() const;
 
     void SetDescriptorTable();
 
@@ -35,14 +35,15 @@ public:
             CEREAL_NVP(p_shared_material_block)
         );
 
-        if (version >= 2)
+        if (version >= 3)
         {
             ar(
-                CEREAL_NVP(p_shared_shader)
+                CEREAL_NVP(render_queue),
+                CEREAL_NVP(shader)
             );
         }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Material, 2)
+CEREAL_CLASS_VERSION(engine::Material, 3)

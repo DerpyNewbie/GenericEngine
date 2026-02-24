@@ -8,19 +8,16 @@ class Material;
 
 class BillboardRenderer : public Renderer
 {
-    Billboard m_billboard_;
+    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
 
-    void SetDescriptorTable(ID3D12GraphicsCommandList *cmd_list);
-
+    void UpdateWorldBuffer();
+    
 public:
-    // TODO: make it AssetPtr
-    std::shared_ptr<Material> shared_material;
 
     void OnConstructed() override;
     void OnInspectorGui() override;
-    void UpdateBuffer() override;
     void Render() override;
-    std::shared_ptr<Transform> BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

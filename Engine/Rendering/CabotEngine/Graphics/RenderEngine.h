@@ -26,6 +26,7 @@ private:
     ComPtr<ID3D12GraphicsCommandList> m_p_command_list_ = nullptr;
     HANDLE m_fence_event_ = nullptr;
     ComPtr<ID3D12Fence> m_p_fence_ = nullptr;
+    UINT64 m_next_fence_value_ = 1;
     UINT64 m_fence_value_[kFrame_Buffer_Count] = {};
     D3D12_VIEWPORT m_viewport_ = {};
     D3D12_RECT m_scissor_ = {};
@@ -56,6 +57,7 @@ private:
     bool CreateDepthStencil();
 
 public:
+    
     static RenderEngine *Instance();
 
     void BeginRender();
@@ -63,6 +65,7 @@ public:
     void SetRenderTarget(ID3D12DescriptorHeap *rtv_heap, ID3D12DescriptorHeap *dsv_heap,
         Color background_color, const D3D12_VIEWPORT *viewport = nullptr, const D3D12_RECT *scissor = nullptr) const;
     void EndRender();
+    void MoveToNextFrame();
     void WaitRender();
     void UpdateMainRenderTarget();
 

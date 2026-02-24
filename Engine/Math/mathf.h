@@ -101,6 +101,14 @@ public:
             );
         return result;
     }
-};
 
+    static void NearFar(const DirectX::SimpleMath::Matrix &proj, float &_near, float &_far)
+    {
+        const float a = proj.m[2][2];
+        const float b = proj.m[3][2];
+
+        _near = -b / a;
+        _far = b / (1.0f - a);
+    }
+};
 }

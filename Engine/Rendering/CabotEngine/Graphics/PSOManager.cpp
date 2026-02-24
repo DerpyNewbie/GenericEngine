@@ -120,7 +120,7 @@ bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string ps
     return true;
 }
 
-bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const std::shared_ptr<engine::Shader> &shader)
+bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader)
 {
     //PSO name is the same as the shader name.
     std::string pso_name = shader->Name();

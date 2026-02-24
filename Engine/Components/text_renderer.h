@@ -17,7 +17,7 @@ public:
     void OnInspectorGui() override;
     void Render() override;
 
-    std::shared_ptr<Transform> BoundsOrigin() override;
+    Matrix BoundsOrigin() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
