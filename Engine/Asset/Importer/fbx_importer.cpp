@@ -201,7 +201,7 @@ std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMe
             object_meta->mesh.instance = converted_mesh;
         }
 
-        const bool has_converted_material = convert.to_material.size() > ai_mesh->mMaterialIndex;
+const bool has_converted_material = convert.to_material.contains(ai_mesh->mMaterialIndex);
         const auto material = has_converted_material ? convert.to_material.at(ai_mesh->mMaterialIndex) : Object::Instantiate<Material>(std::format("FBX_IMPORTER_PLACEHOLDER_MATERIAL_{}_FOR_{}", ai_mesh->mMaterialIndex, converted_mesh->Name()).c_str());
         const auto material_asset = has_converted_material ? AssetPtr<Material>::FromManaged(material) : AssetPtr<Material>::FromInstance(material);
 
