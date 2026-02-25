@@ -36,6 +36,14 @@ void engine::UavBuffer::CreateBuffer()
     m_is_valid_ = true;
 }
 
+void engine::UavBuffer::UpdateBuffer(void *data)
+{}
+
+std::shared_ptr<DescriptorHandle> engine::UavBuffer::UploadBuffer()
+{
+    return nullptr;
+}
+
 bool engine::UavBuffer::IsValid()
 {
     return m_is_valid_;

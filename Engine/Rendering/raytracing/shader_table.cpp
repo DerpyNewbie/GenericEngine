@@ -72,4 +72,19 @@ ShaderTable::ShaderTable()
 
     m_hit_group_shader_table_->Unmap(0, nullptr);
 }
+
+ComPtr<ID3D12Resource> ShaderTable::RayGenShader()
+{
+    return m_ray_gen_shader_table_;
+}
+
+ComPtr<ID3D12Resource> ShaderTable::MissShader()
+{
+    return m_miss_shader_table_;
+}
+
+ComPtr<ID3D12Resource> ShaderTable::HitGroupShader()
+{
+    return m_hit_group_shader_table_;
+}
 }

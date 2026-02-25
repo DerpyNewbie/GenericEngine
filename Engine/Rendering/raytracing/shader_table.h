@@ -10,7 +10,12 @@ class ShaderTable
     ComPtr<ID3D12Resource> m_hit_group_shader_table_;
 
 public:
+
     ShaderTable();
+
+    ComPtr<ID3D12Resource> RayGenShader();
+    ComPtr<ID3D12Resource> MissShader();
+    ComPtr<ID3D12Resource> HitGroupShader();
 
 };
 }

@@ -3,7 +3,7 @@
 
 #include "CabotEngine/Graphics/RenderEngine.h"
 
-UavTexture::UavTexture()
+void UavTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
 
@@ -28,7 +28,7 @@ UavTexture::UavTexture()
         &uav_desc,
         D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
         nullptr,
-        IID_PPV_ARGS(&m_resource_)
+        IID_PPV_ARGS(&m_p_resource_)
     );
 
     D3D12_DESCRIPTOR_HEAP_DESC heap_desc = {};
@@ -43,9 +43,29 @@ UavTexture::UavTexture()
     uav_view_desc.Texture2D.MipSlice = 0;
 
     device->CreateUnorderedAccessView(
-        m_resource_.Get(),
+        m_p_resource_.Get(),
         nullptr,
         &uav_view_desc,
         m_uav_heap_->GetCPUDescriptorHandleForHeapStart()
     );
+}
+
+ID3D12DescriptorHeap *UavTexture::DescriptorHeap() const
+{
+    return m_uav_heap_.Get();
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE UavTexture::GetGpuHandle() const
+{
+    return m_uav_heap_->GetGPUDescriptorHandleForHeapStart();
+}
+
+D3D12_SHADER_RESOURCE_VIEW_DESC UavTexture::ViewDesc()
+{
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srv_desc.Texture2D.MipLevels = 1;
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    return srv_desc;
 }

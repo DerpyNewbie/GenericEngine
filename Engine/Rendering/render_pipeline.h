@@ -5,8 +5,13 @@
 #include "object_pool.h"
 #include "render_command.h"
 #include "render_texture.h"
+#include "uav_texture.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
+#include "raytracing/bottom_level_acceleration_structure.h"
+#include "raytracing/raytracing_shader.h"
+#include "raytracing/shader_table.h"
+#include "raytracing/top_level_acceleration_structure.h"
 
 namespace engine
 {
@@ -37,6 +42,11 @@ class RenderPipeline
     std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
 
+    std::shared_ptr<UavTexture> m_uav_texture_;
+    std::shared_ptr<ShaderTable> m_shader_table_;
+    std::shared_ptr<RaytracingShader> m_raytracing_shader_;
+    std::shared_ptr<BottomLevelAccelerationStructure> m_blts_;
+    std::shared_ptr<TopLevelAccelerationStructure> m_tlas_;
 
     void InvokeDrawCall();
 
@@ -51,6 +61,7 @@ class RenderPipeline
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void DepthRender() const;
     void ExecuteRenderCommands();
+    void RayTracingRender();
 
 public:
     Event<> on_rendering;

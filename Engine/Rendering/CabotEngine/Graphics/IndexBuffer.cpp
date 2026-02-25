@@ -58,3 +58,11 @@ D3D12_INDEX_BUFFER_VIEW *engine::IndexBuffer::View()
 {
     return &m_View;
 }
+
+D3D12_GPU_VIRTUAL_ADDRESS engine::IndexBuffer::GetGPUVirtualAddress() const
+{
+    if (m_pBuffer == nullptr)
+        return 0;
+
+    return m_pBuffer->GetGPUVirtualAddress();
+}

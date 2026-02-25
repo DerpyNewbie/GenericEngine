@@ -5,7 +5,7 @@
 
 namespace engine
 {
-TopLevelAccelerationStructure::TopLevelAccelerationStructure()
+TopLevelAccelerationStructure::TopLevelAccelerationStructure(D3D12_GPU_VIRTUAL_ADDRESS blas_address)
 {
     D3D12_RAYTRACING_INSTANCE_DESC instance_desc = {};
     float transform[3][4] = {
@@ -19,7 +19,7 @@ TopLevelAccelerationStructure::TopLevelAccelerationStructure()
     instance_desc.InstanceMask = 0xFF;
     instance_desc.InstanceContributionToHitGroupIndex = 0;
     instance_desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-    instance_desc.AccelerationStructure = m_result_buffer_->GetGPUVirtualAddress();
+    instance_desc.AccelerationStructure = blas_address;
 
     auto upload_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     auto buff_desc = CD3DX12_RESOURCE_DESC::Buffer(sizeof(D3D12_RAYTRACING_INSTANCE_DESC));
@@ -78,5 +78,10 @@ TopLevelAccelerationStructure::TopLevelAccelerationStructure()
 
     auto barrier = CD3DX12_RESOURCE_BARRIER::UAV(m_result_buffer_.Get());
     RenderEngine::DxrCommandList()->ResourceBarrier(1, &barrier);
+}
+
+D3D12_GPU_VIRTUAL_ADDRESS TopLevelAccelerationStructure::GetGPUVirtualAddress() const
+{
+    return m_result_buffer_->GetGPUVirtualAddress();
 }
 }

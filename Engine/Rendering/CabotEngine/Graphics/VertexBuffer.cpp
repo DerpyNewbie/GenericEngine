@@ -146,4 +146,12 @@ bool VertexBuffer::IsValid()
 {
     return m_IsValid;
 }
+
+D3D12_GPU_VIRTUAL_ADDRESS VertexBuffer::GetGPUVirtualAddress() const
+{
+    if (m_pBuffer == nullptr)
+        return 0;
+
+    return m_pBuffer->GetGPUVirtualAddress();
+}
 }

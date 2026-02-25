@@ -10,6 +10,7 @@ class BottomLevelAccelerationStructure
     std::shared_ptr<UavBuffer> m_scratch_buffer_;
 
 public:
+    D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress();
     BottomLevelAccelerationStructure(const Mesh *mesh_data);
 };
 }

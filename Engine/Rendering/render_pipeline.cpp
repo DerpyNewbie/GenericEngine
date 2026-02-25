@@ -7,12 +7,15 @@
 #include "Components/renderer.h"
 #include "gizmos.h"
 #include "lighting.h"
+#include "primitives.h"
 #include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/light.h"
+#include "raytracing/raytracing_global_root_signature.h"
+#include "raytracing/raytracing_pipeline_state.h"
 
 using namespace DirectX;
 
@@ -149,7 +152,7 @@ void RenderPipeline::InvokeDrawCall()
     {
         view_proj_matrices_buffers.ReturnAll();
     }
-    
+
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
@@ -170,6 +173,8 @@ void RenderPipeline::InvokeDrawCall()
     }
 
     on_rendering.Invoke();
+
+    RayTracingRender();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera &camera)
@@ -390,6 +395,52 @@ void RenderPipeline::ExecuteRenderCommands()
     }
 
     m_commands_.clear();
+}
+
+void RenderPipeline::RayTracingRender()
+{
+    if (m_uav_texture_ == nullptr)
+    {
+        m_raytracing_shader_ = std::make_shared<RaytracingShader>(L"Resources/Raytracing.hlsl");
+        RaytracingPipelineState::Instance()->CreateDxrPipelineState(*m_raytracing_shader_.get());
+        m_uav_texture_ = Object::Instantiate<UavTexture>();
+        m_uav_texture_->CreateBuffer();
+        m_shader_table_ = std::make_shared<ShaderTable>();
+        m_blts_ = std::make_shared<BottomLevelAccelerationStructure>(Primitives::GetQuadMesh().get());
+        m_tlas_ = std::make_shared<TopLevelAccelerationStructure>(m_blts_->GetGPUVirtualAddress());
+    }
+
+    auto dxr_command_list = RenderEngine::DxrCommandList();
+
+    dxr_command_list->SetPipelineState1(RaytracingPipelineState::Get().Get());
+    dxr_command_list->SetComputeRootSignature(RaytracingGlobalRootSignature::Get());
+
+    ID3D12DescriptorHeap *heaps[] = {m_uav_texture_->DescriptorHeap()};
+    dxr_command_list->SetDescriptorHeaps(_countof(heaps), heaps);
+    dxr_command_list->SetComputeRootDescriptorTable(0, m_uav_texture_->GetGpuHandle());
+    dxr_command_list->SetComputeRootShaderResourceView(1, m_tlas_->GetGPUVirtualAddress());
+
+    D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
+
+    auto ray_gen_shader = m_shader_table_->RayGenShader();
+    dispatch_desc.RayGenerationShaderRecord.StartAddress = ray_gen_shader->GetGPUVirtualAddress();
+    dispatch_desc.RayGenerationShaderRecord.SizeInBytes = ray_gen_shader->GetDesc().Width;
+
+    auto miss_shader = m_shader_table_->MissShader();
+    dispatch_desc.MissShaderTable.StartAddress = miss_shader->GetGPUVirtualAddress();
+    dispatch_desc.MissShaderTable.SizeInBytes = miss_shader->GetDesc().Width;
+    dispatch_desc.MissShaderTable.StrideInBytes = dispatch_desc.MissShaderTable.SizeInBytes;
+
+    auto hit_group_shader = m_shader_table_->HitGroupShader();
+    dispatch_desc.HitGroupTable.StartAddress = hit_group_shader->GetGPUVirtualAddress();
+    dispatch_desc.HitGroupTable.SizeInBytes = hit_group_shader->GetDesc().Width;
+    dispatch_desc.HitGroupTable.StrideInBytes = dispatch_desc.HitGroupTable.SizeInBytes;
+
+    dispatch_desc.Width = 1920;
+    dispatch_desc.Height = 1080;
+    dispatch_desc.Depth = 1;
+
+    dxr_command_list->DispatchRays(&dispatch_desc);
 }
 
 void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)

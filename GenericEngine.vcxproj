@@ -222,6 +222,8 @@
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_pipeline_state.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_shader.cpp"/>
         <ClCompile Include="Engine\Rendering\primitives.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\shader_table.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\top_level_acceleration_structure.cpp"/>
         <ClCompile Include="Engine\Rendering\render_command.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>

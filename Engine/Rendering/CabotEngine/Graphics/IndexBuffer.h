@@ -7,6 +7,7 @@ public:
     IndexBuffer(size_t size, const uint32_t *pInitData = nullptr);
     bool IsValid() const;
     D3D12_INDEX_BUFFER_VIEW *View();
+    D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const;
 
 private:
     bool m_IsValid = false;
