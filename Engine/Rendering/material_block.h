@@ -1,4 +1,5 @@
 #pragma once
+#include "generic_material_data.h"
 #include "material_data.h"
 #include "shader.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
@@ -8,7 +9,7 @@ namespace engine
 struct MaterialDataPair
 {
     std::shared_ptr<IMaterialData> data = nullptr;
-    std::shared_ptr<DescriptorHandle> handle = nullptr;
+    DescriptorHandle handle = {};
 
     template <typename Archive>
     void serialize(Archive &ar)
@@ -45,11 +46,10 @@ class MaterialBlock : public Object, public Inspectable
 {
 public:
     ShaderDataIndex shader_index = {};
-
-    std::vector<MaterialDataPair> material_data = {};
+    GenericMaterialData generic_material_data;
+    std::vector<MaterialDataPair> material_data = {}; 
 
     MaterialBlock() = default;
-    ~MaterialBlock() override;
 
     void OnInspectorGui() override;
 

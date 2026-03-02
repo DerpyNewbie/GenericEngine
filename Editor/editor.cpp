@@ -79,17 +79,17 @@ void Editor::Init()
                                                     io.Fonts->GetGlyphRangesJapanese());
         IM_ASSERT(font != nullptr);
 
-        auto descriptor_handle = DescriptorHeap::Allocate();
+        auto descriptor_handle = RenderPipeline::GetStaticDescriptorHeap()->Allocate();
         // フォントディスクリプタ取得
-        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
-        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
+        const D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle.HandleCPU;
+        const D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle.HandleGPU;
 
         ImGui_ImplWin32_Init(Application::Instance()->WindowHandle());
         ImGui_ImplDX12_Init(
             RenderEngine::Device(),
             RenderEngine::kFrame_Buffer_Count,
             DXGI_FORMAT_R8G8B8A8_UNORM,
-            DescriptorHeap::GetHeap(),
+            DescriptorHeap::Instance()->GetHeap(),
             font_cpu_desc_handle,
             font_gpu_desc_handle
         );

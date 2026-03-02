@@ -10,8 +10,8 @@ std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &
 {
     const Vector3 ndc_corners[8] =
     {
-        { -1, -1, 0 }, { -1, 1, 0 }, { 1, 1, 0 }, { 1, -1, 0 },
-        { -1, -1, 1 }, { -1, 1, 1 }, { 1, 1, 1 }, { 1, -1, 1 }
+        {-1, -1, 0}, {-1, 1, 0}, {1, 1, 0}, {1, -1, 0},
+        {-1, -1, 1}, {-1, 1, 1}, {1, 1, 1}, {1, -1, 1}
     };
 
     const Matrix inv_view_proj = (cam_view * cam_proj).Invert();
@@ -48,8 +48,10 @@ void Lighting::UpdateLightBuffer()
         m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
                                                               RenderingConstants::kMaxLightCount);
         m_lights_buffer_->CreateBuffer();
-        m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
     }
+
+    m_lights_buffer_handle_ = RenderPipeline::GetDynamicDescriptorHeap()->Allocate();
+    m_lights_buffer_->UploadBuffer(m_lights_buffer_handle_);
 
     std::array<LightData, RenderingConstants::kMaxLightCount> properties;
     for (int i = 0; i < Instance()->m_lights_.size(); ++i)
@@ -75,7 +77,7 @@ void Lighting::SetLightBuffer()
         return;
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_.HandleGPU);
 }
 
 void Lighting::SetBuffers()
@@ -95,7 +97,9 @@ void Lighting::CreateShadowMapResource()
                                       DXGI_FORMAT_R32_TYPELESS,
                                       D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL, &clear_value);
     m_depth_textures_->SetFormat(DXGI_FORMAT_R32_FLOAT);
-    m_shadow_map_handle_ = m_depth_textures_->UploadBuffer();
+
+    m_shadow_map_handle_ = RenderPipeline::GetDynamicDescriptorHeap()->Allocate();
+    m_depth_textures_->UploadBuffer(m_shadow_map_handle_);
 
     m_free_depth_texture_handles_.clear();
     for (UINT i = 0; i < RenderingConstants::kMaxShadowMapCount; i++)
@@ -171,8 +175,10 @@ void Lighting::UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(
             sizeof(Matrix), RenderingConstants::kMaxShadowMapCount);
         m_light_view_proj_matrices_buffer_->CreateBuffer();
-        m_light_view_proj_handle_ = m_light_view_proj_matrices_buffer_->UploadBuffer();
     }
+
+    m_light_view_proj_handle_ = RenderPipeline::GetDynamicDescriptorHeap()->Allocate();
+    m_light_view_proj_matrices_buffer_->UploadBuffer(m_light_view_proj_handle_);
 
     m_light_view_proj_matrices_buffer_->UpdateBuffer(m_light_view_proj_matrices_.data());
 }
@@ -194,7 +200,7 @@ void Lighting::SetLightsViewProjMatrix() const
 {
     const auto cmd_list = RenderEngine::CommandList();
 
-    cmd_list->SetGraphicsRootDescriptorTable(kLightViewProj, m_light_view_proj_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kLightViewProj, m_light_view_proj_handle_.HandleGPU);
 }
 
 void Lighting::SetShadowMap()
@@ -206,7 +212,7 @@ void Lighting::SetShadowMap()
     const auto cmd_list = RenderEngine::CommandList();
     if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
-                                                 m_shadow_map_handle_->HandleGPU);
+                                                 m_shadow_map_handle_.HandleGPU);
 }
 
 void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)

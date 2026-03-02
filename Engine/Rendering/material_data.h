@@ -22,7 +22,7 @@ struct IMaterialData : Object, Inspectable
     virtual std::shared_ptr<IBuffer> CreateBuffer() = 0;
     virtual bool CanUpdateBuffer() = 0;
     virtual void UpdateBuffer() = 0;
-    virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
+    virtual void UploadBuffer(const DescriptorHandle &descriptor_handle) = 0;
 
     virtual void *Data() = 0;
 
@@ -73,7 +73,7 @@ struct MaterialData : IMaterialData
     std::shared_ptr<IBuffer> CreateBuffer() override;
     bool CanUpdateBuffer() override;
     void UpdateBuffer() override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    void UploadBuffer(const DescriptorHandle &descriptor_handle) override;
 
     void *Data() override;
 
@@ -237,14 +237,14 @@ void MaterialData<T>::UpdateBuffer()
 }
 
 template <typename T>
-std::shared_ptr<DescriptorHandle> MaterialData<T>::UploadBuffer()
+void MaterialData<T>::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
     if (buffer == nullptr)
     {
         buffer = CreateBuffer();
     }
 
-    return buffer->UploadBuffer();
+    return buffer->UploadBuffer(descriptor_handle);
 }
 
 template <typename T>

@@ -100,9 +100,12 @@ void StructuredBuffer::UpdateBuffer(void *data)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
+void StructuredBuffer::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
-    return DescriptorHeap::Register(this);
+    const auto device = RenderEngine::Device();
+    const auto resource = Resource();
+    const auto desc = ViewDesc();
+    device->CreateShaderResourceView(resource, &desc, descriptor_handle.HandleCPU);
 }
 
 bool StructuredBuffer::IsValid()

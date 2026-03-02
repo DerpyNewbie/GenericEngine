@@ -74,7 +74,7 @@ void RenderTexture::EndRender() const
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
-ID3D12DescriptorHeap *RenderTexture::GetHeap()
+ID3D12DescriptorHeap *RenderTexture::GetHeap() const
 {
     return m_RTVHeap_.Get();
 }

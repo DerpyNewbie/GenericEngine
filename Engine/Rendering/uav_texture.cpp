@@ -3,6 +3,30 @@
 
 #include "CabotEngine/Graphics/RenderEngine.h"
 
+void UavTexture::BeginRender() const
+{
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_p_resource_.Get(),
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+    );
+
+    auto cmd_list = RenderEngine::CommandList();
+    cmd_list->ResourceBarrier(1, &barrier);
+}
+
+void UavTexture::EndRender() const
+{
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_p_resource_.Get(),
+        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+    );
+
+    auto cmd_list = RenderEngine::CommandList();
+    cmd_list->ResourceBarrier(1, &barrier);
+}
+
 void UavTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
@@ -26,7 +50,7 @@ void UavTexture::CreateBuffer()
         &default_heap_prop,
         D3D12_HEAP_FLAG_NONE,
         &uav_desc,
-        D3D12_RESOURCE_STATE_UNORDERED_ACCESS,
+        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         nullptr,
         IID_PPV_ARGS(&m_p_resource_)
     );
@@ -48,11 +72,6 @@ void UavTexture::CreateBuffer()
         &uav_view_desc,
         m_uav_heap_->GetCPUDescriptorHandleForHeapStart()
     );
-}
-
-ID3D12DescriptorHeap *UavTexture::DescriptorHeap() const
-{
-    return m_uav_heap_.Get();
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE UavTexture::GetGpuHandle() const

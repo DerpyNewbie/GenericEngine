@@ -20,7 +20,8 @@ public:
                         DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM,
                         D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE,
                         D3D12_CLEAR_VALUE *clear_value = nullptr);
-    std::shared_ptr<DescriptorHandle> UploadBuffer();
+
+    void UploadBuffer(const DescriptorHandle &descriptor_handle);
     bool IsValid() const;
 
     ID3D12Resource *Resource() override;

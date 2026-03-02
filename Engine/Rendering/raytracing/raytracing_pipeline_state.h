@@ -8,5 +8,5 @@ class RaytracingPipelineState
 public:
     static RaytracingPipelineState *Instance();
     static ComPtr<ID3D12StateObject> Get();
-    void CreateDxrPipelineState(const RaytracingShader &raytracing_shader);
+    void CreateDxrPipelineState(const engine::RaytracingShader &raytracing_shader);
 };

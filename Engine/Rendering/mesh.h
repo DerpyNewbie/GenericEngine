@@ -9,6 +9,7 @@ struct aiScene;
 
 namespace engine
 {
+class BottomLevelAccelerationStructure;
 class Mesh : public Object, public Inspectable
 {
 public:
@@ -25,10 +26,12 @@ public:
     std::vector<SubMesh> sub_meshes;
 
     std::shared_ptr<VertexBuffer> vertex_buffer;
+    std::shared_ptr<BottomLevelAccelerationStructure> blts;
     std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
 
     void OnInspectorGui() override;
     void ReconstructMeshesBuffer();
+    void CreateBlts();
 
     static std::shared_ptr<Mesh> CreateFromAiMesh(const aiMesh *mesh);
 

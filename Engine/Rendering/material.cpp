@@ -10,9 +10,10 @@ namespace engine
 {
 void Material::OnInspectorGui()
 {
-    if (Gui::PropertyField("RenderQueue", render_queue))
+    int int_render_queue = render_queue;
+    if (Gui::PropertyField("RenderQueue", int_render_queue))
     {
-        render_queue = std::clamp(render_queue, static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
+        render_queue = std::clamp(static_cast<uint16_t>(int_render_queue), static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
     }
 
     if (Gui::ExpandablePropertyField<Shader>("shader", shader))
@@ -105,7 +106,7 @@ void Material::SetDescriptorTable()
         const int root_param_idx = param_i +
                                    RootSignature::kPreDefinedVariableCount;
         const auto itr = material_block->Begin(param_type);
-        const auto desc_handle = itr->handle->HandleGPU;
+        const auto desc_handle = itr->handle.HandleGPU;
         cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
     }
 }

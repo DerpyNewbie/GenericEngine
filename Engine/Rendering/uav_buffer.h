@@ -21,7 +21,7 @@ public:
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    void UploadBuffer(const DescriptorHandle &descriptor_handle) override;
     bool IsValid() override;
 
     bool CanUpdate() override;

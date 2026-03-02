@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "skybox.h"
 #include "gui.h"
+#include "render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -40,7 +41,8 @@ bool Skybox::ReconstructTextureCube()
     if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
         return false;
 
-    m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
+    m_texture_cube_handle_ = RenderPipeline::GetStaticDescriptorHeap()->Allocate();
+    m_texture_cube_->UploadBuffer(m_texture_cube_handle_);
     return true;
 }
 
@@ -55,7 +57,7 @@ void Skybox::Render()
     if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
         return;
 
-    if (m_texture_cube_handle_ == nullptr)
+    if (m_texture_cube_handle_.HandleCPU.ptr == 0)
         ReconstructTextureCube();
 
     const auto cmd_list = RenderEngine::CommandList();
@@ -64,7 +66,7 @@ void Skybox::Render()
     cmd_list->IASetIndexBuffer(m_index_buffer_->View());
 
     cmd_list->SetPipelineState(PSOManager::Get("Skybox"));
-    cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_.HandleGPU);
 
     cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }

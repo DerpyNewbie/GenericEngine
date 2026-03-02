@@ -61,10 +61,10 @@ void ConstantBuffer::UpdateBuffer(void *data)
     memcpy(m_pMappedPtr, data, m_size_);
 }
 
-std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
+void ConstantBuffer::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
-    auto pHandle = DescriptorHeap::Register(*this);
-    return pHandle;
+    const auto view_desc = ViewDesc();
+    RenderEngine::Device()->CreateConstantBufferView(&view_desc, descriptor_handle.HandleCPU);
 }
 
 bool ConstantBuffer::IsValid()

@@ -1,7 +1,9 @@
 #pragma once
 #include <dxcapi.h>
 
-class RaytracingShader
+namespace engine
+{
+class RaytracingShader : public Object
 {
     ComPtr<IDxcBlob> m_shader_blob_;
 
@@ -10,3 +12,4 @@ public:
     CD3DX12_SHADER_BYTECODE GetByteCode() const;
 
 };
+}

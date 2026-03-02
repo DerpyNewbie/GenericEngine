@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "material_block.h"
 #include "material_data.h"
+#include "render_pipeline.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
 namespace
@@ -116,17 +117,10 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-MaterialBlock::~MaterialBlock()
-{
-    for (auto &desc_handle : material_data | std::views::transform(&MaterialDataPair::handle))
-    {
-        DescriptorHeap::Free(desc_handle);
-        desc_handle = nullptr;
-    }
-}
 
 void MaterialBlock::OnInspectorGui()
 {
+    Gui::PropertyField("Color", generic_material_data.base_color);
     for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
     {
         ImGui::PushID(data.get());
@@ -175,7 +169,7 @@ void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
 
     const auto buffer_type = data->BufferType();
     data->CreateBuffer();
-    material_data.insert(End(buffer_type), {data, nullptr});
+    material_data.insert(End(buffer_type), {data, DescriptorHandle{}});
     data->is_dirty = false;
 
     const auto field = shader_index.GetLengthField(buffer_type);
@@ -230,22 +224,12 @@ void MaterialBlock::UpdateBuffer()
             {
                 data->UpdateBuffer();
             }
-            else
-            {
-                if (handle != nullptr)
-                {
-                    DescriptorHeap::Free(handle);
-                    handle = nullptr;
-                }
-            }
 
             data->is_dirty = false;
         }
 
-        if (handle == nullptr)
-        {
-            handle = data->UploadBuffer();
-        }
+        handle = RenderPipeline::GetDynamicDescriptorHeap()->Allocate();
+        data->UploadBuffer(handle);
     }
 }
 

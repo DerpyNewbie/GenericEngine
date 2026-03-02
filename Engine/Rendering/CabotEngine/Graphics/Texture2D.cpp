@@ -108,9 +108,12 @@ void Texture2D::UpdateBuffer(void *data)
     engine::Logger::Error("Can not Update Texture2D");
 }
 
-std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
+void Texture2D::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
-    return DescriptorHeap::Register(this);
+    const auto device = RenderEngine::Device();
+    const auto resource = Resource();
+    const auto desc = ViewDesc();
+    device->CreateShaderResourceView(resource, &desc, descriptor_handle.HandleCPU);
 }
 
 bool Texture2D::CanUpdate()

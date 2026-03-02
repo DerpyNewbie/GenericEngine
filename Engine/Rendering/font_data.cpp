@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "font_data.h"
 
+#include "render_pipeline.h"
 #include "CabotEngine/Graphics/DescriptorHeap.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
@@ -38,12 +39,12 @@ void FontData::LoadFont(const std::wstring &font_path)
     DirectX::ResourceUploadBatch resource_upload_batch(device);
     resource_upload_batch.Begin();
 
-    m_spritefont_handle_ = DescriptorHeap::Allocate();
+    m_spritefont_handle_ = RenderPipeline::GetStaticDescriptorHeap()->Allocate();
     m_sprite_font_ = std::make_shared<DirectX::SpriteFont>(device,
                                                            resource_upload_batch,
                                                            font_path.c_str(),
-                                                           m_spritefont_handle_->HandleCPU,
-                                                           m_spritefont_handle_->HandleGPU);
+                                                           m_spritefont_handle_.HandleCPU,
+                                                           m_spritefont_handle_.HandleGPU);
 
     auto future = resource_upload_batch.End(RenderEngine::CommandQueue());
 

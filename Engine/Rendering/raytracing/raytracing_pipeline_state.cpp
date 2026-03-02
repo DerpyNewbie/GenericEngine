@@ -16,7 +16,7 @@ ComPtr<ID3D12StateObject> RaytracingPipelineState::Get()
     return Instance()->m_dxr_state_objects_[0].Get();
 }
 
-void RaytracingPipelineState::CreateDxrPipelineState(const RaytracingShader &raytracing_shader)
+void RaytracingPipelineState::CreateDxrPipelineState(const engine::RaytracingShader &raytracing_shader)
 {
     CD3DX12_STATE_OBJECT_DESC dxr_pipeline(D3D12_STATE_OBJECT_TYPE_RAYTRACING_PIPELINE);
     auto lib = dxr_pipeline.CreateSubobject<CD3DX12_DXIL_LIBRARY_SUBOBJECT>();

@@ -192,34 +192,22 @@ void RenderEngine::EndRender()
 
     // 描画完了を待つ
     MoveToNextFrame();
-
-    // バックバッファ番号更新
-    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
 void RenderEngine::MoveToNextFrame()
 {
-    // 1. 今のフレームに対して「この値(m_next_fence_value_)になるまで頑張れ」と命令
+    //TODO : １個前のフレームの書き込みを待つようにする
     const UINT64 fence_to_signal = m_next_fence_value_;
     m_p_queue_->Signal(m_p_fence_.Get(), fence_to_signal);
-
-    // 2. 次回のためにカウンタを絶対増やしておく（これが重要）
     m_next_fence_value_++;
 
-    // 3. バックバッファ更新
-    const UINT last_frame_index = m_current_back_buffer_index_;
-    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
-
-    // 4. 「今のフレーム」が終わるべき値を配列に保存
-    // (次にこのバッファインデックスが回ってきた時、この値を超えてるかチェックするため)
-    m_fence_value_[last_frame_index] = fence_to_signal;
-
-    // 5. 【Wait】次のフレームで使うバッファは、前回Signalした値を超えているか？
-    if (m_p_fence_->GetCompletedValue() < m_fence_value_[m_current_back_buffer_index_])
+    if (m_p_fence_->GetCompletedValue() < fence_to_signal)
     {
-        m_p_fence_->SetEventOnCompletion(m_fence_value_[m_current_back_buffer_index_], m_fence_event_);
+        m_p_fence_->SetEventOnCompletion(fence_to_signal, m_fence_event_);
         WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE);
     }
+    
+    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
 void RenderEngine::SetBackgroundColor(const Color color)

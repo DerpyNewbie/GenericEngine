@@ -52,8 +52,8 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
         float depth = 0.0f;
         if (command.type == engine::CommandType::Mesh)
         {
-            auto render_queue = command.mesh_data.material->render_queue;
-            auto depth = (*command.mesh_data.pos - camera_pos).Length();
+            render_queue = command.mesh_data.material->render_queue;
+            depth = (*command.mesh_data.pos - camera_pos).Length();
         }
         else
         {
@@ -154,9 +154,12 @@ void RenderPipeline::InvokeDrawCall()
     }
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
-    const auto descriptor_heap = DescriptorHeap::GetHeap();
+    const auto descriptor_heap = DescriptorHeap::Instance()->GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
+
+    RayTracingRender();
+
+    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
 
     for (const auto camera : m_requesting_cameras_)
     {
@@ -173,8 +176,8 @@ void RenderPipeline::InvokeDrawCall()
     }
 
     on_rendering.Invoke();
-
-    RayTracingRender();
+    int current_idx_buffer = RenderEngine::CurrentBackBufferIndex();
+    m_dynamic_descriptor_heaps_[current_idx_buffer]->Reset();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera &camera)
@@ -401,24 +404,42 @@ void RenderPipeline::RayTracingRender()
 {
     if (m_uav_texture_ == nullptr)
     {
-        m_raytracing_shader_ = std::make_shared<RaytracingShader>(L"Resources/Raytracing.hlsl");
+        m_raytracing_shader_ = std::make_shared<RaytracingShader>(L"Resources/Raytracing.raytrace");
         RaytracingPipelineState::Instance()->CreateDxrPipelineState(*m_raytracing_shader_.get());
-        m_uav_texture_ = Object::Instantiate<UavTexture>();
+        m_uav_texture_ = Object::Instantiate<UavTexture>("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         m_uav_texture_->CreateBuffer();
         m_shader_table_ = std::make_shared<ShaderTable>();
-        m_blts_ = std::make_shared<BottomLevelAccelerationStructure>(Primitives::GetQuadMesh().get());
-        m_tlas_ = std::make_shared<TopLevelAccelerationStructure>(m_blts_->GetGPUVirtualAddress());
+        m_tlas_ = std::make_shared<TopLevelAccelerationStructure>();
+        m_uav_texture_handle_ = GetStaticDescriptorHeap()->Allocate();
+        m_uav_texture_->UploadBuffer(m_uav_texture_handle_);
+
+        m_material_buffer_ = std::make_shared<StructuredBuffer>(sizeof(GenericMaterialData), 10);
+        m_material_buffer_->CreateBuffer();
     }
 
-    auto dxr_command_list = RenderEngine::DxrCommandList();
+    m_material_buffer_->UpdateBuffer(m_generic_material_datas_.data());
 
+    m_uav_texture_->BeginRender();
+    m_tlas_->Update(m_tlas_instances_);
+    
+    auto dxr_command_list = RenderEngine::DxrCommandList();
+    auto current_back_buffer_index = RenderEngine::CurrentBackBufferIndex();
+
+    auto main_camera = CameraComponent::Main();
+    auto view = main_camera->ViewMatrix().Invert();
+    auto proj = main_camera->property.ProjectionMatrix().Invert();
+    auto view_projection_buffer = m_view_proj_matrix_buffers_[current_back_buffer_index].Get()->get();
+    ViewProjection view_projection;
+    view_projection.matrices[0] = view;
+    view_projection.matrices[1] = proj;
+    view_projection_buffer->UpdateBuffer(&view_projection);
+    
     dxr_command_list->SetPipelineState1(RaytracingPipelineState::Get().Get());
     dxr_command_list->SetComputeRootSignature(RaytracingGlobalRootSignature::Get());
-
-    ID3D12DescriptorHeap *heaps[] = {m_uav_texture_->DescriptorHeap()};
-    dxr_command_list->SetDescriptorHeaps(_countof(heaps), heaps);
-    dxr_command_list->SetComputeRootDescriptorTable(0, m_uav_texture_->GetGpuHandle());
-    dxr_command_list->SetComputeRootShaderResourceView(1, m_tlas_->GetGPUVirtualAddress());
+    dxr_command_list->SetComputeRootConstantBufferView(0, view_projection_buffer->GetAddress());
+    dxr_command_list->SetComputeRootDescriptorTable(1, m_uav_texture_handle_.HandleGPU);
+    dxr_command_list->SetComputeRootShaderResourceView(2, m_tlas_->GetGPUVirtualAddress());
+    dxr_command_list->SetComputeRootShaderResourceView(3, m_material_buffer_->GetAddress());
 
     D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
 
@@ -441,6 +462,11 @@ void RenderPipeline::RayTracingRender()
     dispatch_desc.Depth = 1;
 
     dxr_command_list->DispatchRays(&dispatch_desc);
+
+    m_uav_texture_->EndRender();
+
+    m_tlas_instances_.clear();
+    m_generic_material_datas_.clear();
 }
 
 void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
@@ -524,6 +550,28 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
     return key;
 }
 
+void RenderPipeline::SubmitRaytracing(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, const Matrix &matrix)
+{
+    mesh->CreateBlts();
+    auto instance = Instance();
+
+    D3D12_RAYTRACING_INSTANCE_DESC raytrace_instance_desc = {};
+
+    raytrace_instance_desc.InstanceID = instance->m_generic_material_datas_.size();
+    raytrace_instance_desc.InstanceMask = 0xFF;
+    raytrace_instance_desc.InstanceContributionToHitGroupIndex = 0;
+    raytrace_instance_desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
+    raytrace_instance_desc.AccelerationStructure = mesh->blts->GetGPUVirtualAddress();
+
+    XMFLOAT3X4 dest_matrix;
+    XMStoreFloat3x4(&dest_matrix, matrix);
+
+    memcpy(raytrace_instance_desc.Transform, &dest_matrix, sizeof(XMFLOAT3X4));
+
+    instance->m_tlas_instances_.emplace_back(raytrace_instance_desc);
+    instance->m_generic_material_datas_.emplace_back(materials[0].CastedLock()->p_shared_material_block->generic_material_data);
+}
+
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
@@ -531,7 +579,23 @@ void RenderPipeline::Init()
     {
         view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
     }
+
+    instance->m_commands_.reserve(kReserveRendererCount);
+    instance->m_tlas_instances_.reserve(kReserveRendererCount);
+
+    auto descriptor_heap = DescriptorHeap::Instance()->GetHeap();
+    uint32_t start_idx = kStaticDescriptorHeapCount;
+    uint32_t capacity = DescriptorHeap::kHandleMax - kStaticDescriptorHeapCount / RenderEngine::kFrame_Buffer_Count;
+    uint32_t descriptor_size = DescriptorHeap::Instance()->DescriptorSize();
+
+    instance->m_static_descriptor_heap_ = std::make_shared<SubDescriptorHeap>(descriptor_heap, 0, kStaticDescriptorHeapCount, descriptor_size);
+
+    for (auto &sub_descriptor_heap : instance->m_dynamic_descriptor_heaps_)
+    {
+        sub_descriptor_heap = std::make_shared<SubDescriptorHeap>(descriptor_heap, start_idx, capacity, descriptor_size);
+    }
 }
+
 RenderPipeline *RenderPipeline::Instance()
 {
     static auto instance = new RenderPipeline;
@@ -546,6 +610,17 @@ size_t RenderPipeline::GetRendererCount()
 Camera RenderPipeline::GetCurrentCamera()
 {
     return Instance()->m_current_camera_;
+}
+
+std::shared_ptr<SubDescriptorHeap> RenderPipeline::GetStaticDescriptorHeap()
+{
+    return Instance()->m_static_descriptor_heap_;
+}
+
+std::shared_ptr<SubDescriptorHeap> RenderPipeline::GetDynamicDescriptorHeap()
+{
+    auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    return Instance()->m_dynamic_descriptor_heaps_[current_buffer_idx];
 }
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
@@ -565,5 +640,10 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 void RenderPipeline::RequestRender(Camera camera)
 {
     Instance()->m_requesting_cameras_.emplace_back(camera);
+}
+
+void RenderPipeline::AddRaytracePass(std::shared_ptr<RaytracePass> raytrace_pass)
+{
+    Instance()->m_raytrace_passes_.emplace_back(raytrace_pass);
 }
 }

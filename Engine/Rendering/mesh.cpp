@@ -9,8 +9,8 @@
 #include <assimp/mesh.h>
 #include <assimp/scene.h>
 #include "mesh.h"
-
 #include "assimp_util.h"
+#include "raytracing/bottom_level_acceleration_structure.h"
 
 namespace engine
 {
@@ -113,6 +113,15 @@ void Mesh::ReconstructMeshesBuffer()
 
         index_buffers.emplace_back(sub_index_buffer);
     }
+}
+
+void Mesh::CreateBlts()
+{
+    if (blts != nullptr)
+        return;
+
+    ReconstructMeshesBuffer();
+    blts = std::make_shared<BottomLevelAccelerationStructure>(this);
 }
 
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)

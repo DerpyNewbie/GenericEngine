@@ -14,7 +14,7 @@ public:
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    void UploadBuffer(const DescriptorHandle &descriptor_handle) override;
     bool CanUpdate() override;
     bool IsValid() override;
 

@@ -39,9 +39,9 @@ void engine::UavBuffer::CreateBuffer()
 void engine::UavBuffer::UpdateBuffer(void *data)
 {}
 
-std::shared_ptr<DescriptorHandle> engine::UavBuffer::UploadBuffer()
+void engine::UavBuffer::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
-    return nullptr;
+    //TODO : 追加しといて
 }
 
 bool engine::UavBuffer::IsValid()

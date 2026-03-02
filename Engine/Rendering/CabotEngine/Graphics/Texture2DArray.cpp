@@ -106,9 +106,12 @@ bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count,
     return true;
 }
 
-std::shared_ptr<DescriptorHandle> Texture2DArray::UploadBuffer()
+void Texture2DArray::UploadBuffer(const DescriptorHandle &descriptor_handle)
 {
-    return DescriptorHeap::Register(this);
+    const auto device = RenderEngine::Device();
+    const auto resource = Resource();
+    const auto desc = ViewDesc();
+    device->CreateShaderResourceView(resource, &desc, descriptor_handle.HandleCPU);
 }
 
 bool Texture2DArray::IsValid() const

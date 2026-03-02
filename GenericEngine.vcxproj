@@ -56,6 +56,7 @@
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\import_log.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\material_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\raytracing_shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp"/>
@@ -107,6 +108,7 @@
         <ClCompile Include="Engine\engine_util.cpp"/>
         <ClCompile Include="Engine\event.cpp"/>
         <ClCompile Include="Engine\game_object.cpp"/>
+        <ClCompile Include="Engine\generic_material_data.cpp"/>
         <ClCompile Include="Engine\gui.cpp"/>
         <ClCompile Include="Engine\input.cpp"/>
         <ClCompile Include="Engine\Math\rect.cpp"/>
@@ -136,6 +138,7 @@
             <ShaderType>Vertex</ShaderType>
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\sub_descriptorheap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
@@ -217,6 +220,7 @@
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\raytrace_pass.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_global_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_local_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_pipeline_state.cpp"/>
@@ -287,6 +291,7 @@
         <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\import_log.h"/>
         <ClInclude Include="Engine\Asset\Importer\material_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\raytracing_shader_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_2d_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\texture_cube_importer.h"/>
@@ -342,6 +347,7 @@
         <ClInclude Include="Engine\event.h"/>
         <ClInclude Include="Engine\event_receivers.h"/>
         <ClInclude Include="Engine\game_object.h"/>
+        <ClInclude Include="Engine\generic_material_data.h"/>
         <ClInclude Include="Engine\gui.h"/>
         <ClInclude Include="Engine\guid_serializer.h"/>
         <ClInclude Include="Engine\input.h"/>
@@ -366,6 +372,7 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\sub_descriptorheap.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
@@ -395,6 +402,7 @@
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.h"/>
+        <ClInclude Include="Engine\Rendering\raytracing\raytrace_pass.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_global_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_local_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_pipeline_state.h"/>

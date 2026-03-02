@@ -8,6 +8,7 @@ namespace engine
 class StructuredBuffer : public IBuffer, public ShaderResource
 {
 public:
+    
     explicit StructuredBuffer(const size_t stride, const size_t elem_count)
     {
         m_stride_ = stride;
@@ -17,7 +18,7 @@ public:
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    void UploadBuffer(const DescriptorHandle &descriptor_handle) override;
 
     bool CanUpdate() override
     {

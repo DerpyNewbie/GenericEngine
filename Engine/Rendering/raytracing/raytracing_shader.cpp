@@ -3,6 +3,8 @@
 
 #pragma comment(lib, "dxcompiler.lib")
 
+namespace engine
+{
 RaytracingShader::RaytracingShader(const std::wstring &file_path)
 {
     ComPtr<IDxcUtils> utils;
@@ -18,7 +20,7 @@ RaytracingShader::RaytracingShader(const std::wstring &file_path)
 
     auto hr = utils->LoadFile(file_path.c_str(), nullptr, &source_blob);
     if (FAILED(hr))
-        engine::Logger::Log("Failed to load hlsl file");
+        Logger::Log("Failed to load hlsl file");
 
     LPCWSTR args[] = {
         file_path.c_str(),
@@ -50,7 +52,7 @@ RaytracingShader::RaytracingShader(const std::wstring &file_path)
     result->GetStatus(&hr);
     if (FAILED(hr))
     {
-        engine::Logger::Log("Failed to compile shader");
+        Logger::Log("Failed to compile shader");
     }
 
     result->GetOutput(DXC_OUT_OBJECT, IID_PPV_ARGS(&m_shader_blob_), nullptr);
@@ -62,4 +64,5 @@ CD3DX12_SHADER_BYTECODE RaytracingShader::GetByteCode() const
         m_shader_blob_->GetBufferPointer(),
         m_shader_blob_->GetBufferSize()
     );
+}
 }
