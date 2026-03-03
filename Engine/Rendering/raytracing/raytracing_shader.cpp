@@ -24,7 +24,7 @@ RaytracingShader::RaytracingShader(const std::wstring &file_path)
 
     LPCWSTR args[] = {
         file_path.c_str(),
-        L"-T", L"lib_6_3",
+        L"-T", L"lib_6_6",
         L"-Qstrip_reflect",
         L"-O3"
     };

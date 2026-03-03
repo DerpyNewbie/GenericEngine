@@ -17,16 +17,18 @@ RaytracingGlobalRootSignature::RaytracingGlobalRootSignature()
 {
     CD3DX12_DESCRIPTOR_RANGE range[2];
     range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
-    range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+    range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 20, 3);
 
-    CD3DX12_ROOT_PARAMETER root_params[4];
+    CD3DX12_ROOT_PARAMETER root_params[6];
 
     root_params[0].InitAsConstantBufferView(0);
     root_params[1].InitAsDescriptorTable(1, &range[0]);
     root_params[2].InitAsShaderResourceView(0);
     root_params[3].InitAsShaderResourceView(1);
+    root_params[4].InitAsShaderResourceView(2);
+    root_params[5].InitAsDescriptorTable(1, &range[1]);
 
-    CD3DX12_ROOT_SIGNATURE_DESC global_root_sig_desc(4, root_params, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_NONE);
+    CD3DX12_ROOT_SIGNATURE_DESC global_root_sig_desc(6, root_params, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_CBV_SRV_UAV_HEAP_DIRECTLY_INDEXED);
     
     ComPtr<ID3DBlob> error;
     auto hr = D3D12SerializeRootSignature(&global_root_sig_desc, D3D_ROOT_SIGNATURE_VERSION_1, &m_signature_, &error);

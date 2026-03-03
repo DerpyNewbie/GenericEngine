@@ -6,9 +6,11 @@
 #include "render_command.h"
 #include "uav_texture.h"
 #include "view_projection.h"
+#include "CabotEngine/Graphics/byte_address_buffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/sub_descriptorheap.h"
 #include "raytracing/bottom_level_acceleration_structure.h"
+#include "raytracing/instance_info.h"
 #include "raytracing/raytrace_pass.h"
 #include "raytracing/raytracing_shader.h"
 #include "raytracing/shader_table.h"
@@ -51,7 +53,13 @@ class RenderPipeline
 
     std::vector<std::shared_ptr<RaytracePass>> m_raytrace_passes_;
     std::vector<GenericMaterialData> m_generic_material_datas_;
+    std::vector<InstanceInfo> m_instance_infos_;
+    std::vector<ByteAddressBuffer> m_vertex_address_buffers_;
+    std::vector<ByteAddressBuffer> m_index_address_buffers_;
+    std::vector<DescriptorHandle> m_vertex_buffer_handle_;
+    std::vector<DescriptorHandle> m_index_buffer_handle_;
     std::shared_ptr<StructuredBuffer> m_material_buffer_;
+    std::shared_ptr<StructuredBuffer> m_instance_info_buffer_;
     std::shared_ptr<UavTexture> m_uav_texture_;
     std::shared_ptr<ShaderTable> m_shader_table_;
     std::shared_ptr<RaytracingShader> m_raytracing_shader_;

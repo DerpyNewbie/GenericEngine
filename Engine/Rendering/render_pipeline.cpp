@@ -415,9 +415,27 @@ void RenderPipeline::RayTracingRender()
 
         m_material_buffer_ = std::make_shared<StructuredBuffer>(sizeof(GenericMaterialData), 10);
         m_material_buffer_->CreateBuffer();
+
+        m_instance_info_buffer_ = std::make_shared<StructuredBuffer>(sizeof(InstanceInfo), 10);
+        m_instance_info_buffer_->CreateBuffer();
     }
 
+    for (int i = 0; i < m_vertex_address_buffers_.size(); ++i)
+    {
+        auto vert_desc_handle = GetDynamicDescriptorHeap()->Allocate();
+        auto index_desc_handle = GetDynamicDescriptorHeap()->Allocate();
+
+        m_vertex_address_buffers_[i].UploadBuffer(vert_desc_handle);
+        m_index_address_buffers_[i].UploadBuffer(index_desc_handle);
+
+        m_instance_infos_.emplace_back(vert_desc_handle.index, index_desc_handle.index);
+
+        m_vertex_buffer_handle_.emplace_back(vert_desc_handle);
+        m_index_buffer_handle_.emplace_back(index_desc_handle);
+    }
+    
     m_material_buffer_->UpdateBuffer(m_generic_material_datas_.data());
+    m_instance_info_buffer_->UpdateBuffer(m_instance_infos_.data());
 
     m_uav_texture_->BeginRender();
     m_tlas_->Update(m_tlas_instances_);
@@ -440,6 +458,9 @@ void RenderPipeline::RayTracingRender()
     dxr_command_list->SetComputeRootDescriptorTable(1, m_uav_texture_handle_.HandleGPU);
     dxr_command_list->SetComputeRootShaderResourceView(2, m_tlas_->GetGPUVirtualAddress());
     dxr_command_list->SetComputeRootShaderResourceView(3, m_material_buffer_->GetAddress());
+    dxr_command_list->SetComputeRootShaderResourceView(4, m_instance_info_buffer_->GetAddress());
+    dxr_command_list->SetComputeRootDescriptorTable(5, m_vertex_buffer_handle_[0].HandleGPU);
+    
 
     D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
 
@@ -467,6 +488,11 @@ void RenderPipeline::RayTracingRender()
 
     m_tlas_instances_.clear();
     m_generic_material_datas_.clear();
+    m_vertex_buffer_handle_.clear();
+    m_index_buffer_handle_.clear();
+    m_vertex_address_buffers_.clear();
+    m_index_address_buffers_.clear();
+    m_instance_infos_.clear();
 }
 
 void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
@@ -570,6 +596,11 @@ void RenderPipeline::SubmitRaytracing(const std::shared_ptr<Mesh> &mesh, std::ve
 
     instance->m_tlas_instances_.emplace_back(raytrace_instance_desc);
     instance->m_generic_material_datas_.emplace_back(materials[0].CastedLock()->p_shared_material_block->generic_material_data);
+
+    ByteAddressBuffer vertex_buffer(mesh->vertex_buffer->Resource());
+    ByteAddressBuffer index_buffer(mesh->index_buffers[0]->Resource());
+    instance->m_vertex_address_buffers_.emplace_back(vertex_buffer);
+    instance->m_index_address_buffers_.emplace_back(index_buffer);
 }
 
 void RenderPipeline::Init()

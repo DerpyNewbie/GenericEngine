@@ -54,6 +54,11 @@ bool engine::IndexBuffer::IsValid() const
     return m_IsValid;
 }
 
+ID3D12Resource *engine::IndexBuffer::Resource() const
+{
+    return m_pBuffer.Get();
+}
+
 D3D12_INDEX_BUFFER_VIEW *engine::IndexBuffer::View()
 {
     return &m_View;

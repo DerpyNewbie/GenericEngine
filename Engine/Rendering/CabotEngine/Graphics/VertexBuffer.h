@@ -17,6 +17,7 @@ public:
     D3D12_VERTEX_BUFFER_VIEW *View(); // 頂点バッファビューを取得
     bool IsValid(); // バッファの生成に成功したかを取得
 
+    ID3D12Resource *Resource() const;
     D3D12_GPU_VIRTUAL_ADDRESS GetGPUVirtualAddress() const;
     
     VertexBuffer(const VertexBuffer &) = delete;

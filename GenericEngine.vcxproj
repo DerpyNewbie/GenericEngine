@@ -138,6 +138,7 @@
             <ShaderType>Vertex</ShaderType>
             <ShaderModel>5.1</ShaderModel>
         </FxCompile>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\byte_address_buffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\sub_descriptorheap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
@@ -220,6 +221,7 @@
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\instance_info.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytrace_pass.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_global_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_local_root_signature.cpp"/>
@@ -372,6 +374,7 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\byte_address_buffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\sub_descriptorheap.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
@@ -402,6 +405,7 @@
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.h"/>
+        <ClInclude Include="Engine\Rendering\raytracing\instance_info.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytrace_pass.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_global_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_local_root_signature.h"/>
