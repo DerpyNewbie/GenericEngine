@@ -222,7 +222,7 @@
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\instance_info.cpp"/>
-        <ClCompile Include="Engine\Rendering\raytracing\raytrace_pass.cpp"/>
+        <ClCompile Include="Engine\Rendering\raytracing\raytracing_manager.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_global_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_local_root_signature.cpp"/>
         <ClCompile Include="Engine\Rendering\raytracing\raytracing_pipeline_state.cpp"/>
@@ -406,7 +406,7 @@
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\bottom_level_acceleration_structure.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\instance_info.h"/>
-        <ClInclude Include="Engine\Rendering\raytracing\raytrace_pass.h"/>
+        <ClInclude Include="Engine\Rendering\raytracing\raytracing_manager.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_global_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_local_root_signature.h"/>
         <ClInclude Include="Engine\Rendering\raytracing\raytracing_pipeline_state.h"/>

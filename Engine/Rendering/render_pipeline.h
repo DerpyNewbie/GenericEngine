@@ -11,7 +11,7 @@
 #include "CabotEngine/Graphics/sub_descriptorheap.h"
 #include "raytracing/bottom_level_acceleration_structure.h"
 #include "raytracing/instance_info.h"
-#include "raytracing/raytrace_pass.h"
+#include "raytracing/raytracing_manager.h"
 #include "raytracing/raytracing_shader.h"
 #include "raytracing/shader_table.h"
 #include "raytracing/top_level_acceleration_structure.h"
@@ -41,7 +41,6 @@ class RenderPipeline
     std::shared_ptr<SubDescriptorHeap> m_static_descriptor_heap_;
     std::array<std::shared_ptr<SubDescriptorHeap>, RenderEngine::kFrame_Buffer_Count> m_dynamic_descriptor_heaps_;
     std::vector<RenderCommand> m_commands_;
-    std::vector<D3D12_RAYTRACING_INSTANCE_DESC> m_tlas_instances_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
 
@@ -50,21 +49,6 @@ class RenderPipeline
     uint32_t m_current_view_proj_matrix_index_;
     std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
-
-    std::vector<std::shared_ptr<RaytracePass>> m_raytrace_passes_;
-    std::vector<GenericMaterialData> m_generic_material_datas_;
-    std::vector<InstanceInfo> m_instance_infos_;
-    std::vector<ByteAddressBuffer> m_vertex_address_buffers_;
-    std::vector<ByteAddressBuffer> m_index_address_buffers_;
-    std::vector<DescriptorHandle> m_vertex_buffer_handle_;
-    std::vector<DescriptorHandle> m_index_buffer_handle_;
-    std::shared_ptr<StructuredBuffer> m_material_buffer_;
-    std::shared_ptr<StructuredBuffer> m_instance_info_buffer_;
-    std::shared_ptr<UavTexture> m_uav_texture_;
-    std::shared_ptr<ShaderTable> m_shader_table_;
-    std::shared_ptr<RaytracingShader> m_raytracing_shader_;
-    std::shared_ptr<TopLevelAccelerationStructure> m_tlas_;
-    DescriptorHandle m_uav_texture_handle_;
 
     void InvokeDrawCall();
 
@@ -79,7 +63,6 @@ class RenderPipeline
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void DepthRender() const;
     void ExecuteRenderCommands();
-    void RayTracingRender();
 
 public:
     Event<> on_rendering;
@@ -92,12 +75,10 @@ public:
     static std::shared_ptr<SubDescriptorHeap> GetDynamicDescriptorHeap();
     static uint64_t GenerateSortKey(uint64_t render_queue, float depth, const Shader &shader);
 
-    static void SubmitRaytracing(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, const Matrix &matrix);
     static void Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
     static void Submit(AssetPtr<FontData> font_data, Vector2 position, const std::string &string, Color color);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
     static void RequestRender(Camera camera);
-    static void AddRaytracePass(std::shared_ptr<RaytracePass> raytrace_pass);
 };
 }

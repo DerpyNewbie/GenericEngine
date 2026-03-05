@@ -157,7 +157,7 @@ void RenderPipeline::InvokeDrawCall()
     const auto descriptor_heap = DescriptorHeap::Instance()->GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 
-    RayTracingRender();
+    RaytracingManager::Instance()->Execute();
 
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
 
@@ -400,101 +400,6 @@ void RenderPipeline::ExecuteRenderCommands()
     m_commands_.clear();
 }
 
-void RenderPipeline::RayTracingRender()
-{
-    if (m_uav_texture_ == nullptr)
-    {
-        m_raytracing_shader_ = std::make_shared<RaytracingShader>(L"Resources/Raytracing.raytrace");
-        RaytracingPipelineState::Instance()->CreateDxrPipelineState(*m_raytracing_shader_.get());
-        m_uav_texture_ = Object::Instantiate<UavTexture>("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-        m_uav_texture_->CreateBuffer();
-        m_shader_table_ = std::make_shared<ShaderTable>();
-        m_tlas_ = std::make_shared<TopLevelAccelerationStructure>();
-        m_uav_texture_handle_ = GetStaticDescriptorHeap()->Allocate();
-        m_uav_texture_->UploadBuffer(m_uav_texture_handle_);
-
-        m_material_buffer_ = std::make_shared<StructuredBuffer>(sizeof(GenericMaterialData), 10);
-        m_material_buffer_->CreateBuffer();
-
-        m_instance_info_buffer_ = std::make_shared<StructuredBuffer>(sizeof(InstanceInfo), 10);
-        m_instance_info_buffer_->CreateBuffer();
-    }
-
-    for (int i = 0; i < m_vertex_address_buffers_.size(); ++i)
-    {
-        auto vert_desc_handle = GetDynamicDescriptorHeap()->Allocate();
-        auto index_desc_handle = GetDynamicDescriptorHeap()->Allocate();
-
-        m_vertex_address_buffers_[i].UploadBuffer(vert_desc_handle);
-        m_index_address_buffers_[i].UploadBuffer(index_desc_handle);
-
-        m_instance_infos_.emplace_back(vert_desc_handle.index, index_desc_handle.index);
-
-        m_vertex_buffer_handle_.emplace_back(vert_desc_handle);
-        m_index_buffer_handle_.emplace_back(index_desc_handle);
-    }
-    
-    m_material_buffer_->UpdateBuffer(m_generic_material_datas_.data());
-    m_instance_info_buffer_->UpdateBuffer(m_instance_infos_.data());
-
-    m_uav_texture_->BeginRender();
-    m_tlas_->Update(m_tlas_instances_);
-    
-    auto dxr_command_list = RenderEngine::DxrCommandList();
-    auto current_back_buffer_index = RenderEngine::CurrentBackBufferIndex();
-
-    auto main_camera = CameraComponent::Main();
-    auto view = main_camera->ViewMatrix().Invert();
-    auto proj = main_camera->property.ProjectionMatrix().Invert();
-    auto view_projection_buffer = m_view_proj_matrix_buffers_[current_back_buffer_index].Get()->get();
-    ViewProjection view_projection;
-    view_projection.matrices[0] = view;
-    view_projection.matrices[1] = proj;
-    view_projection_buffer->UpdateBuffer(&view_projection);
-    
-    dxr_command_list->SetPipelineState1(RaytracingPipelineState::Get().Get());
-    dxr_command_list->SetComputeRootSignature(RaytracingGlobalRootSignature::Get());
-    dxr_command_list->SetComputeRootConstantBufferView(0, view_projection_buffer->GetAddress());
-    dxr_command_list->SetComputeRootDescriptorTable(1, m_uav_texture_handle_.HandleGPU);
-    dxr_command_list->SetComputeRootShaderResourceView(2, m_tlas_->GetGPUVirtualAddress());
-    dxr_command_list->SetComputeRootShaderResourceView(3, m_material_buffer_->GetAddress());
-    dxr_command_list->SetComputeRootShaderResourceView(4, m_instance_info_buffer_->GetAddress());
-    dxr_command_list->SetComputeRootDescriptorTable(5, m_vertex_buffer_handle_[0].HandleGPU);
-    
-
-    D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
-
-    auto ray_gen_shader = m_shader_table_->RayGenShader();
-    dispatch_desc.RayGenerationShaderRecord.StartAddress = ray_gen_shader->GetGPUVirtualAddress();
-    dispatch_desc.RayGenerationShaderRecord.SizeInBytes = ray_gen_shader->GetDesc().Width;
-
-    auto miss_shader = m_shader_table_->MissShader();
-    dispatch_desc.MissShaderTable.StartAddress = miss_shader->GetGPUVirtualAddress();
-    dispatch_desc.MissShaderTable.SizeInBytes = miss_shader->GetDesc().Width;
-    dispatch_desc.MissShaderTable.StrideInBytes = dispatch_desc.MissShaderTable.SizeInBytes;
-
-    auto hit_group_shader = m_shader_table_->HitGroupShader();
-    dispatch_desc.HitGroupTable.StartAddress = hit_group_shader->GetGPUVirtualAddress();
-    dispatch_desc.HitGroupTable.SizeInBytes = hit_group_shader->GetDesc().Width;
-    dispatch_desc.HitGroupTable.StrideInBytes = dispatch_desc.HitGroupTable.SizeInBytes;
-
-    dispatch_desc.Width = 1920;
-    dispatch_desc.Height = 1080;
-    dispatch_desc.Depth = 1;
-
-    dxr_command_list->DispatchRays(&dispatch_desc);
-
-    m_uav_texture_->EndRender();
-
-    m_tlas_instances_.clear();
-    m_generic_material_datas_.clear();
-    m_vertex_buffer_handle_.clear();
-    m_index_buffer_handle_.clear();
-    m_vertex_address_buffers_.clear();
-    m_index_address_buffers_.clear();
-    m_instance_infos_.clear();
-}
-
 void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
 {
     const auto instance = Instance();
@@ -576,33 +481,6 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
     return key;
 }
 
-void RenderPipeline::SubmitRaytracing(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, const Matrix &matrix)
-{
-    mesh->CreateBlts();
-    auto instance = Instance();
-
-    D3D12_RAYTRACING_INSTANCE_DESC raytrace_instance_desc = {};
-
-    raytrace_instance_desc.InstanceID = instance->m_generic_material_datas_.size();
-    raytrace_instance_desc.InstanceMask = 0xFF;
-    raytrace_instance_desc.InstanceContributionToHitGroupIndex = 0;
-    raytrace_instance_desc.Flags = D3D12_RAYTRACING_INSTANCE_FLAG_NONE;
-    raytrace_instance_desc.AccelerationStructure = mesh->blts->GetGPUVirtualAddress();
-
-    XMFLOAT3X4 dest_matrix;
-    XMStoreFloat3x4(&dest_matrix, matrix);
-
-    memcpy(raytrace_instance_desc.Transform, &dest_matrix, sizeof(XMFLOAT3X4));
-
-    instance->m_tlas_instances_.emplace_back(raytrace_instance_desc);
-    instance->m_generic_material_datas_.emplace_back(materials[0].CastedLock()->p_shared_material_block->generic_material_data);
-
-    ByteAddressBuffer vertex_buffer(mesh->vertex_buffer->Resource());
-    ByteAddressBuffer index_buffer(mesh->index_buffers[0]->Resource());
-    instance->m_vertex_address_buffers_.emplace_back(vertex_buffer);
-    instance->m_index_address_buffers_.emplace_back(index_buffer);
-}
-
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
@@ -612,7 +490,6 @@ void RenderPipeline::Init()
     }
 
     instance->m_commands_.reserve(kReserveRendererCount);
-    instance->m_tlas_instances_.reserve(kReserveRendererCount);
 
     auto descriptor_heap = DescriptorHeap::Instance()->GetHeap();
     uint32_t start_idx = kStaticDescriptorHeapCount;
@@ -656,11 +533,19 @@ std::shared_ptr<SubDescriptorHeap> RenderPipeline::GetDynamicDescriptorHeap()
 
 void RenderPipeline::AddRenderer(std::shared_ptr<Renderer> renderer)
 {
+    const auto mesh_renderer = std::dynamic_pointer_cast<MeshRenderer>(renderer);
+    if (mesh_renderer != nullptr)
+        RaytracingManager::Instance()->RegisterMeshRenderer(mesh_renderer);
+    
     Instance()->m_renderers_.emplace_back(renderer);
 }
 
 void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 {
+    const auto mesh_renderer = std::dynamic_pointer_cast<MeshRenderer>(renderer);
+    if (mesh_renderer != nullptr)
+        RaytracingManager::Instance()->UnRegisterMeshRenderer(mesh_renderer);
+
     auto &renderers = Instance()->m_renderers_;
     std::erase_if(renderers,
                   [&](const auto &r) {
@@ -671,10 +556,5 @@ void RenderPipeline::RemoveRenderer(const std::shared_ptr<Renderer> &renderer)
 void RenderPipeline::RequestRender(Camera camera)
 {
     Instance()->m_requesting_cameras_.emplace_back(camera);
-}
-
-void RenderPipeline::AddRaytracePass(std::shared_ptr<RaytracePass> raytrace_pass)
-{
-    Instance()->m_raytrace_passes_.emplace_back(raytrace_pass);
 }
 }

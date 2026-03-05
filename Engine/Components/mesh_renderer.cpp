@@ -122,7 +122,6 @@ void MeshRenderer::Render()
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
-    RenderPipeline::SubmitRaytracing(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->WorldMatrix());
 }
 
 void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)

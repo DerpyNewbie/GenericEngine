@@ -113,7 +113,6 @@ void SkinnedMeshRenderer::Render()
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx].HandleGPU);
-    RenderPipeline::SubmitRaytracing(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->WorldMatrix());
 }
 }
 

@@ -51,6 +51,7 @@ bool Engine::Init()
     Time::Get()->Init();
     Input::Instance()->Init();
     RenderPipeline::Init();
+    RaytracingManager::Instance()->Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     on_init.Invoke();

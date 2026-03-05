@@ -1,0 +1,130 @@
+struct InstanceData
+{
+    uint vert_offset;
+    uint index_offset;
+};
+
+cbuffer ViewProjMatrix : register(b0)
+{
+    float4x4 InvView;
+    float4x4 InvProj;
+}
+RaytracingAccelerationStructure rt_scene : register(t0);
+RWTexture2D<float4> out_put : register(u0);
+
+struct GenericMaterialData {
+    float4 baseColor;
+    float roughness;
+    float metallic;
+    float fresnel;
+    float alphaCutoff;
+    float4 emissiveColor;
+    int albedoMapIdx;
+    int normalMapIdx;
+    int metallicRoughnessMapIdx;
+    int emissiveMapIdx;
+    float4 customParams[4];
+    uint flags;
+    uint materialType;
+    float2 padding;
+};
+
+struct Vertex
+{
+    float3 pos : POSITION;
+    float4 color : COLOR;
+    float3 normal : NORMAL;
+    float4 tangent : TANGENT;
+    float2 uv1 : TEXCOORD;
+    float2 uv2 : TEXCOORD1;
+    float2 uv3 : TEXCOORD2;
+    float2 uv4 : TEXCOORD3;
+    float2 uv5 : TEXCOORD4;
+    float2 uv6 : TEXCOORD5;
+    float2 uv7 : TEXCOORD6;
+    float2 uv8 : TEXCOORD7;
+    uint bones_per_vertex : BONESPERVERTEX;
+    uint4 bone_id : BONEINDEX;
+    float4 bone_weight : BONEWEIGHT;
+};
+
+StructuredBuffer<GenericMaterialData> MaterialCatalog : register(t1);
+StructuredBuffer<InstanceData> InstanceDatas :register(t2);
+
+struct RayPayload
+{
+    float4 color;
+};
+
+[shader("raygeneration")]
+void MyRayGen()
+{
+    uint2 launch_index = DispatchRaysIndex().xy;
+    uint2 launch_dim = DispatchRaysDimensions().xy;
+
+    // 1. ピクセル座標を NDC (正規化デバイス座標系: -1.0 ～ 1.0) に変換
+    float2 d = (((float2)launch_index + 0.5f) / (float2)launch_dim) * 2.0f - 1.0f;
+    d.y = -d.y;
+
+    // 2. レイの始点 (Origin) を計算
+    // カメラのワールド座標は、ビュー空間の原点 (0,0,0,1) を逆ビュー行列で変換したもの
+    float3 origin = mul(InvView, float4(0.0f, 0.0f, 0.0f, 1.0f)).xyz;
+
+    // 3. レイの方向 (Direction) を計算
+    // まずスクリーン上の点をビュー空間に逆投影する (深度Zは1.0を想定)
+    float4 target = mul(InvProj, float4(d.x, d.y, 1.0f, 1.0f));
+    float3 directionView = target.xyz / target.w;
+    
+    // ビュー空間の方向ベクトルをワールド空間に変換 (方向ベクトルなので w=0.0f)
+    float3 directionWorld = mul(InvView, float4(directionView, 0.0f)).xyz;
+
+    // 4. レイの設定
+    RayDesc ray;
+    ray.Origin = origin;
+    ray.Direction = normalize(directionWorld);
+    ray.TMin = 0.001f;
+    ray.TMax = 10000.0f;
+    
+    RayPayload payload;
+    payload.color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+    TraceRay(rt_scene, RAY_FLAG_NONE, 0xFF, 0, 1, 0, ray, payload);
+
+    out_put[launch_index] = payload.color;
+}
+
+[shader("miss")]
+void MyMiss(inout RayPayload payload)
+{
+    payload.color = float4(0.0f, 0.2f, 0.4f, 1.0f);
+}
+
+[shader("closesthit")]
+void MyClosestHit(inout RayPayload payload, in BuiltInTriangleIntersectionAttributes attr)
+{
+    uint instance_id = InstanceID();
+    InstanceData data = InstanceDatas[instance_id];
+    GenericMaterialData material_data = MaterialCatalog[instance_id];
+
+    ByteAddressBuffer vertices = ResourceDescriptorHeap[data.vert_offset];
+    ByteAddressBuffer indices = ResourceDescriptorHeap[data.index_offset];
+
+    uint tri_index = PrimitiveIndex();
+
+    uint3 v_indices = indices.Load3(tri_index * 3 * 4);
+
+    const uint stride = sizeof(Vertex);
+    Vertex v0 = vertices.Load<Vertex>(v_indices.x * stride);
+    Vertex v1 = vertices.Load<Vertex>(v_indices.y * stride);
+    Vertex v2 = vertices.Load<Vertex>(v_indices.z * stride);
+
+    float3 edge1 = v1.pos - v0.pos;
+    float3 edge2 = v2.pos - v0.pos;
+    float3 normal = normalize(cross(edge1, edge2));
+    
+    float3 light_dir = normalize(float3(1,1, -1));
+    float intensity = max(0.2f, dot(normal, light_dir));
+    
+    float4 final_color = material_data.baseColor * float4(intensity.xxx,1.0f);
+    payload.color = final_color;
+}
