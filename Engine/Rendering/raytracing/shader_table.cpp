@@ -7,9 +7,9 @@
 
 namespace engine
 {
-ShaderTable::ShaderTable()
+ShaderTable::ShaderTable(const std::shared_ptr<RaytracingShader> &raytracing_shader)
 {
-    RaytracingPipelineState::Get().As(&m_state_object_prop_);
+    RaytracingPipelineState::Get(raytracing_shader).As(&m_state_object_prop_);
 
     void *ray_gen_id = m_state_object_prop_->GetShaderIdentifier(L"MyRayGen");
     void *miss_id = m_state_object_prop_->GetShaderIdentifier(L"MyMiss");

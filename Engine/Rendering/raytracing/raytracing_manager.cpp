@@ -6,6 +6,63 @@
 #include "Components/camera_component.h"
 #include "Rendering/render_pipeline.h"
 
+void engine::RaytracingManager::ExecuteRequest(const RaytracingRequest &raytracing_request)
+{
+    const auto current_back_buffer_index = RenderEngine::CurrentBackBufferIndex();
+
+    const auto uav_texture = raytracing_request.uav_texture;
+    const auto uav_handle = raytracing_request.uav_handle;
+    const auto raytracing_shader = raytracing_request.raytracing_shader;
+    const auto shader_table = raytracing_request.shader_table;
+    const auto target_camera = raytracing_request.target_camera;
+    const auto view_proj_buffer = *m_view_proj_matrix_buffers_[current_back_buffer_index].Get();
+
+    uav_texture->BeginRender();
+
+    const auto dxr_command_list = RenderEngine::DxrCommandList();
+
+    const auto view = target_camera->ViewMatrix().Invert();
+    const auto proj = target_camera->property.ProjectionMatrix().Invert();
+
+    ViewProjection view_projection;
+    view_projection.matrices[0] = view;
+    view_projection.matrices[1] = proj;
+    view_proj_buffer->UpdateBuffer(&view_projection);
+
+    dxr_command_list->SetPipelineState1(RaytracingPipelineState::Get(raytracing_shader).Get());
+    dxr_command_list->SetComputeRootSignature(RaytracingGlobalRootSignature::Get());
+    dxr_command_list->SetComputeRootConstantBufferView(0, view_proj_buffer->GetAddress());
+    dxr_command_list->SetComputeRootDescriptorTable(1, uav_handle.HandleGPU);
+    dxr_command_list->SetComputeRootShaderResourceView(2, m_tlas_->GetGPUVirtualAddress());
+    dxr_command_list->SetComputeRootShaderResourceView(3, m_material_buffer_->GetAddress());
+    dxr_command_list->SetComputeRootShaderResourceView(4, m_instance_info_buffer_->GetAddress());
+    dxr_command_list->SetComputeRootDescriptorTable(5, m_vertex_buffer_handle_[0].HandleGPU);
+
+    D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
+
+    const auto ray_gen_shader = shader_table->RayGenShader();
+    dispatch_desc.RayGenerationShaderRecord.StartAddress = ray_gen_shader->GetGPUVirtualAddress();
+    dispatch_desc.RayGenerationShaderRecord.SizeInBytes = ray_gen_shader->GetDesc().Width;
+
+    const auto miss_shader = shader_table->MissShader();
+    dispatch_desc.MissShaderTable.StartAddress = miss_shader->GetGPUVirtualAddress();
+    dispatch_desc.MissShaderTable.SizeInBytes = miss_shader->GetDesc().Width;
+    dispatch_desc.MissShaderTable.StrideInBytes = dispatch_desc.MissShaderTable.SizeInBytes;
+
+    const auto hit_group_shader = shader_table->HitGroupShader();
+    dispatch_desc.HitGroupTable.StartAddress = hit_group_shader->GetGPUVirtualAddress();
+    dispatch_desc.HitGroupTable.SizeInBytes = hit_group_shader->GetDesc().Width;
+    dispatch_desc.HitGroupTable.StrideInBytes = dispatch_desc.HitGroupTable.SizeInBytes;
+
+    dispatch_desc.Width = 1920;
+    dispatch_desc.Height = 1080;
+    dispatch_desc.Depth = 1;
+
+    dxr_command_list->DispatchRays(&dispatch_desc);
+
+    uav_texture->EndRender();
+}
+
 void engine::RaytracingManager::Submit(const std::shared_ptr<MeshRenderer> &mesh_renderer)
 {
     auto mesh = mesh_renderer->GetSharedMesh().CastedLock();
@@ -45,6 +102,12 @@ void engine::RaytracingManager::UpdateBuffers()
 
         auto materials = m_mesh_renderers_[i]->shared_materials;
         UpdateMaterial(i, materials);
+    }
+
+    for (int i = 0; i < m_requests_.size(); ++i)
+    {
+        m_requests_[i].uav_handle = RenderPipeline::GetDynamicDescriptorHeap()->Allocate();
+        m_requests_[i].uav_texture->UploadBuffer(m_requests_[i].uav_handle);
     }
 
     UpdateVertexIndexBuffer();
@@ -92,26 +155,18 @@ engine::RaytracingManager *engine::RaytracingManager::Instance()
 void engine::RaytracingManager::Init()
 {
     const auto instance = Instance();
-    instance->m_raytracing_shaders_.emplace_back(std::make_shared<RaytracingShader>(L"Resources/Raytracing.raytrace"));
-    RaytracingPipelineState::Instance()->CreateDxrPipelineState(*instance->m_raytracing_shaders_[0].get());
-    instance->m_uav_textures_.emplace_back(Object::Instantiate<UavTexture>("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
-    instance->m_uav_textures_[0]->CreateBuffer();
-    instance->m_shader_table_ = std::make_shared<ShaderTable>();
     instance->m_tlas_ = std::make_shared<TopLevelAccelerationStructure>();
-    instance->m_uav_texture_handle_ = RenderPipeline::GetStaticDescriptorHeap()->Allocate();
-    instance->m_uav_textures_[0]->UploadBuffer(instance->m_uav_texture_handle_);
-
-    for (auto &view_proj_buffer : instance->m_view_proj_buffers_)
-    {
-        view_proj_buffer = std::make_shared<ConstantBuffer>(sizeof(ViewProjection));
-        view_proj_buffer->CreateBuffer();
-    }
 
     instance->m_material_buffer_ = std::make_shared<StructuredBuffer>(sizeof(GenericMaterialData), 10);
     instance->m_material_buffer_->CreateBuffer();
 
     instance->m_instance_info_buffer_ = std::make_shared<StructuredBuffer>(sizeof(InstanceInfo), 10);
     instance->m_instance_info_buffer_->CreateBuffer();
+
+    for (auto &view_proj_matrix_buffers : instance->m_view_proj_matrix_buffers_)
+    {
+        view_proj_matrix_buffers.SetMaxSize(kStableCameraCount);
+    }
 }
 
 void engine::RaytracingManager::Execute()
@@ -136,57 +191,33 @@ void engine::RaytracingManager::Execute()
 
     UpdateBuffers();
 
-    m_uav_textures_[0]->BeginRender();
-
-    auto dxr_command_list = RenderEngine::DxrCommandList();
-    auto current_back_buffer_index = RenderEngine::CurrentBackBufferIndex();
-
-    const auto main_camera = CameraComponent::Main();
-    const auto view = main_camera->ViewMatrix().Invert();
-    const auto proj = main_camera->property.ProjectionMatrix().Invert();
-
-    const auto view_proj_buffer = m_view_proj_buffers_[current_back_buffer_index];
-    ViewProjection view_projection;
-    view_projection.matrices[0] = view;
-    view_projection.matrices[1] = proj;
-    view_proj_buffer->UpdateBuffer(&view_projection);
-
-    dxr_command_list->SetPipelineState1(RaytracingPipelineState::Get().Get());
-    dxr_command_list->SetComputeRootSignature(RaytracingGlobalRootSignature::Get());
-    dxr_command_list->SetComputeRootConstantBufferView(0, view_proj_buffer->GetAddress());
-    dxr_command_list->SetComputeRootDescriptorTable(1, m_uav_texture_handle_.HandleGPU);
-    dxr_command_list->SetComputeRootShaderResourceView(2, m_tlas_->GetGPUVirtualAddress());
-    dxr_command_list->SetComputeRootShaderResourceView(3, m_material_buffer_->GetAddress());
-    dxr_command_list->SetComputeRootShaderResourceView(4, m_instance_info_buffer_->GetAddress());
-    dxr_command_list->SetComputeRootDescriptorTable(5, m_vertex_buffer_handle_[0].HandleGPU);
-
-    D3D12_DISPATCH_RAYS_DESC dispatch_desc = {};
-
-    auto ray_gen_shader = m_shader_table_->RayGenShader();
-    dispatch_desc.RayGenerationShaderRecord.StartAddress = ray_gen_shader->GetGPUVirtualAddress();
-    dispatch_desc.RayGenerationShaderRecord.SizeInBytes = ray_gen_shader->GetDesc().Width;
-
-    auto miss_shader = m_shader_table_->MissShader();
-    dispatch_desc.MissShaderTable.StartAddress = miss_shader->GetGPUVirtualAddress();
-    dispatch_desc.MissShaderTable.SizeInBytes = miss_shader->GetDesc().Width;
-    dispatch_desc.MissShaderTable.StrideInBytes = dispatch_desc.MissShaderTable.SizeInBytes;
-
-    auto hit_group_shader = m_shader_table_->HitGroupShader();
-    dispatch_desc.HitGroupTable.StartAddress = hit_group_shader->GetGPUVirtualAddress();
-    dispatch_desc.HitGroupTable.SizeInBytes = hit_group_shader->GetDesc().Width;
-    dispatch_desc.HitGroupTable.StrideInBytes = dispatch_desc.HitGroupTable.SizeInBytes;
-
-    dispatch_desc.Width = 1920;
-    dispatch_desc.Height = 1080;
-    dispatch_desc.Depth = 1;
-
-    dxr_command_list->DispatchRays(&dispatch_desc);
-
-    m_uav_textures_[0]->EndRender();
-
+    for (auto &request : m_requests_)
+    {
+        ExecuteRequest(request);
+    }
+    
     m_instance_infos_.clear();
     m_vertex_buffer_handle_.clear();
     m_index_buffer_handle_.clear();
+    m_requests_.clear();
+    for (auto &view_proj_matrix_buffers : m_view_proj_matrix_buffers_)
+    {
+        view_proj_matrix_buffers.ReturnAll();
+    }
+}
+
+void engine::RaytracingManager::RequestRaytracing(const std::shared_ptr<CameraComponent> &target_camera, const std::shared_ptr<RaytracingShader> &raytracing_shader, const std::shared_ptr<ShaderTable> &shader_table, const std::shared_ptr<UavTexture> &uav_texture)
+{
+    if (raytracing_shader == nullptr || shader_table == nullptr || uav_texture == nullptr)
+        return;
+
+    RaytracingRequest raytracing_request;
+    raytracing_request.raytracing_shader = raytracing_shader;
+    raytracing_request.shader_table = shader_table;
+    raytracing_request.uav_texture = uav_texture;
+    raytracing_request.target_camera = target_camera;
+
+    Instance()->m_requests_.emplace_back(raytracing_request);
 }
 
 void engine::RaytracingManager::RegisterMeshRenderer(std::shared_ptr<MeshRenderer> mesh_renderer)

@@ -60,6 +60,7 @@
         <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_2d_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\texture_cube_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\uav_texture_importer.cpp"/>
         <ClCompile Include="Engine\Asset\persistent_data_store.cpp"/>
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
@@ -77,6 +78,7 @@
         <ClCompile Include="Engine\Components\component_event_tester.cpp"/>
         <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
+        <ClCompile Include="Engine\Components\raytracing_component.cpp"/>
         <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
         <ClCompile Include="Engine\Components\canvas.cpp"/>
         <ClCompile Include="Engine\Components\camera_component.cpp"/>
@@ -301,6 +303,7 @@
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\shader_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\uav_texture_importer.h"/>
         <ClInclude Include="Engine\Asset\persistent_data_store.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
@@ -315,6 +318,7 @@
         <ClInclude Include="Engine\Components\component_event_tester.h"/>
         <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
+        <ClInclude Include="Engine\Components\raytracing_component.h"/>
         <ClInclude Include="Engine\Components\renderer_2d.h"/>
         <ClInclude Include="Engine\Components\canvas.h"/>
         <ClInclude Include="Engine\Components\camera_component.h"/>

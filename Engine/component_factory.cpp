@@ -15,6 +15,7 @@
 #include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
 #include "Components/mesh_renderer.h"
+#include "Components/raytracing_component.h"
 #include "Components/rotator_component.h"
 #include "Components/rect_transform.h"
 #include "Components/renderer_2d.h"
@@ -71,6 +72,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
     RegisterComponentFactory<CoroutineTest>("Debug");
+    RegisterComponentFactory<RaytracingComponent>("Rendering");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :

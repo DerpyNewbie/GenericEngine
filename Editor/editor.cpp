@@ -139,6 +139,10 @@ void Editor::Init()
         AddCreateMenu("Texture Cube", ".cubemap", [] {
             return Object::Instantiate<TextureCube>("New TextureCube");
         });
+
+        AddCreateMenu("Uav Texture", ".uavtexture", [] {
+            return Object::Instantiate<UavTexture>("New UavTexture");
+        });
     }
     // end CreateMenu register
 
