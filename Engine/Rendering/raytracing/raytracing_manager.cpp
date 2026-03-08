@@ -186,7 +186,7 @@ void engine::RaytracingManager::Execute()
         it = m_no_mesh_mesh_renderers_.erase(it);
     }
 
-    if (m_mesh_renderers_.empty())
+    if (m_mesh_renderers_.empty() || m_requests_.empty())
         return;
 
     UpdateBuffers();

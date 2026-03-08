@@ -98,14 +98,14 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    const auto render_tex = camera.render_texture;
+    const auto &render_tex = camera.render_texture;
     if (render_tex)
     {
         render_tex->BeginRender(camera.background_color);
         rtv_heap = render_tex->GetHeap();
     }
 
-    const auto depth_tex = camera.depth_texture;
+    const auto &depth_tex = camera.depth_texture;
     if (depth_tex)
     {
         depth_tex->BeginRender();
@@ -178,6 +178,7 @@ void RenderPipeline::InvokeDrawCall()
     on_rendering.Invoke();
     int current_idx_buffer = RenderEngine::CurrentBackBufferIndex();
     m_dynamic_descriptor_heaps_[current_idx_buffer]->Reset();
+    m_requesting_cameras_.clear();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera &camera)
