@@ -123,7 +123,7 @@ bool Application::IsPlayMode()
 
 void Application::InitWindow()
 {
-    // SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+    //SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 
     WNDCLASSEX w = {};
 
