@@ -196,18 +196,20 @@ void RenderEngine::EndRender()
 
 void RenderEngine::MoveToNextFrame()
 {
-    //TODO : １個前のフレームの書き込みを待つようにする
     const UINT64 fence_to_signal = m_next_fence_value_;
     m_p_queue_->Signal(m_p_fence_.Get(), fence_to_signal);
+
+    m_fence_value_[m_current_back_buffer_index_] = fence_to_signal;
     m_next_fence_value_++;
 
-    if (m_p_fence_->GetCompletedValue() < fence_to_signal)
+    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
+
+    const UINT64 fence_to_wait = m_fence_value_[m_current_back_buffer_index_];
+    if (fence_to_wait != 0 && m_p_fence_->GetCompletedValue() < fence_to_wait)
     {
-        m_p_fence_->SetEventOnCompletion(fence_to_signal, m_fence_event_);
+        m_p_fence_->SetEventOnCompletion(fence_to_wait, m_fence_event_);
         WaitForSingleObjectEx(m_fence_event_, INFINITE, FALSE);
     }
-    
-    m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
 }
 
 void RenderEngine::SetBackgroundColor(const Color color)
