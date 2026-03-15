@@ -48,7 +48,8 @@ Collision::Collision(const std::weak_ptr<GameObject> &other, btPersistentManifol
         auto cp = manifold->getContactPoint(i);
         total_impulse += cp.m_normalWorldOnB * cp.getAppliedImpulse();
     }
-    m_impulse_ = {total_impulse.x(), total_impulse.y(), total_impulse.z()};
+
+    m_impulse_ = Vector3{total_impulse.x(), total_impulse.y(), total_impulse.z()};
 }
 std::shared_ptr<GameObject> Collision::Other() const
 {
@@ -60,7 +61,15 @@ size_t Collision::ContactCount() const
     return m_manifold_->getNumContacts();
 }
 
-assert(index >= 0 && index < static_cast<int>(ContactCount()) && "Contact index out of range");
+ContactPoint Collision::GetContact(const int index) const
+{
+    if (index < 0 || index >= ContactCount())
+    {
+        throw std::out_of_range("Contact index out of range");
+    }
+
+    return ContactPoint{m_manifold_->getContactPoint(index), m_is_body_0_};
+}
 
 std::vector<ContactPoint> Collision::GetContacts() const
 {
