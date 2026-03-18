@@ -34,15 +34,15 @@ void ComponentEventTester::OnRender()
 }
 void ComponentEventTester::OnCollisionEnter(const Collision &collision)
 {
-    Log("OnCollisionEnter(" + collision.other->Name() + ")");
+    Log("OnCollisionEnter(" + collision.Other()->Name() + ")");
 }
 void ComponentEventTester::OnCollisionStay(const Collision &collision)
 {
-    Log("OnCollisionStay(" + collision.other->Name() + ")");
+    Log("OnCollisionStay(" + collision.Other()->Name() + ")");
 }
 void ComponentEventTester::OnCollisionExit(const Collision &collision)
 {
-    Log("OnCollisionExit(" + collision.other->Name() + ")");
+    Log("OnCollisionExit(" + collision.Other()->Name() + ")");
 }
 }
 

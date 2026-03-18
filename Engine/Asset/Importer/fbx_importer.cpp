@@ -146,10 +146,8 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
         if (ai_texture_path.length == 0)
         {
             ctx->LogImportWarning(std::format("Material {} has no texture assigned!", ai_material->GetName().C_Str()).c_str());
-            continue;
         }
-
-        if (ai_texture_path.C_Str()[0] == '*')
+        else if (ai_texture_path.C_Str()[0] == '*')
         {
             // embedded texture
             const int index = std::stoi(ai_texture_path.C_Str() + 1);
@@ -203,8 +201,8 @@ std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>> FbxImporter::CreateMe
             object_meta->mesh.instance = converted_mesh;
         }
 
-        const bool has_converted_material = convert.to_material.contains(ai_mesh->mMaterialIndex);
-        const auto material = has_converted_material ? convert.to_material.at(ai_mesh->mMaterialIndex) : Object::Instantiate<Material>("Error Material");
+const bool has_converted_material = convert.to_material.contains(ai_mesh->mMaterialIndex);
+        const auto material = has_converted_material ? convert.to_material.at(ai_mesh->mMaterialIndex) : Object::Instantiate<Material>(std::format("FBX_IMPORTER_PLACEHOLDER_MATERIAL_{}_FOR_{}", ai_mesh->mMaterialIndex, converted_mesh->Name()).c_str());
         const auto material_asset = has_converted_material ? AssetPtr<Material>::FromManaged(material) : AssetPtr<Material>::FromInstance(material);
 
         object_meta->mesh.materials.emplace_back(material);
