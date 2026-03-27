@@ -10,6 +10,24 @@ CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
     m_transform_(target)
 { }
 
+void CompoundShape::OnInspectorGui() override
+{
+    if (m_shape_ == nullptr)
+    {
+        ImGui::Text("No shape");
+        return;
+    }
+
+    for (const auto &[weak_collider, shape] : m_colliders_)
+    {
+        auto collider = weak_collider.lock();
+
+        ImGui::Text("%s", collider != nullptr ? collider->Name() : "##NULL!!!##");
+        ImGui::SameLine();
+        ImGui::Text("%s", shape.get()->getName());
+    }
+}
+
 void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
 {
     RemoveChild(collider);

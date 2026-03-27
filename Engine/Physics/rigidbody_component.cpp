@@ -382,6 +382,19 @@ void RigidbodyComponent::OnInspectorGui()
         WakeUp();
     }
 
+    if (ImGui::CollapsingHeader("Colliders"))
+    {
+        if (ImGui::CollapsingHeader("Colliders"))
+        {
+            m_rigidbody_shape_->OnInspectorGui();
+        }
+
+        if (ImGui::CollapsingHeader("Triggers"))
+        {
+            m_ghost_shape_->OnInspectorGui();
+        }
+    }
+
     if (ImGui::CollapsingHeader("Physics Data", ImGuiTreeNodeFlags_DefaultOpen))
     {
         ImGui::Indent();
