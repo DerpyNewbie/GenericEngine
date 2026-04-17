@@ -205,8 +205,11 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
     if (FAILED(hr))
     {
         Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
-        const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        OutputDebugStringA(error_msg);
+        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
+        {
+            const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
+            OutputDebugStringA(error_msg);
+        }
         return false;
     }
 
@@ -225,8 +228,11 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
     if (FAILED(hr))
     {
         Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
-        const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        OutputDebugStringA(error_msg);
+        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
+        {
+            const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
+            OutputDebugStringA(error_msg);
+        }
         return false;
     }
 
