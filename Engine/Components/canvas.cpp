@@ -9,11 +9,48 @@
 
 #include "Rendering/render_pipeline.h"
 
+namespace
+{
+void GetSiblingIndices(const std::shared_ptr<engine::Transform> &a, std::vector<int> &sibling_indices)
+{
+    auto current = a;
+
+    do
+    {
+        sibling_indices.emplace_back(current->GetSiblingIndex());
+
+        current = current->Parent();
+    } while (current->GameObject()->GetComponent<engine::Canvas>() == nullptr);
+}
+}
+
 namespace engine
 {
 bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const
 {
-    return a->GameObject()->Transform()->GetSiblingIndex() < b->GameObject()->Transform()->GetSiblingIndex();
+    std::vector<int> a_sibling_indices = {};
+    std::vector<int> b_sibling_indices = {};
+
+    GetSiblingIndices(a->GameObject()->Transform(), a_sibling_indices);
+    GetSiblingIndices(b->GameObject()->Transform(), b_sibling_indices);
+
+    int min_sibling_indices_size = std::min(a_sibling_indices.size(), b_sibling_indices.size());
+    int itr = 0;
+    while (itr < min_sibling_indices_size)
+    {
+        ++itr;//後ろからやっていきたいので.sizeの差分の１を足しておく
+
+        if (a_sibling_indices[a_sibling_indices.size() - itr] < b_sibling_indices[b_sibling_indices.size() - itr])
+            continue;
+
+        if (a_sibling_indices[a_sibling_indices.size() - itr] < b_sibling_indices[b_sibling_indices.size() - itr])
+            return false;
+
+        if (b_sibling_indices[b_sibling_indices.size() - itr] < a_sibling_indices[a_sibling_indices.size() - itr])
+            return true;
+    }
+
+    return false;
 }
 
 void Canvas::OnInspectorGui()
