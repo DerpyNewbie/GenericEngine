@@ -26,11 +26,12 @@ void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
     const auto render_texture = std::dynamic_pointer_cast<RenderTexture>(ctx->MainObject());
     if (render_texture == nullptr)
     {
-        assert(false && "This object cannot be exported with RenderTextureExporter");
+        Logger::Error("This object cannot be exported with RenderTextureExporter");
     }
 
     std::ofstream file(ctx->AssetPath());
     Serializer serializer;
-    assert(serializer.Save(file, render_texture) && "Something is wrong with this render texture instance");
+    if (!serializer.Save(file, render_texture))
+        Logger::Error("Something is wrong with this render texture instance");
 }
 }
