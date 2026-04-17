@@ -15,12 +15,15 @@ void GetSiblingIndices(const std::shared_ptr<engine::Transform> &a, std::vector<
 {
     auto current = a;
 
-    do
+    while (current)
     {
         sibling_indices.emplace_back(current->GetSiblingIndex());
 
+        if (current->GameObject()->GetComponent<engine::Canvas>() != nullptr)
+            break;
+        
         current = current->Parent();
-    } while (current->GameObject()->GetComponent<engine::Canvas>() == nullptr);
+    }
 }
 }
 
