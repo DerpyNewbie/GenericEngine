@@ -34,20 +34,19 @@ bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const 
     GetSiblingIndices(a->GameObject()->Transform(), a_sibling_indices);
     GetSiblingIndices(b->GameObject()->Transform(), b_sibling_indices);
 
-    int min_sibling_indices_size = std::min(a_sibling_indices.size(), b_sibling_indices.size());
+    const int min_sibling_indices_size = std::min(a_sibling_indices.size(), b_sibling_indices.size());
     int itr = 0;
     while (itr < min_sibling_indices_size)
     {
-        ++itr;//後ろからやっていきたいので.sizeの差分の１を足しておく
+        const int a_idx = a_sibling_indices[a_sibling_indices.size() - 1 - itr];//.sizeの差分の１を引いて置く
+        const int b_idx = b_sibling_indices[b_sibling_indices.size() - 1 - itr];//.sizeの差分の１を引いて置く
 
-        if (a_sibling_indices[a_sibling_indices.size() - itr] < b_sibling_indices[b_sibling_indices.size() - itr])
-            continue;
-
-        if (a_sibling_indices[a_sibling_indices.size() - itr] < b_sibling_indices[b_sibling_indices.size() - itr])
+        if (a_idx < b_idx)
+            return true;
+        if (b_idx < a_idx)
             return false;
 
-        if (b_sibling_indices[b_sibling_indices.size() - itr] < a_sibling_indices[a_sibling_indices.size() - itr])
-            return true;
+        ++itr;
     }
 
     return false;
