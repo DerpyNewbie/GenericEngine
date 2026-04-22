@@ -39,6 +39,7 @@
         <ClCompile Include="Editor\hierarchy.cpp"/>
         <ClCompile Include="Editor\imgui_demo_window.cpp"/>
         <ClCompile Include="Editor\inspector.cpp"/>
+        <ClCompile Include="Editor\object_list_window.cpp"/>
         <ClCompile Include="Editor\profiler.cpp"/>
         <ClCompile Include="Editor\tool_window.cpp"/>
         <ClCompile Include="Editor\update_man_debugger.cpp"/>
@@ -264,6 +265,7 @@
         <ClInclude Include="Editor\hierarchy.h"/>
         <ClInclude Include="Editor\imgui_demo_window.h"/>
         <ClInclude Include="Editor\inspector.h"/>
+        <ClInclude Include="Editor\object_list_window.h"/>
         <ClInclude Include="Editor\profiler.h"/>
         <ClInclude Include="Editor\tool_window.h"/>
         <ClInclude Include="Editor\update_man_debugger.h"/>
