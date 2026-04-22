@@ -10,7 +10,7 @@ CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
     m_transform_(target)
 { }
 
-void CompoundShape::OnInspectorGui() override
+void CompoundShape::OnInspectorGui()
 {
     if (m_shape_ == nullptr)
     {
