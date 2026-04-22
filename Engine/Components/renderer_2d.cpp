@@ -9,7 +9,9 @@ namespace engine
 {
 void Renderer2D::OnAwake()
 {
-    GameObject()->AddComponent<RectTransform>();
+    const auto game_obj = GameObject();
+    if (game_obj->GetComponent<RectTransform>() == nullptr)
+        game_obj->AddComponent<RectTransform>();
 }
 
 void Renderer2D::OnEnabled()
