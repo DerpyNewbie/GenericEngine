@@ -1,6 +1,6 @@
 #pragma once
 #include "event_receivers.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
+#include "CabotEngine/Graphics/constant_buffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 #include "CabotEngine/Graphics/VertexBuffer.h"
 #include "Components/renderer.h"

@@ -4,7 +4,7 @@
 #include "gui.h"
 #include "shader.h"
 #include "Asset/asset_ptr.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
+#include "CabotEngine/Graphics/constant_buffer.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
