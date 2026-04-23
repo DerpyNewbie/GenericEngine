@@ -26,17 +26,11 @@ void PSOManager::Initialize()
     depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
     PSOSetting setting;
-    setting.PSOName = "Basic";
     setting.InputLayout = engine::Vertex::InputLayout;
     setting.IsTransparent = false;
     setting.CullMode = D3D12_CULL_MODE_NONE;
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    setting.RasterizerDesc = rasterizer_desc;
     setting.DepthStencilDesc = depth_stencil_desc;
-    setting.VSPath = L"x64/Debug/BasicVertexShader.cso";
-    setting.PSPath = L"x64/Debug/BasicPixelShader.cso";
-    setting.NumRenderTarget = 1;
-    Register(setting);
 
     setting.PSOName = "Depth";
     setting.RasterizerDesc = rasterizer_desc;
