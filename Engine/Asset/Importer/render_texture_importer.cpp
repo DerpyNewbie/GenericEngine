@@ -32,6 +32,6 @@ void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
     std::ofstream file(ctx->AssetPath());
     Serializer serializer;
     if (!serializer.Save(file, render_texture))
-        ctx->LogImportError("Something is wrong with this render texture instance");
+        ctx->LogImportError("Could not serialize render texture");
 }
 }
