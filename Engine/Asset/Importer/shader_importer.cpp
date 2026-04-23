@@ -186,9 +186,10 @@ void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shade
     shader->parameters = parameters;
 }
 
-bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path)
+std::string ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path)
 {
     ComPtr<ID3DBlob> error_blob;
+    std::string error_msg = "";
 
     HRESULT hr = D3DCompileFromFile(
         file_path.c_str(),
@@ -201,16 +202,20 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         &shader->m_vs_blob_,
         &error_blob
     );
-
+    
     if (FAILED(hr))
     {
         Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
         if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
         {
-            const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-            OutputDebugStringA(error_msg);
+            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
         }
-        return false;
+        else
+        {
+            error_msg = "NULL";
+        }
+
+        return error_msg;
     }
 
     hr = D3DCompileFromFile(
@@ -230,14 +235,18 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
         if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
         {
-            const auto error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-            OutputDebugStringA(error_msg);
+            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
         }
-        return false;
+        else
+        {
+            error_msg = "NULL";
+        }
+
+        return error_msg;
     }
 
     // Add shader variants here if you want to
-    return true;
+    return error_msg;
 }
 
 bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
@@ -321,9 +330,10 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
     }
 
-    if (!CompileShader(shader, ctx->AssetPath()))
+    auto result = CompileShader(shader, ctx->AssetPath());
+    if (!result.empty())
     {
-        ctx->LogImportError("Failed to compile shader!");
+        ctx->LogImportError(result);
         return;
     }
 
