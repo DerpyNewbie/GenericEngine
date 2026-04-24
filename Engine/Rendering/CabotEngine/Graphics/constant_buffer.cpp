@@ -52,8 +52,6 @@ void ConstantBuffer::CreateBuffer()
     m_desc_.SizeInBytes = static_cast<UINT>(m_size_aligned_);
 
     m_p_buffer_->SetName(L"ConstantBuffer");
-
-    m_is_valid_ = true;
 }
 
 void ConstantBuffer::UpdateBuffer(void *data)
