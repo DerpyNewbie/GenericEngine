@@ -361,7 +361,6 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\com_ptr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\constant_buffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\descriptor_heap.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.h"/>
