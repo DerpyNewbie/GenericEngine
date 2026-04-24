@@ -75,7 +75,7 @@ void Lighting::SetLightBuffer()
         return;
 
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->handle_gpu);
 }
 
 void Lighting::SetBuffers()
@@ -194,7 +194,7 @@ void Lighting::SetLightsViewProjMatrix() const
 {
     const auto cmd_list = RenderEngine::CommandList();
 
-    cmd_list->SetGraphicsRootDescriptorTable(kLightViewProj, m_light_view_proj_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kLightViewProj, m_light_view_proj_handle_->handle_gpu);
 }
 
 void Lighting::SetShadowMap()
@@ -206,7 +206,7 @@ void Lighting::SetShadowMap()
     const auto cmd_list = RenderEngine::CommandList();
     if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
-                                                 m_shadow_map_handle_->HandleGPU);
+                                                 m_shadow_map_handle_->handle_gpu);
 }
 
 void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)

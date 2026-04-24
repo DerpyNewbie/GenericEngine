@@ -14,7 +14,7 @@ struct VSOutput
 
 struct GSOutput
 {
-    float4 pos : SV_POSITION; // clip space
+    float4 pos : SV_POSITION;
     float2 near_far : NEARFAR;
     uint RTIndex : SV_RenderTargetArrayIndex;
 };

@@ -180,7 +180,7 @@
             <ShaderType>Vertex</ShaderType>
         </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\constant_buffer.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\descriptor_heap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
         <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl">
             <FileType>Document</FileType>
@@ -360,7 +360,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\2DShader.hlsli"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\com_ptr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\constant_buffer.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\descriptor_heap.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\FeatureLevel.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.h"/>
