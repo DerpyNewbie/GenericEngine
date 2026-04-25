@@ -4,7 +4,7 @@
 
 #include <stb_image.h>
 
-#include "descriptor_heap.h"
+#include "DescriptorHeap.h"
 #include <assimp/texture.h>
 #include "RenderEngine.h"
 

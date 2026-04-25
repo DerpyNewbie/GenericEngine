@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
-#include "constant_buffer.h"
-#include "descriptor_heap.h"
+#include "ConstantBuffer.h"
+#include "DescriptorHeap.h"
 #include "RenderEngine.h"
 
 ConstantBuffer::ConstantBuffer(const size_t size)

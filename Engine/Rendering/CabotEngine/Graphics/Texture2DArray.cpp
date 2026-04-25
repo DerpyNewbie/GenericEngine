@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "Texture2DArray.h"
 
-#include "descriptor_heap.h"
+#include "DescriptorHeap.h"
 #include "RenderEngine.h"
 
 void Texture2DArray::CopyResource()

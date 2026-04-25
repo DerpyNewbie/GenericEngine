@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Rendering/CabotEngine/Graphics/descriptor_heap.h"
+#include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
 #include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 

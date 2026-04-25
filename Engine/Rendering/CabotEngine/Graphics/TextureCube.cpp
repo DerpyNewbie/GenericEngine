@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "TextureCube.h"
 
-#include "descriptor_heap.h"
+#include "DescriptorHeap.h"
 #include "RenderEngine.h"
 #include "gui.h"
 #include "Asset/asset_ptr.h"

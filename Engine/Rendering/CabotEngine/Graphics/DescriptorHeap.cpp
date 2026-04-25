@@ -1,9 +1,9 @@
 ﻿#include "pch.h"
 
-#include "descriptor_heap.h"
+#include "DescriptorHeap.h"
 #include "Texture2D.h"
 #include "RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/constant_buffer.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
 std::shared_ptr<DescriptorHeap> DescriptorHeap::m_instance_;

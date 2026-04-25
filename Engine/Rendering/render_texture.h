@@ -1,5 +1,5 @@
 #pragma once
-#include "CabotEngine/Graphics/com_ptr.h"
+#include "CabotEngine/Graphics/ComPtr.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
 #include <directx/d3d12.h>

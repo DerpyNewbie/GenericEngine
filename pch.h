@@ -81,5 +81,5 @@
 /* === end engine.serializer === */
 
 /* === begin engine.cabot_engine === */
-#include "Rendering/CabotEngine/Graphics/com_ptr.h"
+#include "Rendering/CabotEngine/Graphics/ComPtr.h"
 /* === end engine.cabot_engine === */
