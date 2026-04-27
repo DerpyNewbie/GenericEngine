@@ -2,6 +2,7 @@
 #include "gizmos.h"
 
 #include "update_manager.h"
+#include "Asset/asset_database.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
@@ -13,7 +14,7 @@ std::vector<Vertex> Gizmos::m_vertices_;
 void Gizmos::Init()
 {
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
-
+    
     m_instance_ = std::make_shared<Gizmos>();
 }
 
@@ -66,12 +67,22 @@ void Gizmos::Render()
         return;
     }
 
+    if (m_instance_->m_line_shader_ == nullptr)
+    {
+        m_instance_->m_line_shader_ = AssetDatabase::GetAsset<Shader>("LineShader.hlsl").CastedLock();
+        if (m_instance_->m_line_shader_ == nullptr)
+        {
+            Logger::Error<Gizmos>("Failed to load LineShader.hlsl");
+            return;
+        }
+    }
+    
     // render stuff
-    auto command_list = RenderEngine::CommandList();
-    command_list->SetPipelineState(PSOManager::Get("Line"));
-    command_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    command_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
-    command_list->DrawInstanced(current_vertices_count, 1, 0, 0);
+    const auto cmd_list = RenderEngine::CommandList();
+    PSOManager::SetPipelineState(cmd_list, m_instance_->m_line_shader_.get());
+    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
+    cmd_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
+    cmd_list->DrawInstanced(current_vertices_count, 1, 0, 0);
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)

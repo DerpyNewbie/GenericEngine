@@ -27,6 +27,8 @@ class RenderPipeline
         return view_proj_buff;
     };
 
+    std::shared_ptr<Shader> m_depth_shader_;
+
     std::vector<RenderCommand> m_commands_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
@@ -49,7 +51,7 @@ class RenderPipeline
     void SetSceneData();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
-    void DepthRender() const;
+    void DepthRender();
     void ExecuteRenderCommands();
 
 public:

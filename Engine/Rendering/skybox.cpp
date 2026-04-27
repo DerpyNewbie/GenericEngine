@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "skybox.h"
 #include "gui.h"
+#include "Asset/asset_database.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -55,6 +56,16 @@ void Skybox::Render()
     if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
         return;
 
+    if (m_skybox_shader_ == nullptr)
+    {
+        m_skybox_shader_ = AssetDatabase::GetAsset<Shader>("SkyBoxShader.hlsl").CastedLock();
+        if (m_skybox_shader_ == nullptr)
+        {
+            Logger::Error<Skybox>("Failed to load SkyBoxShader.hlsl");
+            return;
+        }
+    }
+    
     if (m_texture_cube_handle_ == nullptr)
         ReconstructTextureCube();
 
@@ -63,7 +74,7 @@ void Skybox::Render()
     cmd_list->IASetVertexBuffers(0, 1, m_vertex_buffer_->View());
     cmd_list->IASetIndexBuffer(m_index_buffer_->View());
 
-    cmd_list->SetPipelineState(PSOManager::Get("Skybox"));
+    PSOManager::SetPipelineState(cmd_list, m_skybox_shader_.get());
     cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_->HandleGPU);
 
     cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);

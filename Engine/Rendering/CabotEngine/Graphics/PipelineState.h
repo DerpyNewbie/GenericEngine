@@ -1,28 +1,27 @@
 ﻿#pragma once
 #include "Rendering/material.h"
 
+struct PipelineStateSettings
+{
+    D3D12_INPUT_LAYOUT_DESC layout_desc;
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_topology_type;
+    D3D12_RASTERIZER_DESC rasterizer_desc;
+    D3D12_DEPTH_STENCIL_DESC depth_stencil_desc;
+    D3D12_BLEND_DESC blend_desc;
+    UINT num_rendertarget;
+    D3D12_SHADER_BYTECODE vs_code;
+    D3D12_SHADER_BYTECODE ps_code;
+    D3D12_SHADER_BYTECODE gs_code = {};
+    DXGI_FORMAT rtv_format[8] = {DXGI_FORMAT_UNKNOWN};
+    DXGI_FORMAT dsv_format;
+    UINT sample_mask;
+    UINT sample_count;
+
+    void SetShader(const engine::Shader *shader);
+};
+
 class PipelineState
 {
-public:
-    PipelineState();
-    bool IsValid() const;
-
-    void SetTransparent(bool is_transparent);
-    void SetCullMode(D3D12_CULL_MODE cull_mode);
-    void SetInputLayout(D3D12_INPUT_LAYOUT_DESC layout);
-    void SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type);
-    void SetRasterizerState(const D3D12_RASTERIZER_DESC &rasterizer_desc);
-    void SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC &depth_stencil_desc);
-    void SetNumRenderTarget(UINT num_render_target);
-    void SetVS(const std::wstring &file_path);
-    void SetPS(const std::wstring &file_path);
-    void SetGS(const std::wstring &file_path);
-    void SetShader(const std::shared_ptr<engine::Shader> &shader); //これ呼び出したらVS,PSのセットはしなくていい
-    void Create();
-
-    ID3D12PipelineState *Get();
-
-private:
     bool m_is_valid_ = false;
     D3D12_GRAPHICS_PIPELINE_STATE_DESC m_desc_ = {};
     ComPtr<ID3D12PipelineState> m_p_pipeline_state_ = nullptr;
@@ -30,4 +29,13 @@ private:
     ComPtr<ID3DBlob> m_p_vs_blob_ = nullptr;
     ComPtr<ID3DBlob> m_p_ps_blob_ = nullptr;
     ComPtr<ID3DBlob> m_p_gs_blob_ = nullptr;
+    
+public:
+    PipelineState();
+    [[nodiscard]] bool IsValid() const;
+
+    void Create(const PipelineStateSettings &setting);
+
+
+    ID3D12PipelineState *Get() const;
 };

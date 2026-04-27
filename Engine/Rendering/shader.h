@@ -21,6 +21,7 @@ class Shader : public Object, public Inspectable
 
     ComPtr<ID3DBlob> m_vs_blob_;
     ComPtr<ID3DBlob> m_ps_blob_;
+    ComPtr<ID3DBlob> m_gs_blob_;
 
     ShaderSettings m_shader_settings_;
 
@@ -41,6 +42,12 @@ public:
                 return m_vs_blob_.Get();
             case kShaderType_Pixel:
                 return m_ps_blob_.Get();
+            case kShaderType_Geometry:
+                if (m_gs_blob_ == nullptr)
+                {
+                    return {};
+                }
+                return m_gs_blob_.Get();
             default:
                 throw std::runtime_error("Invalid shader type");
         }

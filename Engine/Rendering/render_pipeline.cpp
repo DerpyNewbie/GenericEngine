@@ -11,6 +11,7 @@
 #include "scene_data.h"
 #include "skybox.h"
 #include "view_projection.h"
+#include "Asset/asset_database.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/light.h"
@@ -236,13 +237,23 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     Gizmos::Render();
 }
 
-void RenderPipeline::DepthRender() const
+void RenderPipeline::DepthRender()
 {
     if (Lighting::Instance()->m_lights_.empty())
         return;
 
+    if (m_depth_shader_ == nullptr)
+    {
+        m_depth_shader_ = AssetDatabase::GetAsset<Shader>("depth.hlsl").CastedLock();
+        if (m_depth_shader_ == nullptr)
+        {
+            Logger::Error<Gizmos>("Failed to load DepthShader.hlsl");
+            return;
+        }
+    }
+    
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetPipelineState(PSOManager::Get("Depth"));
+    PSOManager::SetPipelineState(cmd_list, m_depth_shader_.get(), DXGI_FORMAT_R32_FLOAT, 0);
 
     Lighting::Instance()->BeginDepthRender();
 

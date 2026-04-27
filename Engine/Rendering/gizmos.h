@@ -23,6 +23,7 @@ class Gizmos
     static std::vector<Vertex> m_vertices_;
 
     std::shared_ptr<VertexBuffer> m_vertex_buffers_[RenderEngine::kFrame_Buffer_Count];
+    std::shared_ptr<Shader> m_line_shader_;
     int m_vertices_count_[RenderEngine::kFrame_Buffer_Count];
     int m_last_back_buffer_idx_ = -1;
 

@@ -71,7 +71,9 @@ Texture2D _MainTex : register(t4);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
+    float4 shadowMap = ShadowMaps.Sample(smp, float3(input.uv, 0));
+
     float4 mainColor = _MainTex.Sample(smp, input.uv);
 
-    return mainColor;
+    return float4(shadowMap.rgb, 1.0f);
 }

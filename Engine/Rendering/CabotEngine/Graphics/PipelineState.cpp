@@ -5,15 +5,46 @@
 
 #pragma comment(lib, "d3dcompiler.lib")
 
+void PipelineStateSettings::SetShader(const engine::Shader *shader)
+{
+    vs_code = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
+    ps_code = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
+    gs_code = shader->GetByteCode(engine::kShaderType::kShaderType_Geometry);
+
+    auto shader_setting = shader->ShaderSettings();
+    rasterizer_desc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    rasterizer_desc.CullMode = DX_Cull[shader_setting.cull];
+
+    depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+    depth_stencil_desc.DepthFunc = DX_ZTest[shader_setting.z_test];
+    depth_stencil_desc.DepthWriteMask = DX_ZWrite[shader_setting.z_write];
+
+    blend_desc = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+    auto &rt = blend_desc.RenderTarget[0];
+    rt.BlendEnable = shader_setting.use_blend;
+    rt.SrcBlend = DX_BlendFactor[shader_setting.blend_src];
+    rt.DestBlend = DX_BlendFactor[shader_setting.blend_dst];
+    rt.BlendOp = DX_BlendOp[shader_setting.blend_op];
+    rt.RenderTargetWriteMask = DX_ColorMask[shader_setting.color_mask];
+
+    blend_desc.AlphaToCoverageEnable = shader_setting.alpha_to_mask;
+
+    num_rendertarget = 1;
+    dsv_format = DXGI_FORMAT_D32_FLOAT;
+
+    sample_mask = UINT_MAX;
+    sample_count = 1;
+    primitive_topology_type = DX_PrimitiveTopologyType[shader_setting.primitive_topology_type];
+}
+
 PipelineState::PipelineState()
 {
-    // パイプラインステートの設定
-    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
-    m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
+    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+    m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
     m_desc_.RasterizerState.FrontCounterClockwise = TRUE;
-    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT); // 深度ステンシルはデフォルトを使う
+    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
     m_desc_.SampleMask = UINT_MAX;
-    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; // 三角形を描画
+    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
     m_desc_.NumRenderTargets = 1;
     for (auto &RTVFormat : m_desc_.RTVFormats)
         RTVFormat = DXGI_FORMAT_UNKNOWN;
@@ -28,144 +59,34 @@ bool PipelineState::IsValid() const
     return m_is_valid_;
 }
 
-void PipelineState::SetTransparent(bool is_transparent)
+void PipelineState::Create(const PipelineStateSettings &setting)
 {
-    CD3DX12_BLEND_DESC blend_state = {};
-    if (!is_transparent)
+    m_desc_.InputLayout = setting.layout_desc;
+    m_desc_.PrimitiveTopologyType = setting.primitive_topology_type;
+    m_desc_.RasterizerState = setting.rasterizer_desc;
+    m_desc_.DepthStencilState = setting.depth_stencil_desc;
+    m_desc_.BlendState = setting.blend_desc;
+
+    m_desc_.NumRenderTargets = setting.num_rendertarget;
+    if (m_desc_.NumRenderTargets > D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT)
     {
-        blend_state = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    }
-    else
-    {
-        blend_state.AlphaToCoverageEnable = false;
-        blend_state.IndependentBlendEnable = false;
-        auto &[BlendEnable, LogicOpEnable, SrcBlend, DestBlend, BlendOp, SrcBlendAlpha, DestBlendAlpha, BlendOpAlpha, LogicOp, RenderTargetWriteMask] = blend_state.RenderTarget[0];
-        BlendEnable = true;
-        LogicOpEnable = false;
-        SrcBlend = D3D12_BLEND_SRC_ALPHA;
-        DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-        BlendOp = D3D12_BLEND_OP_ADD;
-        SrcBlendAlpha = D3D12_BLEND_ONE;
-        DestBlendAlpha = D3D12_BLEND_ZERO;
-        BlendOpAlpha = D3D12_BLEND_OP_ADD;
-        LogicOp = D3D12_LOGIC_OP_NOOP;
-        RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-        m_desc_.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-        m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    }
-
-    m_desc_.BlendState = blend_state;
-}
-
-void PipelineState::SetCullMode(D3D12_CULL_MODE cull_mode)
-{
-    m_desc_.RasterizerState.CullMode = cull_mode;
-}
-
-void PipelineState::SetInputLayout(const D3D12_INPUT_LAYOUT_DESC layout)
-{
-    m_desc_.InputLayout = layout;
-}
-
-void PipelineState::SetPrimitiveTopologyType(const D3D12_PRIMITIVE_TOPOLOGY_TYPE primitive_type)
-{
-    m_desc_.PrimitiveTopologyType = primitive_type;
-}
-
-void PipelineState::SetRasterizerState(const D3D12_RASTERIZER_DESC &rasterizer_desc)
-{
-    m_desc_.RasterizerState = rasterizer_desc;
-}
-
-void PipelineState::SetDepthStencilState(const D3D12_DEPTH_STENCIL_DESC &depth_stencil_desc)
-{
-    m_desc_.DepthStencilState = depth_stencil_desc;
-}
-
-void PipelineState::SetNumRenderTarget(const UINT num_render_target)
-{
-    //RTVの数の上限を超えてたら上限数に抑える
-    if (num_render_target > 8)
-    {
-        m_desc_.NumRenderTargets = 8;
+        m_desc_.NumRenderTargets = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;
         engine::Logger::Warn<PipelineState>("NumRenderTarget exceeds 8");
     }
-    m_desc_.NumRenderTargets = num_render_target;
-    for (UINT i = 0; i < m_desc_.NumRenderTargets; ++i)
-    {
-        m_desc_.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM;
-    }
-}
 
-void PipelineState::SetVS(const std::wstring &file_path)
-{
-    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_vs_blob_.GetAddressOf());
-    if (FAILED(hr))
+    for (UINT i = 0; i < setting.num_rendertarget; ++i)
     {
-        engine::Logger::Error<PipelineState>("Failed to load vertex shader");
-        return;
+        m_desc_.RTVFormats[i] = setting.rtv_format[i];
     }
 
-    m_desc_.VS = CD3DX12_SHADER_BYTECODE(m_p_vs_blob_.Get());
-}
+    m_desc_.VS = setting.vs_code;
+    m_desc_.PS = setting.ps_code;
+    m_desc_.GS = setting.gs_code;
 
-void PipelineState::SetPS(const std::wstring &file_path)
-{
-    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_ps_blob_.GetAddressOf());
-    if (FAILED(hr))
-    {
-        engine::Logger::Error<PipelineState>("Failed to load pixel shader");
-        return;
-    }
+    m_desc_.DSVFormat = setting.dsv_format;
+    m_desc_.SampleMask = setting.sample_mask;
+    m_desc_.SampleDesc.Count = setting.sample_count;
 
-    m_desc_.PS = CD3DX12_SHADER_BYTECODE(m_p_ps_blob_.Get());
-}
-
-void PipelineState::SetGS(const std::wstring &file_path)
-{
-    auto hr = D3DReadFileToBlob(file_path.c_str(), m_p_gs_blob_.GetAddressOf());
-    if (FAILED(hr))
-    {
-        engine::Logger::Error<PipelineState>("Failed to load geometry shader");
-        return;
-    }
-
-    m_desc_.GS = CD3DX12_SHADER_BYTECODE(m_p_gs_blob_.Get());
-}
-
-void PipelineState::SetShader(const std::shared_ptr<engine::Shader> &shader)
-{
-    m_desc_.VS = shader->GetByteCode(engine::kShaderType::kShaderType_Vertex);
-    m_desc_.PS = shader->GetByteCode(engine::kShaderType::kShaderType_Pixel);
-    auto shader_setting = shader->ShaderSettings();
-    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    m_desc_.RasterizerState.CullMode = DX_Cull[shader_setting.cull];
-
-    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-    m_desc_.DepthStencilState.DepthFunc = DX_ZTest[shader_setting.z_test];
-    m_desc_.DepthStencilState.DepthWriteMask = DX_ZWrite[shader_setting.z_write];
-
-    m_desc_.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-    auto &rt = m_desc_.BlendState.RenderTarget[0];
-    rt.BlendEnable = shader_setting.use_blend;
-    rt.SrcBlend = DX_BlendFactor[shader_setting.blend_src];
-    rt.DestBlend = DX_BlendFactor[shader_setting.blend_dst];
-    rt.BlendOp = DX_BlendOp[shader_setting.blend_op];
-    rt.RenderTargetWriteMask = DX_ColorMask[shader_setting.color_mask];
-
-    m_desc_.BlendState.AlphaToCoverageEnable = shader_setting.alpha_to_mask;
-
-    m_desc_.NumRenderTargets = 1;
-    m_desc_.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-    m_desc_.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-
-    m_desc_.SampleMask = UINT_MAX;
-    m_desc_.SampleDesc.Count = 1;
-    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-}
-
-void PipelineState::Create()
-{
     auto hr = RenderEngine::Device()->CreateGraphicsPipelineState(
         &m_desc_, IID_PPV_ARGS(m_p_pipeline_state_.ReleaseAndGetAddressOf()));
     if (FAILED(hr))
@@ -177,7 +98,7 @@ void PipelineState::Create()
     m_is_valid_ = true;
 }
 
-ID3D12PipelineState *PipelineState::Get()
+ID3D12PipelineState *PipelineState::Get() const
 {
     return m_p_pipeline_state_.Get();
 }
