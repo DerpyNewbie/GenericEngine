@@ -10,10 +10,10 @@ void DepthTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
 
-    width = Application::WindowWidth();
-    height = Application::WindowHeight();
-    format = DXGI_FORMAT_R32_FLOAT;
-    mip_level = 1;
+    m_width_ = Application::WindowWidth();
+    m_height_ = Application::WindowHeight();
+    m_format_ = DXGI_FORMAT_R32_FLOAT;
+    m_mip_level_ = 1;
 
     // ---- DSV Heap ----
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
@@ -34,7 +34,7 @@ void DepthTexture::CreateBuffer()
 
     auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     CD3DX12_RESOURCE_DESC resourceDesc =
-        CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R32_TYPELESS, width, height);
+        CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R32_TYPELESS, m_width_, m_height_);
     resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     resourceDesc.MipLevels = 1;
 
@@ -45,7 +45,7 @@ void DepthTexture::CreateBuffer()
         // 初期状態は DSV として使うので DEPTH_WRITE
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &dsvClearValue,
-        IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
+        IID_PPV_ARGS(m_buffer_.ReleaseAndGetAddressOf())
     );
 
     if (FAILED(hr))
@@ -62,16 +62,16 @@ void DepthTexture::CreateBuffer()
     D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    device->CreateDepthStencilView(m_p_resource_.Get(), &dsvDesc, dsvHandle);
+    device->CreateDepthStencilView(m_buffer_.Get(), &dsvDesc, dsvHandle);
 }
 
 void DepthTexture::BeginRender()
 {
-    if (m_p_resource_ == nullptr)
+    if (m_buffer_ == nullptr)
         CreateBuffer();
 
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -79,7 +79,7 @@ void DepthTexture::BeginRender()
 void DepthTexture::EndRender()
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -109,7 +109,7 @@ void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_ar
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
 
-    m_p_resource_ = texture_array->Resource();
+    m_buffer_ = texture_array->Resource();
 }
 
 ID3D12DescriptorHeap *DepthTexture::GetHeap()

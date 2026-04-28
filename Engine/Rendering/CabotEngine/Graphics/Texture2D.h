@@ -16,16 +16,17 @@ class Texture2D : public engine::Object, public engine::Inspectable, public IBuf
     friend class engine::Texture2DImporter;
 
 protected:
-    std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
-    UINT width = 0;
-    UINT height = 0;
-    UINT16 mip_level;
-    DXGI_FORMAT format;
+    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
+    UINT m_width_ = 0;
+    UINT m_height_ = 0;
+    UINT16 m_mip_level_;
+    DXGI_FORMAT m_format_;
 
-    ComPtr<ID3D12Resource> m_p_resource_ = nullptr;
+    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
 
 public:
-    static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);
+    Texture2D() = default;
+    Texture2D(const aiTexture *ai_texture);
 
     void OnInspectorGui() override;
     void CreateBuffer() override;
@@ -39,32 +40,32 @@ public:
 
     std::vector<DirectX::PackedVector::XMCOLOR> GetTexData()
     {
-        return tex_data;
+        return m_tex_data_;
     }
 
     void SetTexData(const std::vector<DirectX::PackedVector::XMCOLOR> &resource)
     {
-        tex_data = resource;
+        m_tex_data_ = resource;
     }
 
-    UINT Width() const
+    [[nodiscard]] UINT Width() const
     {
-        return width;
+        return m_width_;
     }
 
-    UINT Height() const
+    [[nodiscard]] UINT Height() const
     {
-        return height;
+        return m_height_;
     }
 
-    UINT16 MipLevel() const
+    [[nodiscard]] UINT16 MipLevel() const
     {
-        return mip_level;
+        return m_mip_level_;
     }
 
-    DXGI_FORMAT Format() const
+    [[nodiscard]] DXGI_FORMAT Format() const
     {
-        return format;
+        return m_format_;
     }
 
     template <class Archive>
@@ -72,11 +73,11 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(tex_data),
-            CEREAL_NVP(width),
-            CEREAL_NVP(height),
-            CEREAL_NVP(format),
-            CEREAL_NVP(mip_level)
+            CEREAL_NVP(m_tex_data_),
+            CEREAL_NVP(m_width_),
+            CEREAL_NVP(m_height_),
+            CEREAL_NVP(m_format_),
+            CEREAL_NVP(m_mip_level_)
         );
     }
 };

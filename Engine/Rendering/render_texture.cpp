@@ -21,8 +21,8 @@ void RenderTexture::CreateBuffer()
     clearValue.Color[2] = 0.5f;
     clearValue.Color[3] = 0.5f;
 
-    width = Application::WindowWidth();
-    height = Application::WindowHeight();
+    m_width_ = Application::WindowWidth();
+    m_height_ = Application::WindowHeight();
 
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,
@@ -30,9 +30,9 @@ void RenderTexture::CreateBuffer()
         &res_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         &clearValue,
-        IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
+        IID_PPV_ARGS(m_buffer_.ReleaseAndGetAddressOf())
     );
-    m_p_resource_->SetName(L"RenderTexture");
+    m_buffer_->SetName(L"RenderTexture");
 
     if (FAILED(hr))
     {
@@ -51,17 +51,17 @@ void RenderTexture::CreateBuffer()
     rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    device->CreateRenderTargetView(m_p_resource_.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateRenderTargetView(m_buffer_.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTexture::BeginRender(const Color background_color)
 {
-    if (!m_p_resource_)
+    if (!m_buffer_)
     {
         CreateBuffer();
     }
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_RENDER_TARGET);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -69,7 +69,7 @@ void RenderTexture::BeginRender(const Color background_color)
 void RenderTexture::EndRender() const
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
