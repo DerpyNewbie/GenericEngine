@@ -7,12 +7,9 @@ namespace engine
 {
 void StructuredBuffer::CreateBuffer()
 {
-    m_is_valid_ = false;
-
     const auto total_size = m_stride_ * m_element_count_;
     const CD3DX12_RESOURCE_DESC resource_desc = CD3DX12_RESOURCE_DESC::Buffer(total_size);
-
-    // create a default heap (used for gpu data processing)
+    
     const auto default_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     auto hr = RenderEngine::Device()->CreateCommittedResource(
         &default_heap_prop,
@@ -62,7 +59,6 @@ void StructuredBuffer::CreateBuffer()
     }
 
     m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
-    m_is_valid_ = true;
 }
 
 void StructuredBuffer::UpdateBuffer(void *data)
@@ -107,7 +103,7 @@ std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
 
 bool StructuredBuffer::IsValid()
 {
-    return m_is_valid_;
+    return m_default_buffer_ != nullptr;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC StructuredBuffer::ViewDesc()
