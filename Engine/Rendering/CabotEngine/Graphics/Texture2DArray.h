@@ -7,8 +7,8 @@
 class Texture2DArray : public engine::ShaderResource
 {
     std::vector<engine::AssetPtr<Texture2D>> m_textures_;
-    ComPtr<ID3D12Resource> m_p_resource_;
-    DXGI_FORMAT m_format_;
+    ComPtr<ID3D12Resource> m_resource_;
+    DXGI_FORMAT m_format_ = {};
     UINT m_mip_level_ = 1;
     UINT16 m_element_count_ = 0;
     bool m_is_valid_ = false;

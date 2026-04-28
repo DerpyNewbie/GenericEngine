@@ -79,6 +79,7 @@ void Texture2D::CreateBuffer()
 
     if (FAILED(hr))
     {
+        engine::Logger::Error<Texture2D>("failed to create texture2d resource");
         return;
     }
 
