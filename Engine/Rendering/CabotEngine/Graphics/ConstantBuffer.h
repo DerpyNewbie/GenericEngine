@@ -6,7 +6,7 @@ class ConstantBuffer : public IBuffer
     UINT64 m_size_aligned_;
     UINT64 m_size_;
 
-    ComPtr<ID3D12Resource> m_p_buffer_;
+    ComPtr<ID3D12Resource> m_buffer_;
     D3D12_CONSTANT_BUFFER_VIEW_DESC m_desc_;
 
     void *m_p_mapped_ptr_ = nullptr;

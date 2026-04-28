@@ -20,7 +20,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *init_data)
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(m_upload_resource_.GetAddressOf()));
+        IID_PPV_ARGS(m_upload_buffer_.GetAddressOf()));
 
     if (FAILED(hr))
     {
@@ -31,17 +31,17 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *init_data)
     void *ptr = nullptr;
 
     constexpr D3D12_RANGE read_range = {0, 0};
-    hr = m_upload_resource_->Map(0, &read_range, &ptr);
+    hr = m_upload_buffer_->Map(0, &read_range, &ptr);
     if (FAILED(hr))
     {
         Logger::Error<IndexBuffer>("failed to index buffer mapping");
-        m_upload_resource_.Reset();
+        m_upload_buffer_.Reset();
         return;
     }
 
     memcpy(ptr, init_data, size);
 
-    m_upload_resource_->Unmap(0, nullptr);
+    m_upload_buffer_->Unmap(0, nullptr);
 
     const auto default_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
     hr = RenderEngine::Device()->CreateCommittedResource(
@@ -50,30 +50,30 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *init_data)
         &desc,
         D3D12_RESOURCE_STATE_COPY_DEST,
         nullptr,
-        IID_PPV_ARGS(m_default_resource_.GetAddressOf()));
+        IID_PPV_ARGS(m_default_buffer_.GetAddressOf()));
 
     if (FAILED(hr))
     {
         Logger::Error<IndexBuffer>("failed to create index buffer default resource");
-        m_default_resource_.Reset();
+        m_default_buffer_.Reset();
         return;
     }
 
-    RenderEngine::CommandList()->CopyBufferRegion(m_default_resource_.Get(), 0, m_upload_resource_.Get(), 0, size);
+    RenderEngine::CommandList()->CopyBufferRegion(m_default_buffer_.Get(), 0, m_upload_buffer_.Get(), 0, size);
 
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_default_resource_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
+    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(m_default_buffer_.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_INDEX_BUFFER);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
-    m_view_.BufferLocation = m_default_resource_->GetGPUVirtualAddress();
+    m_view_.BufferLocation = m_default_buffer_->GetGPUVirtualAddress();
     m_view_.Format = DXGI_FORMAT_R32_UINT;
     m_view_.SizeInBytes = static_cast<UINT>(size);
 
-    m_default_resource_->SetName(L"IndexBuffer");
+    m_default_buffer_->SetName(L"IndexBuffer");
 }
 
 bool engine::IndexBuffer::IsValid() const
 {
-    return m_default_resource_ != nullptr;
+    return m_default_buffer_ != nullptr;
 }
 
 D3D12_INDEX_BUFFER_VIEW *engine::IndexBuffer::View()
