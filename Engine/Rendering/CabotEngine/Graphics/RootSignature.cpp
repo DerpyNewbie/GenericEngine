@@ -5,15 +5,11 @@
 
 namespace engine
 {
-std::shared_ptr<RootSignature> RootSignature::m_instance_;
 
 std::shared_ptr<RootSignature> RootSignature::Instance()
 {
-    if (!m_instance_)
-    {
-        m_instance_ = std::make_shared<RootSignature>();
-    }
-    return m_instance_;
+    static auto instance = std::make_shared<RootSignature>();
+    return instance;
 }
 
 RootSignature::RootSignature()
@@ -32,12 +28,15 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangeBone = {};
     tableRangeBone.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     rootParam[kBoneSRV].InitAsDescriptorTable(1, &tableRangeBone, D3D12_SHADER_VISIBILITY_ALL);
+    
     CD3DX12_DESCRIPTOR_RANGE tableRangeLightVP = {};
     tableRangeLightVP.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
     rootParam[kLightViewProj].InitAsDescriptorTable(1, &tableRangeLightVP, D3D12_SHADER_VISIBILITY_ALL);
+    
     CD3DX12_DESCRIPTOR_RANGE tableRangeLight = {};
     tableRangeLight.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
     rootParam[kLightSRV].InitAsDescriptorTable(1, &tableRangeLight, D3D12_SHADER_VISIBILITY_ALL);
+    
     CD3DX12_DESCRIPTOR_RANGE tableRangeShadowMap = {};
     tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
     rootParam[kShadowMapSRV].InitAsDescriptorTable(1, &tableRangeShadowMap, D3D12_SHADER_VISIBILITY_ALL);
@@ -45,9 +44,6 @@ RootSignature::RootSignature()
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSUAV = {};
-    CD3DX12_DESCRIPTOR_RANGE tableRangePSCBV = {};
-    CD3DX12_DESCRIPTOR_RANGE tableRangePSSRV = {};
-    CD3DX12_DESCRIPTOR_RANGE tableRangePSUAV = {};
 
     tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 5);
     tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 4);
@@ -56,20 +52,19 @@ RootSignature::RootSignature()
     rootParam[kMaterialCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kMaterialSRV].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kMaterialUAV].InitAsDescriptorTable(1, &tableRangeVSUAV, D3D12_SHADER_VISIBILITY_ALL);
-
-    // スタティックサンプラーの設定
+    
     D3D12_STATIC_SAMPLER_DESC sampler[2];
     sampler[0] = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
     sampler[1] = CD3DX12_STATIC_SAMPLER_DESC(
-    1, // shader register
-    D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT, // ←ここが重要！
+        1,
+        D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT,
     D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
     D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
     D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
     0.0f,
     16,
-    D3D12_COMPARISON_FUNC_LESS_EQUAL, // ←比較関数を有効にする
+        D3D12_COMPARISON_FUNC_LESS_EQUAL,
     D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE
     );
 
@@ -94,28 +89,27 @@ RootSignature::RootSignature()
         return;
     }
 
-    // ルートシグネチャ生成
     hr = RenderEngine::Device()->CreateRootSignature(
     0,
     pBlob->GetBufferPointer(),
     pBlob->GetBufferSize(),
-    IID_PPV_ARGS(m_pRootSignature.GetAddressOf()));
+    IID_PPV_ARGS(m_root_signature_.GetAddressOf()));
     if (FAILED(hr))
     {
         Logger::Error("Failed to Create RootSignature");
         return;
     }
 
-    m_IsValid = true;
+    m_is_valid_ = true;
 }
 
 bool RootSignature::IsValid()
 {
-    return Instance()->m_IsValid;
+    return Instance()->m_root_signature_ != nullptr;
 }
 
 ID3D12RootSignature *RootSignature::Get()
 {
-    return Instance()->m_pRootSignature.Get();
+    return Instance()->m_root_signature_.Get();
 }
 }

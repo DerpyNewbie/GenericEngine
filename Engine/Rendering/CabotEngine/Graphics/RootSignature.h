@@ -22,13 +22,11 @@ enum kRootParameterIndex
 
 class RootSignature
 {
-    static std::shared_ptr<RootSignature> m_instance_;
-
-    bool m_IsValid = false;
-    ComPtr<ID3D12RootSignature> m_pRootSignature = nullptr;
+    bool m_is_valid_ = false;
+    ComPtr<ID3D12RootSignature> m_root_signature_ = nullptr;
 
 public:
-    constexpr static int kPreDefinedVariableCount = 9;
+    constexpr static int kPreDefinedVariableCount = kMaterialCBV;
 
     static std::shared_ptr<RootSignature> Instance();
     static ID3D12RootSignature *Get();
