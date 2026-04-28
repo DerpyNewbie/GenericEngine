@@ -8,7 +8,7 @@ ConstantBuffer::ConstantBuffer(const size_t size)
     m_size_ = size;
 
     constexpr size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-    m_size_aligned_ = size + (align - 1) & ~(align - 1);
+    m_size_aligned_ = (size + (align - 1)) & ~(align - 1);
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetAddress() const
@@ -40,7 +40,8 @@ void ConstantBuffer::CreateBuffer()
         return;
     }
 
-    hr = m_p_buffer_->Map(0, nullptr, &m_p_mapped_ptr_);
+    constexpr D3D12_RANGE read_range = {0, 0};
+    hr = m_p_buffer_->Map(0, &read_range, &m_p_mapped_ptr_);
     if (FAILED(hr))
     {
         engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");

@@ -11,11 +11,10 @@ class ConstantBuffer : public IBuffer
 
     void *m_p_mapped_ptr_ = nullptr;
 
-    ConstantBuffer(const ConstantBuffer &) = delete;
-    void operator =(const ConstantBuffer &) = delete;
-
 public:
     explicit ConstantBuffer(size_t size);
+    ConstantBuffer(const ConstantBuffer &) = delete;
+    void operator =(const ConstantBuffer &) = delete;
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
