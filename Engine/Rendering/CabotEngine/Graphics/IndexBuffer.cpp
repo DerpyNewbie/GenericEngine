@@ -48,7 +48,7 @@ engine::IndexBuffer::IndexBuffer(size_t size, const uint32_t *init_data)
         &default_prop,
         D3D12_HEAP_FLAG_NONE,
         &desc,
-        D3D12_RESOURCE_STATE_COPY_DEST,
+        D3D12_RESOURCE_STATE_COMMON,
         nullptr,
         IID_PPV_ARGS(m_default_buffer_.GetAddressOf()));
 

@@ -26,7 +26,7 @@ void PSOManager::Initialize()
     depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 
     PSOSetting setting;
-    setting.InputLayout = engine::Vertex::InputLayout;
+    setting.InputLayout = engine::Vertex::kInputLayout;
     setting.IsTransparent = false;
     setting.CullMode = D3D12_CULL_MODE_NONE;
     setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -99,7 +99,7 @@ bool PSOManager::Register(PSOSetting setting)
 bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string pso_name)
 {
     auto pso = new PipelineState;
-    pso->SetInputLayout(engine::Vertex::InputLayout);
+    pso->SetInputLayout(engine::Vertex::kInputLayout);
     pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
     pso->SetNumRenderTarget(1);
     pso->SetShader(shader);
