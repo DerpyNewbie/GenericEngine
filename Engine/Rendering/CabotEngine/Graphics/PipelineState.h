@@ -31,10 +31,8 @@ class PipelineState
     ComPtr<ID3DBlob> m_p_gs_blob_ = nullptr;
     
 public:
-    PipelineState();
+    PipelineState(const PipelineStateSettings &setting);
     [[nodiscard]] bool IsValid() const;
-
-    void Create(const PipelineStateSettings &setting);
 
 
     ID3D12PipelineState *Get() const;

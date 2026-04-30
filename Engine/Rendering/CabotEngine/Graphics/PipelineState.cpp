@@ -37,30 +37,9 @@ void PipelineStateSettings::SetShader(const engine::Shader *shader)
     primitive_topology_type = DX_PrimitiveTopologyType[shader_setting.primitive_topology_type];
 }
 
-PipelineState::PipelineState()
+PipelineState::PipelineState(const PipelineStateSettings &setting)
 {
-    m_desc_.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-    m_desc_.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-    m_desc_.RasterizerState.FrontCounterClockwise = TRUE;
-    m_desc_.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-    m_desc_.SampleMask = UINT_MAX;
-    m_desc_.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    m_desc_.NumRenderTargets = 1;
-    for (auto &RTVFormat : m_desc_.RTVFormats)
-        RTVFormat = DXGI_FORMAT_UNKNOWN;
-    m_desc_.DSVFormat = DXGI_FORMAT_D32_FLOAT;
-    m_desc_.SampleDesc.Count = 1;
-    m_desc_.SampleDesc.Quality = 0;
     m_desc_.pRootSignature = engine::RootSignature::Get();
-}
-
-bool PipelineState::IsValid() const
-{
-    return m_is_valid_;
-}
-
-void PipelineState::Create(const PipelineStateSettings &setting)
-{
     m_desc_.InputLayout = setting.layout_desc;
     m_desc_.PrimitiveTopologyType = setting.primitive_topology_type;
     m_desc_.RasterizerState = setting.rasterizer_desc;
@@ -86,6 +65,7 @@ void PipelineState::Create(const PipelineStateSettings &setting)
     m_desc_.DSVFormat = setting.dsv_format;
     m_desc_.SampleMask = setting.sample_mask;
     m_desc_.SampleDesc.Count = setting.sample_count;
+    m_desc_.SampleDesc.Quality = 0;
 
     auto hr = RenderEngine::Device()->CreateGraphicsPipelineState(
         &m_desc_, IID_PPV_ARGS(m_p_pipeline_state_.ReleaseAndGetAddressOf()));
@@ -96,6 +76,11 @@ void PipelineState::Create(const PipelineStateSettings &setting)
     }
 
     m_is_valid_ = true;
+}
+
+bool PipelineState::IsValid() const
+{
+    return m_is_valid_;
 }
 
 ID3D12PipelineState *PipelineState::Get() const

@@ -21,8 +21,7 @@ bool PSOManager::Register(const engine::Shader *shader, const std::string &pso_n
     pso_setting.num_rendertarget = num_render_targets;
     pso_setting.rtv_format[0] = rtv_format;
 
-    const auto pso = new PipelineState;
-    pso->Create(pso_setting);
+    const auto pso = new PipelineState(pso_setting);
 
     if (!pso->IsValid())
     {
