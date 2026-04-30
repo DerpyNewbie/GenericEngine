@@ -43,6 +43,7 @@ void Shader::DrawShaderSettings()
 
     ImGui::Combo("ColorMask", &m_shader_settings_.color_mask, ColorMaskNames, IM_ARRAYSIZE(ColorMaskNames));
     ImGui::Checkbox("AlphaToMask(Coverage)", &m_shader_settings_.alpha_to_mask);
+    ImGui::Combo("PrimitiveTopologyType", &m_shader_settings_.primitive_topology_type, PrimitiveTopologyNames, IM_ARRAYSIZE(PrimitiveTopologyNames));
 }
 
 void Shader::OnInspectorGui()

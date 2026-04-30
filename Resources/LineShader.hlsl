@@ -31,7 +31,7 @@ struct VSOutput
     float2 uv : TEXCOORD;
 };
 
-VSOutput main(VSInput input)
+VSOutput vrt(VSInput input)
 {
     float4 localPos = float4(input.pos, 1.0f);
     float4 viewPos = mul(View, localPos);
@@ -44,4 +44,9 @@ VSOutput main(VSInput input)
     output.uv = float2(1, 1);
 
     return output;
+}
+
+float4 pix(VSOutput input) : SV_TARGET
+{
+    return input.color;
 }

@@ -58,17 +58,14 @@ bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
     });
 
     engine::Logger::Log<RenderEngine>("Rendering engine initialization successful");
-    PSOManager::Initialize();
     return true;
 }
 
 void RenderEngine::BeginRender()
 {
-    // 現在のレンダーターゲットを更新
     m_current_render_target_ = m_p_render_targets_[m_current_back_buffer_index_].
         Get();
 
-    // コマンドを初期化してためる準備をする
     m_p_allocator_[m_current_back_buffer_index_]->Reset();
     m_p_command_list_->Reset(m_p_allocator_[m_current_back_buffer_index_].Get(),
                              nullptr);

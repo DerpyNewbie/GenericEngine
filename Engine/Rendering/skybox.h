@@ -1,4 +1,5 @@
 #pragma once
+#include "shader.h"
 #include "Rendering/CabotEngine/Graphics/IndexBuffer.h"
 #include "Rendering/CabotEngine/Graphics/TextureCube.h"
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
@@ -11,6 +12,7 @@ class Skybox
     std::shared_ptr<VertexBuffer> m_vertex_buffer_;
     std::shared_ptr<IndexBuffer> m_index_buffer_;
     std::shared_ptr<DescriptorHandle> m_texture_cube_handle_;
+    std::shared_ptr<Shader> m_skybox_shader_;
 
     Skybox();
     bool ReconstructTextureCube();
