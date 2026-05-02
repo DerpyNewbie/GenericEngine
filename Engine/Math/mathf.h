@@ -107,8 +107,8 @@ public:
         const float a = proj.m[2][2];
         const float b = proj.m[3][2];
 
-        _near = -b / a;
-        _far = b / (1.0f - a);
+        _near = b / a;
+        _far = b / (1.0f + a);
     }
 };
 }
