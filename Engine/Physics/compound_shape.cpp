@@ -14,15 +14,20 @@ void CompoundShape::OnInspectorGui()
 {
     if (m_shape_ == nullptr)
     {
-        ImGui::Text("No shape");
+        ImGui::TextDisabled("[Shape is not initialized]");
         return;
     }
 
     for (const auto &[weak_collider, shape] : m_colliders_)
     {
         auto collider = weak_collider.lock();
+        if (collider == nullptr)
+        {
+            ImGui::TextDisabled("[nullptr]");
+            continue;
+        }
 
-        ImGui::Text("%s", collider != nullptr ? collider->Name() : "##NULL!!!##");
+        ImGui::Text("%s", collider->Name());
         ImGui::SameLine();
         ImGui::Text("%s", shape.get()->getName());
     }

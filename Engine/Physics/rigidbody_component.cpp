@@ -329,7 +329,7 @@ void RigidbodyComponent::OnInspectorGui()
         SetAngularVelocity(m_angular_velocity_);
     }
 
-    if (ImGui::CollapsingHeader("Advanced Settings"))
+    if (ImGui::TreeNodeEx("Advanced Settings", ImGuiTreeNodeFlags_Framed))
     {
         if (Gui::FloatField("Friction", m_friction_))
         {
@@ -361,7 +361,7 @@ void RigidbodyComponent::OnInspectorGui()
             SetAngularDamping(m_angular_damping_);
         }
 
-        if (ImGui::CollapsingHeader("Axis Lock"))
+        if (ImGui::TreeNodeEx("Axis Lock"))
         {
             int lock_axis = m_lock_axis_;
             bool has_changes = false;
@@ -374,91 +374,97 @@ void RigidbodyComponent::OnInspectorGui()
             {
                 SetLockAxis(static_cast<kLockAxis>(lock_axis));
             }
+
+            ImGui::TreePop();
         }
+
+        ImGui::TreePop();
     }
 
-    if (ImGui::Button("WakeUp"))
+    if (ImGui::TreeNodeEx("Debug Info", ImGuiTreeNodeFlags_Framed))
     {
-        WakeUp();
-    }
-
-    if (ImGui::CollapsingHeader("Colliders"))
-    {
-        if (ImGui::CollapsingHeader("Colliders"))
+        if (ImGui::Button("WakeUp"))
         {
-            m_rigidbody_shape_->OnInspectorGui();
+            WakeUp();
         }
 
-        if (ImGui::CollapsingHeader("Triggers"))
+        if (ImGui::TreeNodeEx("Compound Shape", ImGuiTreeNodeFlags_Framed))
         {
-            m_ghost_shape_->OnInspectorGui();
-        }
-    }
+            if (ImGui::TreeNodeEx("Rigidbody Shape", ImGuiTreeNodeFlags_Framed))
+            {
+                m_rigidbody_shape_->OnInspectorGui();
+                ImGui::TreePop();
+            }
 
-    if (ImGui::CollapsingHeader("Physics Data", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::Indent();
-        if (m_bt_rigidbody_ == nullptr)
+            if (ImGui::TreeNodeEx("Ghost Shape", ImGuiTreeNodeFlags_Framed))
+            {
+                m_ghost_shape_->OnInspectorGui();
+                ImGui::TreePop();
+            }
+
+            ImGui::TreePop();
+        }
+
+        if (m_bt_rigidbody_ != nullptr && ImGui::TreeNodeEx("Physics Data", ImGuiTreeNodeFlags_Framed))
         {
-            ImGui::Text("Rigidbody has not been setup.");
-            ImGui::Unindent();
-            return;
+            ImGui::BulletText("Is Sleeping : %d", IsSleeping());
+            if (ImGui::TreeNodeEx("Rigidbody"))
+            {
+                btTransform bt_transform;
+                m_bt_motion_state_->getWorldTransform(bt_transform);
+                const auto origin = bt_transform.getOrigin();
+                const auto rot = bt_transform.getRotation();
+                const auto vel = m_bt_rigidbody_->getLinearVelocity();
+                const auto ang_vel = m_bt_rigidbody_->getAngularVelocity();
+                const auto total_force = m_bt_rigidbody_->getTotalForce();
+                const auto total_torque = m_bt_rigidbody_->getTotalTorque();
+                const auto com = m_bt_rigidbody_->getCenterOfMassPosition();
+                const auto gravity = m_bt_rigidbody_->getGravity();
+                const auto inertia = m_bt_rigidbody_->getLocalInertia();
+                const auto ang_factor = m_bt_rigidbody_->getAngularFactor();
+
+                ImGui::BulletText("Position       : {%.2f, %.2f, %.2f}", origin.x(), origin.y(), origin.z());
+                ImGui::BulletText("Rotation       : {%.2f, %.2f, %.2f, %.2f}", rot.x(), rot.y(), rot.z(), rot.w());
+                ImGui::BulletText("Velocity       : {%.2f, %.2f, %.2f}", vel.x(), vel.y(), vel.z());
+                ImGui::BulletText("Ang Velocity   : {%.2f, %.2f, %.2f}", ang_vel.x(), ang_vel.y(), ang_vel.z());
+                ImGui::BulletText("Total Force    : {%.2f, %.2f, %.2f}", total_force.x(), total_force.y(), total_force.z());
+                ImGui::BulletText("Total Torque   : {%.2f, %.2f, %.2f}", total_torque.x(), total_torque.y(), total_torque.z());
+                ImGui::BulletText("Ang Factor     : {%.2f, %.2f, %.2f}", ang_factor.x(), ang_factor.y(), ang_factor.z());
+                ImGui::BulletText("Inertia        : {%.2f, %.2f, %.2f}", inertia.x(), inertia.y(), inertia.z());
+                ImGui::BulletText("Center of Mass : {%.2f, %.2f, %.2f}", com.x(), com.y(), com.z());
+                ImGui::BulletText("Gravity        : {%.2f, %.2f, %.2f}", gravity.x(), gravity.y(), gravity.z());
+                ImGui::BulletText("Lock Axis      : %d", m_lock_axis_);
+                ImGui::BulletText("Mass           : %.2f", m_bt_rigidbody_->getMass());
+                ImGui::BulletText("Friction       : %.2f", m_bt_rigidbody_->getFriction());
+                ImGui::BulletText("Rolling Friction       : %.2f", m_bt_rigidbody_->getRollingFriction());
+                ImGui::BulletText("Spinning Friction      : %.2f", m_bt_rigidbody_->getSpinningFriction());
+                ImGui::BulletText("Restitution(Bounciness): %.2f", m_bt_rigidbody_->getRestitution());
+                ImGui::BulletText("Ang Damping            : %.2f", m_bt_rigidbody_->getAngularDamping());
+                ImGui::BulletText("Lin Damping            : %.2f", m_bt_rigidbody_->getLinearDamping());
+                ImGui::BulletText("Flags                  : %d", m_bt_rigidbody_->getFlags());
+                ImGui::BulletText("Collision Flags        : %d", m_bt_rigidbody_->getCollisionFlags());
+                ImGui::BulletText("Is In World            : %d", m_bt_rigidbody_->isInWorld());
+                ImGui::BulletText("Deactivation Time      : %f", m_bt_rigidbody_->getDeactivationTime());
+                ImGui::BulletText("Is Static Or Kinematic : %d", m_bt_rigidbody_->isStaticOrKinematicObject());
+                ImGui::BulletText("Activation State       : %d", m_bt_rigidbody_->getActivationState());
+                ImGui::TreePop();
+            }
+
+            const auto shape = m_bt_rigidbody_->getCollisionShape();
+
+            if (ImGui::TreeNodeEx("Shape"))
+            {
+                ImGui::BulletText("Is Compound  : %d", shape->isCompound());
+                ImGui::BulletText("Is Non-Moving: %d", shape->isNonMoving());
+                ImGui::BulletText("Is Concave   : %d", shape->isConcave());
+                ImGui::BulletText("Is Convex    : %d", shape->isConvex());
+                ImGui::BulletText("Is Infinite  : %d", shape->isInfinite());
+                ImGui::TreePop();
+            }
+            ImGui::TreePop();
         }
 
-        btTransform bt_transform;
-        m_bt_motion_state_->getWorldTransform(bt_transform);
-        const auto origin = bt_transform.getOrigin();
-        const auto rot = bt_transform.getRotation();
-        const auto vel = m_bt_rigidbody_->getLinearVelocity();
-        const auto ang_vel = m_bt_rigidbody_->getAngularVelocity();
-        const auto total_force = m_bt_rigidbody_->getTotalForce();
-        const auto total_torque = m_bt_rigidbody_->getTotalTorque();
-        const auto com = m_bt_rigidbody_->getCenterOfMassPosition();
-        const auto gravity = m_bt_rigidbody_->getGravity();
-        const auto inertia = m_bt_rigidbody_->getLocalInertia();
-        const auto ang_factor = m_bt_rigidbody_->getAngularFactor();
-
-        ImGui::BulletText("Is Sleeping : %d", IsSleeping());
-        ImGui::Text("Rigidbody");
-        ImGui::Indent();
-        ImGui::Text("Position : {%.2f, %.2f, %.2f}", origin.x(), origin.y(), origin.z());
-        ImGui::Text("Rotation : {%.2f, %.2f, %.2f, %.2f}", rot.x(), rot.y(), rot.z(), rot.w());
-        ImGui::Text("Velocity    : {%.2f, %.2f, %.2f}", vel.x(), vel.y(), vel.z());
-        ImGui::Text("Ang Velocity: {%.2f, %.2f, %.2f}", ang_vel.x(), ang_vel.y(), ang_vel.z());
-        ImGui::Text("Total Force : {%.2f, %.2f, %.2f}", total_force.x(), total_force.y(), total_force.z());
-        ImGui::Text("Total Torque: {%.2f, %.2f, %.2f}", total_torque.x(), total_torque.y(), total_torque.z());
-        ImGui::Text("Ang Factor  : {%.2f, %.2f, %.2f}", ang_factor.x(), ang_factor.y(), ang_factor.z());
-        ImGui::Text("Inertia     : {%.2f, %.2f, %.2f}", inertia.x(), inertia.y(), inertia.z());
-        ImGui::Text("Center of Mass : {%.2f, %.2f, %.2f}", com.x(), com.y(), com.z());
-        ImGui::Text("Gravity  : {%.2f, %.2f, %.2f}", gravity.x(), gravity.y(), gravity.z());
-        ImGui::Text("Lock Axis: %d", m_lock_axis_);
-        ImGui::Text("Mass     : %.2f", m_bt_rigidbody_->getMass());
-        ImGui::Text("Friction : %.2f", m_bt_rigidbody_->getFriction());
-        ImGui::Text("Rolling Friction : %.2f", m_bt_rigidbody_->getRollingFriction());
-        ImGui::Text("Spinning Friction: %.2f", m_bt_rigidbody_->getSpinningFriction());
-        ImGui::Text("Restitution(Bounciness): %.2f", m_bt_rigidbody_->getRestitution());
-        ImGui::Text("Ang Damping: %.2f", m_bt_rigidbody_->getAngularDamping());
-        ImGui::Text("Lin Damping: %.2f", m_bt_rigidbody_->getLinearDamping());
-        ImGui::Text("Flags          : %d", m_bt_rigidbody_->getFlags());
-        ImGui::Text("Collision Flags: %d", m_bt_rigidbody_->getCollisionFlags());
-        ImGui::Text("Is In World              : %d", m_bt_rigidbody_->isInWorld());
-        ImGui::Text("Deactivation Time        : %f", m_bt_rigidbody_->getDeactivationTime());
-        ImGui::Text("Is Static Or Kinematic   : %d", m_bt_rigidbody_->isStaticOrKinematicObject());
-        ImGui::Text("Activation State         : %d", m_bt_rigidbody_->getActivationState());
-        ImGui::Unindent();
-
-        const auto shape = m_bt_rigidbody_->getCollisionShape();
-
-        ImGui::Text("Shape");
-        ImGui::Indent();
-        ImGui::BulletText("Is Compound  : %d", shape->isCompound());
-        ImGui::BulletText("Is Non-Moving: %d", shape->isNonMoving());
-        ImGui::BulletText("Is Concave   : %d", shape->isConcave());
-        ImGui::BulletText("Is Convex    : %d", shape->isConvex());
-        ImGui::BulletText("Is Infinite  : %d", shape->isInfinite());
-        ImGui::Unindent();
-
-        ImGui::Unindent();
+        ImGui::TreePop();
     }
 }
 
