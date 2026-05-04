@@ -2,6 +2,7 @@
 #include "TextureCube.h"
 
 #include "DescriptorHeap.h"
+#include "DirectXResourceFactory.h"
 #include "RenderEngine.h"
 #include "gui.h"
 #include "Asset/asset_ptr.h"
@@ -51,28 +52,23 @@ void TextureCube::CreateBuffer()
     cube_desc.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN;
 
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &cube_desc,
+
+    m_buffer_ = DirectXResourceFactory::CreateBuffer(
+        prop,
+        cube_desc,
         D3D12_RESOURCE_STATE_COPY_DEST,
-        nullptr,
-        IID_PPV_ARGS(&m_buffer_)
+        D3D12_HEAP_FLAG_NONE,
+        nullptr
     );
 
-    if (FAILED(hr))
+    if (m_buffer_ == nullptr)
     {
         m_buffer_ = nullptr;
         return;
     }
 
-    hr = m_buffer_->SetName(L"TextureCube");
-    if (FAILED(hr))
-    {
-        m_buffer_ = nullptr;
-        return;
-    }
-
+    m_buffer_->SetName(L"TextureCube");
+    
     const auto cmd_list = RenderEngine::CommandList();
     for (int i = 0; i < 6; ++i)
     {
