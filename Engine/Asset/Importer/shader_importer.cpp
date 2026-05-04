@@ -19,6 +19,7 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderParameters(const std::sha
 {
     const auto vs_blob = shader->m_vs_blob_;
     const auto ps_blob = shader->m_ps_blob_;
+    const auto gs_blob = shader->m_gs_blob_;
 
     const auto vs_params = ReadShaderBlob(vs_blob);
     const auto ps_params = ReadShaderBlob(ps_blob);
@@ -27,17 +28,16 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderParameters(const std::sha
     shader_parameters.reserve(vs_params.size() + ps_params.size());
     shader_parameters.insert(shader_parameters.end(), vs_params.begin(), vs_params.end());
 
-    for (auto ps_param : ps_params)
-    {
-        auto same_param = std::ranges::find(shader_parameters, ps_param) != shader_parameters.end();
-        if (same_param)
-            continue;
+    EmplaceShaderParameters(shader_parameters, ps_params);
 
-        shader_parameters.emplace_back(ps_param);
+    if (gs_blob != nullptr)
+    {
+        const auto gs_params = ReadShaderBlob(gs_blob);
+        EmplaceShaderParameters(shader_parameters, gs_params);
     }
 
     shader_parameters.shrink_to_fit();
-    
+
     return shader_parameters;
 }
 
@@ -169,6 +169,15 @@ std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind
     }
 }
 
+void ShaderImporter::EmplaceShaderParameters(std::vector<ShaderParameter> &base_parameters, const std::vector<ShaderParameter> &src_parameters)
+{
+    for (auto src_param : src_parameters)
+    {
+        if (std::ranges::find(base_parameters, src_param) == base_parameters.end())
+            base_parameters.emplace_back(src_param);
+    }
+}
+
 void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shader)
 {
     auto old_parameters = shader->parameters;
@@ -220,11 +229,17 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         &error_blob
     );
 
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
-        return false;
-    }
+    hr = D3DCompileFromFile(
+        file_path.c_str(),
+        nullptr,
+        D3D_COMPILE_STANDARD_FILE_INCLUDE,
+        "geo",
+        "gs_5_0",
+        0,
+        0,
+        &shader->m_gs_blob_,
+        &error_blob
+    );
 
     // Add shader variants here if you want to
     return true;
@@ -321,12 +336,6 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
     WriteShaderMeta(shader, ctx->DataStore());
 
     shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
-
-    if (!PSOManager::Register(shader, ctx->AssetPath().filename().string()))
-    {
-        ctx->LogImportError("Failed to register shader to PSOManager!");
-        return;
-    }
 
     ctx->SetMainObject(shader);
 }

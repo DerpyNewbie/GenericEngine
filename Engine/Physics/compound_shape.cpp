@@ -2,6 +2,7 @@
 #include "collider.h"
 #include "compound_shape.h"
 #include "game_object.h"
+#include "gui.h"
 
 namespace engine
 {
@@ -9,6 +10,27 @@ CompoundShape::CompoundShape(const std::shared_ptr<Transform> &target) :
     m_shape_(std::make_unique<btCompoundShape>()),
     m_transform_(target)
 { }
+
+void CompoundShape::OnInspectorGui()
+{
+    if (m_shape_ == nullptr)
+    {
+        ImGui::TextDisabled("[Shape is not initialized]");
+        return;
+    }
+
+    for (const auto &[weak_collider, shape] : m_colliders_)
+    {
+        auto collider = weak_collider.lock();
+        if (collider == nullptr)
+        {
+            ImGui::TextDisabled("[nullptr]");
+            continue;
+        }
+
+        ImGui::Text("%s: %s", collider->GameObject()->Name().c_str(), shape.get()->getName());
+    }
+}
 
 void CompoundShape::AddChild(const std::shared_ptr<Collider> &collider)
 {

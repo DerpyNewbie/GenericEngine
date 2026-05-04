@@ -60,11 +60,12 @@ bool Engine::Init()
 
 void Engine::Tick()
 {
+    Profiler::NewFrame();
+    Time::Get()->IncrementFrame();
+    Input::Instance()->Update();
+
     if (Application::IsPlayMode())
     {
-        Profiler::NewFrame();
-        Time::Get()->IncrementFrame();
-
         on_tick.Invoke();
 
         Profiler::Begin("Fixed Update");
@@ -76,7 +77,6 @@ void Engine::Tick()
         Profiler::End("Fixed Update");
 
         Profiler::Begin("Update");
-        Input::Instance()->Update();
         UpdateManager::InvokeUpdate();
         Profiler::End("Update");
     }

@@ -135,6 +135,11 @@ public:
     {
         return a == b || (a != nullptr && b != nullptr && a->Guid() == b->Guid());
     }
+
+    [[nodiscard]] static std::unordered_map<xg::Guid, std::shared_ptr<Object>> AllObjects()
+    {
+        return m_objects_;
+    }
 };
 }
 

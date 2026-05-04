@@ -1,5 +1,6 @@
 #include "pch.h"
 
+#include "Rendering/CabotEngine/Graphics/billboard.h"
 #include "billboard_renderer.h"
 #include "game_object.h"
 #include "Asset/asset_database.h"

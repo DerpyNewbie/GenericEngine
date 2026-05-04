@@ -6,7 +6,7 @@ namespace engine
 {
 class Transform;
 class Collider;
-class CompoundShape
+class CompoundShape : public Inspectable
 {
     std::unique_ptr<btCompoundShape> m_shape_ = {};
     std::list<std::pair<std::weak_ptr<Collider>, std::shared_ptr<btCollisionShape>>> m_colliders_ = {};
@@ -15,6 +15,8 @@ class CompoundShape
 public:
     CompoundShape() = default;
     explicit CompoundShape(const std::shared_ptr<Transform> &target);
+
+    void OnInspectorGui() override;
 
     void AddChild(const std::shared_ptr<Collider> &collider);
     void RemoveChild(const std::shared_ptr<Collider> &collider);

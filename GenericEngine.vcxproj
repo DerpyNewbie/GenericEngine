@@ -39,6 +39,7 @@
         <ClCompile Include="Editor\hierarchy.cpp"/>
         <ClCompile Include="Editor\imgui_demo_window.cpp"/>
         <ClCompile Include="Editor\inspector.cpp"/>
+        <ClCompile Include="Editor\object_list_window.cpp"/>
         <ClCompile Include="Editor\profiler.cpp"/>
         <ClCompile Include="Editor\tool_window.cpp"/>
         <ClCompile Include="Editor\update_man_debugger.cpp"/>
@@ -128,71 +129,15 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_pixel.hlsl">
-            <ShaderType>Pixel</ShaderType>
-            <EntryPointName>pix</EntryPointName>
-            <ShaderModel>5.1</ShaderModel>
-        </FxCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_vertex.hlsl">
-            <EntryPointName>vrt</EntryPointName>
-            <ShaderType>Vertex</ShaderType>
-            <ShaderModel>5.1</ShaderModel>
-        </FxCompile>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.cpp"/>
-        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\MemUtil.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\billboard.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\depth_geometry.hlsl">
-            <EntryPointName>geo</EntryPointName>
-            <ShaderModel>5.1</ShaderModel>
-            <ShaderType>Geometry</ShaderType>
-        </FxCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxPixelShader.hlsl">
-            <EntryPointName>pix</EntryPointName>
-            <ShaderModel>5.0</ShaderModel>
-            <ShaderType>Pixel</ShaderType>
-        </FxCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\SkyboxVertShader.hlsl">
-            <EntryPointName>vert</EntryPointName>
-            <ShaderType>Vertex</ShaderType>
-            <ShaderModel>5.0</ShaderModel>
-        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\2DPixelShader.hlsl">
-            <EntryPointName>pix</EntryPointName>
-            <SuppressStartupBanner>true</SuppressStartupBanner>
-            <ShaderModel>5.0</ShaderModel>
-            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-            <DisableOptimizations>true</DisableOptimizations>
-            <EnableDebuggingInformation>true</EnableDebuggingInformation>
-            <FileType>Document</FileType>
-            <ShaderType>Pixel</ShaderType>
-        </FxCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\2DVertShader.hlsl">
-            <EntryPointName>vrt</EntryPointName>
-            <SuppressStartupBanner>true</SuppressStartupBanner>
-            <ShaderModel>5.0</ShaderModel>
-            <MinimalRebuildFromTracking>true</MinimalRebuildFromTracking>
-            <DisableOptimizations>true</DisableOptimizations>
-            <EnableDebuggingInformation>true</EnableDebuggingInformation>
-            <FileType>Document</FileType>
-            <ShaderType>Vertex</ShaderType>
-        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LinePixelShader.hlsl">
-            <FileType>Document</FileType>
-            <ShaderModel>5.1</ShaderModel>
-            <ShaderType>Pixel</ShaderType>
-        </FxCompile>
-        <FxCompile Include="Engine\Rendering\CabotEngine\Graphics\LineVertexShader.hlsl">
-            <FileType>Document</FileType>
-            <ShaderModel>5.1</ShaderModel>
-            <ShaderType>Vertex</ShaderType>
-        </FxCompile>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PipelineState.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\PSOManager.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\RenderEngine.cpp"/>
@@ -255,6 +200,7 @@
         <ClInclude Include="Editor\hierarchy.h"/>
         <ClInclude Include="Editor\imgui_demo_window.h"/>
         <ClInclude Include="Editor\inspector.h"/>
+        <ClInclude Include="Editor\object_list_window.h"/>
         <ClInclude Include="Editor\profiler.h"/>
         <ClInclude Include="Editor\tool_window.h"/>
         <ClInclude Include="Editor\update_man_debugger.h"/>
@@ -352,6 +298,7 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\billboard.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MemUtil.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>

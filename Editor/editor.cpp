@@ -16,6 +16,7 @@
 #include "editor_gizmos.h"
 #include "engine.h"
 #include "tool_window.h"
+#include "object_list_window.h"
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
@@ -75,8 +76,12 @@ void Editor::Init()
         font_config.MergeMode = true;
         font_config.GlyphRanges = io.Fonts->GetGlyphRangesJapanese();
         io.Fonts->AddFontDefault();
-        ImFont *font = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\meiryo.ttc)", 18.0f, &font_config,
-                                                    io.Fonts->GetGlyphRangesJapanese());
+        ImFont *font = io.Fonts->AddFontFromFileTTF(
+            R"(C:\Windows\Fonts\meiryo.ttc)",
+            18.0f,
+            &font_config,
+            io.Fonts->GetGlyphRangesJapanese()
+        );
         IM_ASSERT(font != nullptr);
 
         auto descriptor_handle = DescriptorHeap::Allocate();
@@ -107,6 +112,7 @@ void Editor::Init()
         AddEditorWindow("ImGui Demo Window", std::make_shared<ImGuiDemoWindow>());
         AddEditorWindow("Audio", std::make_shared<AudioWindow>());
         AddEditorWindow("Tools", std::make_shared<ToolWindow>());
+        AddEditorWindow("Object List", std::make_shared<ObjectListWindow>());
     }
     // end EditorWindow register
 
@@ -124,29 +130,47 @@ void Editor::Init()
 
     // begin CreateMenu register
     {
-        AddCreateMenu("Text Asset", ".txt", [] {
-            return Object::Instantiate<TextAsset>("New Text Asset");
-        });
+        AddCreateMenu(
+            "Text Asset",
+            ".txt",
+            [] {
+                return Object::Instantiate<TextAsset>("New Text Asset");
+            }
+        );
 
-        AddCreateMenu("Material", ".material", [] {
-            return Object::Instantiate<Material>("New Material");
-        });
+        AddCreateMenu(
+            "Material",
+            ".material",
+            [] {
+                return Object::Instantiate<Material>("New Material");
+            }
+        );
 
-        AddCreateMenu("Render Texture", ".rendertexture", [] {
-            return Object::Instantiate<RenderTexture>("New RenderTexture");
-        });
+        AddCreateMenu(
+            "Render Texture",
+            ".rendertexture",
+            [] {
+                return Object::Instantiate<RenderTexture>("New RenderTexture");
+            }
+        );
 
-        AddCreateMenu("Texture Cube", ".cubemap", [] {
-            return Object::Instantiate<TextureCube>("New TextureCube");
-        });
+        AddCreateMenu(
+            "Texture Cube",
+            ".cubemap",
+            [] {
+                return Object::Instantiate<TextureCube>("New TextureCube");
+            }
+        );
     }
     // end CreateMenu register
 
     // begin Engine Event Hook register
     {
-        Engine::on_tick.AddListener([this] {
-            OnEngineTick();
-        });
+        Engine::on_tick.AddListener(
+            [this] {
+                OnEngineTick();
+            }
+        );
     }
 }
 
@@ -213,17 +237,23 @@ void Editor::OnDraw()
 
 void Editor::Attach()
 {
-    Engine::on_init.AddListener([this] {
-        Init();
-    });
+    Engine::on_init.AddListener(
+        [this] {
+            Init();
+        }
+    );
 
-    RenderPipeline::Instance()->on_rendering.AddListener([this] {
-        OnDraw();
-    });
+    RenderPipeline::Instance()->on_rendering.AddListener(
+        [this] {
+            OnDraw();
+        }
+    );
 
-    Engine::on_finalize.AddListener([this] {
-        Finalize();
-    });
+    Engine::on_finalize.AddListener(
+        [this] {
+            Finalize();
+        }
+    );
 }
 
 void Editor::Finalize()
@@ -366,7 +396,7 @@ void Editor::AddEditorWindow(const std::string &name, std::shared_ptr<EditorWind
 std::vector<std::string> Editor::GetEditorWindowNames()
 {
     auto keys = std::views::keys(m_editor_windows_);
-    return { keys.begin(), keys.end() };
+    return {keys.begin(), keys.end()};
 }
 
 std::shared_ptr<EditorWindow> Editor::GetEditorWindow(const std::string &name)
@@ -399,13 +429,20 @@ std::shared_ptr<EditorMenu> Editor::GetEditorMenu(const std::string &name)
 
 void Editor::RemoveEditorMenu(const std::string &name)
 {
-    m_editor_menus_.erase(std::ranges::find_if(m_editor_menus_, [&](const auto &m) {
-        return m.name == name;
-    }));
+    m_editor_menus_.erase(
+        std::ranges::find_if(
+            m_editor_menus_,
+            [&](const auto &m) {
+                return m.name == name;
+            }
+        )
+    );
 }
 
-void Editor::AddCreateMenu(const std::string &name, const std::string &extension,
-    std::function<std::shared_ptr<Object>()> factory, int priority)
+void Editor::AddCreateMenu(
+    const std::string &name, const std::string &extension,
+    std::function<std::shared_ptr<Object>()> factory, int priority
+)
 {
     m_create_menus_.emplace_back(name, extension, factory, priority);
     std::ranges::sort(m_create_menus_, std::ranges::less(), &PrioritizedCreateMenu::priority);
@@ -418,9 +455,14 @@ std::vector<Editor::PrioritizedCreateMenu> Editor::GetCreateMenus()
 
 void Editor::RemoveCreateMenu(const std::string &name)
 {
-    m_create_menus_.erase(std::ranges::find_if(m_create_menus_, [&](const auto &m) {
-        return m.name == name;
-    }));
+    m_create_menus_.erase(
+        std::ranges::find_if(
+            m_create_menus_,
+            [&](const auto &m) {
+                return m.name == name;
+            }
+        )
+    );
 }
 
 void Editor::DrawEditorMenuBar() const

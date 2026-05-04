@@ -4,7 +4,7 @@ namespace engine
 {
 struct ShaderSettings
 {
-    static constexpr std::uint32_t kSerializationVersion = 4;
+    static constexpr std::uint32_t kSerializationVersion = 5;
     
     int z_test = 0;
     int z_write = 1;
@@ -18,6 +18,8 @@ struct ShaderSettings
     int color_mask = 0;
 
     bool alpha_to_mask = false;
+
+    int primitive_topology_type = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
     template <class Archive>
     void serialize(Archive &ar, const std::uint32_t version)
@@ -35,6 +37,9 @@ struct ShaderSettings
 
         if (4 <= version)
             ar(CEREAL_NVP(use_blend));
+
+        if (5 <= version)
+            ar(CEREAL_NVP(primitive_topology_type));
     }
 };
 }
@@ -106,6 +111,14 @@ constexpr const char *RenderQueueNames[] = {
     "Overlay"
 };
 
+constexpr const char *PrimitiveTopologyNames[] = {
+    "Undefined",
+    "Point",
+    "Line",
+    "Triangle",
+    "Patch"
+};
+
 constexpr D3D12_COMPARISON_FUNC DX_ZTest[] = {
     D3D12_COMPARISON_FUNC_LESS,
     D3D12_COMPARISON_FUNC_GREATER,
@@ -157,4 +170,12 @@ constexpr UINT8 DX_ColorMask[] = {
     D3D12_COLOR_WRITE_ENABLE_GREEN,
     D3D12_COLOR_WRITE_ENABLE_BLUE,
     0
+};
+
+constexpr D3D12_PRIMITIVE_TOPOLOGY_TYPE DX_PrimitiveTopologyType[] = {
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED,
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT,
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE,
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH
 };

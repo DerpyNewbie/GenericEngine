@@ -13,116 +13,38 @@ std::shared_ptr<PSOManager> PSOManager::Instance()
     return m_instance_;
 }
 
-void PSOManager::Initialize()
+bool PSOManager::Register(const engine::Shader *shader, const std::string &pso_name, const DXGI_FORMAT rtv_format, const UINT num_render_targets)
 {
-    D3D12_RASTERIZER_DESC rasterizer_desc;
+    PipelineStateSettings pso_setting;
+    pso_setting.SetShader(shader);
+    pso_setting.layout_desc = engine::Vertex::InputLayout;
+    pso_setting.num_rendertarget = num_render_targets;
+    pso_setting.rtv_format[0] = rtv_format;
 
-    rasterizer_desc = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); // ラスタライザーはデフォルト
-    rasterizer_desc.CullMode = D3D12_CULL_MODE_NONE; // カリングはなし
-    rasterizer_desc.FrontCounterClockwise = TRUE;
-
-    D3D12_DEPTH_STENCIL_DESC depth_stencil_desc;
-
-    depth_stencil_desc = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-
-    PSOSetting setting;
-    setting.InputLayout = engine::Vertex::kInputLayout;
-    setting.IsTransparent = false;
-    setting.CullMode = D3D12_CULL_MODE_NONE;
-    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    setting.DepthStencilDesc = depth_stencil_desc;
-
-    setting.PSOName = "Depth";
-    setting.RasterizerDesc = rasterizer_desc;
-    setting.NumRenderTarget = 0;
-    setting.VSPath = L"x64/Debug/depth_vertex.cso";
-    setting.PSPath = L"x64/Debug/depth_pixel.cso";
-    setting.GSPath = L"x64/Debug/depth_geometry.cso";
-    Register(setting);
-
-    //設定の一部が一緒なので使いまわす
-    setting.PSOName = "Line";
-    setting.RasterizerDesc = rasterizer_desc;
-    setting.NumRenderTarget = 1;
-    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-    setting.VSPath = L"x64/Debug/LineVertexShader.cso";
-    setting.PSPath = L"x64/Debug/LinePixelShader.cso";
-    setting.GSPath = L"";
-    Register(setting);
-
-    setting.PSOName = "2DBasic";
-    setting.IsTransparent = true;
-    setting.PrimitiveType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-    setting.VSPath = L"x64/Debug/2DVertShader.cso";
-    setting.PSPath = L"x64/Debug/2DPixelShader.cso";
-    Register(setting);
-
-    setting.PSOName = "Skybox";
-    setting.IsTransparent = false;
-    setting.RasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
-    setting.RasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
-    setting.DepthStencilDesc.DepthEnable = true;
-    setting.DepthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-    setting.DepthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
-    setting.VSPath = L"x64/Debug/SkyboxVertShader.cso";
-    setting.PSPath = L"x64/Debug/SkyboxPixelShader.cso";
-    Register(setting);
-}
-
-bool PSOManager::Register(PSOSetting setting)
-{
-    PipelineState *pso = new PipelineState;
-    pso->SetInputLayout(setting.InputLayout);
-    pso->SetPrimitiveTopologyType(setting.PrimitiveType);
-    pso->SetRasterizerState(setting.RasterizerDesc);
-    pso->SetDepthStencilState(setting.DepthStencilDesc);
-    pso->SetNumRenderTarget(setting.NumRenderTarget);
-    pso->SetTransparent(setting.IsTransparent);
-    pso->SetCullMode(setting.CullMode);
-    pso->SetVS(setting.VSPath);
-    if (!setting.PSPath.empty())
-        pso->SetPS(setting.PSPath);
-    if (!setting.GSPath.empty())
-        pso->SetGS(setting.GSPath);
-    pso->Create();
+    const auto pso = new PipelineState(pso_setting);
 
     if (!pso->IsValid())
     {
         return false;
     }
 
-    Instance()->m_pso_cache_.emplace(setting.PSOName, pso);
-
+    Instance()->m_pso_cache_[pso_name][rtv_format] = std::shared_ptr<PipelineState>(pso);
     return true;
 }
 
-bool PSOManager::Register(std::shared_ptr<engine::Shader> shader, std::string pso_name)
+bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader, const DXGI_FORMAT rtv_format, const UINT num_render_targets)
 {
-    auto pso = new PipelineState;
-    pso->SetInputLayout(engine::Vertex::kInputLayout);
-    pso->SetPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
-    pso->SetNumRenderTarget(1);
-    pso->SetShader(shader);
-    pso->Create();
-
-    if (!pso->IsValid())
-    {
-        return false;
-    }
-
-    Instance()->m_pso_cache_.emplace(pso_name, pso);
-    return true;
-}
-
-bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader)
-{
-    //PSO name is the same as the shader name.
     std::string pso_name = shader->Name();
     auto it = Instance()->m_pso_cache_.find(pso_name);
-    if (it != Instance()->m_pso_cache_.end())
+    if (it == Instance()->m_pso_cache_.end() || !it->second.contains(rtv_format))
     {
-        cmd_list->SetPipelineState(Get(shader->Name()));
-        return true;
+        if (!Register(shader, pso_name, rtv_format, num_render_targets))
+        {
+            engine::Logger::Error<PSOManager>("Failed to register PSO for shader: %s", pso_name);
+            return false;
+        }
     }
-    return false;
+
+    cmd_list->SetPipelineState(Instance()->m_pso_cache_[pso_name][rtv_format]->Get());
+    return true;
 }

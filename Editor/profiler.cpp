@@ -3,6 +3,7 @@
 #include "profiler.h"
 
 #include "engine_profiler.h"
+#include "Rendering/render_pipeline.h"
 
 template <typename T>
 struct ScrollingBuffer
@@ -64,6 +65,7 @@ void Profiler::OnEditorGui()
         ImGui::Text("Unscaled Delta Time: %f", time->UnscaledDeltaTime());
         ImGui::Text("Time Scale         : %f", time->TimeScale());
         ImGui::Text("Last Fixed Frame Count: %d", time->LastFixedFrameCount());
+        ImGui::Text("Renderer Count        : %d", engine::RenderPipeline::GetRendererCount());
         ImGui::Unindent();
     }
 
@@ -99,16 +101,26 @@ void Profiler::OnEditorGui()
 
         for (auto &[name, history] : g_history)
         {
-            ImPlot::PlotLine(name.c_str(),
-                             &history.data.data()[0].x, &history.data.data()[0].y,
-                             static_cast<int>(history.data.size()), 0,
-                             history.offset, sizeof(float) * 2);
+            ImPlot::PlotLine(
+                name.c_str(),
+                &history.data.data()[0].x,
+                &history.data.data()[0].y,
+                static_cast<int>(history.data.size()),
+                0,
+                history.offset,
+                sizeof(float) * 2
+            );
         }
 
-        ImPlot::PlotLine("Total",
-                         &g_history_sum.data.data()[0].x, &g_history_sum.data.data()[0].y,
-                         static_cast<int>(g_history_sum.data.size()), 0,
-                         g_history_sum.offset, sizeof(float) * 2);
+        ImPlot::PlotLine(
+            "Total",
+            &g_history_sum.data.data()[0].x,
+            &g_history_sum.data.data()[0].y,
+            static_cast<int>(g_history_sum.data.size()),
+            0,
+            g_history_sum.offset,
+            sizeof(float) * 2
+        );
 
         ImPlot::EndPlot();
     }
