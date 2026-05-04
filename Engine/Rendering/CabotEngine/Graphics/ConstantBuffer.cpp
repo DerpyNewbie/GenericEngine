@@ -40,8 +40,8 @@ void ConstantBuffer::CreateBuffer()
         return;
     }
 
-    constexpr D3D12_RANGE read_range = {0, 0};
-    hr = m_buffer_->Map(0, &read_range, &m_p_mapped_ptr_);
+    constexpr D3D12_RANGE unreadable_range = {0, 0};
+    hr = m_buffer_->Map(0, &unreadable_range, &m_p_mapped_ptr_);
     if (FAILED(hr))
     {
         engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");

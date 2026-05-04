@@ -74,8 +74,8 @@ VertexBuffer::VertexBuffer(const size_t num_vertices, const Vertex *init_data)
     }
 
     void *ptr = nullptr;
-    constexpr D3D12_RANGE read_range = {0, 0};
-    hr = m_upload_buffer_->Map(0, &read_range, &ptr);
+    constexpr D3D12_RANGE unreadable_range = {0, 0};
+    hr = m_upload_buffer_->Map(0, &unreadable_range, &ptr);
 
     if (FAILED(hr))
     {
