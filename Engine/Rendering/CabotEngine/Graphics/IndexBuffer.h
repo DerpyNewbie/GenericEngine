@@ -4,8 +4,7 @@ namespace engine
 class IndexBuffer
 {
     //TODO : upload_resourceを保持する必要があるか？初期化後は不要なはず、ExecuteCommandListの後にResetしましょう
-    ComPtr<ID3D12Resource> m_upload_buffer_;
-    ComPtr<ID3D12Resource> m_default_buffer_;
+    ComPtr<ID3D12Resource> m_buffer_;
     D3D12_INDEX_BUFFER_VIEW m_view_;
     
 public:

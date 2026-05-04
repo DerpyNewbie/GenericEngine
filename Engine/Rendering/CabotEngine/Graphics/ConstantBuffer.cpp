@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "ConstantBuffer.h"
 #include "DescriptorHeap.h"
+#include "DirectXResourceFactory.h"
 #include "RenderEngine.h"
 
 ConstantBuffer::ConstantBuffer(const size_t size)
@@ -26,22 +27,19 @@ void ConstantBuffer::CreateBuffer()
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     const auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_size_aligned_);
 
-    auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(m_buffer_.GetAddressOf()));
+    m_buffer_ = DirectXResourceFactory::CreateBuffer(
+        prop,
+        desc,
+        D3D12_RESOURCE_STATE_GENERIC_READ);
 
-    if (FAILED(hr))
+    if (m_buffer_ == nullptr)
     {
         engine::Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
         return;
     }
 
     constexpr D3D12_RANGE unreadable_range = {0, 0};
-    hr = m_buffer_->Map(0, &unreadable_range, &m_p_mapped_ptr_);
+    const auto hr = m_buffer_->Map(0, &unreadable_range, &m_p_mapped_ptr_);
     if (FAILED(hr))
     {
         engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
