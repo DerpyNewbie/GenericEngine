@@ -87,12 +87,21 @@ std::string IAssetPtr::Name() const
 
 bool IAssetPtr::IsNull() const
 {
-    return m_guid_ == kNullGuid;
+    return IsNone() || IsMissing();
 }
 
-bool IAssetPtr::IsLoaded() const
+bool IAssetPtr::IsNone() const
 {
-    return Lock() != nullptr;
+    if (m_guid_ == kNullGuid || m_type_ == AssetPtrType::kNull || (m_type_ == AssetPtrType::kStoredReference && m_stored_reference_ == nullptr))
+        return true;
+
+    const auto lock = Lock();
+    return lock != nullptr && lock->IsDestroying();
+}
+
+bool IAssetPtr::IsMissing() const
+{
+    return !IsNone() && Lock() == nullptr;
 }
 
 std::shared_ptr<Object> IAssetPtr::Lock() const

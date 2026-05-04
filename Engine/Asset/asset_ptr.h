@@ -26,7 +26,7 @@ protected:
         const std::shared_ptr<Object> &shared_ptr,
         const xg::Guid guid,
         const AssetPtrType type
-    ) :
+        ) :
         m_external_reference_(weak_ptr),
         m_stored_reference_(shared_ptr),
         m_guid_(guid),
@@ -50,9 +50,11 @@ public:
 
     [[nodiscard]] std::string Name() const;
 
-    [[nodiscard]] bool IsNull() const;
+    [[nodiscard]] bool IsNone() const;
 
-    [[nodiscard]] bool IsLoaded() const;
+    [[nodiscard]] bool IsMissing() const;
+
+    [[nodiscard]] bool IsNull() const;
 
     [[nodiscard]] virtual std::shared_ptr<Object> Lock() const;
 
@@ -73,12 +75,14 @@ template <typename T> requires std::is_base_of_v<Object, T>
 struct AssetPtr : IAssetPtr
 {
 private:
+    mutable std::weak_ptr<T> m_cached_ptr_reference_;
+
     AssetPtr(
         const std::weak_ptr<Object> &weak_ptr,
         const std::shared_ptr<Object> &shared_ptr,
         const xg::Guid guid,
         const AssetPtrType type
-    ) :
+        ) :
         IAssetPtr(weak_ptr, shared_ptr, guid, type)
     { }
 
@@ -89,9 +93,15 @@ private:
 public:
     AssetPtr() = default;
 
-    std::shared_ptr<T> CastedLock()
+    std::shared_ptr<T> CastedLock() const
     {
-        return std::dynamic_pointer_cast<T>(Lock());
+        auto locked = Lock();
+        if (locked != m_cached_ptr_reference_.lock())
+        {
+            m_cached_ptr_reference_ = std::dynamic_pointer_cast<T>(locked);
+        }
+
+        return m_cached_ptr_reference_.lock();
     }
 
     static AssetPtr FromIAssetPtr(IAssetPtr ptr)
@@ -120,12 +130,36 @@ public:
         };
     }
 
+    // Does the casting implicitly
+    // ReSharper disable once CppNonExplicitConversionOperator
+    operator std::shared_ptr<T>() const
+    {
+        return CastedLock();
+    }
+
+    std::shared_ptr<T> operator->() const
+    {
+        return CastedLock();
+    }
+
+    bool operator==(const AssetPtr other) const
+    {
+        return Guid() == other.Guid();
+    }
+
+    bool operator==(const std::shared_ptr<T> &other) const
+    {
+        return (other == nullptr && IsNull()) || Guid() == other->Guid();
+    }
+
     template <class Archive>
     void serialize(Archive &ar)
     {
         ar(cereal::base_class<IAssetPtr>(this));
         auto _ = Lock(); // try to import the object associated with guid
     }
+
+
 };
 }
 
