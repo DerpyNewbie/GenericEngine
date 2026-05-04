@@ -27,14 +27,14 @@ Matrix LookAtCamera(Matrix &mat)
     Vector3 dir_vec3 = camera_pos - pos;
 
     float angle_y = std::atan2(dir_vec3.x, dir_vec3.z);
-    float value = dir_vec3.y / DirectX::XMVectorGetX(DirectX::XMVector3Length(XMLoadFloat3(&dir_vec3)));
+    float value = dir_vec3.y / dir_vec3.Length();
     value = std::clamp(value, -1.0f, 1.0f);
     float angle_x = -std::asin(value);
 
-    auto rot_y = Matrix(DirectX::XMMatrixRotationY(angle_y));
-    auto rot_x = Matrix(DirectX::XMMatrixRotationX(angle_x));
-    auto scale_mat = Matrix(DirectX::XMMatrixScaling(scale.x, scale.y, scale.z));
-    auto trans = Matrix(DirectX::XMMatrixTranslation(pos.x, pos.y, pos.z));
+    auto rot_y = Matrix::CreateRotationY(angle_y);
+    auto rot_x = Matrix::CreateRotationX(angle_x);
+    auto scale_mat = Matrix::CreateScale(scale.x, scale.y, scale.z);
+    auto trans = Matrix::CreateTranslation(pos.x, pos.y, pos.z);
 
     return scale_mat * rot_x * rot_y * trans;
 }
