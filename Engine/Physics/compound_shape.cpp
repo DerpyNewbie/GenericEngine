@@ -2,6 +2,7 @@
 #include "collider.h"
 #include "compound_shape.h"
 #include "game_object.h"
+#include "gui.h"
 
 namespace engine
 {
@@ -27,9 +28,7 @@ void CompoundShape::OnInspectorGui()
             continue;
         }
 
-        ImGui::Text("%s", collider->Name());
-        ImGui::SameLine();
-        ImGui::Text("%s", shape.get()->getName());
+        ImGui::Text("%s: %s", collider->GameObject()->Name().c_str(), shape.get()->getName());
     }
 }
 
