@@ -12,7 +12,7 @@
 
 using namespace DirectX;
 
-Texture2D::Texture2D(const aiTexture *ai_texture)
+void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
 {
     unsigned char *pixels;
     int width = 0, height = 0, channels = 0;
@@ -21,7 +21,7 @@ Texture2D::Texture2D(const aiTexture *ai_texture)
     {
         pixels = stbi_load_from_memory(
             reinterpret_cast<const unsigned char *>(ai_texture->pcData),
-            static_cast<int>(ai_texture->mWidth),
+            ai_texture->mWidth,
             &width,
             &height,
             &channels,
@@ -31,8 +31,8 @@ Texture2D::Texture2D(const aiTexture *ai_texture)
     }
     else
     {
-        width = static_cast<int>(ai_texture->mWidth);
-        height = static_cast<int>(ai_texture->mHeight);
+        width = ai_texture->mWidth;
+        height = ai_texture->mHeight;
         pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
     }
     m_width_ = width;

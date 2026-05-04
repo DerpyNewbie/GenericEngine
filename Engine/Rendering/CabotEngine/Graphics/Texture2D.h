@@ -32,6 +32,8 @@ public:
     bool CanUpdate() override;
     bool IsValid() override;
 
+    void LoadFromAiTexture(const aiTexture *ai_texture);
+
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 

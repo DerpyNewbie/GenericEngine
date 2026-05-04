@@ -121,7 +121,8 @@ void FbxImporter::CreateTextureMappings(AssetDescriptor *ctx, const aiScene *ai_
     for (UINT i = 0; i < ai_scene->mNumTextures; i++)
     {
         const auto ai_texture = ai_scene->mTextures[i];
-        const auto texture = std::make_shared<Texture2D>(ai_texture);
+        const auto texture = Object::Instantiate<Texture2D>();
+        texture->LoadFromAiTexture(ai_texture);
         texture->SetName(ai_texture->mFilename.C_Str());
         ctx->AddObject(texture);
         out_conversion_mapping.EmplaceTexture(i, texture);
