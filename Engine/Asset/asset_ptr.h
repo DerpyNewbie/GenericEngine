@@ -63,6 +63,11 @@ public:
         return m_guid_ == other.m_guid_;
     }
 
+    bool operator==(nullptr_t) const
+    {
+        return IsNull();
+    }
+
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
@@ -149,7 +154,10 @@ public:
 
     bool operator==(const std::shared_ptr<T> &other) const
     {
-        return (other == nullptr && IsNull()) || Guid() == other->Guid();
+        if (other == nullptr)
+            return IsNull();
+
+        return Guid() == other->Guid();
     }
 
     template <class Archive>
@@ -158,8 +166,6 @@ public:
         ar(cereal::base_class<IAssetPtr>(this));
         auto _ = Lock(); // try to import the object associated with guid
     }
-
-
 };
 }
 
