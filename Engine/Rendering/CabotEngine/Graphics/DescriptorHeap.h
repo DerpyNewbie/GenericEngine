@@ -22,12 +22,12 @@ public:
 
 class DescriptorHeap
 {
-    static constexpr UINT kHandleMax = 512;
+    static constexpr uint32_t kHandleMax = 512;
     static std::shared_ptr<DescriptorHeap> m_instance_;
 
     bool m_is_valid_ = false;
-    UINT m_increment_size_ = 0;
-    std::vector<UINT> m_free_indices_;
+    uint32_t m_increment_size_ = 0;
+    std::vector<uint32_t> m_free_indices_;
     ComPtr<ID3D12DescriptorHeap> m_p_heap_ = nullptr;
     std::vector<std::shared_ptr<DescriptorHandle>> m_p_handles_;
 

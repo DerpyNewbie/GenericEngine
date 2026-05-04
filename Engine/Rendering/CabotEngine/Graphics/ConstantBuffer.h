@@ -3,8 +3,8 @@
 
 class ConstantBuffer : public IBuffer
 {
-    UINT64 m_size_aligned_;
-    UINT64 m_size_;
+    uint64_t m_size_aligned_;
+    uint64_t m_size_;
 
     ComPtr<ID3D12Resource> m_buffer_;
     D3D12_CONSTANT_BUFFER_VIEW_DESC m_desc_;
@@ -13,8 +13,6 @@ class ConstantBuffer : public IBuffer
 
 public:
     explicit ConstantBuffer(size_t size);
-    ConstantBuffer(const ConstantBuffer &) = delete;
-    void operator =(const ConstantBuffer &) = delete;
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;

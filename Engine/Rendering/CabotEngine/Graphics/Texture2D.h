@@ -17,17 +17,14 @@ class Texture2D : public engine::Object, public engine::Inspectable, public IBuf
 
 protected:
     std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
-    UINT m_width_ = 0;
-    UINT m_height_ = 0;
-    UINT16 m_mip_level_;
+    uint32_t m_width_ = 0;
+    uint32_t m_height_ = 0;
+    uint16_t m_mip_level_;
     DXGI_FORMAT m_format_;
 
     ComPtr<ID3D12Resource> m_buffer_ = nullptr;
 
 public:
-    Texture2D() = default;
-    Texture2D(const aiTexture *ai_texture);
-
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
@@ -48,17 +45,17 @@ public:
         m_tex_data_ = resource;
     }
 
-    [[nodiscard]] UINT Width() const
+    [[nodiscard]] uint32_t Width() const
     {
         return m_width_;
     }
 
-    [[nodiscard]] UINT Height() const
+    [[nodiscard]] uint32_t Height() const
     {
         return m_height_;
     }
 
-    [[nodiscard]] UINT16 MipLevel() const
+    [[nodiscard]] uint16_t MipLevel() const
     {
         return m_mip_level_;
     }
