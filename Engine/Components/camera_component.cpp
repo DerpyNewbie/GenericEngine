@@ -39,14 +39,14 @@ Matrix CameraProperty::ProjectionMatrix() const
                 aspect_ratio,
                 near_plane,
                 far_plane
-            );
+                );
         case kViewMode::kOrthographic:
             return DirectX::XMMatrixOrthographicRH(
                 ortho_size * aspect_ratio,
                 ortho_size,
                 near_plane,
                 far_plane
-            );
+                );
         default:
             assert(false && "Invalid ViewMode");
             return Matrix::Identity;
@@ -86,7 +86,7 @@ void CameraComponent::OnEnabled()
         [](auto a) {
             return a.lock();
         }
-    );
+        );
 
     if (find == m_cameras_.end())
         m_cameras_.emplace_back(shared_from_base<CameraComponent>());
@@ -102,7 +102,7 @@ void CameraComponent::OnDisabled()
         [shared_this](const std::weak_ptr<CameraComponent> &a) {
             return a.expired() || a.lock() == shared_this;
         }
-    );
+        );
 
     if (m_main_camera_.lock() == shared_this)
     {
@@ -114,15 +114,14 @@ void CameraComponent::OnDisabled()
 
 Camera CameraComponent::GetCamera()
 {
-    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
+    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_, m_depth_texture_);
 }
 
 std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
 {
-    return m_render_texture_.CastedLock() != nullptr
-        ? m_render_texture_.CastedLock()
-        : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
-        .CastedLock();
+    return m_render_texture_ != nullptr
+    ? m_render_texture_
+    : m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>());
 }
 
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)
@@ -148,7 +147,7 @@ Matrix CameraComponent::ViewMatrix() const
         transform->Position(),
         transform->Position() + transform->Forward(),
         transform->Up()
-    );
+        );
 }
 }
 

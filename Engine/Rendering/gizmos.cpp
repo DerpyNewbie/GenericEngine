@@ -14,7 +14,7 @@ std::vector<Vertex> Gizmos::m_vertices_;
 void Gizmos::Init()
 {
     assert(m_instance_ == nullptr && "Gizmos is already initialized");
-    
+
     m_instance_ = std::make_shared<Gizmos>();
 }
 
@@ -69,14 +69,14 @@ void Gizmos::Render()
 
     if (m_instance_->m_line_shader_ == nullptr)
     {
-        m_instance_->m_line_shader_ = AssetDatabase::GetAsset<Shader>("LineShader.hlsl").CastedLock();
+        m_instance_->m_line_shader_ = AssetDatabase::GetAsset<Shader>("LineShader.hlsl");
         if (m_instance_->m_line_shader_ == nullptr)
         {
             Logger::Error<Gizmos>("Failed to load LineShader.hlsl");
             return;
         }
     }
-    
+
     // render stuff
     const auto cmd_list = RenderEngine::CommandList();
     PSOManager::SetPipelineState(cmd_list, m_instance_->m_line_shader_.get());
@@ -103,7 +103,7 @@ void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
 }
 
 void Gizmos::DrawCircle(const Vector3 &center, const float radius, const Color &color,
-                        const Quaternion &rotation, const int segments)
+    const Quaternion &rotation, const int segments)
 {
     std::vector<Vector3> circle(segments);
     for (auto i = 0; i < segments; i++)

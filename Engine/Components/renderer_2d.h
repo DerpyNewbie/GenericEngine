@@ -15,7 +15,7 @@ public:
     void OnDisabled() override;
 
     void SetCanvas(const std::shared_ptr<Canvas> &canvas);
-    Rect NormalizedRect();
+    Rect NormalizedRect() const;
 
     virtual void Render() = 0;
 
@@ -25,7 +25,7 @@ public:
         ar(
             cereal::base_class<Component>(this),
             CEREAL_NVP(m_canvas_)
-        );
+            );
     }
 };
 }

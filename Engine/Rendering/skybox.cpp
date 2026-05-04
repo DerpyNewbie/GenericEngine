@@ -58,14 +58,14 @@ void Skybox::Render()
 
     if (m_skybox_shader_ == nullptr)
     {
-        m_skybox_shader_ = AssetDatabase::GetAsset<Shader>("SkyBoxShader.hlsl").CastedLock();
+        m_skybox_shader_ = AssetDatabase::GetAsset<Shader>("SkyBoxShader.hlsl");
         if (m_skybox_shader_ == nullptr)
         {
             Logger::Error<Skybox>("Failed to load SkyBoxShader.hlsl");
             return;
         }
     }
-    
+
     if (m_texture_cube_handle_ == nullptr)
         ReconstructTextureCube();
 

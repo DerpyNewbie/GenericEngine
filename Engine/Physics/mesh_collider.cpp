@@ -79,8 +79,7 @@ void MeshCollider::SetMesh(const AssetPtr<Mesh> &mesh)
 
 void MeshCollider::UpdateShape()
 {
-    const auto mesh = m_mesh_.CastedLock();
-    if (mesh == nullptr)
+    if (m_mesh_ == nullptr)
     {
         m_bvh_tri_shape_ = nullptr;
         m_convex_hull_shape_ = nullptr;
@@ -88,15 +87,14 @@ void MeshCollider::UpdateShape()
     }
 
     // NOTE(derpy): there might be a memory leak with tri_mesh handling
-    m_tri_mesh_ = ToTriangleIndexVertexArray(mesh);
+    m_tri_mesh_ = ToTriangleIndexVertexArray(m_mesh_);
     m_bvh_tri_shape_ = std::make_shared<btBvhTriangleMeshShape>(m_tri_mesh_.get(), true);
-    m_convex_hull_shape_ = ToBtConvexHullShape(mesh);
+    m_convex_hull_shape_ = ToBtConvexHullShape(m_mesh_);
 }
 
 std::shared_ptr<btCollisionShape> MeshCollider::GetShape()
 {
-    const auto mesh = m_mesh_.CastedLock();
-    if (mesh == nullptr)
+    if (m_mesh_ == nullptr)
     {
         return nullptr;
     }
