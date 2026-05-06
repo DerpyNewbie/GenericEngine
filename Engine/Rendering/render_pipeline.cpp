@@ -69,6 +69,37 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
                           return a.priority < b.priority;
                       });
 }
+
+bool SetToDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_block)
+{
+    if (material_block == nullptr)
+    {
+        engine::Logger::Error<engine::RenderPipeline>("MaterialBlock is null. Cannot set to descriptor table.");
+        return false;
+    }
+
+    const auto cmd_list = RenderEngine::CommandList();
+
+    material_block->UpdateBuffer();
+
+    for (int param_i = 0; param_i < engine::kParameterBufferType_Count; ++param_i)
+    {
+        const auto param_type = static_cast<engine::kParameterBufferType>(param_i);
+
+        if (material_block->Empty(param_type))
+        {
+            continue;
+        }
+
+        const int root_param_idx = param_i +
+                                   engine::RootSignature::kPreDefinedVariableCount;
+        const auto itr = material_block->Begin(param_type);
+        const auto desc_handle = itr->handle->HandleGPU;
+        cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+    }
+
+    return true;
+}
 }
 
 namespace engine
@@ -355,7 +386,7 @@ void RenderPipeline::ExecuteRenderCommands()
                 if (material->p_shared_material_block == nullptr)
                     material->CreateMaterialBlock();
 
-                material->SetDescriptorTable();
+                SetToDescriptorTable(material->p_shared_material_block);
             }
 
             if (sub_mesh_index == -1)

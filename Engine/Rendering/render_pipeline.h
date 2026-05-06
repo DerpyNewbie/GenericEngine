@@ -38,8 +38,7 @@ class RenderPipeline
     uint32_t m_current_view_proj_matrix_index_;
     std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
-
-
+    
     void InvokeDrawCall();
 
     void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
