@@ -2,6 +2,7 @@
 #include "ConstantBuffer.h"
 #include "DescriptorHeap.h"
 #include "DirectXResourceFactory.h"
+#include "MemUtil.h"
 #include "RenderEngine.h"
 
 ConstantBuffer::ConstantBuffer(const size_t size)
@@ -9,7 +10,7 @@ ConstantBuffer::ConstantBuffer(const size_t size)
     m_size_ = size;
 
     constexpr size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-    m_size_aligned_ = (size + (align - 1)) & ~(align - 1);
+    m_size_aligned_ = MemUtil::AlignUp(size, align);
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetAddress() const
