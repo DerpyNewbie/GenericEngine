@@ -8,7 +8,7 @@ class IndexBuffer
     D3D12_INDEX_BUFFER_VIEW m_view_;
     
 public:
-    explicit IndexBuffer(size_t size, const uint32_t *init_data = nullptr);
+    explicit IndexBuffer(size_t size, const uint32_t *init_data);
     IndexBuffer(const IndexBuffer &) = delete;
     void operator =(const IndexBuffer &) = delete;
 
