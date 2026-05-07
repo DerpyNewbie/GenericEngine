@@ -72,11 +72,11 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(m_tex_data_),
-            CEREAL_NVP(m_width_),
-            CEREAL_NVP(m_height_),
-            CEREAL_NVP(m_format_),
-            CEREAL_NVP(m_mip_level_)
+            cereal::make_nvp("tex_data", m_tex_data_),
+            cereal::make_nvp("width", m_width_),
+            cereal::make_nvp("height", m_height_),
+            cereal::make_nvp("format", m_format_),
+            cereal::make_nvp("mip_level", m_mip_level_)
         );
     }
 };
