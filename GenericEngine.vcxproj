@@ -299,7 +299,6 @@
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.h"/>
-        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\MemUtil.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
