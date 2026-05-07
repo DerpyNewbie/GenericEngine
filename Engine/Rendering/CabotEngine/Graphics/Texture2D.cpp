@@ -56,7 +56,7 @@ void Texture2D::OnInspectorGui()
 
     if (const auto desc_heap = UploadBuffer())
     {
-        const auto ratio = m_height_ > 0 ? static_cast<float>(width) / static_cast<float>(height) : 1.0f;
+        const auto ratio = m_height_ > 0 ? static_cast<float>(m_width_) / static_cast<float>(m_height_) : 1.0f;
         const auto max_width = ImGui::CalcItemWidth();
         static float scale = 1.0f;
         ImGui::SliderFloat("Preview Scale", &scale, 0.1f, 1.0f);
