@@ -1,68 +1,39 @@
 ﻿#include "pch.h"
 #include "StructuredBuffer.h"
 
+#include "DirectXResourceFactory.h"
 #include "RenderEngine.h"
 
 namespace engine
 {
 void StructuredBuffer::CreateBuffer()
 {
-    m_is_valid_ = false;
-
     const auto total_size = m_stride_ * m_element_count_;
     const CD3DX12_RESOURCE_DESC resource_desc = CD3DX12_RESOURCE_DESC::Buffer(total_size);
-
-    // create a default heap (used for gpu data processing)
+    
     const auto default_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &default_heap_prop,
-        D3D12_HEAP_FLAG_NONE,
-        &resource_desc,
-        D3D12_RESOURCE_STATE_COMMON,
-        nullptr,
-        IID_PPV_ARGS(&m_default_buffer_)
-    );
 
-    if (FAILED(hr))
+    m_default_buffer_ = DirectXResourceFactory::CreateBuffer(default_heap_prop, resource_desc, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_FLAG_NONE, nullptr);
+
+    if (m_default_buffer_ == nullptr)
     {
         Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (DefaultBuffer)");
         return;
     }
-
-    hr = m_default_buffer_->SetName(L"StructuredBuffer_Default");
-    if (FAILED(hr))
-    {
-        Logger::Error<StructuredBuffer>("Failed to SetName StructuredBuffer Resource (DefaultBuffer)");
-        return;
-    }
-
-    // create an upload heap (used for updating the default buffer with new data)
+    m_default_buffer_->SetName(L"StructuredBuffer_Default");
+    
     const auto upload_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    hr = RenderEngine::Device()->CreateCommittedResource(
-        &upload_heap_prop,
-        D3D12_HEAP_FLAG_NONE,
-        &resource_desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_upload_buffer_)
-    );
 
-    if (FAILED(hr))
+    m_upload_buffer_ = DirectXResourceFactory::CreateBuffer(upload_heap_prop, resource_desc, D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_HEAP_FLAG_NONE, nullptr);
+
+    if (m_upload_buffer_ == nullptr)
     {
         Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (UploadBuffer)");
         return;
     }
-
-    hr = m_upload_buffer_->SetName(L"StructuredBuffer_Upload");
-
-    if (FAILED(hr))
-    {
-        Logger::Error<StructuredBuffer>("Failed to SetName StructuredBuffer Resource (UploadBuffer)");
-        return;
-    }
+    m_upload_buffer_->SetName(L"StructuredBuffer_Upload");
 
     m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
-    m_is_valid_ = true;
 }
 
 void StructuredBuffer::UpdateBuffer(void *data)
@@ -107,7 +78,7 @@ std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
 
 bool StructuredBuffer::IsValid()
 {
-    return m_is_valid_;
+    return m_default_buffer_ != nullptr;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC StructuredBuffer::ViewDesc()

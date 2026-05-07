@@ -8,7 +8,7 @@ namespace engine
 class TextureCube final : public Object, public Inspectable, public IBuffer, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> m_p_resource_;
+    Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer_;
 
 public:
     void OnInspectorGui() override;

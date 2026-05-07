@@ -17,7 +17,7 @@ bool PSOManager::Register(const engine::Shader *shader, const std::string &pso_n
 {
     PipelineStateSettings pso_setting;
     pso_setting.SetShader(shader);
-    pso_setting.layout_desc = engine::Vertex::InputLayout;
+    pso_setting.layout_desc = engine::Vertex::kInputLayout;
     pso_setting.num_rendertarget = num_render_targets;
     pso_setting.rtv_format[0] = rtv_format;
 

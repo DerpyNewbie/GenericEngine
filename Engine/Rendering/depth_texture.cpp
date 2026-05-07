@@ -2,6 +2,7 @@
 #include "depth_texture.h"
 
 #include "application.h"
+#include "CabotEngine/Graphics/DirectXResourceFactory.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
@@ -10,12 +11,11 @@ void DepthTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
 
-    width = Application::WindowWidth();
-    height = Application::WindowHeight();
-    format = DXGI_FORMAT_R32_FLOAT;
-    mip_level = 1;
+    m_width_ = Application::WindowWidth();
+    m_height_ = Application::WindowHeight();
+    m_format_ = DXGI_FORMAT_R32_FLOAT;
+    m_mip_level_ = 1;
 
-    // ---- DSV Heap ----
     D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
     heapDesc.NumDescriptors = 1;
     heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
@@ -26,52 +26,49 @@ void DepthTexture::CreateBuffer()
         Logger::Error<DepthTexture>("Failed To Create DSV Heap for DepthTexture");
     }
 
-    // ---- Resource ----
     D3D12_CLEAR_VALUE dsvClearValue = {};
-    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT; // 実際のDSVフォーマット
+    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
     dsvClearValue.DepthStencil.Depth = 1.0f;
     dsvClearValue.DepthStencil.Stencil = 0;
 
-    auto heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-    CD3DX12_RESOURCE_DESC resourceDesc =
-        CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R32_TYPELESS, width, height);
-    resourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
-    resourceDesc.MipLevels = 1;
+    const auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    hr = device->CreateCommittedResource(
-        &heapProp,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        // 初期状態は DSV として使うので DEPTH_WRITE
+    CD3DX12_RESOURCE_DESC resource_desc =
+        CD3DX12_RESOURCE_DESC::Tex2D(DXGI_FORMAT_R32_TYPELESS, m_width_, m_height_);
+
+    resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
+    resource_desc.MipLevels = 1;
+
+    m_buffer_ = DirectXResourceFactory::CreateBuffer(
+        heap_prop,
+        resource_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        &dsvClearValue,
-        IID_PPV_ARGS(m_p_resource_.ReleaseAndGetAddressOf())
-    );
+        D3D12_HEAP_FLAG_NONE,
+        &dsvClearValue);
 
-    if (FAILED(hr))
+    if (m_buffer_ == nullptr)
     {
         Logger::Error<DepthTexture>("Failed To Create Depth Resource");
     }
 
-    // ---- DSV ----
-    D3D12_DEPTH_STENCIL_VIEW_DESC dsvDesc = {};
-    dsvDesc.Format = DXGI_FORMAT_D32_FLOAT; // typelessに対応するフォーマットを指定
-    dsvDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
-    dsvDesc.Flags = D3D12_DSV_FLAG_NONE;
+    D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc = {};
+    dsv_desc.Format = DXGI_FORMAT_D32_FLOAT;
+    dsv_desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+    dsv_desc.Flags = D3D12_DSV_FLAG_NONE;
 
-    D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle =
+    const D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle =
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    device->CreateDepthStencilView(m_p_resource_.Get(), &dsvDesc, dsvHandle);
+    device->CreateDepthStencilView(m_buffer_.Get(), &dsv_desc, dsv_handle);
 }
 
 void DepthTexture::BeginRender()
 {
-    if (m_p_resource_ == nullptr)
+    if (m_buffer_ == nullptr)
         CreateBuffer();
 
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_RESOURCE_STATE_DEPTH_WRITE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -79,7 +76,7 @@ void DepthTexture::BeginRender()
 void DepthTexture::EndRender()
 {
     auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_p_resource_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
+        m_buffer_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
@@ -109,7 +106,7 @@ void DepthTexture::SetResource(const std::shared_ptr<Texture2DArray> &texture_ar
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
 
-    m_p_resource_ = texture_array->Resource();
+    m_buffer_ = texture_array->Resource();
 }
 
 ID3D12DescriptorHeap *DepthTexture::GetHeap()
