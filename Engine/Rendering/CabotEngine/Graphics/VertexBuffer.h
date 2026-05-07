@@ -6,8 +6,7 @@ namespace engine
 class Mesh;
 class VertexBuffer
 {
-    ComPtr<ID3D12Resource> m_upload_buffer_ = nullptr;
-    ComPtr<ID3D12Resource> m_default_buffer_ = nullptr;
+    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
     D3D12_VERTEX_BUFFER_VIEW m_view_ = {};
 
     std::vector<Vertex> CreateVertexData(const Mesh *mesh) const;
