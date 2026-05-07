@@ -13,6 +13,8 @@ enum kRootParameterIndex
     kLightSRV,
     kLightViewProj,
     kShadowMapSRV,
+
+    //エンジン定義のルートパラメータはここより上に追加してください
     kMaterialCBV,
     kMaterialSRV,
     kMaterialUAV,
