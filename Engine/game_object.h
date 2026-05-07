@@ -175,7 +175,7 @@ private:
     void InvokeUpdate();
     void InvokeFixedUpdate() const;
     void InvokeOnValidate() const;
-    void NotifyIsActiveChanged() const;
+    void UpdateActiveInHierarchy() const;
 
     void InvokeOnCollisionEnter(const Collision &collision) const;
     void InvokeOnCollisionStay(const Collision &collision) const;
