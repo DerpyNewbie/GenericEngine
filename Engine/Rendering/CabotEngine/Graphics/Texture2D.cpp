@@ -53,6 +53,20 @@ void Texture2D::OnInspectorGui()
     ImGui::Text("Width: %d", m_width_);
     ImGui::Text("Height: %d", m_height_);
     ImGui::Text("Mip Level: %d", m_mip_level_);
+
+    if (const auto desc_heap = UploadBuffer())
+    {
+        const auto ratio = m_height_ > 0 ? static_cast<float>(width) / static_cast<float>(height) : 1.0f;
+        const auto max_width = ImGui::CalcItemWidth();
+        static float scale = 1.0f;
+        ImGui::SliderFloat("Preview Scale", &scale, 0.1f, 1.0f);
+        ImGui::Image(desc_heap->handle_gpu.ptr, ImVec2(scale * max_width, scale * max_width * ratio));
+        DescriptorHeap::Free(desc_heap);
+    }
+    else
+    {
+        ImGui::Text("Could not preview the texture.");
+    }
 }
 
 void Texture2D::CreateBuffer()
