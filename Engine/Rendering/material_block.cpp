@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "material_block.h"
+
+#include "constant_buffer_asset.h"
 #include "material_data.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
@@ -12,12 +14,18 @@ std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
 std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     {"int",
      [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<int>>(0, param);
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<int>>();
+         return std::make_shared<MaterialData<AssetPtr<ConstantBufferAsset<int>>>>(
+             AssetPtr<ConstantBufferAsset<int>>::FromInstance(constant_buffer_asset),
+             param);
      }
     },
     {"float",
      [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<float>>(0.0F, param);
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<float>>();
+         return std::make_shared<MaterialData<AssetPtr<ConstantBufferAsset<int>>>>(
+             AssetPtr<ConstantBufferAsset<int>>::FromInstance(constant_buffer_asset),
+             param);
      }
     },
     {"color",
