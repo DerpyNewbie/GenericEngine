@@ -1,52 +1,21 @@
 #include "pch.h"
 #include "material_block.h"
-
-#include "constant_buffer_asset.h"
 #include "material_data.h"
+#include "BufferAsset/constant_buffer_asset.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
 namespace
 {
 using namespace engine;
 using MaterialFactory =
-std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
+std::function<std::shared_ptr<MaterialData>(const ShaderParameter &)>;
 
 std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-    {"int",
-     [](const ShaderParameter &param) {
-         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<int>>();
-         return std::make_shared<MaterialData<AssetPtr<ConstantBufferAsset<int>>>>(
-             AssetPtr<ConstantBufferAsset<int>>::FromInstance(constant_buffer_asset),
-             param);
-     }
-    },
-    {"float",
-     [](const ShaderParameter &param) {
-         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<float>>();
-         return std::make_shared<MaterialData<AssetPtr<ConstantBufferAsset<int>>>>(
-             AssetPtr<ConstantBufferAsset<int>>::FromInstance(constant_buffer_asset),
-             param);
-     }
-    },
-    {"color",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Color>>(Color(), param);
-     }
-    },
-    {"float2",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector2>>(Vector2::Zero, param);
-     }
-    },
-    {"float3",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
-     }
-    },
+
     {"texture2d",
      [](const ShaderParameter &param) {
          auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
-         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
+         return std::make_shared<MaterialData>(
              AssetPtr<Texture2D>::FromIAssetPtr(texture),
              param
          );
@@ -54,7 +23,7 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     }
 };
 
-std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_param)
+std::shared_ptr<MaterialData> CreateMaterialData(const ShaderParameter &shader_param)
 {
     const auto func = g_material_data_factory[shader_param.type_hint];
     if (func != nullptr)
@@ -177,14 +146,13 @@ void MaterialBlock::LoadShaderParameters(
     UpdateBuffer();
 }
 
-void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
+void MaterialBlock::Insert(const std::shared_ptr<MaterialData> &data)
 {
     Logger::Log<MaterialBlock>("Inserting data %s", data->parameter.name.c_str());
 
     const auto buffer_type = data->BufferType();
     data->CreateBuffer();
     material_data.insert(End(buffer_type), {data, nullptr});
-    data->is_dirty = false;
 
     const auto field = shader_index.GetLengthField(buffer_type);
     ++(*field);
@@ -210,7 +178,7 @@ std::vector<MaterialDataPair>::iterator MaterialBlock::End(
     return Begin(buffer_type) + shader_index.GetLength(buffer_type);
 }
 
-std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
+std::shared_ptr<MaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
 {
     for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
     {
@@ -225,29 +193,11 @@ void MaterialBlock::UpdateBuffer()
 {
     for (auto &[data, handle] : material_data)
     {
-        if (data->is_dirty)
+        data->UpdateBuffer();
+        if (handle != nullptr)
         {
-            Logger::Log<MaterialBlock>("Updating data in MaterialBlock: %s", data->parameter.name.c_str());
-
-            if (data->buffer == nullptr)
-            {
-                data->buffer = data->CreateBuffer();
-            }
-
-            if (data->CanUpdateBuffer())
-            {
-                data->UpdateBuffer();
-            }
-            else
-            {
-                if (handle != nullptr)
-                {
-                    DescriptorHeap::Free(handle);
-                    handle = nullptr;
-                }
-            }
-
-            data->is_dirty = false;
+            DescriptorHeap::Free(handle);
+            handle = nullptr;
         }
 
         if (handle == nullptr)
@@ -255,19 +205,6 @@ void MaterialBlock::UpdateBuffer()
             handle = data->UploadBuffer();
         }
     }
-}
-
-bool MaterialBlock::IsDirty()
-{
-    for (const auto &data : material_data | std::views::transform(&MaterialDataPair::data))
-    {
-        if (data->is_dirty)
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 }
 

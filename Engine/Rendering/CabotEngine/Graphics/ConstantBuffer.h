@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
+#include "DescriptorHeap.h"
 
-class ConstantBuffer : public IBuffer
+class ConstantBuffer
 {
     uint64_t m_size_aligned_;
     uint64_t m_size_;
@@ -14,12 +14,12 @@ class ConstantBuffer : public IBuffer
 public:
     explicit ConstantBuffer(size_t size);
 
-    void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool IsValid() override;
+    bool CreateBuffer();
+    void UpdateBuffer(const void *data) const;
+    std::shared_ptr<DescriptorHandle> UploadBuffer();
+    bool IsValid();
 
-    bool CanUpdate() override;
+    bool CanUpdate();
 
     void *GetPtr() const;
 

@@ -22,7 +22,7 @@ void TextureCube::OnInspectorGui()
     }
 }
 
-void TextureCube::CreateBuffer()
+bool TextureCube::CreateBuffer()
 {
     std::array<std::shared_ptr<Texture2D>, 6> locked_textures;
     for (int i = 0; i < 6; ++i)
@@ -32,7 +32,7 @@ void TextureCube::CreateBuffer()
         {
             Logger::Error<TextureCube>("Texture at index %d was invalid", i);
             m_buffer_ = nullptr;
-            return;
+            return false;
         }
 
         if (locked_textures[0]->Width() != locked_textures[i]->Width() ||
@@ -40,7 +40,7 @@ void TextureCube::CreateBuffer()
         {
             Logger::Error<TextureCube>("Texture at index %d was not the same size as the first texture", i);
             m_buffer_ = nullptr;
-            return;
+            return false;
         }
     }
 
@@ -64,7 +64,7 @@ void TextureCube::CreateBuffer()
     if (m_buffer_ == nullptr)
     {
         m_buffer_ = nullptr;
-        return;
+        return false;
     }
 
     m_buffer_->SetName(L"TextureCube");
@@ -92,21 +92,18 @@ void TextureCube::CreateBuffer()
     );
 
     cmd_list->ResourceBarrier(1, &barrier);
+
+    return true;
 }
 
-void TextureCube::UpdateBuffer(void *data)
+void TextureCube::UpdateBuffer()
 {
-    Logger::Error<TextureCube>("UpdateBuffer is not supported");
+    //TODO : support updating texture cube by copying from6 texture2d resources 
 }
 
 std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
 {
     return DescriptorHeap::Register(this);
-}
-
-bool TextureCube::CanUpdate()
-{
-    return false;
 }
 
 bool TextureCube::IsValid()

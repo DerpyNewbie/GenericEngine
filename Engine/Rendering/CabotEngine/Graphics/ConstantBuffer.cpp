@@ -22,7 +22,7 @@ D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::ViewDesc() const
     return m_desc_;
 }
 
-void ConstantBuffer::CreateBuffer()
+bool ConstantBuffer::CreateBuffer()
 {
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
     const auto desc = CD3DX12_RESOURCE_DESC::Buffer(m_size_aligned_);
@@ -35,7 +35,7 @@ void ConstantBuffer::CreateBuffer()
     if (m_buffer_ == nullptr)
     {
         engine::Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
-        return;
+        return false;
     }
 
     constexpr D3D12_RANGE unreadable_range = {0, 0};
@@ -43,7 +43,7 @@ void ConstantBuffer::CreateBuffer()
     if (FAILED(hr))
     {
         engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
-        return;
+        return false;
     }
 
     m_desc_ = {};
@@ -51,9 +51,11 @@ void ConstantBuffer::CreateBuffer()
     m_desc_.SizeInBytes = static_cast<UINT>(m_size_aligned_);
 
     m_buffer_->SetName(L"ConstantBuffer");
+
+    return true;
 }
 
-void ConstantBuffer::UpdateBuffer(void *data)
+void ConstantBuffer::UpdateBuffer(const void *data) const
 {
     memcpy(m_p_mapped_ptr_, data, m_size_);
 }

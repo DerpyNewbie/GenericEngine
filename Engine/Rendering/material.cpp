@@ -81,11 +81,6 @@ void Material::UpdateBuffer()
     p_shared_material_block->UpdateBuffer();
 }
 
-bool Material::IsDirty() const
-{
-    return p_shared_material_block == nullptr || p_shared_material_block->IsDirty();
-}
-
 void Material::SetDescriptorTable()
 {
     const auto material_block = p_shared_material_block;

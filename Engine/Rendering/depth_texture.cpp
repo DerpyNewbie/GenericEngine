@@ -7,7 +7,7 @@
 
 namespace engine
 {
-void DepthTexture::CreateBuffer()
+bool DepthTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
 
@@ -24,6 +24,7 @@ void DepthTexture::CreateBuffer()
     if (FAILED(hr))
     {
         Logger::Error<DepthTexture>("Failed To Create DSV Heap for DepthTexture");
+        return false;
     }
 
     D3D12_CLEAR_VALUE dsvClearValue = {};
@@ -49,6 +50,7 @@ void DepthTexture::CreateBuffer()
     if (m_buffer_ == nullptr)
     {
         Logger::Error<DepthTexture>("Failed To Create Depth Resource");
+        return false;
     }
 
     D3D12_DEPTH_STENCIL_VIEW_DESC dsv_desc = {};
@@ -60,6 +62,8 @@ void DepthTexture::CreateBuffer()
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     device->CreateDepthStencilView(m_buffer_.Get(), &dsv_desc, dsv_handle);
+
+    return true;
 }
 
 void DepthTexture::BeginRender()

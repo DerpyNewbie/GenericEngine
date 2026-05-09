@@ -9,7 +9,7 @@ class DepthTexture : public Texture2D
     ComPtr<ID3D12DescriptorHeap> m_dsv_heap_;
 
 public:
-    void CreateBuffer() override;
+    bool CreateBuffer() override;
     void BeginRender();
     void EndRender();
 

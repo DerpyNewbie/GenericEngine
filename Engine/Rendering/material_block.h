@@ -7,7 +7,7 @@ namespace engine
 {
 struct MaterialDataPair
 {
-    std::shared_ptr<IMaterialData> data = nullptr;
+    std::shared_ptr<MaterialData> data = nullptr;
     std::shared_ptr<DescriptorHandle> handle = nullptr;
 
     template <typename Archive>
@@ -61,15 +61,14 @@ public:
         const std::vector<MaterialDataPair> &resource_material_data = {}
     );
 
-    void Insert(const std::shared_ptr<IMaterialData> &data);
+    void Insert(const std::shared_ptr<MaterialData> &data);
     bool Empty(kParameterBufferType buffer_type);
     std::vector<MaterialDataPair>::iterator Begin(kParameterBufferType buffer_type);
     std::vector<MaterialDataPair>::iterator End(kParameterBufferType buffer_type);
 
-    std::shared_ptr<IMaterialData> FindMaterialDataByName(const std::string &name);
+    std::shared_ptr<MaterialData> FindMaterialDataByName(const std::string &name);
 
     void UpdateBuffer();
-    bool IsDirty();
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
@@ -95,7 +94,7 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
     {
         if (data->parameter.name == name)
         {
-            auto casted_data = std::dynamic_pointer_cast<MaterialData<T>>(data);
+            auto casted_data = std::dynamic_pointer_cast<MaterialData>(data);
             if (casted_data == nullptr)
                 return false;
             casted_data->SetValue(material_data);
@@ -104,7 +103,6 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
     }
     return false;
 }
-
 }
 
 CEREAL_CLASS_VERSION(engine::MaterialBlock, 2)

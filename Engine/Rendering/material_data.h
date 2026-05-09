@@ -1,274 +1,75 @@
 #pragma once
-#include "ibuffer.h"
-#include "engine_traits.h"
 #include "gui.h"
 #include "shader.h"
 #include "Asset/asset_ptr.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
-#include "CabotEngine/Graphics/StructuredBuffer.h"
+#include "BufferAsset/constant_buffer_asset.h"
+#include "BufferAsset/structured_buffer_asset.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {
 struct MaterialData : Inspectable
 {
-    bool is_dirty = true;
     ShaderParameter parameter;
-    std::shared_ptr<IBuffer> buffer = nullptr; // can be null
+    kParameterBufferType buffer_type;
+    AssetPtr<IBuffer> buffer; // can be null
 
-    MaterialData();
-    explicit MaterialData(const ShaderParameter &new_parameter);
-    explicit MaterialData(std::shared_ptr<IBuffer> new_value, const ShaderParameter &new_parameter);
+    explicit MaterialData(ShaderParameter new_parameter);
+    explicit MaterialData(const AssetPtr<IBuffer> &new_value, ShaderParameter new_parameter);
     ~MaterialData() override = default;
 
-    void OnDeserialized();
-
     void OnInspectorGui() override;
-    void SetValue(T value);
 
-    std::shared_ptr<IBuffer> CreateBuffer();
-    bool CanUpdateBuffer() override;
-    void UpdateBuffer() override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    template <typename T> requires kAllowedBufferType<T>
+    void SetValue(T &value);
+    template <typename T> requires kAllowedBufferType<T>
+    void SetValue(std::vector<T> &value);
 
-    void *Data() override;
+    void SetValue(const AssetPtr<IBuffer> &new_buffer);
+    void SetValue(const AssetPtr<Texture2D> &new_texture);
 
-    int Count() override;
-    int SizeInBytes() override;
-    kParameterBufferType BufferType() override;
+    bool CreateBuffer() const;
+    void UpdateBuffer() const;
+    std::shared_ptr<DescriptorHandle> UploadBuffer() const;
+    kParameterBufferType BufferType() const
+    {
+        return buffer_type;
+    }
 
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
-        ar(cereal::base_class<IMaterialData>(this), CEREAL_NVP(value));
+        ar(
+            CEREAL_NVP(parameter),
+            CEREAL_NVP(buffer_type),
+            CEREAL_NVP(buffer)
+        );
     }
 };
 
-template <typename T>
-MaterialData<T>::MaterialData() :
-    MaterialData({}, {})
-{ }
-
-template <typename T>
-MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) :
-    MaterialData({}, new_parameter)
-{ }
-
-template <typename T>
-MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
-    IMaterialData(new_parameter), value(new_value)
-{ }
-
-template <typename T>
-void MaterialData<T>::OnDeserialized()
+template <typename T> requires kAllowedBufferType<T>
+void MaterialData::SetValue(T &value)
 {
-    is_dirty = true;
-    if constexpr (kIsAssetPtr)
-        if (value.Lock())
-            CreateBuffer();
-}
-
-template <typename T>
-void MaterialData<T>::OnInspectorGui()
-{
-    auto name = parameter.display_name.empty() ? parameter.name.c_str() : parameter.display_name.c_str();
-
-    if constexpr (std::is_same_v<T, int>)
+    if (this->buffer != nullptr)
     {
-        if (ImGui::InputInt(name, &value))
+        if (auto constant_buffer = std::dynamic_pointer_cast<ConstantBufferAsset<T>>(buffer.Lock()))
         {
-            is_dirty = true;
-        }
-        ImGui::SetItemTooltip("Is Dirty?: %s", is_dirty ? "true" : "false");
-    }
-    else if constexpr (std::is_same_v<T, float>)
-    {
-        if (ImGui::InputFloat(name, &value))
-        {
-            is_dirty = true;
+            constant_buffer->SetValue(value);
         }
     }
-    else if constexpr (std::is_same_v<T, Color>)
+}
+
+template <typename T> requires kAllowedBufferType<T>
+void MaterialData::SetValue(std::vector<T> &value)
+{
+    if (this->buffer != nullptr)
     {
-        if (ImGui::CollapsingHeader("Color"))
+        if (auto structured_buffer = std::dynamic_pointer_cast<StructuredBufferAsset<T>>(buffer.Lock()))
         {
-            if (Gui::PropertyField(name, value))
-            {
-                is_dirty = true;
-            }
+            structured_buffer->SetData(value);
         }
     }
-    else if constexpr (std::is_same_v<T, Vector2>)
-    {
-        if (Gui::PropertyField(name, value))
-        {
-            is_dirty = true;
-        }
-    }
-    else if constexpr (std::is_same_v<T, Vector3>)
-    {
-        if (Gui::PropertyField(name, value))
-        {
-            is_dirty = true;
-        }
-    }
-    else if constexpr (kIsAssetPtr)
-    {
-        if (Gui::PropertyField(name, value))
-        {
-            buffer = CreateBuffer();
-            is_dirty = true;
-        }
-    }
-    else
-    {
-        ImGui::Text("GUI not implemented for type %s", typeid(T).name());
-    }
-}
-
-template <typename T>
-void MaterialData<T>::SetValue(T value)
-{
-    this->value = value;
-    is_dirty = true;
-    if constexpr (kIsTexture)
-    {
-        buffer = CreateBuffer();
-    }
-}
-
-template <typename T>
-std::shared_ptr<IBuffer> MaterialData<T>::CreateBuffer()
-{
-    std::shared_ptr<IBuffer> buff = nullptr;
-    if constexpr (kIsTexture)
-    {
-        if constexpr (kIsAssetPtr)
-        {
-            buff = value.CastedLock();
-        }
-        else
-        {
-            buff = value;
-        }
-    }
-    else if constexpr (kBufferType == kParameterBufferType_CBV)
-    {
-        buff = std::make_shared<ConstantBuffer>(SizeInBytes());
-    }
-    else if constexpr (kBufferType == kParameterBufferType_SRV)
-    {
-        buff = std::make_shared<StructuredBuffer>(SizeInBytes(), Count());
-    }
-    else
-    {
-        static_assert("Not Implemented");
-        return nullptr;
-    }
-
-    buff->CreateBuffer();
-    return buff;
-}
-
-template <typename T>
-bool MaterialData<T>::CanUpdateBuffer()
-{
-    return buffer != nullptr && buffer->CanUpdate();
-}
-
-template <typename T>
-void MaterialData<T>::UpdateBuffer()
-{
-    if (buffer == nullptr)
-    {
-        buffer = CreateBuffer();
-    }
-
-    if (is_dirty && buffer->CanUpdate())
-    {
-        Logger::Log<MaterialData>("Updating buffer: %s", parameter.name.c_str());
-        buffer->UpdateBuffer(Data());
-        is_dirty = false;
-    }
-}
-
-template <typename T>
-std::shared_ptr<DescriptorHandle> MaterialData<T>::UploadBuffer()
-{
-    if (buffer == nullptr)
-    {
-        buffer = CreateBuffer();
-    }
-
-    return buffer->UploadBuffer();
-}
-
-template <typename T>
-void *MaterialData<T>::Data()
-{
-    if constexpr (kIsTexture)
-    {
-        if constexpr (kIsAssetPtr)
-        {
-            return value.CastedLock()->GetTexData().data();
-        }
-        else
-        {
-            return value->tex_data;
-        }
-    }
-    else if constexpr (kIsVector)
-    {
-        return value.data();
-    }
-    else if constexpr (kIsAssetPtr)
-    {
-        return value.Lock().get();
-    }
-    else
-    {
-        return &value;
-    }
-}
-
-template <typename T>
-int MaterialData<T>::Count()
-{
-    if constexpr (kIsVector)
-    {
-        return static_cast<int>(value.size());
-    }
-    else
-    {
-        return 1;
-    }
-}
-
-template <typename T>
-int MaterialData<T>::SizeInBytes()
-{
-    return sizeof(T) * Count();
-}
-
-template <typename T>
-kParameterBufferType MaterialData<T>::BufferType()
-{
-    return kBufferType;
 }
 }
 
-CEREAL_CLASS_VERSION(engine::IMaterialData, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<bool>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<int>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<float>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<Color>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<Vector2>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
-
-CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<Texture2D>>, 1)
+CEREAL_CLASS_VERSION(engine::MaterialData, 2)

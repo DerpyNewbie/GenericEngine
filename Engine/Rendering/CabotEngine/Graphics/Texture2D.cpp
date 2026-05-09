@@ -16,7 +16,7 @@ void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
 {
     unsigned char *pixels;
     int width = 0, height = 0, channels = 0;
-    
+
     if (ai_texture->mHeight == 0)
     {
         pixels = stbi_load_from_memory(
@@ -69,7 +69,7 @@ void Texture2D::OnInspectorGui()
     }
 }
 
-void Texture2D::CreateBuffer()
+bool Texture2D::CreateBuffer()
 {
     const auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
         m_format_,
@@ -93,7 +93,7 @@ void Texture2D::CreateBuffer()
     if (FAILED(hr))
     {
         engine::Logger::Error<Texture2D>("failed to create texture2d resource");
-        return;
+        return false;
     }
 
     m_buffer_->SetName(L"Texture");
@@ -111,21 +111,32 @@ void Texture2D::CreateBuffer()
     {
         m_buffer_ = nullptr;
     }
+
+    return true;
 }
 
-void Texture2D::UpdateBuffer(void *data)
+void Texture2D::UpdateBuffer()
 {
-    engine::Logger::Error("Can not Update Texture2D");
+    if (!IsValid())
+    {
+        CreateBuffer();
+    }
+    else
+    {
+        const D3D12_BOX dest_region = {0, 0, 0, m_width_, m_height_, 1};
+        m_buffer_->WriteToSubresource(
+            0,
+            &dest_region,
+            m_tex_data_.data(),
+            m_width_ * sizeof(PackedVector::XMCOLOR),
+            m_width_ * m_height_ * sizeof(PackedVector::XMCOLOR)
+        );
+    }
 }
 
 std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
 {
     return DescriptorHeap::Register(this);
-}
-
-bool Texture2D::CanUpdate()
-{
-    return false;
 }
 
 bool Texture2D::IsValid()

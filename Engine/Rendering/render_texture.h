@@ -11,7 +11,7 @@ class RenderTexture : public Texture2D
     ComPtr<ID3D12DescriptorHeap> m_RTVHeap_;
 
 public:
-    void CreateBuffer() override;
+    bool CreateBuffer() override;
     void BeginRender(Color background_color);
     void EndRender() const;
     ID3D12DescriptorHeap *GetHeap();

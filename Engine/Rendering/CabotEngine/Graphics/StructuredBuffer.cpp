@@ -6,7 +6,7 @@
 
 namespace engine
 {
-void StructuredBuffer::CreateBuffer()
+bool StructuredBuffer::CreateBuffer()
 {
     const auto total_size = m_stride_ * m_element_count_;
     const CD3DX12_RESOURCE_DESC resource_desc = CD3DX12_RESOURCE_DESC::Buffer(total_size);
@@ -18,7 +18,7 @@ void StructuredBuffer::CreateBuffer()
     if (m_default_buffer_ == nullptr)
     {
         Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (DefaultBuffer)");
-        return;
+        return false;
     }
     m_default_buffer_->SetName(L"StructuredBuffer_Default");
     
@@ -29,14 +29,16 @@ void StructuredBuffer::CreateBuffer()
     if (m_upload_buffer_ == nullptr)
     {
         Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource (UploadBuffer)");
-        return;
+        return false;
     }
     m_upload_buffer_->SetName(L"StructuredBuffer_Upload");
 
     m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
+
+    return true;
 }
 
-void StructuredBuffer::UpdateBuffer(void *data)
+void StructuredBuffer::UpdateBuffer(const void *data) const
 {
     if (m_upload_buffer_ == nullptr || m_default_buffer_ == nullptr)
     {

@@ -8,7 +8,7 @@
 
 namespace engine
 {
-void RenderTexture::CreateBuffer()
+bool RenderTexture::CreateBuffer()
 {
     auto device = RenderEngine::Device();
     auto res_desc = RenderEngine::BBuffDesc();
@@ -36,7 +36,7 @@ void RenderTexture::CreateBuffer()
 
     if (FAILED(hr))
     {
-        return;
+        return false;
     }
 
     D3D12_DESCRIPTOR_HEAP_DESC heap_desc = RenderEngine::RTVHeapDesc();
@@ -52,6 +52,8 @@ void RenderTexture::CreateBuffer()
     rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
     device->CreateRenderTargetView(m_buffer_.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
+
+    return true;
 }
 
 void RenderTexture::BeginRender(const Color background_color)

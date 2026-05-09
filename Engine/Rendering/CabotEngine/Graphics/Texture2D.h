@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
+#include "Rendering/BufferAsset/ibuffer.h"
 
 namespace engine
 {
@@ -26,9 +26,13 @@ protected:
 
 public:
     void OnInspectorGui() override;
-    void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
+    bool CreateBuffer() override;
+    void UpdateBuffer() override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    engine::kParameterBufferType BufferType() const override
+    {
+        return engine::kParameterBufferType_SRV;
+    }
     bool IsValid() override;
 
     void LoadFromAiTexture(const aiTexture *ai_texture);

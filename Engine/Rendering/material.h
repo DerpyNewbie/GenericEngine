@@ -23,7 +23,6 @@ public:
     void CreateMaterialBlock();
 
     void UpdateBuffer();
-    bool IsDirty() const;
 
     void SetDescriptorTable();
 

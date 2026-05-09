@@ -1,11 +1,10 @@
 ﻿#pragma once
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
-#include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class StructuredBuffer final : public IBuffer, public ShaderResource
+class StructuredBuffer : public ShaderResource
 {
     ComPtr<ID3D12Resource> m_default_buffer_;
     ComPtr<ID3D12Resource> m_upload_buffer_;
@@ -21,16 +20,11 @@ public:
         m_gpu_address_ = 0;
     }
 
-    void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    bool CreateBuffer();
+    void UpdateBuffer(const void *data) const;
+    std::shared_ptr<DescriptorHandle> UploadBuffer();
 
-    bool CanUpdate() override
-    {
-        return true;
-    }
-
-    bool IsValid() override;
+    bool IsValid();
 
     [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
     [[nodiscard]] ID3D12Resource *Resource() override;
