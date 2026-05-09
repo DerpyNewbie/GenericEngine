@@ -65,3 +65,5 @@ std::shared_ptr<DescriptorHandle> engine::MaterialData::UploadBuffer() const
 
     return buffer->UploadBuffer();
 }
+
+CEREAL_REGISTER_TYPE(engine::MaterialData)

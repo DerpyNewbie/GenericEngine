@@ -42,12 +42,12 @@ void ConstantBufferAsset<T>::UpdateBuffer()
     {
         return;
     }
-
+    
     if (m_buffer_ == nullptr)
     {
         CreateBuffer();
     }
-
+    
     m_buffer_->UpdateBuffer(&m_data_);
 }
 

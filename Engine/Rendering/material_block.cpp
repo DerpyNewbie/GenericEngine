@@ -11,7 +11,46 @@ using MaterialFactory =
 std::function<std::shared_ptr<MaterialData>(const ShaderParameter &)>;
 
 std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-
+    {"int",
+     [](const ShaderParameter &param) {
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<int>>();
+         return std::make_shared<MaterialData>(
+             AssetPtr<ConstantBufferAsset<int>>::FromInstance(constant_buffer_asset),
+             param);
+     }
+    },
+    {"float",
+     [](const ShaderParameter &param) {
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<float>>();
+         return std::make_shared<MaterialData>(
+             AssetPtr<ConstantBufferAsset<float>>::FromInstance(constant_buffer_asset),
+             param);
+     }
+    },
+    {"color",
+     [](const ShaderParameter &param) {
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<Color>>();
+         return std::make_shared<MaterialData>(
+             AssetPtr<ConstantBufferAsset<Color>>::FromInstance(constant_buffer_asset),
+             param);
+     }
+    },
+    {"float2",
+     [](const ShaderParameter &param) {
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<Vector2>>();
+         return std::make_shared<MaterialData>(
+             AssetPtr<ConstantBufferAsset<Vector2>>::FromInstance(constant_buffer_asset),
+             param);
+     }
+    },
+    {"float3",
+     [](const ShaderParameter &param) {
+         auto constant_buffer_asset = Object::Instantiate<ConstantBufferAsset<Vector3>>();
+         return std::make_shared<MaterialData>(
+             AssetPtr<ConstantBufferAsset<Vector3>>::FromInstance(constant_buffer_asset),
+             param);
+     }
+    },
     {"texture2d",
      [](const ShaderParameter &param) {
          auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});

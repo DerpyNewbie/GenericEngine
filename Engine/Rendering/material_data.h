@@ -14,6 +14,7 @@ struct MaterialData : Inspectable
     kParameterBufferType buffer_type;
     AssetPtr<IBuffer> buffer; // can be null
 
+    MaterialData() = default;
     explicit MaterialData(ShaderParameter new_parameter);
     explicit MaterialData(const AssetPtr<IBuffer> &new_value, ShaderParameter new_parameter);
     ~MaterialData() override = default;
