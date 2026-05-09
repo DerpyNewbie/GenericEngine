@@ -88,9 +88,9 @@ void Material::SetDescriptorTable()
 
     UpdateBuffer();
 
-    for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
+    for (int param_i = 0; param_i < kGpuUploadType_Count; ++param_i)
     {
-        const auto param_type = static_cast<kParameterBufferType>(param_i);
+        const auto param_type = static_cast<kGpuUploadType>(param_i);
 
         if (material_block->Empty(param_type))
         {

@@ -6,7 +6,20 @@ engine::MaterialData::MaterialData(ShaderParameter new_parameter): MaterialData(
 
 engine::MaterialData::MaterialData(const AssetPtr<IBuffer> &new_value, ShaderParameter new_parameter): parameter(std::move(new_parameter)), buffer(new_value)
 {
-    buffer_type = new_value->BufferType();
+    switch (new_value->BufferType())
+    {
+        case kParameterBufferType_ConstantBuffer:
+            buffer_type = kGpuUploadType_CBV;
+            break;
+        case kParameterBufferType_StructuredBuffer:
+            buffer_type = kGpuUploadType_SRV;
+            break;
+        case kParameterBufferType_Texture2D:
+            buffer_type = kGpuUploadType_SRV;
+            break;
+
+        default: ;
+    }
 }
 
 void engine::MaterialData::OnInspectorGui()
@@ -14,6 +27,21 @@ void engine::MaterialData::OnInspectorGui()
     auto name = parameter.display_name.empty() ? parameter.name.c_str() : parameter.display_name.c_str();
     ImGui::Text("Material Data: %s", name);
     ImGui::Text("Type: %s", parameter.type_hint.c_str());
+
+    switch (buffer->BufferType())
+    {
+        case kParameterBufferType_ConstantBuffer:
+            Gui::PropertyField<IConstantBufferAsset>("Buffer", buffer);
+            break;
+        case kParameterBufferType_StructuredBuffer:
+            Gui::PropertyField<IStructuredBufferAsset>("Buffer", buffer);
+            break;
+        case kParameterBufferType_Texture2D:
+            Gui::PropertyField<Texture2D>("Buffer", buffer);
+            break;
+
+        default: ;
+    }
 
     if (buffer != nullptr)
     {

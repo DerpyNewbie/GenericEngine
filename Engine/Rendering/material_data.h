@@ -8,10 +8,19 @@
 
 namespace engine
 {
+enum kGpuUploadType
+{
+    kGpuUploadType_CBV,
+    kGpuUploadType_SRV,
+    kGpuUploadType_UAV,
+
+    kGpuUploadType_Count
+};
+
 struct MaterialData : Inspectable
 {
     ShaderParameter parameter;
-    kParameterBufferType buffer_type;
+    kGpuUploadType buffer_type;
     AssetPtr<IBuffer> buffer; // can be null
 
     MaterialData() = default;
@@ -32,7 +41,7 @@ struct MaterialData : Inspectable
     bool CreateBuffer() const;
     void UpdateBuffer() const;
     std::shared_ptr<DescriptorHandle> UploadBuffer() const;
-    kParameterBufferType BufferType() const
+    kGpuUploadType BufferType() const
     {
         return buffer_type;
     }

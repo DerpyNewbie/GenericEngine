@@ -6,8 +6,11 @@
 
 namespace engine
 {
+class IConstantBufferAsset : public IBuffer
+{};
+
 template <typename T> requires kAllowedBufferType<T>
-class ConstantBufferAsset : public IBuffer
+class ConstantBufferAsset : public IConstantBufferAsset
 {
     std::unique_ptr<ConstantBuffer> m_buffer_ = nullptr;
     bool m_is_dirty_ = true;
@@ -21,7 +24,7 @@ public:
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     kParameterBufferType BufferType() const override
     {
-        return kParameterBufferType_CBV;
+        return kParameterBufferType_ConstantBuffer;
     }
     bool IsValid() override;
 

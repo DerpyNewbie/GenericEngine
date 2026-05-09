@@ -5,8 +5,11 @@
 
 namespace engine
 {
+class IStructuredBufferAsset : public IBuffer
+{};
+
 template <typename T> requires kAllowedBufferType<T>
-class StructuredBufferAsset : public IBuffer
+class StructuredBufferAsset : public IStructuredBufferAsset
 {
     std::unique_ptr<StructuredBuffer> m_buffer_ = nullptr;
     bool m_is_dirty_ = true;
@@ -18,6 +21,10 @@ public:
     void UpdateBuffer() override;
     void SetValue(std::vector<T> value);
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    kParameterBufferType BufferType() const override
+    {
+        return kParameterBufferType_StructuredBuffer;
+    }
     bool IsValid() override;
 
     template <class Archive>

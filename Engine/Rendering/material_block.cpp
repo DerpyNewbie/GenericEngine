@@ -76,15 +76,15 @@ std::shared_ptr<MaterialData> CreateMaterialData(const ShaderParameter &shader_p
 
 namespace engine
 {
-int *ShaderDataIndex::GetLengthField(kParameterBufferType type)
+int *ShaderDataIndex::GetLengthField(kGpuUploadType type)
 {
     switch (type)
     {
-        case kParameterBufferType_CBV:
+        case kGpuUploadType_CBV:
             return &cbv_length;
-        case kParameterBufferType_SRV:
+        case kGpuUploadType_SRV:
             return &srv_length;
-        case kParameterBufferType_UAV:
+        case kGpuUploadType_UAV:
             return &uav_length;
         default:
             static_assert("Invalid buffer type");
@@ -92,15 +92,15 @@ int *ShaderDataIndex::GetLengthField(kParameterBufferType type)
     }
 }
 
-int ShaderDataIndex::GetLength(const kParameterBufferType type) const
+int ShaderDataIndex::GetLength(const kGpuUploadType type) const
 {
     switch (type)
     {
-        case kParameterBufferType_CBV:
+        case kGpuUploadType_CBV:
             return cbv_length;
-        case kParameterBufferType_SRV:
+        case kGpuUploadType_SRV:
             return srv_length;
-        case kParameterBufferType_UAV:
+        case kGpuUploadType_UAV:
             return uav_length;
         default:
             static_assert("Invalid buffer type");
@@ -108,18 +108,18 @@ int ShaderDataIndex::GetLength(const kParameterBufferType type) const
     }
 }
 
-int ShaderDataIndex::GetOffset(kParameterBufferType type) const
+int ShaderDataIndex::GetOffset(kGpuUploadType type) const
 {
     int offset = 0;
 
     // fall-through
     switch (type)
     {
-        case kParameterBufferType_UAV:
+        case kGpuUploadType_CBV:
             offset += srv_length;
-        case kParameterBufferType_SRV:
+        case kGpuUploadType_SRV:
             offset += cbv_length;
-        case kParameterBufferType_CBV:
+        case kGpuUploadType_UAV:
         default:
             break;
     }
@@ -197,13 +197,13 @@ void MaterialBlock::Insert(const std::shared_ptr<MaterialData> &data)
     ++(*field);
 }
 
-bool MaterialBlock::Empty(const kParameterBufferType buffer_type)
+bool MaterialBlock::Empty(const kGpuUploadType buffer_type)
 {
     return shader_index.GetLength(buffer_type) == 0;
 }
 
 std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(
-    const kParameterBufferType buffer_type
+    const kGpuUploadType buffer_type
 )
 {
     const auto buffer_offset = shader_index.GetOffset(buffer_type);
@@ -211,7 +211,7 @@ std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(
 }
 
 std::vector<MaterialDataPair>::iterator MaterialBlock::End(
-    const kParameterBufferType buffer_type
+    const kGpuUploadType buffer_type
 )
 {
     return Begin(buffer_type) + shader_index.GetLength(buffer_type);

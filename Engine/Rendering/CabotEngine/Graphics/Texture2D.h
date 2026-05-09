@@ -31,7 +31,7 @@ public:
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     engine::kParameterBufferType BufferType() const override
     {
-        return engine::kParameterBufferType_SRV;
+        return engine::kParameterBufferType_Texture2D;
     }
     bool IsValid() override;
 

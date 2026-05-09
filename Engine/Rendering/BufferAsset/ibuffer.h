@@ -5,9 +5,9 @@ namespace engine
 {
 enum kParameterBufferType
 {
-    kParameterBufferType_CBV,
-    kParameterBufferType_SRV,
-    kParameterBufferType_UAV,
+    kParameterBufferType_ConstantBuffer,
+    kParameterBufferType_StructuredBuffer,
+    kParameterBufferType_Texture2D,
 
     kParameterBufferType_Count
 };

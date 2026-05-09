@@ -23,9 +23,9 @@ struct ShaderDataIndex
     int srv_length = 0;
     int uav_length = 0;
 
-    int *GetLengthField(kParameterBufferType type);
-    int GetLength(kParameterBufferType type) const;
-    int GetOffset(kParameterBufferType type) const;
+    int *GetLengthField(kGpuUploadType type);
+    int GetLength(kGpuUploadType type) const;
+    int GetOffset(kGpuUploadType type) const;
     int GetFullLength() const;
 
     template <typename Archive>
@@ -62,9 +62,9 @@ public:
     );
 
     void Insert(const std::shared_ptr<MaterialData> &data);
-    bool Empty(kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator Begin(kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator End(kParameterBufferType buffer_type);
+    bool Empty(kGpuUploadType buffer_type);
+    std::vector<MaterialDataPair>::iterator Begin(kGpuUploadType buffer_type);
+    std::vector<MaterialDataPair>::iterator End(kGpuUploadType buffer_type);
 
     std::shared_ptr<MaterialData> FindMaterialDataByName(const std::string &name);
 
