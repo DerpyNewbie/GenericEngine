@@ -34,15 +34,15 @@ IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
     constexpr auto height = 4;
     constexpr auto pixel_count = width * height;
 
-    texture_2d->width = width;
-    texture_2d->height = height;
-    texture_2d->format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    texture_2d->mip_level = 1;
-    texture_2d->tex_data.reserve(pixel_count);
+    texture_2d->m_width_ = width;
+    texture_2d->m_height_ = height;
+    texture_2d->m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+    texture_2d->m_mip_level_ = 1;
+    texture_2d->m_tex_data_.reserve(pixel_count);
 
     for (auto i = 0; i < pixel_count; ++i)
     {
-        texture_2d->tex_data.emplace_back(color);
+        texture_2d->m_tex_data_.emplace_back(color);
     }
 
     auto asset_ptr = IAssetPtr::FromManaged(texture_2d);
@@ -89,11 +89,11 @@ void Texture2DImporter::OnImport(AssetDescriptor *ctx)
     const size_t pixel_count = img->width * img->height;
     const auto texture_2d = Object::Instantiate<Texture2D>();
 
-    texture_2d->width = static_cast<UINT>(meta.width);
-    texture_2d->height = static_cast<UINT>(meta.height);
-    texture_2d->format = meta.format;
-    texture_2d->mip_level = static_cast<UINT16>(meta.mipLevels);
-    texture_2d->tex_data.reserve(pixel_count);
+    texture_2d->m_width_ = static_cast<UINT>(meta.width);
+    texture_2d->m_height_ = static_cast<UINT>(meta.height);
+    texture_2d->m_format_ = meta.format;
+    texture_2d->m_mip_level_ = static_cast<UINT16>(meta.mipLevels);
+    texture_2d->m_tex_data_.reserve(pixel_count);
 
     for (UINT i = 0; i < pixel_count; ++i)
     {
@@ -108,7 +108,7 @@ void Texture2DImporter::OnImport(AssetDescriptor *ctx)
         color.r = b;
         color.a = a;
 
-        texture_2d->tex_data.emplace_back(color);
+        texture_2d->m_tex_data_.emplace_back(color);
     }
 
     ctx->SetMainObject(texture_2d);

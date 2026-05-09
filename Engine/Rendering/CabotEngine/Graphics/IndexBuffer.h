@@ -3,17 +3,17 @@ namespace engine
 {
 class IndexBuffer
 {
+    //TODO : upload_resourceを保持する必要があるか？初期化後は不要なはず、ExecuteCommandListの後にResetしましょう
+    ComPtr<ID3D12Resource> m_buffer_;
+    D3D12_INDEX_BUFFER_VIEW m_view_;
+    
 public:
-    IndexBuffer(size_t size, const uint32_t *pInitData = nullptr);
-    bool IsValid() const;
-    D3D12_INDEX_BUFFER_VIEW *View();
-
-private:
-    bool m_IsValid = false;
-    ComPtr<ID3D12Resource> m_pBuffer; // インデックスバッファ
-    D3D12_INDEX_BUFFER_VIEW m_View; // インデックスバッファビュー
-
+    explicit IndexBuffer(size_t size, const uint32_t *init_data);
     IndexBuffer(const IndexBuffer &) = delete;
     void operator =(const IndexBuffer &) = delete;
+
+    [[nodiscard]] bool IsValid() const;
+    D3D12_INDEX_BUFFER_VIEW *View();
+
 };
 }

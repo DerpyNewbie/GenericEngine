@@ -86,8 +86,8 @@ void Editor::Init()
 
         auto descriptor_handle = DescriptorHeap::Allocate();
         // フォントディスクリプタ取得
-        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->HandleCPU;
-        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->HandleGPU;
+        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->handle_cpu;
+        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->handle_gpu;
 
         ImGui_ImplWin32_Init(Application::Instance()->WindowHandle());
         ImGui_ImplDX12_Init(

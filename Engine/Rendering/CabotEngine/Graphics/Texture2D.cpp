@@ -12,12 +12,11 @@
 
 using namespace DirectX;
 
-std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
+void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
 {
-    auto result_texture = Instantiate<Texture2D>();
-    unsigned char *pixels = nullptr;
+    unsigned char *pixels;
     int width = 0, height = 0, channels = 0;
-
+    
     if (ai_texture->mHeight == 0)
     {
         pixels = stbi_load_from_memory(
@@ -28,46 +27,56 @@ std::shared_ptr<Texture2D> Texture2D::LoadFromAiTexture(const aiTexture *ai_text
             &channels,
             4
         );
-        result_texture->tex_data.reserve(width * height * sizeof(PackedVector::XMCOLOR));
+        m_tex_data_.reserve(width * height * sizeof(PackedVector::XMCOLOR));
     }
     else
     {
-        // RGBAのRAWデータ
         width = ai_texture->mWidth;
         height = ai_texture->mHeight;
-        channels = 4;
         pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
     }
-    result_texture->width = width;
-    result_texture->height = height;
-    result_texture->format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    result_texture->tex_data.resize(width * height);
-    memcpy(result_texture->tex_data.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
+    m_width_ = width;
+    m_height_ = height;
+    m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+    m_tex_data_.resize(width * height);
+    memcpy(m_tex_data_.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
 
     if (pixels)
     {
         stbi_image_free(pixels);
     }
-
-    return result_texture;
 }
 
 void Texture2D::OnInspectorGui()
 {
     ImGui::Text("Texture2D");
-    ImGui::Text("Width: %d", width);
-    ImGui::Text("Height: %d", height);
-    ImGui::Text("Mip Level: %d", mip_level);
+    ImGui::Text("Width: %d", m_width_);
+    ImGui::Text("Height: %d", m_height_);
+    ImGui::Text("Mip Level: %d", m_mip_level_);
+
+    if (const auto desc_heap = UploadBuffer())
+    {
+        const auto ratio = m_height_ > 0 ? static_cast<float>(m_width_) / static_cast<float>(m_height_) : 1.0f;
+        const auto max_width = ImGui::CalcItemWidth();
+        static float scale = 1.0f;
+        ImGui::SliderFloat("Preview Scale", &scale, 0.1f, 1.0f);
+        ImGui::Image(desc_heap->handle_gpu.ptr, ImVec2(scale * max_width, scale * max_width * ratio));
+        DescriptorHeap::Free(desc_heap);
+    }
+    else
+    {
+        ImGui::Text("Could not preview the texture.");
+    }
 }
 
 void Texture2D::CreateBuffer()
 {
     const auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
-        format,
-        width,
-        height,
+        m_format_,
+        m_width_,
+        m_height_,
         1,
-        mip_level
+        m_mip_level_
     );
 
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
@@ -78,28 +87,29 @@ void Texture2D::CreateBuffer()
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&m_p_resource_)
+        IID_PPV_ARGS(&m_buffer_)
     );
 
     if (FAILED(hr))
     {
+        engine::Logger::Error<Texture2D>("failed to create texture2d resource");
         return;
     }
 
-    m_p_resource_->SetName(L"Texture");
+    m_buffer_->SetName(L"Texture");
 
-    const D3D12_BOX dest_region = {0, 0, 0, width, height, 1};
-    hr = m_p_resource_->WriteToSubresource(
+    const D3D12_BOX dest_region = {0, 0, 0, m_width_, m_height_, 1};
+    hr = m_buffer_->WriteToSubresource(
         0,
-        &dest_region, // copy all
-        tex_data.data(), // origin data addr
-        width * sizeof(PackedVector::XMCOLOR), // 1 line size
-        width * height * sizeof(PackedVector::XMCOLOR) // all line sizes
+        &dest_region,
+        m_tex_data_.data(),
+        m_width_ * sizeof(PackedVector::XMCOLOR),
+        m_width_ * m_height_ * sizeof(PackedVector::XMCOLOR)
     );
 
     if (FAILED(hr))
     {
-        m_p_resource_ = nullptr;
+        m_buffer_ = nullptr;
     }
 }
 
@@ -120,7 +130,7 @@ bool Texture2D::CanUpdate()
 
 bool Texture2D::IsValid()
 {
-    return m_p_resource_ != nullptr;
+    return m_buffer_ != nullptr;
 }
 
 ID3D12Resource *Texture2D::Resource()
@@ -130,7 +140,7 @@ ID3D12Resource *Texture2D::Resource()
         CreateBuffer();
     }
 
-    return m_p_resource_ != nullptr ? m_p_resource_.Get() : nullptr;
+    return m_buffer_ != nullptr ? m_buffer_.Get() : nullptr;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
@@ -138,8 +148,8 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
     D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
     desc.Format = Resource()->GetDesc().Format;
     desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D; // 2D texture
-    desc.Texture2D.MipLevels = 1; // no mipmaps
+    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+    desc.Texture2D.MipLevels = 1;
     return desc;
 }
 

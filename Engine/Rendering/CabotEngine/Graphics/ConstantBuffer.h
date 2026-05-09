@@ -3,10 +3,16 @@
 
 class ConstantBuffer : public IBuffer
 {
+    uint64_t m_size_aligned_;
+    uint64_t m_size_;
+
+    ComPtr<ID3D12Resource> m_buffer_;
+    D3D12_CONSTANT_BUFFER_VIEW_DESC m_desc_;
+
+    void *m_p_mapped_ptr_ = nullptr;
+
 public:
-    ConstantBuffer(size_t size);
-    D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const; // バッファのGPU上のアドレスを返す
-    D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc(); // 定数バッファビューを返す
+    explicit ConstantBuffer(size_t size);
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
@@ -17,20 +23,12 @@ public:
 
     void *GetPtr() const;
 
+    D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;
+    D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc() const;
+
     template <typename T>
     T *GetPtr()
     {
         return static_cast<T *>(GetPtr());
     }
-
-private:
-    UINT64 m_SizeAligned;
-    UINT64 m_size_;
-    ComPtr<ID3D12Resource> m_pBuffer; // 定数バッファ
-    D3D12_CONSTANT_BUFFER_VIEW_DESC m_Desc; // 定数バッファビューの設定
-    void *m_pMappedPtr = nullptr;
-
-    ConstantBuffer(const ConstantBuffer &) = delete;
-    void operator =(const ConstantBuffer &) = delete;
-    bool m_IsValid = false;
 };

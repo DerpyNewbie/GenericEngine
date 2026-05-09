@@ -2,6 +2,7 @@
 
 #include "game_object.h"
 
+#include "application.h"
 #include "scene.h"
 #include "scene_manager.h"
 
@@ -59,7 +60,7 @@ void GameObject::SetActive(const bool is_active)
     }
 
     m_is_active_self_ = is_active;
-    NotifyIsActiveChanged();
+    UpdateActiveInHierarchy();
 }
 
 std::shared_ptr<Scene> GameObject::Scene() const
@@ -193,14 +194,13 @@ void GameObject::InvokeFixedUpdate() const
 
 void GameObject::InvokeOnValidate() const
 {
-    NotifyIsActiveChanged();
     for (const auto &component : m_components_)
     {
         component->OnValidate();
     }
 }
 
-void GameObject::NotifyIsActiveChanged() const
+void GameObject::UpdateActiveInHierarchy() const
 {
     const auto transform = Transform();
     const auto parent = transform != nullptr ? transform->Parent() : nullptr;
@@ -213,23 +213,31 @@ void GameObject::NotifyIsActiveChanged() const
 
     m_is_active_in_hierarchy_ = active_in_hierarchy;
 
-    for (const auto &component : m_components_)
+    // not clean but it works
+    if (Application::IsPlayMode())
     {
-        if (m_is_active_in_hierarchy_)
+        for (const auto &component : m_components_)
         {
-            InvokeComponentOnEnabled(component);
+            if (m_is_active_in_hierarchy_)
+            {
+                InvokeComponentOnEnabled(component);
+            }
+            else
+            {
+                InvokeComponentOnDisabled(component);
+            }
         }
-        else
-        {
-            InvokeComponentOnDisabled(component);
-        }
+    }
+    else
+    {
+        InvokeOnValidate();
     }
 
     if (transform != nullptr)
     {
         for (int i = 0; i < transform->ChildCount(); i++)
         {
-            transform->GetChild(i)->GameObject()->NotifyIsActiveChanged();
+            transform->GetChild(i)->GameObject()->UpdateActiveInHierarchy();
         }
     }
 }

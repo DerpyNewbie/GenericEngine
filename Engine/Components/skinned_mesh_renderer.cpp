@@ -102,7 +102,7 @@ void SkinnedMeshRenderer::UpdateBuffer()
     const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
     const auto cmd_list = RenderEngine::CommandList();
 
-    cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->handle_gpu);
 }
 
 void SkinnedMeshRenderer::Render()
@@ -111,7 +111,7 @@ void SkinnedMeshRenderer::Render()
     UpdateBoneTransformsBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->HandleGPU);
+    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
 }
 }
 

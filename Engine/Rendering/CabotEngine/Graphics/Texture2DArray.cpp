@@ -19,17 +19,16 @@ void Texture2DArray::CopyResource()
     for (UINT i = 0; i < m_textures_.size(); ++i)
     {
         D3D12_TEXTURE_COPY_LOCATION dst = {};
-        dst.pResource = m_p_resource_.Get();
+        dst.pResource = m_buffer_.Get();
         dst.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         dst.SubresourceIndex = D3D12CalcSubresource(
-            0, // mip level
-            i, // array slice
-            0, // plane slice
+            0,
+            i,
+            0,
             texture->MipLevel(),
             static_cast<UINT>(m_textures_.size())
             );
 
-        // コピー元 (既存の Texture2D の mip=0)
         D3D12_TEXTURE_COPY_LOCATION src = {};
         src.pResource = m_textures_[i]->Resource();
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
@@ -54,9 +53,9 @@ void Texture2DArray::CopyResource()
     m_is_valid_ = true;
 
     const CD3DX12_RESOURCE_BARRIER barrier =
-    CD3DX12_RESOURCE_BARRIER::Transition(m_p_resource_.Get(),
-                                         D3D12_RESOURCE_STATE_COPY_DEST,
-                                         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+        CD3DX12_RESOURCE_BARRIER::Transition(m_buffer_.Get(),
+                                             D3D12_RESOURCE_STATE_COPY_DEST,
+                                             D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     cmd_list->ResourceBarrier(1, &barrier);
 }
 
@@ -87,16 +86,16 @@ bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count,
         &array_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         clear_value,
-        IID_PPV_ARGS(&m_p_resource_)
-        );
+        IID_PPV_ARGS(&m_buffer_)
+    );
 
     if (FAILED(hr))
     {
-        m_is_valid_ = false;
+        engine::Logger::Error<Texture2DArray>("failed to create texture2d array resource");
         return false;
     }
 
-    hr = m_p_resource_->SetName(L"TextureArray");
+    hr = m_buffer_->SetName(L"TextureArray");
     if (FAILED(hr))
     {
         m_is_valid_ = false;
@@ -118,7 +117,7 @@ bool Texture2DArray::IsValid() const
 
 ID3D12Resource *Texture2DArray::Resource()
 {
-    return m_p_resource_.Get();
+    return m_buffer_.Get();
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC Texture2DArray::ViewDesc()

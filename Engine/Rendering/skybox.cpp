@@ -75,7 +75,7 @@ void Skybox::Render()
     cmd_list->IASetIndexBuffer(m_index_buffer_->View());
 
     PSOManager::SetPipelineState(cmd_list, m_skybox_shader_.get());
-    cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_->HandleGPU);
+    cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_->handle_gpu);
 
     cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);
 }

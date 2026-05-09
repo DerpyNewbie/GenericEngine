@@ -3,11 +3,9 @@
 #include "hierarchy.h"
 
 #include "default_editor_menus.h"
-#include "editor_prefs.h"
 #include "gui.h"
 #include "scene.h"
 #include "scene_manager.h"
-#include "str_util.h"
 #include "ContextMenu/context_menu.h"
 
 namespace editor
@@ -41,6 +39,9 @@ void Hierarchy::OnEditorGui()
 
 void Hierarchy::DrawScene(const std::shared_ptr<Scene> &scene)
 {
+    if (scene == nullptr)
+        return;
+
     const auto draw = Gui::ObjectHeader(scene);
     if (ImGui::IsItemClicked())
     {
@@ -70,12 +71,6 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<GameObject> &game_obje
 
     ImGui::PushID(game_object.get());
     {
-        const bool has_style_color = !game_object->IsActiveInHierarchy();
-        if (has_style_color)
-        {
-            ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
-        }
-
         {
             ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
             DrawReorderingTarget(game_object, 0);
@@ -104,11 +99,6 @@ void Hierarchy::DrawObjectRecursive(const std::shared_ptr<GameObject> &game_obje
             DrawReorderingTarget(game_object, 1);
             ImGui::PopStyleVar();
         }
-
-        if (has_style_color)
-        {
-            ImGui::PopStyleColor();
-        }
     }
 
     ImGui::PopID();
@@ -132,7 +122,19 @@ bool Hierarchy::DrawObject(const std::shared_ptr<GameObject> &game_object)
     }
 
     ImGui::PushStyleVarY(ImGuiStyleVar_ItemSpacing, 0);
+    const bool has_style_color = !game_object->IsActiveInHierarchy();
+    if (has_style_color)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImVec4(0.3F, 0.3F, 0.3F, 1.0F)));
+    }
+
     const bool open = ImGui::TreeNodeEx("", flags, "%s", game_object->Name().c_str());
+
+    if (has_style_color)
+    {
+        ImGui::PopStyleColor();
+    }
+
     ImGui::PopStyleVar();
 
     if (ImGui::IsItemHovered() && ImGui::IsMouseReleased(ImGuiMouseButton_Left))

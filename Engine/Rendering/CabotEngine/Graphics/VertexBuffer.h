@@ -6,15 +6,17 @@ namespace engine
 class Mesh;
 class VertexBuffer
 {
-    bool m_IsValid = false; // バッファの生成に成功したかを取得
-    ComPtr<ID3D12Resource> m_pBuffer = nullptr; // バッファ
-    D3D12_VERTEX_BUFFER_VIEW m_View = {}; // 頂点バッファビュー
+    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
+    D3D12_VERTEX_BUFFER_VIEW m_view_ = {};
 
+    std::vector<Vertex> CreateVertexData(const Mesh *mesh) const;
+    
 public:
-    VertexBuffer(const Mesh *p_init_data); // コンストラクタでバッファを生成
-    VertexBuffer(size_t num_vertices, const Vertex *p_init_data);
-    D3D12_VERTEX_BUFFER_VIEW *View(); // 頂点バッファビューを取得
-    bool IsValid(); // バッファの生成に成功したかを取得
+    VertexBuffer(const Mesh *init_data);
+    VertexBuffer(size_t num_vertices, const Vertex *init_data);
+
+    D3D12_VERTEX_BUFFER_VIEW *View();
+    bool IsValid() const;
 
     VertexBuffer(const VertexBuffer &) = delete;
     void operator =(const VertexBuffer &) = delete;

@@ -105,7 +105,7 @@ void Material::SetDescriptorTable()
         const int root_param_idx = param_i +
                                    RootSignature::kPreDefinedVariableCount;
         const auto itr = material_block->Begin(param_type);
-        const auto desc_handle = itr->handle->HandleGPU;
+        const auto desc_handle = itr->handle->handle_gpu;
         cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
     }
 }

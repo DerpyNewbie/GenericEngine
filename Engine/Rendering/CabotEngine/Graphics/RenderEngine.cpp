@@ -3,6 +3,7 @@
 #include "RenderEngine.h"
 #include "PSOManager.h"
 #include "application.h"
+#include "DirectXResourceFactory.h"
 #include "Rendering/font_data.h"
 
 bool RenderEngine::Init(HWND hwnd, UINT windowWidth, UINT windowHeight)
@@ -179,6 +180,8 @@ void RenderEngine::EndRender()
 
     // バックバッファ番号更新
     m_current_back_buffer_index_ = m_p_swap_chain_->GetCurrentBackBufferIndex();
+
+    DirectXResourceFactory::ClearStoredResources(m_current_back_buffer_index_);
 }
 
 void RenderEngine::MoveToNextFrame()

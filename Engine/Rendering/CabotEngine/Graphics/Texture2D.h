@@ -16,17 +16,15 @@ class Texture2D : public engine::Object, public engine::Inspectable, public IBuf
     friend class engine::Texture2DImporter;
 
 protected:
-    std::vector<DirectX::PackedVector::XMCOLOR> tex_data;
-    UINT width = 0;
-    UINT height = 0;
-    UINT16 mip_level;
-    DXGI_FORMAT format;
+    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
+    uint32_t m_width_ = 0;
+    uint32_t m_height_ = 0;
+    uint16_t m_mip_level_;
+    DXGI_FORMAT m_format_;
 
-    ComPtr<ID3D12Resource> m_p_resource_ = nullptr;
+    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
 
 public:
-    static std::shared_ptr<Texture2D> LoadFromAiTexture(const aiTexture *ai_texture);
-
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
@@ -34,37 +32,39 @@ public:
     bool CanUpdate() override;
     bool IsValid() override;
 
+    void LoadFromAiTexture(const aiTexture *ai_texture);
+
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
     std::vector<DirectX::PackedVector::XMCOLOR> GetTexData()
     {
-        return tex_data;
+        return m_tex_data_;
     }
 
     void SetTexData(const std::vector<DirectX::PackedVector::XMCOLOR> &resource)
     {
-        tex_data = resource;
+        m_tex_data_ = resource;
     }
 
-    UINT Width() const
+    [[nodiscard]] uint32_t Width() const
     {
-        return width;
+        return m_width_;
     }
 
-    UINT Height() const
+    [[nodiscard]] uint32_t Height() const
     {
-        return height;
+        return m_height_;
     }
 
-    UINT16 MipLevel() const
+    [[nodiscard]] uint16_t MipLevel() const
     {
-        return mip_level;
+        return m_mip_level_;
     }
 
-    DXGI_FORMAT Format() const
+    [[nodiscard]] DXGI_FORMAT Format() const
     {
-        return format;
+        return m_format_;
     }
 
     template <class Archive>
@@ -72,11 +72,11 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(tex_data),
-            CEREAL_NVP(width),
-            CEREAL_NVP(height),
-            CEREAL_NVP(format),
-            CEREAL_NVP(mip_level)
+            cereal::make_nvp("tex_data", m_tex_data_),
+            cereal::make_nvp("width", m_width_),
+            cereal::make_nvp("height", m_height_),
+            cereal::make_nvp("format", m_format_),
+            cereal::make_nvp("mip_level", m_mip_level_)
         );
     }
 };

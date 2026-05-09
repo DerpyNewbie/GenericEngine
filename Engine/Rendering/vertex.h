@@ -13,10 +13,10 @@ struct Vertex
     unsigned int bone_index[4];
     float bone_weight[4];
 
-    static const D3D12_INPUT_LAYOUT_DESC InputLayout;
+    static const D3D12_INPUT_LAYOUT_DESC kInputLayout;
 
 private:
-    static constexpr int InputElementCount = 15;
-    static const D3D12_INPUT_ELEMENT_DESC InputElements[InputElementCount];
+    static constexpr int kInputElementCount = 15;
+    static const D3D12_INPUT_ELEMENT_DESC kInputElements[kInputElementCount];
 };
 }
