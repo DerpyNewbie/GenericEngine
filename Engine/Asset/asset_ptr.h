@@ -142,6 +142,14 @@ public:
         return CastedLock();
     }
 
+    // Does the casting to base AssetPtr implicitly
+    // ReSharper disable once CppNonExplicitConversionOperator
+    template <typename Base> requires std::is_base_of_v<Base, T>
+    operator AssetPtr<Base>() const
+    {
+        return AssetPtr<Base>::FromIAssetPtr(*this);
+    }
+
     std::shared_ptr<T> operator->() const
     {
         return CastedLock();
