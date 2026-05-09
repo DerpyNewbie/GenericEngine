@@ -142,9 +142,9 @@ public:
         return CastedLock();
     }
 
-    // Does the casting to base AssetPtr implicitly
+    // Does the casting to base AssetPtr implicitly. requires T to be inheriting Base, and T and Base must not be the same type. 
     // ReSharper disable once CppNonExplicitConversionOperator
-    template <typename Base> requires std::is_base_of_v<Base, T>
+    template <typename Base> requires !std::is_same_v<Base, T> && std::is_base_of_v<Base, T>
     operator AssetPtr<Base>() const
     {
         return AssetPtr<Base>::FromIAssetPtr(*this);
