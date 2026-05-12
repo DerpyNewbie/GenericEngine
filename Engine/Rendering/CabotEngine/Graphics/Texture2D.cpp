@@ -123,11 +123,6 @@ std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
     return DescriptorHeap::Register(this);
 }
 
-bool Texture2D::CanUpdate()
-{
-    return false;
-}
-
 bool Texture2D::IsValid()
 {
     return m_buffer_ != nullptr;

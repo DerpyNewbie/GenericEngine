@@ -104,11 +104,6 @@ std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
     return DescriptorHeap::Register(this);
 }
 
-bool TextureCube::CanUpdate()
-{
-    return false;
-}
-
 bool TextureCube::IsValid()
 {
     return m_buffer_ != nullptr;

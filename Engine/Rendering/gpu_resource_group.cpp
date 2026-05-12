@@ -59,13 +59,13 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-void GpuResourceGroup::Insert(BufferIsExternalPair buffer_pair)
+void GpuResourceGroup::Insert(const AssetPtr<BufferBase> &buffer, bool is_external)
 {
-    auto data = buffer_pair.first.first;
+    auto data = buffer;
 
     const auto buffer_type = data->BufferType();
     data->CreateBuffer();
-    buffers.insert(End(buffer_type), {data, nullptr});
+    buffers.insert(End(buffer_type), {{data, is_external}, nullptr});
     data->is_dirty = false;
 
     const auto field = m_shader_index_.GetLengthField(buffer_type);

@@ -1,11 +1,11 @@
 #pragma once
 #include "Texture2D.h"
-#include "Rendering/ibuffer.h"
+#include "Rendering/BufferBase.h"
 #include "Asset/asset_ptr.h"
 
 namespace engine
 {
-class TextureCube final : public Object, public Inspectable, public IBuffer, public ShaderResource
+class TextureCube final : public BufferBase, public Inspectable, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer_;
@@ -15,7 +15,10 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool CanUpdate() override;
+    kParameterBufferType BufferType() const override
+    {
+        return kParameterBufferType_SRV;
+    }
     bool IsValid() override;
 
     ID3D12Resource *Resource() override;

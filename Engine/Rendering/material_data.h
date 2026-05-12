@@ -1,5 +1,5 @@
 #pragma once
-#include "ibuffer.h"
+#include "BufferBase.h"
 #include "engine_traits.h"
 #include "gui.h"
 #include "shader.h"

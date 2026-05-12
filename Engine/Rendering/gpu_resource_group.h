@@ -1,5 +1,5 @@
 #pragma once
-#include "ibuffer.h"
+#include "BufferBase.h"
 #include "material_block.h"
 #include "Asset/asset_ptr.h"
 
@@ -29,11 +29,11 @@ class GpuResourceGroup
     bool m_is_dirty_ = true;
 
 public:
-    using BufferIsExternalPair = std::pair<AssetPtr<IBuffer>, bool>;
+    using BufferIsExternalPair = std::pair<AssetPtr<BufferBase>, bool>;
     using BufferHandlePair = std::pair<BufferIsExternalPair, std::shared_ptr<DescriptorHandle>>;
     std::vector<BufferHandlePair> buffers;
 
-    void Insert(BufferIsExternalPair buffer_pair);
+    void Insert(const AssetPtr<BufferBase> &buffer, bool is_external = false);
     bool Empty(kParameterBufferType buffer_type);
     std::vector<BufferHandlePair>::iterator Begin(kParameterBufferType buffer_type);
     std::vector<BufferHandlePair>::iterator End(kParameterBufferType buffer_type);

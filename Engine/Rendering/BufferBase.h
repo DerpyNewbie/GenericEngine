@@ -13,12 +13,15 @@ enum kParameterBufferType
 };
 }
 
-class IBuffer
+class BufferBase : public engine::Object
 {
 public:
-    virtual ~IBuffer() = default;
+    bool is_dirty_;
+
+    ~BufferBase() override = default;
     virtual void CreateBuffer() = 0;
     virtual void UpdateBuffer(void *data) = 0;
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
+    virtual engine::kParameterBufferType BufferType() const = 0;
     virtual bool IsValid() = 0;
 };

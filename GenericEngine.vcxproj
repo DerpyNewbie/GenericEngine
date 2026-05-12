@@ -136,7 +136,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <ClCompile Include="Engine\Rendering\gpu_resource_group.cpp"/>
         <ClCompile Include="Engine\Rendering\gpu_resource_manager.cpp"/>
-        <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
+        <ClCompile Include="Engine\Rendering\BufferBase.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\IndexBuffer.cpp"/>
@@ -307,7 +307,7 @@
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_group.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_manager.h"/>
-        <ClInclude Include="Engine\Rendering\ibuffer.h"/>
+        <ClInclude Include="Engine\Rendering\BufferBase.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.h"/>

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Rendering/ibuffer.h"
 
-class ConstantBuffer : public IBuffer
+class ConstantBuffer : public BufferBase
 {
     uint64_t m_size_aligned_;
     uint64_t m_size_;
@@ -17,9 +17,11 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
+    engine::kParameterBufferType BufferType() const override
+    {
+        return engine::kParameterBufferType_CBV;
+    }
     bool IsValid() override;
-
-    bool CanUpdate() override;
 
     void *GetPtr() const;
 

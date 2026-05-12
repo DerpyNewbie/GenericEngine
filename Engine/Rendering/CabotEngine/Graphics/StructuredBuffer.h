@@ -5,7 +5,7 @@
 
 namespace engine
 {
-class StructuredBuffer final : public IBuffer, public ShaderResource
+class StructuredBuffer final : public BufferBase, public ShaderResource
 {
     ComPtr<ID3D12Resource> m_default_buffer_;
     ComPtr<ID3D12Resource> m_upload_buffer_;
@@ -24,12 +24,10 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-
-    bool CanUpdate() override
+    kParameterBufferType BufferType() const override
     {
-        return true;
+        return kParameterBufferType_SRV;
     }
-
     bool IsValid() override;
 
     [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;

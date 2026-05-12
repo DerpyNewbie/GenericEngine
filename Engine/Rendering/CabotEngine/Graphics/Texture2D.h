@@ -11,7 +11,7 @@ struct aiTexture;
 class DescriptorHeap;
 class DescriptorHandle;
 
-class Texture2D : public engine::Object, public engine::Inspectable, public IBuffer, public engine::ShaderResource
+class Texture2D : public BufferBase, public engine::Inspectable, public engine::ShaderResource
 {
     friend class engine::Texture2DImporter;
 
@@ -29,7 +29,10 @@ public:
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool CanUpdate() override;
+    engine::kParameterBufferType BufferType() const override
+    {
+        return engine::kParameterBufferType_SRV;
+    }
     bool IsValid() override;
 
     void LoadFromAiTexture(const aiTexture *ai_texture);
