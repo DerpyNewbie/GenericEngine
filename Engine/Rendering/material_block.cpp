@@ -60,62 +60,6 @@ std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_
 
 namespace engine
 {
-int *ShaderDataIndex::GetLengthField(kParameterBufferType type)
-{
-    switch (type)
-    {
-        case kParameterBufferType_CBV:
-            return &cbv_length;
-        case kParameterBufferType_SRV:
-            return &srv_length;
-        case kParameterBufferType_UAV:
-            return &uav_length;
-        default:
-            static_assert("Invalid buffer type");
-            return nullptr;
-    }
-}
-
-int ShaderDataIndex::GetLength(const kParameterBufferType type) const
-{
-    switch (type)
-    {
-        case kParameterBufferType_CBV:
-            return cbv_length;
-        case kParameterBufferType_SRV:
-            return srv_length;
-        case kParameterBufferType_UAV:
-            return uav_length;
-        default:
-            static_assert("Invalid buffer type");
-            return 0;
-    }
-}
-
-int ShaderDataIndex::GetOffset(kParameterBufferType type) const
-{
-    int offset = 0;
-
-    // fall-through
-    switch (type)
-    {
-        case kParameterBufferType_UAV:
-            offset += srv_length;
-        case kParameterBufferType_SRV:
-            offset += cbv_length;
-        case kParameterBufferType_CBV:
-        default:
-            break;
-    }
-
-    return offset;
-}
-
-int ShaderDataIndex::GetFullLength() const
-{
-    return cbv_length + srv_length + uav_length;
-}
-
 MaterialBlock::~MaterialBlock()
 {
     for (auto &desc_handle : material_data | std::views::transform(&MaterialDataPair::handle))
@@ -167,39 +111,6 @@ void MaterialBlock::LoadShaderParameters(
         }
     }
     UpdateBuffer();
-}
-
-void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
-{
-    Logger::Log<MaterialBlock>("Inserting data %s", data->parameter.name.c_str());
-
-    const auto buffer_type = data->BufferType();
-    data->CreateBuffer();
-    material_data.insert(End(buffer_type), {data, nullptr});
-    data->is_dirty = false;
-
-    const auto field = shader_index.GetLengthField(buffer_type);
-    ++(*field);
-}
-
-bool MaterialBlock::Empty(const kParameterBufferType buffer_type)
-{
-    return shader_index.GetLength(buffer_type) == 0;
-}
-
-std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(
-    const kParameterBufferType buffer_type
-)
-{
-    const auto buffer_offset = shader_index.GetOffset(buffer_type);
-    return material_data.begin() + buffer_offset;
-}
-
-std::vector<MaterialDataPair>::iterator MaterialBlock::End(
-    const kParameterBufferType buffer_type
-)
-{
-    return Begin(buffer_type) + shader_index.GetLength(buffer_type);
 }
 
 std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)

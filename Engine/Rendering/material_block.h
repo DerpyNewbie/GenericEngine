@@ -8,30 +8,11 @@ namespace engine
 struct MaterialDataPair
 {
     std::shared_ptr<IMaterialData> data = nullptr;
-    std::shared_ptr<DescriptorHandle> handle = nullptr;
 
     template <typename Archive>
     void serialize(Archive &ar)
     {
         ar(CEREAL_NVP(data));
-    }
-};
-
-struct ShaderDataIndex
-{
-    int cbv_length = 0;
-    int srv_length = 0;
-    int uav_length = 0;
-
-    int *GetLengthField(kParameterBufferType type);
-    int GetLength(kParameterBufferType type) const;
-    int GetOffset(kParameterBufferType type) const;
-    int GetFullLength() const;
-
-    template <typename Archive>
-    void serialize(Archive &ar)
-    {
-        ar(CEREAL_NVP(cbv_length), CEREAL_NVP(srv_length), CEREAL_NVP(uav_length));
     }
 };
 
@@ -44,7 +25,6 @@ struct ShaderDataIndex
 class MaterialBlock : public Object, public Inspectable
 {
 public:
-    ShaderDataIndex shader_index = {};
 
     std::vector<MaterialDataPair> material_data = {};
 
@@ -60,12 +40,7 @@ public:
         const std::vector<ShaderParameter> &shader_params,
         const std::vector<MaterialDataPair> &resource_material_data = {}
     );
-
-    void Insert(const std::shared_ptr<IMaterialData> &data);
-    bool Empty(kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator Begin(kParameterBufferType buffer_type);
-    std::vector<MaterialDataPair>::iterator End(kParameterBufferType buffer_type);
-
+    
     std::shared_ptr<IMaterialData> FindMaterialDataByName(const std::string &name);
 
     void UpdateBuffer();
@@ -78,13 +53,6 @@ public:
             cereal::base_class<Object>(this),
             CEREAL_NVP(material_data)
         );
-
-        if (version >= 2)
-        {
-            ar(
-                CEREAL_NVP(shader_index)
-            );
-        }
     }
 };
 

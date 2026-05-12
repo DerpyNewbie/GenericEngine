@@ -41,7 +41,9 @@ public:
     static std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
 
     static std::shared_ptr<DescriptorHandle> Allocate();
-    static void Free(std::shared_ptr<DescriptorHandle> handle);
+    static std::shared_ptr<DescriptorHandle> Allocate(uint32_t index);
+    static std::vector<std::shared_ptr<DescriptorHandle>> AllocateLinedUp(size_t count);
+    static void Free(const std::shared_ptr<DescriptorHandle> &handle);
 
     static void Release();
 };
