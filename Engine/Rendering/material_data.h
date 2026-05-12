@@ -14,16 +14,11 @@ struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
     ShaderParameter parameter;
-    std::shared_ptr<IBuffer> buffer = nullptr; // can be null
+    kParameterBufferType buffer_type;
 
     IMaterialData();
     explicit IMaterialData(ShaderParameter param);
-
-    virtual std::shared_ptr<IBuffer> CreateBuffer() = 0;
-    virtual bool CanUpdateBuffer() = 0;
-    virtual void UpdateBuffer() = 0;
-    virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
-
+    
     virtual void *Data() = 0;
 
     virtual int Count() = 0;
@@ -35,7 +30,8 @@ struct IMaterialData : Object, Inspectable
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(parameter)
+            CEREAL_NVP(parameter),
+            CEREAL_NVP(buffer_type)
         );
     }
 };
@@ -54,10 +50,7 @@ struct MaterialData : IMaterialData
     static constexpr bool kIsVector = engine_traits::is_vector<T>::value;
     static constexpr bool kIsAssetPtr = std::is_base_of_v<IAssetPtr, T>;
     static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T> || std::is_same_v<Texture2D, T>;
-    static constexpr kParameterBufferType kBufferType = kIsVector || kIsTexture
-        ? kParameterBufferType_SRV
-        : kParameterBufferType_CBV;
-
+    
     T value;
 
     MaterialData();
@@ -66,15 +59,10 @@ struct MaterialData : IMaterialData
     ~MaterialData() override = default;
 
     void OnDeserialized() override;
-
+    
     void OnInspectorGui() override;
     void SetValue(T value);
-
-    std::shared_ptr<IBuffer> CreateBuffer() override;
-    bool CanUpdateBuffer() override;
-    void UpdateBuffer() override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-
+    
     void *Data() override;
 
     int Count() override;
@@ -101,15 +89,14 @@ MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) :
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
-{ }
+{
+    buffer_type = kIsTexture || kIsVector ? kParameterBufferType_SRV : kParameterBufferType_CBV;
+}
 
 template <typename T>
 void MaterialData<T>::OnDeserialized()
 {
     is_dirty = true;
-    if constexpr (kIsAssetPtr)
-        if (value.Lock())
-            CreateBuffer();
 }
 
 template <typename T>
@@ -160,7 +147,6 @@ void MaterialData<T>::OnInspectorGui()
     {
         if (Gui::PropertyField(name, value))
         {
-            buffer = CreateBuffer();
             is_dirty = true;
         }
     }
@@ -175,104 +161,12 @@ void MaterialData<T>::SetValue(T value)
 {
     this->value = value;
     is_dirty = true;
-    if constexpr (kIsTexture)
-    {
-        buffer = CreateBuffer();
-    }
-}
-
-template <typename T>
-std::shared_ptr<IBuffer> MaterialData<T>::CreateBuffer()
-{
-    std::shared_ptr<IBuffer> buff = nullptr;
-    if constexpr (kIsTexture)
-    {
-        if constexpr (kIsAssetPtr)
-        {
-            buff = value.CastedLock();
-        }
-        else
-        {
-            buff = value;
-        }
-    }
-    else if constexpr (kBufferType == kParameterBufferType_CBV)
-    {
-        buff = std::make_shared<ConstantBuffer>(SizeInBytes());
-    }
-    else if constexpr (kBufferType == kParameterBufferType_SRV)
-    {
-        buff = std::make_shared<StructuredBuffer>(SizeInBytes(), Count());
-    }
-    else
-    {
-        static_assert("Not Implemented");
-        return nullptr;
-    }
-
-    buff->CreateBuffer();
-    return buff;
-}
-
-template <typename T>
-bool MaterialData<T>::CanUpdateBuffer()
-{
-    return buffer != nullptr && buffer->CanUpdate();
-}
-
-template <typename T>
-void MaterialData<T>::UpdateBuffer()
-{
-    if (buffer == nullptr)
-    {
-        buffer = CreateBuffer();
-    }
-
-    if (is_dirty && buffer->CanUpdate())
-    {
-        Logger::Log<MaterialData>("Updating buffer: %s", parameter.name.c_str());
-        buffer->UpdateBuffer(Data());
-        is_dirty = false;
-    }
-}
-
-template <typename T>
-std::shared_ptr<DescriptorHandle> MaterialData<T>::UploadBuffer()
-{
-    if (buffer == nullptr)
-    {
-        buffer = CreateBuffer();
-    }
-
-    return buffer->UploadBuffer();
 }
 
 template <typename T>
 void *MaterialData<T>::Data()
 {
-    if constexpr (kIsTexture)
-    {
-        if constexpr (kIsAssetPtr)
-        {
-            return value.CastedLock()->GetTexData().data();
-        }
-        else
-        {
-            return value->tex_data;
-        }
-    }
-    else if constexpr (kIsVector)
-    {
-        return value.data();
-    }
-    else if constexpr (kIsAssetPtr)
-    {
-        return value.Lock().get();
-    }
-    else
-    {
-        return &value;
-    }
+    return static_cast<void *>(&value);
 }
 
 template <typename T>
@@ -297,7 +191,7 @@ int MaterialData<T>::SizeInBytes()
 template <typename T>
 kParameterBufferType MaterialData<T>::BufferType()
 {
-    return kBufferType;
+    return buffer_type;
 }
 }
 

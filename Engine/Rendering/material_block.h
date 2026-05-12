@@ -5,31 +5,13 @@
 
 namespace engine
 {
-struct MaterialDataPair
-{
-    std::shared_ptr<IMaterialData> data = nullptr;
-
-    template <typename Archive>
-    void serialize(Archive &ar)
-    {
-        ar(CEREAL_NVP(data));
-    }
-};
-
-/// <summary>
-/// Shared shader parameters.
-/// </summary>
-/// <remarks>
-/// Used by Material for better memory-management among the same objects
-/// </remarks>
 class MaterialBlock : public Object, public Inspectable
 {
+    friend class Material;
+    std::vector<std::shared_ptr<IMaterialData>> m_material_data_ = {};
+
 public:
-
-    std::vector<MaterialDataPair> material_data = {};
-
     MaterialBlock() = default;
-    ~MaterialBlock() override;
 
     void OnInspectorGui() override;
 
@@ -38,12 +20,11 @@ public:
 
     void LoadShaderParameters(
         const std::vector<ShaderParameter> &shader_params,
-        const std::vector<MaterialDataPair> &resource_material_data = {}
+        const std::vector<std::shared_ptr<IMaterialData>> &resource_material_data = {}
     );
-    
+
     std::shared_ptr<IMaterialData> FindMaterialDataByName(const std::string &name);
 
-    void UpdateBuffer();
     bool IsDirty();
 
     template <class Archive>
@@ -51,7 +32,7 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(material_data)
+            CEREAL_NVP(m_material_data_)
         );
     }
 };
@@ -59,7 +40,7 @@ public:
 template <typename T>
 bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 {
-    for (auto &data : this->material_data | std::views::transform(&MaterialDataPair::data))
+    for (const auto &data : this->m_material_data_)
     {
         if (data->parameter.name == name)
         {
@@ -72,7 +53,6 @@ bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
     }
     return false;
 }
-
 }
 
 CEREAL_CLASS_VERSION(engine::MaterialBlock, 2)

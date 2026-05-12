@@ -99,7 +99,7 @@ void GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
             continue;
         }
 
-        for (auto &material_data_pair : material_block->material_data)
+        for (auto &material_data_pair : material_block->m_material_data_)
         {
             auto &data = material_data_pair.data;
             if (data->BufferType() == buffer->BufferType())

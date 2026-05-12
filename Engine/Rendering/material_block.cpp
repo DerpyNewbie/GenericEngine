@@ -60,18 +60,10 @@ std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_
 
 namespace engine
 {
-MaterialBlock::~MaterialBlock()
-{
-    for (auto &desc_handle : material_data | std::views::transform(&MaterialDataPair::handle))
-    {
-        DescriptorHeap::Free(desc_handle);
-        desc_handle = nullptr;
-    }
-}
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
+    for (auto &data : m_material_data_)
     {
         ImGui::PushID(data.get());
         data->OnInspectorGui();
@@ -81,19 +73,21 @@ void MaterialBlock::OnInspectorGui()
 
 void MaterialBlock::LoadShaderParameters(
     const std::vector<ShaderParameter> &shader_params,
-    const std::vector<MaterialDataPair> &resource_material_data
+    const std::vector<std::shared_ptr<IMaterialData>> &resource_material_data
 )
 {
+
+    //TODO : パラメーターの順番が正しいとは限らないので、パラメーターのインデックス見に行った方がいいかも。 要検証。
     for (auto &param : shader_params)
     {
         bool found = false;
         if (!resource_material_data.empty())
         {
-            for (auto material_data_pair : resource_material_data)
+            for (auto material_data : resource_material_data)
             {
-                if (param.name == material_data_pair.data->parameter.name)
+                if (param.name == material_data->parameter.name)
                 {
-                    Insert(material_data_pair.data);
+                    m_material_data_.emplace_back(material_data);
                     found = true;
                     break;
                 }
@@ -106,68 +100,35 @@ void MaterialBlock::LoadShaderParameters(
 
             if (material_data != nullptr)
             {
-                Insert(material_data);
+                m_material_data_.emplace_back(material_data);
             }
         }
     }
-    UpdateBuffer();
 }
 
 std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
 {
-    for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
+    const auto it = std::ranges::find_if(m_material_data_, [&name](const std::shared_ptr<IMaterialData> &data) {
+        )
+        return data->parameter.name == name;
+    });
+    if (it != m_material_data_.end())
     {
-        if (data->parameter.name == name)
-            return data;
+        return *it;
     }
 
     return {};
 }
 
-void MaterialBlock::UpdateBuffer()
-{
-    for (auto &[data, handle] : material_data)
-    {
-        if (data->is_dirty)
-        {
-            Logger::Log<MaterialBlock>("Updating data in MaterialBlock: %s", data->parameter.name.c_str());
-
-            if (data->buffer == nullptr)
-            {
-                data->buffer = data->CreateBuffer();
-            }
-
-            if (data->CanUpdateBuffer())
-            {
-                data->UpdateBuffer();
-            }
-            else
-            {
-                if (handle != nullptr)
-                {
-                    DescriptorHeap::Free(handle);
-                    handle = nullptr;
-                }
-            }
-
-            data->is_dirty = false;
-        }
-
-        if (handle == nullptr)
-        {
-            handle = data->UploadBuffer();
-        }
-    }
-}
-
 bool MaterialBlock::IsDirty()
 {
-    for (const auto &data : material_data | std::views::transform(&MaterialDataPair::data))
+    const auto it = std::ranges::find_if(m_material_data_, [](const std::shared_ptr<IMaterialData> &data) {
+        return data->is_dirty;
+    });
+
+    if (it != m_material_data_.end())
     {
-        if (data->is_dirty)
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;
