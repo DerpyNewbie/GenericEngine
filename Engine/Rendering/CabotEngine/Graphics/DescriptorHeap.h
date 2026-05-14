@@ -38,7 +38,7 @@ public:
 
     static ID3D12DescriptorHeap *GetHeap();
     static std::shared_ptr<DescriptorHandle> Register(engine::ShaderResource *shader_resource);
-    static std::shared_ptr<DescriptorHandle> Register(ConstantBuffer &constant_buffer);
+    static std::shared_ptr<DescriptorHandle> Register(const ConstantBuffer &constant_buffer);
 
     static std::shared_ptr<DescriptorHandle> Allocate();
     static std::shared_ptr<DescriptorHandle> Allocate(uint32_t index);

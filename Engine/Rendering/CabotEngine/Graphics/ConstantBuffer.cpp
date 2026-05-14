@@ -57,21 +57,20 @@ void ConstantBuffer::UpdateBuffer(void *data)
 {
     memcpy(m_p_mapped_ptr_, data, m_size_);
 }
+void ConstantBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
+{
+    const auto view_desc = ViewDesc();
+    RenderEngine::Device()->CreateConstantBufferView(&view_desc, desc_handle->handle_cpu);
+}
 
 std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 {
-    auto pHandle = DescriptorHeap::Register(*this);
-    return pHandle;
+    return DescriptorHeap::Register(*this);
 }
 
 bool ConstantBuffer::IsValid()
 {
     return m_buffer_ != nullptr;
-}
-
-bool ConstantBuffer::CanUpdate()
-{
-    return true;
 }
 
 void *ConstantBuffer::GetPtr() const

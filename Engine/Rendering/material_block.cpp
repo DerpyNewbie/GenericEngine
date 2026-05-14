@@ -63,7 +63,7 @@ namespace engine
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : m_material_data_)
+    for (auto &data : material_data)
     {
         ImGui::PushID(data.get());
         data->OnInspectorGui();
@@ -83,11 +83,11 @@ void MaterialBlock::LoadShaderParameters(
         bool found = false;
         if (!resource_material_data.empty())
         {
-            for (auto material_data : resource_material_data)
+            for (auto res_data : resource_material_data)
             {
-                if (param.name == material_data->parameter.name)
+                if (param.name == res_data->parameter.name)
                 {
-                    m_material_data_.emplace_back(material_data);
+                    material_data.emplace_back(res_data);
                     found = true;
                     break;
                 }
@@ -96,11 +96,11 @@ void MaterialBlock::LoadShaderParameters(
 
         if (!found)
         {
-            const auto material_data = CreateMaterialData(param);
+            const auto data = CreateMaterialData(param);
 
-            if (material_data != nullptr)
+            if (data != nullptr)
             {
-                m_material_data_.emplace_back(material_data);
+                material_data.emplace_back(data);
             }
         }
     }
@@ -108,11 +108,10 @@ void MaterialBlock::LoadShaderParameters(
 
 std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
 {
-    const auto it = std::ranges::find_if(m_material_data_, [&name](const std::shared_ptr<IMaterialData> &data) {
-        )
+    const auto it = std::ranges::find_if(material_data, [&name](const std::shared_ptr<IMaterialData> &data) {
         return data->parameter.name == name;
     });
-    if (it != m_material_data_.end())
+    if (it != material_data.end())
     {
         return *it;
     }
@@ -122,11 +121,11 @@ std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::
 
 bool MaterialBlock::IsDirty()
 {
-    const auto it = std::ranges::find_if(m_material_data_, [](const std::shared_ptr<IMaterialData> &data) {
+    const auto it = std::ranges::find_if(material_data, [](const std::shared_ptr<IMaterialData> &data) {
         return data->is_dirty;
     });
 
-    if (it != m_material_data_.end())
+    if (it != material_data.end())
     {
         return true;
     }

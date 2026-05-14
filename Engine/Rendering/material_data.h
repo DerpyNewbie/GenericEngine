@@ -1,5 +1,5 @@
 #pragma once
-#include "BufferBase.h"
+#include "buffer_base.h"
 #include "engine_traits.h"
 #include "gui.h"
 #include "shader.h"
@@ -8,22 +8,29 @@
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
+enum kBufferType
+{
+    kBufferType_ConstantBuffer,
+    kBufferType_StructuredBuffer,
+    kBufferType_Texture2D
+};
+
 namespace engine
 {
 struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
     ShaderParameter parameter;
-    kParameterBufferType buffer_type;
+    kGpuUploadType upload_type;
 
     IMaterialData();
     explicit IMaterialData(ShaderParameter param);
-    
+
     virtual void *Data() = 0;
 
     virtual int Count() = 0;
     virtual int SizeInBytes() = 0;
-    virtual kParameterBufferType BufferType() = 0;
+    virtual kBufferType BufferType() = 0;
 
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
@@ -31,18 +38,18 @@ struct IMaterialData : Object, Inspectable
         ar(
             cereal::base_class<Object>(this),
             CEREAL_NVP(parameter),
-            CEREAL_NVP(buffer_type)
+            CEREAL_NVP(upload_type)
         );
     }
 };
 
 inline IMaterialData::IMaterialData() :
     parameter()
-{ }
+{}
 
 inline IMaterialData::IMaterialData(ShaderParameter param) :
     parameter(std::move(param))
-{ }
+{}
 
 template <typename T>
 struct MaterialData : IMaterialData
@@ -50,7 +57,7 @@ struct MaterialData : IMaterialData
     static constexpr bool kIsVector = engine_traits::is_vector<T>::value;
     static constexpr bool kIsAssetPtr = std::is_base_of_v<IAssetPtr, T>;
     static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T> || std::is_same_v<Texture2D, T>;
-    
+
     T value;
 
     MaterialData();
@@ -59,15 +66,15 @@ struct MaterialData : IMaterialData
     ~MaterialData() override = default;
 
     void OnDeserialized() override;
-    
+
     void OnInspectorGui() override;
     void SetValue(T value);
-    
+
     void *Data() override;
 
     int Count() override;
     int SizeInBytes() override;
-    kParameterBufferType BufferType() override;
+    kBufferType BufferType() override;
 
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
@@ -79,18 +86,18 @@ struct MaterialData : IMaterialData
 template <typename T>
 MaterialData<T>::MaterialData() :
     MaterialData({}, {})
-{ }
+{}
 
 template <typename T>
 MaterialData<T>::MaterialData(const ShaderParameter &new_parameter) :
     MaterialData({}, new_parameter)
-{ }
+{}
 
 template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
 {
-    buffer_type = kIsTexture || kIsVector ? kParameterBufferType_SRV : kParameterBufferType_CBV;
+    upload_type = kIsTexture || kIsVector ? kParameterBufferType_SRV : kParameterBufferType_CBV;
 }
 
 template <typename T>
@@ -189,9 +196,20 @@ int MaterialData<T>::SizeInBytes()
 }
 
 template <typename T>
-kParameterBufferType MaterialData<T>::BufferType()
+kBufferType MaterialData<T>::BufferType()
 {
-    return buffer_type;
+    if constexpr (std::is_same_v<T, AssetPtr<Texture2D>> || std::is_same_v<T, Texture2D>)
+    {
+        return kBufferType_Texture2D;
+    }
+    else if constexpr (kIsVector)
+    {
+        return kBufferType_StructuredBuffer;
+    }
+    else
+    {
+        return kBufferType_ConstantBuffer;
+    }
 }
 }
 

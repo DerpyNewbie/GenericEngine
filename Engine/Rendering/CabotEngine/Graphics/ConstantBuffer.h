@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
+#include "Rendering/buffer_base.h"
 
 class ConstantBuffer : public BufferBase
 {
@@ -13,11 +13,12 @@ class ConstantBuffer : public BufferBase
 
 public:
     explicit ConstantBuffer(size_t size);
-
+    
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    engine::kParameterBufferType BufferType() const override
+    engine::kGpuUploadType BufferType() const override
     {
         return engine::kParameterBufferType_CBV;
     }

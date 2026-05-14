@@ -7,10 +7,9 @@ namespace engine
 {
 class MaterialBlock : public Object, public Inspectable
 {
-    friend class Material;
-    std::vector<std::shared_ptr<IMaterialData>> m_material_data_ = {};
-
 public:
+    std::vector<std::shared_ptr<IMaterialData>> material_data = {};
+    
     MaterialBlock() = default;
 
     void OnInspectorGui() override;
@@ -32,7 +31,7 @@ public:
     {
         ar(
             cereal::base_class<Object>(this),
-            CEREAL_NVP(m_material_data_)
+            CEREAL_NVP(material_data)
         );
     }
 };
@@ -40,7 +39,7 @@ public:
 template <typename T>
 bool MaterialBlock::SetMaterialData(const std::string &name, T material_data)
 {
-    for (const auto &data : this->m_material_data_)
+    for (const auto &data : this->material_data)
     {
         if (data->parameter.name == name)
         {

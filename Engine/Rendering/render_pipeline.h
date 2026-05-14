@@ -1,6 +1,7 @@
 #pragma once
 #include "camera.h"
 #include "event.h"
+#include "gpu_resource_group.h"
 #include "material.h"
 #include "object_pool.h"
 #include "render_command.h"
@@ -39,6 +40,7 @@ class RenderPipeline
     std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
         = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
 
+    std::unordered_map<std::shared_ptr<MaterialBlock>, std::shared_ptr<GpuResourceGroup>> m_material_block_gpu_resource_groups_map_;
 
     void InvokeDrawCall();
 

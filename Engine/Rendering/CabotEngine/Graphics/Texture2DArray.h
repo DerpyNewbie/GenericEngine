@@ -1,7 +1,7 @@
 #pragma once
 #include "Texture2D.h"
 #include "Asset/asset_ptr.h"
-#include "Rendering/BufferBase.h"
+#include "Rendering/buffer_base.h"
 #include "Rendering/shader_resource.h"
 
 class Texture2DArray : public engine::ShaderResource

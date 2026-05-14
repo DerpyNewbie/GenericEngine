@@ -54,7 +54,7 @@ void Material::CreateMaterialBlock()
 {
     if (p_shared_material_block)
     {
-        auto material_data = p_shared_material_block->m_material_data_;
+        auto material_data = p_shared_material_block->material_data;
         p_shared_material_block->DestroyThis();
         p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
         p_shared_material_block->LoadShaderParameters(shader.CastedLock()->parameters, material_data);
@@ -77,8 +77,6 @@ void Material::UpdateBuffer()
         Logger::Log<Material>("MaterialBlock is null. Instantiating!");
         CreateMaterialBlock();
     }
-
-    p_shared_material_block->UpdateBuffer();
 }
 
 bool Material::IsDirty() const
@@ -95,7 +93,7 @@ void Material::SetDescriptorTable()
 
     for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
     {
-        const auto param_type = static_cast<kParameterBufferType>(param_i);
+        const auto param_type = static_cast<kGpuUploadType>(param_i);
 
         if (material_block->Empty(param_type))
         {

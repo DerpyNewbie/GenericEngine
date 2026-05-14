@@ -65,14 +65,14 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::ShaderResourc
     return desc_handle;
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &constant_buffer)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(const ConstantBuffer &constant_buffer)
 {
-    auto pHandle = Instance()->Allocate();
+    auto p_handle = Instance()->Allocate();
 
-    auto view_desc = constant_buffer.ViewDesc();
-    RenderEngine::Device()->CreateConstantBufferView(&view_desc, pHandle->handle_cpu);
+    const auto view_desc = constant_buffer.ViewDesc();
+    RenderEngine::Device()->CreateConstantBufferView(&view_desc, p_handle->handle_cpu);
 
-    return pHandle;
+    return p_handle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()

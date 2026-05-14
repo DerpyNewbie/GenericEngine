@@ -99,6 +99,12 @@ void TextureCube::UpdateBuffer(void *data)
     Logger::Error<TextureCube>("UpdateBuffer is not supported");
 }
 
+void TextureCube::UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle)
+{
+    const auto view_desc = ViewDesc();
+    RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
+}
+
 std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
 {
     return DescriptorHeap::Register(this);

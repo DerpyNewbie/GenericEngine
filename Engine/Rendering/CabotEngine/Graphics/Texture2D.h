@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
+#include "Rendering/buffer_base.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
@@ -28,8 +28,9 @@ public:
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    engine::kParameterBufferType BufferType() const override
+    engine::kGpuUploadType BufferType() const override
     {
         return engine::kParameterBufferType_SRV;
     }

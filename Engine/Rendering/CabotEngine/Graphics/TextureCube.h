@@ -1,6 +1,6 @@
 #pragma once
 #include "Texture2D.h"
-#include "Rendering/BufferBase.h"
+#include "Rendering/buffer_base.h"
 #include "Asset/asset_ptr.h"
 
 namespace engine
@@ -14,8 +14,9 @@ public:
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    kParameterBufferType BufferType() const override
+    kGpuUploadType BufferType() const override
     {
         return kParameterBufferType_SRV;
     }

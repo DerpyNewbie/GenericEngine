@@ -1,6 +1,5 @@
 ﻿#pragma once
 #include "Rendering/CabotEngine/Graphics/DescriptorHeap.h"
-#include "Rendering/ibuffer.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
@@ -23,8 +22,9 @@ public:
 
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    kParameterBufferType BufferType() const override
+    kGpuUploadType BufferType() const override
     {
         return kParameterBufferType_SRV;
     }

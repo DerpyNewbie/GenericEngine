@@ -71,6 +71,12 @@ void StructuredBuffer::UpdateBuffer(void *data)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
+void StructuredBuffer::UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle)
+{
+    const auto view_desc = ViewDesc();
+    RenderEngine::Device()->CreateShaderResourceView(m_default_buffer_.Get(), &view_desc, desc_handle->handle_cpu);
+}
+
 std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
 {
     return DescriptorHeap::Register(this);
@@ -95,7 +101,7 @@ D3D12_SHADER_RESOURCE_VIEW_DESC StructuredBuffer::ViewDesc()
 }
 
 ID3D12Resource *StructuredBuffer::Resource()
-{
+{   
     return m_default_buffer_.Get();
 }
 
