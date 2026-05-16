@@ -2,6 +2,7 @@
 
 #include "texture_2d_importer.h"
 #include "Asset/asset_database.h"
+#include "Rendering/texture_list.h"
 #include "Rendering/CabotEngine/Graphics/Texture2D.h"
 
 using namespace DirectX;
@@ -46,7 +47,7 @@ AssetPtr<Texture2D> Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR col
     }
 
     auto asset_ptr = AssetPtr<Texture2D>::FromManaged(texture_2d);
-    Texture2D::SetTexture(asset_ptr);
+    TextureList::SetTexture(asset_ptr);
     return asset_ptr;
 }
 
@@ -112,7 +113,7 @@ void Texture2DImporter::OnImport(AssetDescriptor *ctx)
         texture_2d->m_tex_data_.emplace_back(color);
     }
 
-    Texture2D::SetTexture(AssetPtr<Texture2D>::FromManaged(texture_2d));
+    TextureList::SetTexture(AssetPtr<Texture2D>::FromManaged(texture_2d));
     
     ctx->SetMainObject(texture_2d);
 }

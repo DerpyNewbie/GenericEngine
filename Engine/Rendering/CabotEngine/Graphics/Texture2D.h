@@ -22,11 +22,8 @@ protected:
 
     ComPtr<ID3D12Resource> m_buffer_ = nullptr;
 
-    inline static std::unordered_map<TextureId, AssetPtr<Texture2D>> m_textures_;
-
 public:
-    static void SetTexture(const AssetPtr<Texture2D> &texture);
-    static AssetPtr<Texture2D> GetTexture(TextureId texture_id);
+    ~Texture2D() override;
     
     void OnInspectorGui() override;
     void CreateBuffer() override;

@@ -32,7 +32,7 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
             }
             case kBufferType_Texture2D: {
                 auto texture_id = data->Data();
-                auto texture = Texture2D::GetTexture(*static_cast<TextureId *>(texture_id));
+                auto texture = TextureList::GetTexture(*static_cast<TextureId *>(texture_id));
                 new_group->Insert(texture, data);
                 break;
             }

@@ -76,7 +76,7 @@ public:
     }
 };
 
-template <typename T>
+template <typename T> requires std::is_base_of_v<Object, T>
 struct AssetPtr : IAssetPtr
 {
 private:

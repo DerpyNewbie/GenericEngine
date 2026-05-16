@@ -126,7 +126,7 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
 
         if (data->BufferType() == kBufferType_Texture2D)
         {
-            gpu_resource.buffer = Texture2D::GetTexture(*static_cast<TextureId *>(data->Data()));
+            gpu_resource.buffer = TextureList::GetTexture(*static_cast<TextureId *>(data->Data()));
             if (gpu_resource.buffer == nullptr)
                 return false;
             gpu_resource.buffer->UploadBuffer(gpu_resource.handle);

@@ -7,6 +7,7 @@
 #include "DescriptorHeap.h"
 #include <assimp/texture.h>
 #include "RenderEngine.h"
+#include "Rendering/texture_list.h"
 
 #pragma comment(lib, "DirectXTex.lib")
 
@@ -47,6 +48,11 @@ void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
     {
         stbi_image_free(pixels);
     }
+}
+
+Texture2D::~Texture2D()
+{
+    TextureList::RemoveTexture(TextureList::GenerateTextureId(shared_from_base<Texture2D>()));
 }
 
 void Texture2D::OnInspectorGui()
@@ -154,26 +160,6 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
     desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
     desc.Texture2D.MipLevels = 1;
     return desc;
-}
-
-void Texture2D::SetTexture(const AssetPtr<Texture2D> &texture)
-{
-    if (texture == nullptr)
-        return;
-
-    const auto texture_id = reinterpret_cast<TextureId>(texture.Lock().get());
-    m_textures_[texture_id] = texture;
-}
-
-AssetPtr<Texture2D> Texture2D::GetTexture(const TextureId texture_id)
-{
-    const auto it = m_textures_.find(texture_id);
-    if (it != m_textures_.end())
-    {
-        return it->second;
-    }
-
-    return {};
 }
 }
 

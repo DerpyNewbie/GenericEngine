@@ -169,6 +169,7 @@
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_list.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
@@ -342,6 +343,7 @@
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
+        <ClInclude Include="Engine\Rendering\texture_list.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>
