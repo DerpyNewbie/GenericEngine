@@ -169,7 +169,7 @@ AssetPtr<BufferBase> GpuResourceGroup::FindBufferWithName(const std::string &nam
         return material_data.name == name;
     });
 
-    if (it != m_gpu_resources_.end())
+    if (it == m_gpu_resources_.end())
         return {};
 
     return it->buffer;
