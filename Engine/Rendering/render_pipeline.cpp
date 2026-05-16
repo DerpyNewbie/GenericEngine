@@ -6,6 +6,7 @@
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "gizmos.h"
+#include "gpu_resource_manager.h"
 #include "lighting.h"
 #include "render_command.h"
 #include "scene_data.h"
@@ -68,6 +69,33 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
                       [](const engine::RenderCommand &a, const engine::RenderCommand &b) {
                           return a.priority < b.priority;
                       });
+}
+
+bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_block)
+{
+    const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
+    const auto cmd_list = RenderEngine::CommandList();
+    if (!resource_group->SetBufferToDescriptorTable())
+        return false;
+    if (!resource_group->UpdateBuffer(material_block))
+        return false;
+
+    for (int param_i = 0; param_i < engine::kParameterBufferType_Count; ++param_i)
+    {
+        const auto param_type = static_cast<engine::kGpuUploadType>(param_i);
+
+        if (resource_group->Empty(param_type))
+        {
+            continue;
+        }
+
+        const int root_param_idx = param_i +
+                                   engine::RootSignature::kPreDefinedVariableCount;
+        const auto itr = resource_group->Begin(param_type);
+        const auto desc_handle = itr->handle->handle_gpu;
+        cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+    }
+    return true;
 }
 }
 
@@ -351,11 +379,13 @@ void RenderPipeline::ExecuteRenderCommands()
 
             if (current_material != material)
             {
-                current_material = material;
                 if (material->p_shared_material_block == nullptr)
                     material->CreateMaterialBlock();
 
-                material->SetDescriptorTable();
+                if (!SetDescriptorTable(material->p_shared_material_block))
+                    continue;
+
+                current_material = material;
             }
 
             if (sub_mesh_index == -1)

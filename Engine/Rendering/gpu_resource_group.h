@@ -23,23 +23,31 @@ struct ShaderDataIndex
     }
 };
 
+struct GpuResource
+{
+    bool is_external;
+    std::string name;
+    AssetPtr<BufferBase> buffer;
+    std::shared_ptr<DescriptorHandle> handle;
+    kBufferType buffer_type;
+};
+
 class GpuResourceGroup
 {
     ShaderDataIndex m_shader_index_;
     bool m_is_dirty_ = true;
-    using BufferIsExternalPair = std::pair<AssetPtr<BufferBase>, bool>;
-    using BufferHandlePair = std::pair<BufferIsExternalPair, std::shared_ptr<DescriptorHandle>>;
-    std::vector<BufferHandlePair> m_buffers_;
+    std::vector<GpuResource> m_gpu_resources_;
 
 public:
+    void Insert(const AssetPtr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external = false);
+    bool Empty(kGpuUploadType buffer_type) const;
+    std::vector<GpuResource>::iterator Begin(kGpuUploadType buffer_type);
+    std::vector<GpuResource>::iterator End(kGpuUploadType buffer_type);
 
-    void Insert(const AssetPtr<BufferBase> &buffer, bool is_external = false);
-    bool Empty(kGpuUploadType buffer_type);
-    std::vector<BufferHandlePair>::iterator Begin(kGpuUploadType buffer_type);
-    std::vector<BufferHandlePair>::iterator End(kGpuUploadType buffer_type);
+    AssetPtr<BufferBase> FindBufferWithName(const std::string &name);
+    bool SetBufferWithName(const AssetPtr<BufferBase> &buffer, const std::string &name);
 
-    
-    void UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block);
-    void SetBufferToDescriptorTable();
+    bool UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block) const;
+    bool SetBufferToDescriptorTable();
 };
 }

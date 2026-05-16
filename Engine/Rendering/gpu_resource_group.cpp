@@ -59,85 +59,119 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-void GpuResourceGroup::Insert(const AssetPtr<BufferBase> &buffer, bool is_external)
+void GpuResourceGroup::Insert(const AssetPtr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external)
 {
     auto data = buffer;
 
     const auto buffer_type = data->BufferType();
     data->CreateBuffer();
-    m_buffers_.insert(End(buffer_type), {{data, is_external}, nullptr});
-    data->is_dirty = false;
+    GpuResource gpu_resource;
+    gpu_resource.is_external = is_external;
+    gpu_resource.name = material_data->parameter.name;
+    gpu_resource.buffer = buffer;
+    gpu_resource.buffer_type = material_data->BufferType();
+    m_gpu_resources_.insert(End(buffer_type), gpu_resource);
 
     const auto field = m_shader_index_.GetLengthField(buffer_type);
     ++(*field);
 }
 
-bool GpuResourceGroup::Empty(const kGpuUploadType buffer_type)
+bool GpuResourceGroup::Empty(const kGpuUploadType buffer_type) const
 {
     return m_shader_index_.GetLength(buffer_type) == 0;
 }
 
-std::vector<GpuResourceGroup::BufferHandlePair>::iterator GpuResourceGroup::Begin(const kGpuUploadType buffer_type)
+std::vector<GpuResource>::iterator GpuResourceGroup::Begin(const kGpuUploadType buffer_type)
 {
     const auto buffer_offset = m_shader_index_.GetOffset(buffer_type);
-    return m_buffers_.begin() + buffer_offset;
+    return m_gpu_resources_.begin() + buffer_offset;
 }
 
-std::vector<GpuResourceGroup::BufferHandlePair>::iterator GpuResourceGroup::End(const kGpuUploadType buffer_type)
+std::vector<GpuResource>::iterator GpuResourceGroup::End(const kGpuUploadType buffer_type)
 {
     return Begin(buffer_type) + m_shader_index_.GetLength(buffer_type);
 }
 
-void GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block)
+bool GpuResourceGroup::SetBufferWithName(const AssetPtr<BufferBase> &buffer, const std::string &name)
 {
-    for (auto &buffer_pair : m_buffers_ | std::views::keys)
-    {
-        const auto &buffer = buffer_pair.first;
-        if (buffer_pair.second)
-        {
-            // external buffer, do not update
-            continue;
-        }
+    const auto it = std::ranges::find_if(m_gpu_resources_, [&name](const GpuResource &material_data) {
+        return material_data.name == name;
+    });
 
-        for (const auto &data : material_block->material_data)
-        {
-            if (data->BufferType() == buffer->BufferType())
-            {
-                if (data->is_dirty)
-                {
-                    buffer->UpdateBuffer(data->Data());
-                    data->is_dirty = false;
-                }
-                break;
-            }
-        }
-    }
+    if (it == m_gpu_resources_.end())
+        return false;
 
+    it->buffer = buffer;
+    return true;
 }
 
-void GpuResourceGroup::SetBufferToDescriptorTable()
+bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block) const
 {
-    if (!m_is_dirty_)
-        return;
-
-    auto handles = DescriptorHeap::AllocateLinedUp(m_buffers_.size());
-    for (size_t i = 0; i < m_buffers_.size(); ++i)
+    const auto &material_data = material_block->material_data;
+    for (auto gpu_resource : m_gpu_resources_)
     {
-        auto &buffer_pair = m_buffers_[i];
-        const auto &buffer = buffer_pair.first.first;
-        const auto is_external = buffer_pair.first.second;
+        if (gpu_resource.buffer == nullptr || gpu_resource.handle == nullptr)
+            return false;
 
-        if (is_external)
+        auto it = std::ranges::find_if(material_data, [&gpu_resource](const std::shared_ptr<IMaterialData> &material_data) {
+            return material_data->parameter.name == gpu_resource.name;
+        });
+
+        if (it == material_data.end())
+            continue;
+
+        const auto &data = *it;
+        if (gpu_resource.is_external || !data->is_dirty)
+            continue;
+
+        if (data->BufferType() == kBufferType_Texture2D)
         {
-            // external buffer, do not set to descriptor table
+            gpu_resource.buffer = Texture2D::GetTexture(*static_cast<TextureId *>(data->Data()));
+            if (gpu_resource.buffer == nullptr)
+                return false;
+            gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
             continue;
         }
 
-        const auto handle = handles[i];
-        buffer->UploadBuffer(handle);
-        buffer_pair.second = handle;
+        gpu_resource.buffer->UpdateBuffer(data->Data());
     }
 
+    return true;
+}
+
+bool GpuResourceGroup::SetBufferToDescriptorTable()
+{
+    if (!m_is_dirty_)
+        return true;
+
+    auto itr = 0;
+    const auto handles = DescriptorHeap::AllocateLinedUp(m_gpu_resources_.size());
+    for (auto &gpu_resource : m_gpu_resources_)
+    {
+        if (gpu_resource.buffer == nullptr)
+            return false;
+
+        const auto handle = handles[itr];
+        gpu_resource.buffer->UploadBuffer(handle);
+        gpu_resource.handle = handle;
+
+        ++itr;
+    }
+    
     m_is_dirty_ = false;
+
+    return true;
+}
+
+AssetPtr<BufferBase> GpuResourceGroup::FindBufferWithName(const std::string &name)
+{
+    const auto it = std::ranges::find_if(m_gpu_resources_, [&name](const GpuResource &material_data) {
+        return material_data.name == name;
+    });
+
+    if (it != m_gpu_resources_.end())
+        return {};
+
+    return it->buffer;
 }
 }

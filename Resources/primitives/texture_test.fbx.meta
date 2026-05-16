@@ -17,6 +17,11 @@
             "guid": "930595c5-4a55-4352-af99-65939a302ede",
             "name": "Cube",
             "type_hint": "class engine::Mesh"
+        },
+        {
+            "guid": "1bd745bf-8e6d-4d86-812a-1287e9003de1",
+            "name": "texture_test.fbm\\TestTexture",
+            "type_hint": "class engine::Texture2D"
         }
     ]
 }

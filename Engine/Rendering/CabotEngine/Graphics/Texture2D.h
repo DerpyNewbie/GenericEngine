@@ -1,19 +1,17 @@
 ﻿#pragma once
+#include <assimp/texture.h>
+
+#include "Asset/asset_ptr.h"
 #include "Rendering/buffer_base.h"
 #include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class Texture2DImporter;
-}
+using TextureId = uint64_t;
 
-struct aiTexture;
-class DescriptorHeap;
-class DescriptorHandle;
-
-class Texture2D : public BufferBase, public engine::Inspectable, public engine::ShaderResource
+class Texture2D : public BufferBase, public Inspectable, public ShaderResource
 {
-    friend class engine::Texture2DImporter;
+    friend class Texture2DImporter;
 
 protected:
     std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
@@ -24,15 +22,20 @@ protected:
 
     ComPtr<ID3D12Resource> m_buffer_ = nullptr;
 
+    inline static std::unordered_map<TextureId, AssetPtr<Texture2D>> m_textures_;
+
 public:
+    static void SetTexture(const AssetPtr<Texture2D> &texture);
+    static AssetPtr<Texture2D> GetTexture(TextureId texture_id);
+    
     void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    engine::kGpuUploadType BufferType() const override
+    kGpuUploadType BufferType() const override
     {
-        return engine::kParameterBufferType_SRV;
+        return kParameterBufferType_SRV;
     }
     bool IsValid() override;
 
@@ -84,5 +87,6 @@ public:
         );
     }
 };
+}
 
-CEREAL_CLASS_VERSION(Texture2D, 1)
+CEREAL_CLASS_VERSION(engine::Texture2D, 1)

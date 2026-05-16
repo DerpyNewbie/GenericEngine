@@ -4,9 +4,11 @@
 #include "Rendering/buffer_base.h"
 #include "Rendering/shader_resource.h"
 
-class Texture2DArray : public engine::ShaderResource
+namespace engine
 {
-    std::vector<engine::AssetPtr<Texture2D>> m_textures_;
+class Texture2DArray : public ShaderResource
+{
+    std::vector<AssetPtr<Texture2D>> m_textures_;
     ComPtr<ID3D12Resource> m_buffer_;
     DXGI_FORMAT m_format_ = {};
     uint32_t m_mip_level_ = 1;
@@ -26,8 +28,8 @@ public:
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
-    void AddTexture(engine::AssetPtr<Texture2D> texture);
-    void RemoveTexture(engine::AssetPtr<Texture2D> texture);
+    void AddTexture(AssetPtr<Texture2D> texture);
+    void RemoveTexture(AssetPtr<Texture2D> texture);
 
     void SetFormat(DXGI_FORMAT format);
 
@@ -37,3 +39,4 @@ public:
         ar(m_textures_);
     }
 };
+}

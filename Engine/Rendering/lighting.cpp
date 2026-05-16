@@ -3,6 +3,7 @@
 #include "CabotEngine/Graphics/RootSignature.h"
 #include "Components/camera_component.h"
 #include "lighting.h"
+#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace
 {

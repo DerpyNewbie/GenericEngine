@@ -27,7 +27,7 @@ Texture2DImporter::kImageFormat Texture2DImporter::GetImageFormat(const path &fi
     return kImageFormat::kUnknown;
 }
 
-IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
+AssetPtr<Texture2D> Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
     const auto texture_2d = Object::Instantiate<Texture2D>("Generated Color Texture");
     constexpr auto width = 4;
@@ -45,7 +45,8 @@ IAssetPtr Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
         texture_2d->m_tex_data_.emplace_back(color);
     }
 
-    auto asset_ptr = IAssetPtr::FromManaged(texture_2d);
+    auto asset_ptr = AssetPtr<Texture2D>::FromManaged(texture_2d);
+    Texture2D::SetTexture(asset_ptr);
     return asset_ptr;
 }
 
@@ -111,6 +112,8 @@ void Texture2DImporter::OnImport(AssetDescriptor *ctx)
         texture_2d->m_tex_data_.emplace_back(color);
     }
 
+    Texture2D::SetTexture(AssetPtr<Texture2D>::FromManaged(texture_2d));
+    
     ctx->SetMainObject(texture_2d);
 }
 }

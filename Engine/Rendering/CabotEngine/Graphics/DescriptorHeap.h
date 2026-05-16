@@ -1,16 +1,13 @@
 ﻿#pragma once
 #include "TextureCube.h"
 
-class ConstantBuffer;
-class Texture2D;
-
-
 namespace engine
 {
+class ConstantBuffer;
 class ShaderResource;
 class MaterialBlock;
 class StructuredBuffer;
-}
+
 
 class DescriptorHandle
 {
@@ -47,3 +44,4 @@ public:
 
     static void Release();
 };
+}

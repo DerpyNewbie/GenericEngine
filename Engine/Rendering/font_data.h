@@ -2,10 +2,12 @@
 #include <directxtk12/SpriteFont.h>
 #include <directxtk12/ResourceUploadBatch.h>
 
-class DescriptorHandle;
+
 
 namespace engine
 {
+class DescriptorHandle;
+
 class FontData : public Object
 {
     static std::shared_ptr<DirectX::GraphicsMemory> m_graphics_memory_;

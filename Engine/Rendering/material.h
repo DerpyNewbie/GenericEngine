@@ -25,8 +25,6 @@ public:
     void UpdateBuffer();
     bool IsDirty() const;
 
-    void SetDescriptorTable();
-
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {

@@ -6,6 +6,8 @@
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
+namespace engine
+{
 std::shared_ptr<DescriptorHeap> DescriptorHeap::m_instance_;
 
 std::shared_ptr<DescriptorHeap> DescriptorHeap::Instance()
@@ -154,6 +156,9 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate(const uint32_t index)
 
 std::vector<std::shared_ptr<DescriptorHandle>> DescriptorHeap::AllocateLinedUp(size_t count)
 {
+    if (count == 0)
+        return {};
+    
     std::vector<std::shared_ptr<DescriptorHandle>> handles;
     handles.reserve(count);
 
@@ -164,7 +169,7 @@ std::vector<std::shared_ptr<DescriptorHandle>> DescriptorHeap::AllocateLinedUp(s
     {
         if (free_index != before_index + free_count)
         {
-            count = 0;
+            free_count = 0;
             before_index = free_index;
         }
 
@@ -201,4 +206,5 @@ void DescriptorHeap::Release()
     auto instance = Instance();
     instance->m_p_handles_.clear();
     instance->m_free_indices_.clear();
+}
 }

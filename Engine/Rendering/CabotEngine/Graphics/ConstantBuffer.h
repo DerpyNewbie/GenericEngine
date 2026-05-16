@@ -1,6 +1,8 @@
 ﻿#pragma once
 #include "Rendering/buffer_base.h"
 
+namespace engine
+{
 class ConstantBuffer : public BufferBase
 {
     uint64_t m_size_aligned_;
@@ -12,15 +14,23 @@ class ConstantBuffer : public BufferBase
     void *m_p_mapped_ptr_ = nullptr;
 
 public:
+    ConstantBuffer() = default;
     explicit ConstantBuffer(size_t size);
+
+    void SetBufferSize(const size_t size)
+    {
+        m_size_ = size;
+        constexpr size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+        m_size_aligned_ = ((size + (align - 1)) & ~(align - 1));
+    }
     
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    engine::kGpuUploadType BufferType() const override
+    kGpuUploadType BufferType() const override
     {
-        return engine::kParameterBufferType_CBV;
+        return kParameterBufferType_CBV;
     }
     bool IsValid() override;
 
@@ -35,3 +45,4 @@ public:
         return static_cast<T *>(GetPtr());
     }
 };
+}

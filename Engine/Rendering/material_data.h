@@ -4,7 +4,6 @@
 #include "gui.h"
 #include "shader.h"
 #include "Asset/asset_ptr.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
@@ -17,6 +16,7 @@ enum kBufferType
 
 namespace engine
 {
+
 struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
@@ -55,8 +55,7 @@ template <typename T>
 struct MaterialData : IMaterialData
 {
     static constexpr bool kIsVector = engine_traits::is_vector<T>::value;
-    static constexpr bool kIsAssetPtr = std::is_base_of_v<IAssetPtr, T>;
-    static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T> || std::is_same_v<Texture2D, T>;
+    static constexpr bool kIsTexture = std::is_same_v<TextureId, T>;
 
     T value;
 
@@ -150,10 +149,12 @@ void MaterialData<T>::OnInspectorGui()
             is_dirty = true;
         }
     }
-    else if constexpr (kIsAssetPtr)
+    else if constexpr (std::is_same_v<T, TextureId>)
     {
-        if (Gui::PropertyField(name, value))
+        auto texture = Texture2D::GetTexture(value);
+        if (Gui::PropertyField(name, texture))
         {
+            value = reinterpret_cast<TextureId>(texture.Lock().get());
             is_dirty = true;
         }
     }
@@ -198,7 +199,7 @@ int MaterialData<T>::SizeInBytes()
 template <typename T>
 kBufferType MaterialData<T>::BufferType()
 {
-    if constexpr (std::is_same_v<T, AssetPtr<Texture2D>> || std::is_same_v<T, Texture2D>)
+    if constexpr (std::is_same_v<T, TextureId>)
     {
         return kBufferType_Texture2D;
     }
@@ -227,4 +228,4 @@ CEREAL_CLASS_VERSION(engine::MaterialData<Vector2>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
 
-CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<Texture2D>>, 1)
+CEREAL_CLASS_VERSION(engine::MaterialData<engine::TextureId>, 1)

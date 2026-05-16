@@ -4,6 +4,8 @@
 #include "DirectXResourceFactory.h"
 #include "RenderEngine.h"
 
+namespace engine
+{
 ConstantBuffer::ConstantBuffer(const size_t size)
 {
     m_size_ = size;
@@ -76,4 +78,5 @@ bool ConstantBuffer::IsValid()
 void *ConstantBuffer::GetPtr() const
 {
     return m_p_mapped_ptr_;
+}
 }

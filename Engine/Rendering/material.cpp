@@ -83,30 +83,6 @@ bool Material::IsDirty() const
 {
     return p_shared_material_block == nullptr || p_shared_material_block->IsDirty();
 }
-
-void Material::SetDescriptorTable()
-{
-    const auto material_block = p_shared_material_block;
-    const auto cmd_list = RenderEngine::CommandList();
-
-    UpdateBuffer();
-
-    for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
-    {
-        const auto param_type = static_cast<kGpuUploadType>(param_i);
-
-        if (material_block->Empty(param_type))
-        {
-            continue;
-        }
-
-        const int root_param_idx = param_i +
-                                   RootSignature::kPreDefinedVariableCount;
-        const auto itr = material_block->Begin(param_type);
-        const auto desc_handle = itr->handle->handle_gpu;
-        cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
-    }
-}
 }
 
 CEREAL_REGISTER_TYPE(engine::Material)

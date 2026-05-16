@@ -13,11 +13,18 @@ class StructuredBuffer final : public BufferBase, public ShaderResource
     size_t m_stride_ = 0;
     
 public:
+    StructuredBuffer() = default;
     explicit StructuredBuffer(const size_t stride, const size_t elem_count)
     {
         m_stride_ = stride;
         m_element_count_ = elem_count;
         m_gpu_address_ = 0;
+    }
+
+    void SetBufferSizeAndCount(const size_t stride, const size_t elem_count)
+    {
+        m_stride_ = stride;
+        m_element_count_ = elem_count;
     }
 
     void CreateBuffer() override;

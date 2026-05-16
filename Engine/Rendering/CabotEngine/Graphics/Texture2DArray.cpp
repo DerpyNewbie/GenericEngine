@@ -4,6 +4,8 @@
 #include "DescriptorHeap.h"
 #include "RenderEngine.h"
 
+namespace engine
+{
 void Texture2DArray::CopyResource()
 {
     const auto texture = m_textures_[0].CastedLock();
@@ -156,4 +158,5 @@ void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
 void Texture2DArray::SetFormat(const DXGI_FORMAT format)
 {
     m_format_ = format;
+}
 }

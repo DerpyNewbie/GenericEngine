@@ -12,6 +12,8 @@
 
 using namespace DirectX;
 
+namespace engine
+{
 void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
 {
     unsigned char *pixels;
@@ -92,7 +94,7 @@ void Texture2D::CreateBuffer()
 
     if (FAILED(hr))
     {
-        engine::Logger::Error<Texture2D>("failed to create texture2d resource");
+        Logger::Error<Texture2D>("failed to create texture2d resource");
         return;
     }
 
@@ -115,10 +117,10 @@ void Texture2D::CreateBuffer()
 
 void Texture2D::UpdateBuffer(void *data)
 {
-    engine::Logger::Error("Can not Update Texture2D");
+    Logger::Error("Can not Update Texture2D");
 }
 
-void Texture2D::UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle)
+void Texture2D::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
 {
     const auto view_desc = ViewDesc();
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
@@ -154,4 +156,25 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
     return desc;
 }
 
-CEREAL_REGISTER_TYPE(Texture2D)
+void Texture2D::SetTexture(const AssetPtr<Texture2D> &texture)
+{
+    if (texture == nullptr)
+        return;
+
+    const auto texture_id = reinterpret_cast<TextureId>(texture.Lock().get());
+    m_textures_[texture_id] = texture;
+}
+
+AssetPtr<Texture2D> Texture2D::GetTexture(const TextureId texture_id)
+{
+    const auto it = m_textures_.find(texture_id);
+    if (it != m_textures_.end())
+    {
+        return it->second;
+    }
+
+    return {};
+}
+}
+
+CEREAL_REGISTER_TYPE(engine::Texture2D)
