@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "gpu_resource_manager.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
-
+#include "CabotEngine/Graphics/StructuredBuffer.h"
+#include "texture_list.h"
 
 namespace engine
 {
