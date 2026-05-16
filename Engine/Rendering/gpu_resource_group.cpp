@@ -7,11 +7,11 @@ int *ShaderDataIndex::GetLengthField(kGpuUploadType type)
 {
     switch (type)
     {
-        case kParameterBufferType_CBV:
+        case kGpuBufferType_CBV:
             return &cbv_length;
-        case kParameterBufferType_SRV:
+        case kGpuBufferType_SRV:
             return &srv_length;
-        case kParameterBufferType_UAV:
+        case kGpuBufferType_UAV:
             return &uav_length;
         default:
             static_assert("Invalid buffer type");
@@ -23,11 +23,11 @@ int ShaderDataIndex::GetLength(const kGpuUploadType type) const
 {
     switch (type)
     {
-        case kParameterBufferType_CBV:
+        case kGpuBufferType_CBV:
             return cbv_length;
-        case kParameterBufferType_SRV:
+        case kGpuBufferType_SRV:
             return srv_length;
-        case kParameterBufferType_UAV:
+        case kGpuBufferType_UAV:
             return uav_length;
         default:
             static_assert("Invalid buffer type");
@@ -42,11 +42,11 @@ int ShaderDataIndex::GetOffset(kGpuUploadType type) const
     // fall-through
     switch (type)
     {
-        case kParameterBufferType_UAV:
+        case kGpuBufferType_UAV:
             offset += srv_length;
-        case kParameterBufferType_SRV:
+        case kGpuBufferType_SRV:
             offset += cbv_length;
-        case kParameterBufferType_CBV:
+        case kGpuBufferType_CBV:
         default:
             break;
     }

@@ -80,7 +80,7 @@ bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_b
     if (!resource_group->UpdateBuffer(material_block))
         return false;
 
-    for (int param_i = 0; param_i < engine::kParameterBufferType_Count; ++param_i)
+    for (int param_i = 0; param_i < engine::kGpuBufferType_Count; ++param_i)
     {
         const auto param_type = static_cast<engine::kGpuUploadType>(param_i);
 

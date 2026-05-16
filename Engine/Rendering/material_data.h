@@ -97,7 +97,7 @@ template <typename T>
 MaterialData<T>::MaterialData(T new_value, const ShaderParameter &new_parameter) :
     IMaterialData(new_parameter), value(new_value)
 {
-    upload_type = kIsTexture || kIsVector ? kParameterBufferType_SRV : kParameterBufferType_CBV;
+    upload_type = kIsTexture || kIsVector ? kGpuBufferType_SRV : kGpuBufferType_CBV;
 }
 
 template <typename T>

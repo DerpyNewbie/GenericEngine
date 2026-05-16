@@ -30,7 +30,7 @@ public:
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     kGpuUploadType BufferType() const override
     {
-        return kParameterBufferType_CBV;
+        return kGpuBufferType_CBV;
     }
     bool IsValid() override;
 

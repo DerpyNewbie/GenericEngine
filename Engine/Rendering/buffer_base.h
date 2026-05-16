@@ -4,11 +4,11 @@ namespace engine
 {
 enum kGpuUploadType
 {
-    kParameterBufferType_CBV,
-    kParameterBufferType_SRV,
-    kParameterBufferType_UAV,
+    kGpuBufferType_CBV,
+    kGpuBufferType_SRV,
+    kGpuBufferType_UAV,
 
-    kParameterBufferType_Count
+    kGpuBufferType_Count
 };
 
 class DescriptorHandle;
