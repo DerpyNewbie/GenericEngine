@@ -8,14 +8,14 @@ namespace engine
 {
 class RenderTexture : public Texture2D
 {
-    ComPtr<ID3D12DescriptorHeap> m_RTVHeap_;
-
-public:
-    void CreateBuffer() override;
-    void BeginRender(Color background_color);
-    void EndRender() const;
-    ID3D12DescriptorHeap *GetHeap();
-
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            cereal::base_class<Texture2D>(this)
+        );
+    }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::RenderTexture, 1)

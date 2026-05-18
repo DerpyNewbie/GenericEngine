@@ -3,7 +3,7 @@
 
 namespace engine
 {
-class TextureList
+class TextureCollection
 {
     friend class Texture2DImporter;
     friend class Texture2D;

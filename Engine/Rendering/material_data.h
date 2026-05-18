@@ -3,7 +3,7 @@
 #include "engine_traits.h"
 #include "gui.h"
 #include "shader.h"
-#include "texture_list.h"
+#include "texture_collection.h"
 #include "Asset/asset_ptr.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "CabotEngine/Graphics/Texture2D.h"
@@ -17,7 +17,6 @@ enum kBufferType
 
 namespace engine
 {
-
 struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
@@ -152,7 +151,7 @@ void MaterialData<T>::OnInspectorGui()
     }
     else if constexpr (std::is_same_v<T, TextureId>)
     {
-        auto texture = TextureList::GetTexture(value);
+        auto texture = TextureCollection::GetTexture(value);
         if (Gui::PropertyField(name, texture))
         {
             value = reinterpret_cast<TextureId>(texture.Lock().get());

@@ -7,7 +7,8 @@
 #include "DescriptorHeap.h"
 #include <assimp/texture.h>
 #include "RenderEngine.h"
-#include "Rendering/texture_list.h"
+#include "Asset/asset_database.h"
+#include "Rendering/texture_collection.h"
 
 #pragma comment(lib, "DirectXTex.lib")
 
@@ -15,44 +16,146 @@ using namespace DirectX;
 
 namespace engine
 {
-void Texture2D::LoadFromAiTexture(const aiTexture *ai_texture)
-{
-    unsigned char *pixels;
-    int width = 0, height = 0, channels = 0;
-    
-    if (ai_texture->mHeight == 0)
-    {
-        pixels = stbi_load_from_memory(
-            reinterpret_cast<const unsigned char *>(ai_texture->pcData),
-            ai_texture->mWidth,
-            &width,
-            &height,
-            &channels,
-            4
-        );
-        m_tex_data_.reserve(width * height * sizeof(PackedVector::XMCOLOR));
-    }
-    else
-    {
-        width = ai_texture->mWidth;
-        height = ai_texture->mHeight;
-        pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
-    }
-    m_width_ = width;
-    m_height_ = height;
-    m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
-    m_tex_data_.resize(width * height);
-    memcpy(m_tex_data_.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
+constexpr std::array<std::string_view, 7> kWicFormats = {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp"};
 
-    if (pixels)
+Texture2D::kImageFormat Texture2D::GetImageFormat(const path &file_path)
+{
     {
-        stbi_image_free(pixels);
+        auto ext = file_path.extension().string();
+        std::ranges::transform(ext, ext.begin(), tolower);
+        if (std::ranges::find(kWicFormats, ext) != kWicFormats.end())
+        {
+            return kImageFormat::kWic;
+        }
+
+        if (ext == ".tga")
+        {
+            return kImageFormat::kTga;
+        }
+
+        return kImageFormat::kUnknown;
     }
+}
+void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, ScratchImage &scratch) const
+{
+    const auto format = GetImageFormat(file_path);
+    HRESULT hr;
+
+    switch (format)
+    {
+        case kImageFormat::kWic: {
+            hr = LoadFromWICFile(file_path.c_str(), WIC_FLAGS_NONE, &metadata, scratch);
+            break;
+        }
+        case kImageFormat::kTga: {
+            hr = LoadFromTGAFile(file_path.c_str(), &metadata, scratch);
+            break;
+        }
+        default: {
+            Logger::Error<Texture2D>("Unsupported image format");
+        }
+    }
+
+    if (FAILED(hr))
+    {
+        Logger::Error<Texture2D>("Failed load texture");
+    }
+}
+
+void Texture2D::CacheData()
+{
+    const auto path = AssetDatabase::GetAssetDescriptor(Guid())->AssetPath();
+    TexMetadata metadata;
+    ScratchImage scratch;
+
+    LoadMetadata(path, metadata, scratch);
+    m_width_ = static_cast<UINT>(metadata.width);
+    m_height_ = static_cast<UINT>(metadata.height);
+    m_format_ = metadata.format;
+    m_mip_level_ = static_cast<UINT16>(metadata.mipLevels);
+}
+
+std::vector<PackedVector::XMCOLOR> Texture2D::GetPixels()
+{
+    const auto path = AssetDatabase::GetAssetDescriptor(Guid())->AssetPath();
+    //internalなテクスチャだったらそのまま返す
+    if (path.empty())
+        return m_tex_data_;
+
+    std::vector<PackedVector::XMCOLOR> result;
+    TexMetadata metadata;
+    ScratchImage scratch;
+
+    LoadMetadata(path, metadata, scratch);
+
+    const auto img = scratch.GetImage(0, 0, 0);
+    const uint8_t *src = img->pixels;
+    const size_t pixel_count = img->width * img->height;
+
+    m_width_ = static_cast<UINT>(metadata.width);
+    m_height_ = static_cast<UINT>(metadata.height);
+    m_format_ = metadata.format;
+    m_mip_level_ = static_cast<UINT16>(metadata.mipLevels);
+    result.reserve(pixel_count);
+
+    for (UINT i = 0; i < pixel_count; ++i)
+    {
+        const uint8_t r = src[i * 4 + 0];
+        const uint8_t g = src[i * 4 + 1];
+        const uint8_t b = src[i * 4 + 2];
+        const uint8_t a = src[i * 4 + 3];
+
+        PackedVector::XMCOLOR color;
+        color.b = r;
+        color.g = g;
+        color.r = b;
+        color.a = a;
+
+        result.emplace_back(color);
+    }
+
+    return result;
+}
+
+uint32_t Texture2D::Width()
+{
+    if (m_width_ != UINT32_MAX)
+        return m_width_;
+
+    CacheData();
+    return m_width_;
+}
+
+uint32_t Texture2D::Height()
+{
+    if (m_height_ != UINT32_MAX)
+        return m_height_;
+
+    CacheData();
+    return m_height_;
+}
+
+uint16_t Texture2D::MipLevel()
+{
+    if (m_mip_level_ != UINT16_MAX)
+        return m_mip_level_;
+
+    CacheData();
+    return m_mip_level_;
+}
+
+DXGI_FORMAT Texture2D::Format()
+{
+    if (m_format_ != DXGI_FORMAT_UNKNOWN)
+        return m_format_;
+
+    CacheData();
+    return m_format_;
 }
 
 Texture2D::~Texture2D()
 {
-    TextureList::RemoveTexture(TextureList::GenerateTextureId(shared_from_base<Texture2D>()));
+    TextureCollection::RemoveTexture(TextureCollection::GenerateTextureId(shared_from_base<Texture2D>()));
 }
 
 void Texture2D::OnInspectorGui()
@@ -75,91 +178,6 @@ void Texture2D::OnInspectorGui()
     {
         ImGui::Text("Could not preview the texture.");
     }
-}
-
-void Texture2D::CreateBuffer()
-{
-    const auto desc = CD3DX12_RESOURCE_DESC::Tex2D(
-        m_format_,
-        m_width_,
-        m_height_,
-        1,
-        m_mip_level_
-    );
-
-    const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
-
-    auto hr = RenderEngine::Device()->CreateCommittedResource(
-        &prop,
-        D3D12_HEAP_FLAG_NONE,
-        &desc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_buffer_)
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<Texture2D>("failed to create texture2d resource");
-        return;
-    }
-
-    m_buffer_->SetName(L"Texture");
-
-    const D3D12_BOX dest_region = {0, 0, 0, m_width_, m_height_, 1};
-    hr = m_buffer_->WriteToSubresource(
-        0,
-        &dest_region,
-        m_tex_data_.data(),
-        m_width_ * sizeof(PackedVector::XMCOLOR),
-        m_width_ * m_height_ * sizeof(PackedVector::XMCOLOR)
-    );
-
-    if (FAILED(hr))
-    {
-        m_buffer_ = nullptr;
-    }
-}
-
-void Texture2D::UpdateBuffer(void *data)
-{
-    Logger::Error("Can not Update Texture2D");
-}
-
-void Texture2D::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
-{
-    const auto view_desc = ViewDesc();
-    RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
-}
-
-std::shared_ptr<DescriptorHandle> Texture2D::UploadBuffer()
-{
-    return DescriptorHeap::Register(this);
-}
-
-bool Texture2D::IsValid()
-{
-    return m_buffer_ != nullptr;
-}
-
-ID3D12Resource *Texture2D::Resource()
-{
-    if (!IsValid())
-    {
-        CreateBuffer();
-    }
-
-    return m_buffer_ != nullptr ? m_buffer_.Get() : nullptr;
-}
-
-D3D12_SHADER_RESOURCE_VIEW_DESC Texture2D::ViewDesc()
-{
-    D3D12_SHADER_RESOURCE_VIEW_DESC desc = {};
-    desc.Format = Resource()->GetDesc().Format;
-    desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    desc.Texture2D.MipLevels = 1;
-    return desc;
 }
 }
 
