@@ -29,7 +29,6 @@ AssetPtr<Texture2D> Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR col
     }
 
     auto asset_ptr = AssetPtr<Texture2D>::FromManaged(texture_2d);
-    TextureCollection::SetTexture(asset_ptr);
     return asset_ptr;
 }
 

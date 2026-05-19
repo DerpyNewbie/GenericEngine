@@ -55,7 +55,7 @@ template <typename T>
 struct MaterialData : IMaterialData
 {
     static constexpr bool kIsVector = engine_traits::is_vector<T>::value;
-    static constexpr bool kIsTexture = std::is_same_v<TextureId, T>;
+    static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T>;
 
     T value;
 
@@ -149,12 +149,10 @@ void MaterialData<T>::OnInspectorGui()
             is_dirty = true;
         }
     }
-    else if constexpr (std::is_same_v<T, TextureId>)
+    else if constexpr (std::is_same_v<T, AssetPtr<Texture2D>>)
     {
-        auto texture = TextureCollection::GetTexture(value);
-        if (Gui::PropertyField(name, texture))
+        if (Gui::PropertyField(name, value))
         {
-            value = reinterpret_cast<TextureId>(texture.Lock().get());
             is_dirty = true;
         }
     }
@@ -199,7 +197,7 @@ int MaterialData<T>::SizeInBytes()
 template <typename T>
 kBufferType MaterialData<T>::BufferType()
 {
-    if constexpr (std::is_same_v<T, TextureId>)
+    if constexpr (std::is_same_v<T, AssetPtr<Texture2D>>)
     {
         return kBufferType_Texture2D;
     }
@@ -228,4 +226,4 @@ CEREAL_CLASS_VERSION(engine::MaterialData<Vector2>, 1)
 
 CEREAL_CLASS_VERSION(engine::MaterialData<Vector3>, 1)
 
-CEREAL_CLASS_VERSION(engine::MaterialData<engine::TextureId>, 1)
+CEREAL_CLASS_VERSION(engine::MaterialData<engine::AssetPtr<engine::Texture2D>>, 1)

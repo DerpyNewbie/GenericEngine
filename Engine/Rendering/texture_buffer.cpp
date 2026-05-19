@@ -7,7 +7,15 @@
 
 namespace engine
 {
+TextureBuffer::TextureBuffer(const std::shared_ptr<Texture2D> &texture)
+{
+    m_tex_data_ = texture->GetPixels();
 
+    m_format_ = texture->Format();
+    m_width_ = texture->Width();
+    m_height_ = texture->Height();
+    m_mip_level_ = texture->MipLevel();
+}
 
 void TextureBuffer::CreateBuffer()
 {

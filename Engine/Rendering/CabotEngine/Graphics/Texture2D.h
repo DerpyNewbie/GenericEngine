@@ -4,7 +4,6 @@
 
 namespace engine
 {
-using TextureId = uint64_t;
 
 class Texture2D : public Object, public Inspectable
 {
@@ -19,7 +18,8 @@ class Texture2D : public Object, public Inspectable
 
     static kImageFormat GetImageFormat(const std::filesystem::path &file_path);
 
-    void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch) const;
+    void LoadFromAiTexture(aiTexture *ai_texture);
+    static void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch);
     void CacheData();
 
 protected:

@@ -1,4 +1,5 @@
 #pragma once
+#include "Rendering/depth_texture.h"
 #include "Rendering/texture_buffer.h"
 #include "Rendering/CabotEngine/Graphics/Texture2DArray.h"
 
@@ -9,6 +10,8 @@ class DepthTextureBuffer : public TextureBuffer
     ComPtr<ID3D12DescriptorHeap> m_dsv_heap_;
 
 public:
+    DepthTextureBuffer(const std::shared_ptr<DepthTexture> &depth_texture);
+    
     void CreateBuffer() override;
     void BeginRender();
     void EndRender();

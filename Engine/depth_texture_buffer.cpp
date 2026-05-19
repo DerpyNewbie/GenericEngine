@@ -8,9 +8,12 @@
 
 namespace engine
 {
+DepthTextureBuffer::DepthTextureBuffer(const std::shared_ptr<DepthTexture> &depth_texture) : TextureBuffer(depth_texture)
+{}
+
 void DepthTextureBuffer::CreateBuffer()
 {
-    auto device = RenderEngine::Device();
+    const auto device = RenderEngine::Device();
 
     m_width_ = Application::WindowWidth();
     m_height_ = Application::WindowHeight();
@@ -21,16 +24,16 @@ void DepthTextureBuffer::CreateBuffer()
     heapDesc.NumDescriptors = 1;
     heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
     heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-    auto hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_dsv_heap_));
+    const auto hr = device->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&m_dsv_heap_));
     if (FAILED(hr))
     {
         Logger::Error<DepthTextureBuffer>("Failed To Create DSV Heap for DepthTexture");
     }
 
-    D3D12_CLEAR_VALUE dsvClearValue = {};
-    dsvClearValue.Format = DXGI_FORMAT_D32_FLOAT;
-    dsvClearValue.DepthStencil.Depth = 1.0f;
-    dsvClearValue.DepthStencil.Stencil = 0;
+    D3D12_CLEAR_VALUE dsv_clear_value = {};
+    dsv_clear_value.Format = DXGI_FORMAT_D32_FLOAT;
+    dsv_clear_value.DepthStencil.Depth = 1.0f;
+    dsv_clear_value.DepthStencil.Stencil = 0;
 
     const auto heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
@@ -45,7 +48,7 @@ void DepthTextureBuffer::CreateBuffer()
         resource_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_HEAP_FLAG_NONE,
-        &dsvClearValue);
+        &dsv_clear_value);
 
     if (m_buffer_ == nullptr)
     {
@@ -76,7 +79,7 @@ void DepthTextureBuffer::BeginRender()
 
 void DepthTextureBuffer::EndRender()
 {
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_buffer_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);

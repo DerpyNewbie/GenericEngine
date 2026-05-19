@@ -36,7 +36,11 @@ Texture2D::kImageFormat Texture2D::GetImageFormat(const path &file_path)
         return kImageFormat::kUnknown;
     }
 }
-void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, ScratchImage &scratch) const
+
+void Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
+{}
+
+void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, ScratchImage &scratch)
 {
     const auto format = GetImageFormat(file_path);
     HRESULT hr;
@@ -65,6 +69,11 @@ void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, Scrat
 void Texture2D::CacheData()
 {
     const auto path = AssetDatabase::GetAssetDescriptor(Guid())->AssetPath();
+
+    //internalだったらキャッシュできないよ
+    if (path.empty())
+        return;
+    
     TexMetadata metadata;
     ScratchImage scratch;
 

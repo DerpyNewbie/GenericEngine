@@ -5,6 +5,9 @@
 
 namespace engine
 {
+RenderTextureBuffer::RenderTextureBuffer(const std::shared_ptr<RenderTexture> &render_texture) : TextureBuffer(std::static_pointer_cast<Texture2D>(render_texture))
+{}
+
 void RenderTextureBuffer::CreateBuffer()
 {
     auto device = RenderEngine::Device();

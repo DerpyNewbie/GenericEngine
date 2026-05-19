@@ -1,42 +1,40 @@
 #include "pch.h"
 #include "texture_collection.h"
 
-void engine::TextureCollection::SetTexture(const AssetPtr<Texture2D> &texture)
+std::shared_ptr<engine::TextureBuffer> engine::TextureCollection::GetTexture(const AssetPtr<Texture2D> &texture)
 {
-    if (texture == nullptr)
-        return;
-
-    const auto texture_id = GenerateTextureId(texture);
-    m_textures_[texture_id] = texture;
-}
-
-void engine::TextureCollection::RemoveTexture(const AssetPtr<Texture2D> &texture)
-{
-    RemoveTexture(GenerateTextureId(texture));
-}
-
-void engine::TextureCollection::RemoveTexture(const TextureId texture_id)
-{
-    m_textures_.erase(texture_id);
-}
-
-engine::TextureId engine::TextureCollection::GenerateTextureId(const std::shared_ptr<Texture2D> &texture)
-{
-    return reinterpret_cast<TextureId>(texture.get());
-}
-
-engine::TextureId engine::TextureCollection::GenerateTextureId(const AssetPtr<Texture2D> &texture)
-{
-    return GenerateTextureId(texture.CastedLock());
-}
-
-engine::AssetPtr<engine::Texture2D> engine::TextureCollection::GetTexture(const TextureId texture_id)
-{
-    const auto it = m_textures_.find(texture_id);
-    if (it != m_textures_.end())
-    {
+    const auto it = m_textures_buffer_map_.find(texture);
+    if (it != m_textures_buffer_map_.end())
         return it->second;
-    }
 
-    return {};
+    auto texture_buffer = std::make_shared<TextureBuffer>(texture.CastedLock());
+    m_textures_buffer_map_.try_emplace(texture, texture_buffer);
+
+    return texture_buffer;
+}
+
+std::shared_ptr<engine::RenderTextureBuffer> engine::TextureCollection::GetRenderTexture(const AssetPtr<RenderTexture> &render_texture)
+{
+    const auto it = m_render_texture_buffer_map_.find(render_texture);
+    if (it != m_render_texture_buffer_map_.end())
+        return it->second;
+
+    auto render_texture_buffer = std::make_shared<RenderTextureBuffer>(render_texture);
+    m_textures_buffer_map_.try_emplace(render_texture, render_texture_buffer);
+    m_render_texture_buffer_map_.try_emplace(render_texture, render_texture_buffer);
+
+    return render_texture_buffer;
+}
+
+std::shared_ptr<engine::DepthTextureBuffer> engine::TextureCollection::GetDepthTexture(AssetPtr<DepthTexture> depth_texture)
+{
+    const auto it = m_depth_texture_buffer_map_.find(depth_texture);
+    if (it != m_depth_texture_buffer_map_.end())
+        return it->second;
+
+    auto depth_texture_buffer = std::make_shared<DepthTextureBuffer>(depth_texture);
+    m_textures_buffer_map_.try_emplace(depth_texture, depth_texture_buffer);
+    m_render_texture_buffer_map_.try_emplace(depth_texture, depth_texture_buffer);
+
+    return depth_texture_buffer;
 }

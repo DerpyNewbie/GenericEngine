@@ -2,10 +2,11 @@
 #include "Texture2D.h"
 #include "Rendering/buffer_base.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class TextureCube final : public BufferBase, public Inspectable, public ShaderResource
+class TextureCube final : public Object, public BufferBase, public Inspectable, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer_;

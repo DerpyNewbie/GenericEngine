@@ -1,11 +1,11 @@
 #pragma once
 #include "buffer_base.h"
 #include "shader_resource.h"
-#include "CabotEngine/Graphics/UnorderedAccessibleBase.h"
+#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {
-class TextureBuffer : public BufferBase, public ShaderResource, public UnorderedAccessibleBase
+class TextureBuffer : public BufferBase, public ShaderResource
 {
 protected:
     ComPtr<ID3D12Resource> m_buffer_ = nullptr;
@@ -17,6 +17,9 @@ protected:
     DXGI_FORMAT m_format_;
 
 public:
+    TextureBuffer() = default;
+    TextureBuffer(const std::shared_ptr<Texture2D> &texture);
+    
     void CreateBuffer() override;
     void UpdateBuffer(void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;

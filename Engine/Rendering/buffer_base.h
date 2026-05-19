@@ -13,12 +13,12 @@ enum kGpuUploadType
 
 class DescriptorHandle;
 
-class BufferBase : public Object
+class BufferBase
 {
 public:
     bool is_dirty;
 
-    ~BufferBase() override = default;
+    ~BufferBase() = default;
     virtual void CreateBuffer() = 0;
     virtual void UpdateBuffer(void *data) = 0;
     virtual void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) = 0;

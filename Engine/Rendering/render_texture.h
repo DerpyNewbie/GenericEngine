@@ -8,6 +8,8 @@ namespace engine
 {
 class RenderTexture : public Texture2D
 {
+    void OnInspectorGui() override;
+    
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
