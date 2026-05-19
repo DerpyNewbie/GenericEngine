@@ -18,7 +18,6 @@ class Texture2D : public Object, public Inspectable
 
     static kImageFormat GetImageFormat(const std::filesystem::path &file_path);
 
-    void LoadFromAiTexture(aiTexture *ai_texture);
     static void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch);
     void CacheData();
 
@@ -30,9 +29,11 @@ protected:
     DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
     std::string m_path_;
     uint64_t m_id_ = -1;
-    
+
 public:
     ~Texture2D() override;
+
+    void LoadFromAiTexture(aiTexture *ai_texture);
     
     void OnInspectorGui() override;
 

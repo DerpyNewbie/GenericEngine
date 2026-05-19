@@ -38,8 +38,8 @@ std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
     {"texture2d",
      [](const ShaderParameter &param) {
          auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
-         return std::make_shared<MaterialData<TextureId>>(
-             reinterpret_cast<TextureId>(texture.Lock().get()),
+         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
+             texture,
              param
          );
      }

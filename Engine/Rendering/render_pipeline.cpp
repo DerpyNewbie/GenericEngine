@@ -125,18 +125,18 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    const auto render_tex = camera.render_texture;
-    if (render_tex)
+    const auto render_texture_buffer = camera.render_texture ? TextureCollection::GetRenderTexture(camera.render_texture) : nullptr;
+    if (render_texture_buffer)
     {
-        render_tex->BeginRender(camera.background_color);
-        rtv_heap = render_tex->GetHeap();
+        render_texture_buffer->BeginRender(camera.background_color);
+        rtv_heap = render_texture_buffer->GetHeap();
     }
 
-    const auto depth_tex = camera.depth_texture;
-    if (depth_tex)
+    const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::GetDepthTexture(camera.depth_texture) : nullptr;
+    if (depth_texture_buffer)
     {
-        depth_tex->BeginRender();
-        dsv_heap = depth_tex->GetHeap();
+        depth_texture_buffer->BeginRender();
+        dsv_heap = depth_texture_buffer->GetHeap();
     }
 
     if (rtv_heap == nullptr && dsv_heap == nullptr)
@@ -153,11 +153,11 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
     Render(view, proj);
 
-    if (render_tex)
-        render_tex->EndRender();
+    if (render_texture_buffer)
+        render_texture_buffer->EndRender();
 
-    if (depth_tex)
-        depth_tex->EndRender();
+    if (depth_texture_buffer)
+        depth_texture_buffer->EndRender();
 }
 
 void RenderPipeline::RenderVoid()

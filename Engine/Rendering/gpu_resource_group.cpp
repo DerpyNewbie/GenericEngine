@@ -59,7 +59,7 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-void GpuResourceGroup::Insert(const AssetPtr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external)
+void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external)
 {
     auto data = buffer;
 
@@ -92,7 +92,7 @@ std::vector<GpuResource>::iterator GpuResourceGroup::End(const kGpuUploadType bu
     return Begin(buffer_type) + m_shader_index_.GetLength(buffer_type);
 }
 
-bool GpuResourceGroup::SetBufferWithName(const AssetPtr<BufferBase> &buffer, const std::string &name)
+bool GpuResourceGroup::SetBufferWithName(const std::shared_ptr<BufferBase> &buffer, const std::string &name)
 {
     const auto it = std::ranges::find_if(m_gpu_resources_, [&name](const GpuResource &material_data) {
         return material_data.name == name;
@@ -126,7 +126,7 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
 
         if (data->BufferType() == kBufferType_Texture2D)
         {
-            gpu_resource.buffer = TextureCollection::GetTexture(*static_cast<TextureId *>(data->Data()));
+            gpu_resource.buffer = TextureCollection::GetTexture(*static_cast<AssetPtr<Texture2D> *>(data->Data()));
             if (gpu_resource.buffer == nullptr)
                 return false;
             gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
@@ -163,7 +163,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
     return true;
 }
 
-AssetPtr<BufferBase> GpuResourceGroup::FindBufferWithName(const std::string &name)
+std::shared_ptr<BufferBase> GpuResourceGroup::FindBufferWithName(const std::string &name)
 {
     const auto it = std::ranges::find_if(m_gpu_resources_, [&name](const GpuResource &material_data) {
         return material_data.name == name;

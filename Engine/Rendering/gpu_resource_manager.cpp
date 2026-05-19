@@ -21,20 +21,18 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
         switch (data->BufferType())
         {
             case kBufferType_ConstantBuffer: {
-                auto cb = Object::Instantiate<ConstantBuffer>();
-                cb->SetBufferSize(data->SizeInBytes());
-                new_group->Insert(AssetPtr<ConstantBuffer>::FromManaged(cb), data);
+                auto cb = std::make_shared<ConstantBuffer>(data->SizeInBytes());
+                new_group->Insert(cb, data);
                 break;
             }
             case kBufferType_StructuredBuffer: {
-                auto sb = Object::Instantiate<StructuredBuffer>();
-                sb->SetBufferSizeAndCount(data->SizeInBytes(), data->Count());
-                new_group->Insert(AssetPtr<StructuredBuffer>::FromManaged(sb), data);
+                auto sb = std::make_shared<StructuredBuffer>(data->SizeInBytes(), data->Count());
+                new_group->Insert(sb, data);
             }
             case kBufferType_Texture2D: {
-                auto texture_id = data->Data();
-                auto texture = TextureList::GetTexture(*static_cast<TextureId *>(texture_id));
-                new_group->Insert(texture, data);
+                auto texture = data->Data();
+                auto texture_buffer = TextureCollection::GetTexture(*static_cast<AssetPtr<Texture2D> *>(texture));
+                new_group->Insert(texture_buffer, data);
                 break;
             }
         }

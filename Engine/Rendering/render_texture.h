@@ -8,6 +8,8 @@ namespace engine
 {
 class RenderTexture : public Texture2D
 {
+
+public:
     void OnInspectorGui() override;
     
     template <class Archive>

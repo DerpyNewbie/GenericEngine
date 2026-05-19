@@ -27,7 +27,7 @@ struct GpuResource
 {
     bool is_external;
     std::string name;
-    AssetPtr<BufferBase> buffer;
+    std::shared_ptr<BufferBase> buffer;
     std::shared_ptr<DescriptorHandle> handle;
     kBufferType buffer_type;
 };
@@ -39,13 +39,13 @@ class GpuResourceGroup
     std::vector<GpuResource> m_gpu_resources_;
 
 public:
-    void Insert(const AssetPtr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external = false);
+    void Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external = false);
     bool Empty(kGpuUploadType buffer_type) const;
     std::vector<GpuResource>::iterator Begin(kGpuUploadType buffer_type);
     std::vector<GpuResource>::iterator End(kGpuUploadType buffer_type);
 
-    AssetPtr<BufferBase> FindBufferWithName(const std::string &name);
-    bool SetBufferWithName(const AssetPtr<BufferBase> &buffer, const std::string &name);
+    std::shared_ptr<BufferBase> FindBufferWithName(const std::string &name);
+    bool SetBufferWithName(const std::shared_ptr<BufferBase> &buffer, const std::string &name);
 
     bool UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block) const;
     bool SetBufferToDescriptorTable();

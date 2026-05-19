@@ -38,7 +38,39 @@ Texture2D::kImageFormat Texture2D::GetImageFormat(const path &file_path)
 }
 
 void Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
-{}
+{
+    unsigned char *pixels;
+    int width = 0, height = 0, channels = 0;
+
+    if (ai_texture->mHeight == 0)
+    {
+        pixels = stbi_load_from_memory(
+            reinterpret_cast<const unsigned char *>(ai_texture->pcData),
+            ai_texture->mWidth,
+            &width,
+            &height,
+            &channels,
+            4
+        );
+        m_tex_data_.reserve(width * height * sizeof(PackedVector::XMCOLOR));
+    }
+    else
+    {
+        width = ai_texture->mWidth;
+        height = ai_texture->mHeight;
+        pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
+    }
+    m_width_ = width;
+    m_height_ = height;
+    m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+    m_tex_data_.resize(width * height);
+    memcpy(m_tex_data_.data(), pixels, width * height * sizeof(PackedVector::XMCOLOR));
+
+    if (pixels)
+    {
+        stbi_image_free(pixels);
+    }
+}
 
 void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, ScratchImage &scratch)
 {
@@ -68,11 +100,12 @@ void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, Scrat
 
 void Texture2D::CacheData()
 {
-    const auto path = AssetDatabase::GetAssetDescriptor(Guid())->AssetPath();
-
+    const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(Guid());
     //internalだったらキャッシュできないよ
-    if (path.empty())
+    if (asset_descriptor == nullptr)
         return;
+
+    const auto path = asset_descriptor->AssetPath();
     
     TexMetadata metadata;
     ScratchImage scratch;
@@ -86,10 +119,12 @@ void Texture2D::CacheData()
 
 std::vector<PackedVector::XMCOLOR> Texture2D::GetPixels()
 {
-    const auto path = AssetDatabase::GetAssetDescriptor(Guid())->AssetPath();
+    const auto asset_descriptor = AssetDatabase::GetAssetDescriptor(Guid());
     //internalなテクスチャだったらそのまま返す
-    if (path.empty())
+    if (asset_descriptor == nullptr)
         return m_tex_data_;
+
+    const auto path = asset_descriptor->AssetPath();
 
     std::vector<PackedVector::XMCOLOR> result;
     TexMetadata metadata;
@@ -164,7 +199,7 @@ DXGI_FORMAT Texture2D::Format()
 
 Texture2D::~Texture2D()
 {
-    TextureCollection::RemoveTexture(TextureCollection::GenerateTextureId(shared_from_base<Texture2D>()));
+    TextureCollection::DeleteTexture(AssetPtr<Texture2D>::FromManaged(shared_from_base<Texture2D>()));
 }
 
 void Texture2D::OnInspectorGui()
@@ -174,7 +209,8 @@ void Texture2D::OnInspectorGui()
     ImGui::Text("Height: %d", m_height_);
     ImGui::Text("Mip Level: %d", m_mip_level_);
 
-    if (const auto desc_heap = UploadBuffer())
+    auto texture_buffer = TextureCollection::GetTexture(shared_from_base<Texture2D>());
+    if (const auto desc_heap = texture_buffer->UploadBuffer())
     {
         const auto ratio = m_height_ > 0 ? static_cast<float>(m_width_) / static_cast<float>(m_height_) : 1.0f;
         const auto max_width = ImGui::CalcItemWidth();
