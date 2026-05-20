@@ -28,7 +28,7 @@ public:
     }
 
     void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
+    void UpdateBuffer(const void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     kGpuUploadType BufferType() const override

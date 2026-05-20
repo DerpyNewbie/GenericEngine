@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "gpu_resource_group.h"
 
+#include "gpu_resource_manager.h"
+
 namespace engine
 {
 int *ShaderDataIndex::GetLengthField(kGpuUploadType type)
@@ -61,10 +63,8 @@ int ShaderDataIndex::GetFullLength() const
 
 void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external)
 {
-    auto data = buffer;
-
-    const auto buffer_type = data->BufferType();
-    data->CreateBuffer();
+    const auto buffer_type = buffer->BufferType();
+    buffer->CreateBuffer();
     GpuResource gpu_resource;
     gpu_resource.is_external = is_external;
     gpu_resource.name = material_data->parameter.name;
@@ -113,6 +113,14 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
         if (gpu_resource.buffer == nullptr || gpu_resource.handle == nullptr)
             return false;
 
+        auto global_resource = GpuResourceManager::GetGlobalBuffer(gpu_resource.name);
+        if (global_resource != nullptr)
+        {
+            gpu_resource.buffer = global_resource;
+            gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+            continue;
+        }
+        
         auto it = std::ranges::find_if(material_data, [&gpu_resource](const std::shared_ptr<IMaterialData> &material_data) {
             return material_data->parameter.name == gpu_resource.name;
         });
@@ -121,9 +129,9 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
             continue;
 
         const auto &data = *it;
-        if (gpu_resource.is_external || !data->is_dirty)
+        if (!data->is_dirty)
             continue;
-
+        
         if (data->BufferType() == kBufferType_Texture2D)
         {
             gpu_resource.buffer = TextureCollection::GetTexture(*static_cast<AssetPtr<Texture2D> *>(data->Data()));
