@@ -38,6 +38,10 @@ class GpuResourceGroup
     bool m_is_dirty_ = true;
     std::vector<GpuResource> m_gpu_resources_;
 
+    static void UpdateConstantBuffer(const GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
+    static void UpdateStructuredBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
+    static void UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
+    
 public:
     void Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, kBufferType buffer_type, bool is_external = false);
     bool Empty(kGpuUploadType buffer_type) const;
@@ -49,5 +53,6 @@ public:
 
     bool UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block) const;
     bool SetBufferToDescriptorTable();
+    
 };
 }

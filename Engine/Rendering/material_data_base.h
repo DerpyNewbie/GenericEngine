@@ -15,8 +15,9 @@ struct MaterialDataBase : Object, Inspectable
     ShaderParameter parameter;
     kGpuUploadType upload_type;
 
-    MaterialDataBase();
-    explicit MaterialDataBase(ShaderParameter param);
+
+    MaterialDataBase() = default;
+    explicit MaterialDataBase(const ShaderParameter &param);
 
     void OnDeserialized() override;
 
@@ -30,19 +31,6 @@ struct MaterialDataBase : Object, Inspectable
         );
     }
 };
-
-inline MaterialDataBase::MaterialDataBase() :
-    parameter()
-{}
-
-inline MaterialDataBase::MaterialDataBase(ShaderParameter param) :
-    parameter(std::move(param))
-{}
-
-inline void MaterialDataBase::OnDeserialized()
-{
-    is_dirty = true;
-}
 }
 
 CEREAL_CLASS_VERSION(engine::MaterialDataBase, 1)

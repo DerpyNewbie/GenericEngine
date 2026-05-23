@@ -99,14 +99,26 @@ VSOutput vrt(VSInput input)
 
 float4 pix(VSOutput input) : SV_TARGET
 {
+    float4 color = float4(0.1, 0.2, 0.3, 1.0);
+    
+    // [loop] でコンパイラに「展開するな！」と強制する
+    [loop]
+    for (uint i = 0; i < 1500; ++i) {
+        // GPUがサボれないように、前の結果に依存する重い計算をさせる
+        color.rgb = sin(color.rgb) * cos(color.rgb) + tan(color.rgb);
+        color.rgb = sqrt(abs(color.rgb)) + frac(color.rgb);
+    }
+    
     float3 N = normalize(input.normal);
     float3 brightness = float3(0, 0, 0);
-    if (light_count == 0)
+    if (light_count != 0)
     {
         float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
         float4 mainColor = _MainTex.Sample(smp, flippedUV);
         return float4(mainColor.rgb, mainColor.a);
     }
+
+	return saturate(color);
 
     float4 viewPos = mul(View, float4(input.worldpos, 1.0));
     float depth = abs(viewPos.z);
@@ -138,6 +150,6 @@ float4 pix(VSOutput input) : SV_TARGET
     }
 
     float4 main_color = _MainTex.Sample(smp, input.uv);
-
+    
     return float4(main_color.rgb * brightness, main_color.a);
 }

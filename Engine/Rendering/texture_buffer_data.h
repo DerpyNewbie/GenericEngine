@@ -1,5 +1,7 @@
 #pragma once
-#include "material_data.h"
+#include "material_data_base.h"
+#include "Asset/asset_ptr.h"
+#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {

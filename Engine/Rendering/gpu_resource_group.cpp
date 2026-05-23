@@ -59,6 +59,36 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
+void GpuResourceGroup::UpdateConstantBuffer(const GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+{
+    auto cb_data = material_block->GetConstantBufferData(gpu_resource.name);
+    if (cb_data->is_dirty)
+        gpu_resource.buffer->UpdateBuffer(cb_data->Data());
+}
+
+void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+{
+    auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
+    if (sb_data->is_size_changed)
+    {
+        sb_data->is_size_changed = false;
+        gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
+        gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+    }
+    if (sb_data->is_dirty)
+        gpu_resource.buffer->UpdateBuffer(sb_data->Data());
+}
+
+void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+{
+    auto tex_data = material_block->GetTextureBufferData(gpu_resource.name);
+    if (tex_data->is_dirty)
+    {
+        gpu_resource.buffer = TextureCollection::GetTexture(tex_data->Data());
+        gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+    }
+}
+
 void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, kBufferType buffer_type, bool is_external)
 {
     auto data = buffer;
@@ -118,29 +148,15 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
         switch (gpu_resource.buffer_type)
         {
             case kBufferType_ConstantBuffer: {
-                auto cb_data = material_block->GetConstantBufferData(gpu_resource.name);
-                if (cb_data->is_dirty)
-                    gpu_resource.buffer->UpdateBuffer(cb_data->Data());
+                UpdateConstantBuffer(gpu_resource, material_block);
                 break;
             }
             case kBufferType_StructuredBuffer: {
-                auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
-                if (sb_data->is_size_changed)
-                {
-                    gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
-                    gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
-                }
-                if (sb_data->is_dirty)
-                    gpu_resource.buffer->UpdateBuffer(sb_data->Data());
+                UpdateStructuredBuffer(gpu_resource, material_block);
                 break;
             }
             case kBufferType_Texture2D: {
-                auto tex_data = material_block->GetTextureBufferData(gpu_resource.name);
-                if (tex_data->is_dirty)
-                {
-                    gpu_resource.buffer = TextureCollection::GetTexture(tex_data->Data());
-                    gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
-                }
+                UpdateTextureBuffer(gpu_resource, material_block);
                 break;
             }
         }

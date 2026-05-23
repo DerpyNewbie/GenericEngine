@@ -1,6 +1,6 @@
 #pragma once
 #include "constant_buffer_data.h"
-#include "material_data.h"
+#include "material_data_base.h"
 #include "shader.h"
 #include "structured_buffer_data.h"
 #include "texture_buffer_data.h"
