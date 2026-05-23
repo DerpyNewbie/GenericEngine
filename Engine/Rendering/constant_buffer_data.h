@@ -15,18 +15,21 @@ class ConstantBufferData : public MaterialDataBase
 
     void AddIntData(const std::string &name);
     void AddFloatData(const std::string &name);
-    void AddVectorData(const std::string &name);
+    void AddVector2Data(const std::string &name);
+    void AddVector3Data(const std::string &name);
     void AddColorData(const std::string &name);
     void AddMatrixData(const std::string &name);
 
 public:
+    ConstantBufferData() = default;
     ConstantBufferData(const ShaderParameter &shader_param);
 
     void OnInspectorGui() override;
 
     bool SetIntData(const std::string &name, int data);
     bool SetFloatData(const std::string &name, float data);
-    bool SetVectorData(const std::string &name, Vector3 data);
+    bool SetVector2Data(const std::string &name, Vector2 data);
+    bool SetVector3Data(const std::string &name, Vector3 data);
     bool SetColorData(const std::string &name, Color data);
     bool SetMatrixData(const std::string &name, const Matrix &data);
 

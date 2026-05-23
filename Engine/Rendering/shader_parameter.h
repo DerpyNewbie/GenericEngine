@@ -6,7 +6,8 @@ enum class kConstantBufferDataType
 {
     kConstantBufferDataType_Int,
     kConstantBufferDataType_Float,
-    kConstantBufferDataType_Vector,
+    kConstantBufferDataType_Vector2,
+    kConstantBufferDataType_Vector3,
     kConstantBufferDataType_Color,
     kConstantBufferDataType_Matrix,
     kConstantBufferDataType_Unknown
@@ -23,6 +24,15 @@ struct ShaderVariableDesc
 {
     std::string name;
     kConstantBufferDataType data_type;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            CEREAL_NVP(name),
+            CEREAL_NVP(data_type)
+        );
+    }
 };
 
 struct ShaderParameter

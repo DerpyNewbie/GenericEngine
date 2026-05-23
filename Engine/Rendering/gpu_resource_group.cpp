@@ -59,20 +59,20 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, bool is_external)
+void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, kBufferType buffer_type, bool is_external)
 {
     auto data = buffer;
 
-    const auto buffer_type = data->BufferType();
+    const auto upload_type = data->BufferType();
     data->CreateBuffer();
     GpuResource gpu_resource;
     gpu_resource.is_external = is_external;
     gpu_resource.name = material_data->parameter.name;
     gpu_resource.buffer = buffer;
-    gpu_resource.buffer_type = material_data->BufferType();
-    m_gpu_resources_.insert(End(buffer_type), gpu_resource);
+    gpu_resource.buffer_type = buffer_type;
+    m_gpu_resources_.insert(End(upload_type), gpu_resource);
 
-    const auto field = m_shader_index_.GetLengthField(buffer_type);
+    const auto field = m_shader_index_.GetLengthField(upload_type);
     ++(*field);
 }
 
@@ -107,33 +107,43 @@ bool GpuResourceGroup::SetBufferWithName(const std::shared_ptr<BufferBase> &buff
 
 bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block) const
 {
-    const auto &material_data = material_block->material_data;
     for (auto gpu_resource : m_gpu_resources_)
     {
         if (gpu_resource.buffer == nullptr || gpu_resource.handle == nullptr)
             return false;
 
-        auto it = std::ranges::find_if(material_data, [&gpu_resource](const std::shared_ptr<MaterialDataBase> &material_data) {
-            return material_data->parameter.name == gpu_resource.name;
-        });
-
-        if (it == material_data.end())
+        if (gpu_resource.is_external)
             continue;
 
-        const auto &data = *it;
-        if (gpu_resource.is_external || !data->is_dirty)
-            continue;
-
-        if (data->BufferType() == kBufferType_Texture2D)
+        switch (gpu_resource.buffer_type)
         {
-            gpu_resource.buffer = TextureCollection::GetTexture(*static_cast<AssetPtr<Texture2D> *>(data->Data()));
-            if (gpu_resource.buffer == nullptr)
-                return false;
-            gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
-            continue;
+            case kBufferType_ConstantBuffer: {
+                auto cb_data = material_block->GetConstantBufferData(gpu_resource.name);
+                if (cb_data->is_dirty)
+                    gpu_resource.buffer->UpdateBuffer(cb_data->Data());
+                break;
+            }
+            case kBufferType_StructuredBuffer: {
+                auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
+                if (sb_data->is_size_changed)
+                {
+                    gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
+                    gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+                }
+                if (sb_data->is_dirty)
+                    gpu_resource.buffer->UpdateBuffer(sb_data->Data());
+                break;
+            }
+            case kBufferType_Texture2D: {
+                auto tex_data = material_block->GetTextureBufferData(gpu_resource.name);
+                if (tex_data->is_dirty)
+                {
+                    gpu_resource.buffer = TextureCollection::GetTexture(tex_data->Data());
+                    gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+                }
+                break;
+            }
         }
-
-        gpu_resource.buffer->UpdateBuffer(data->Data());
     }
 
     return true;
@@ -157,7 +167,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
 
         ++itr;
     }
-    
+
     m_is_dirty_ = false;
 
     return true;

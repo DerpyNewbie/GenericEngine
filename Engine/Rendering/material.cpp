@@ -73,7 +73,7 @@ void Material::UpdateBuffer()
 
 bool Material::IsDirty() const
 {
-    return p_shared_material_block == nullptr || p_shared_material_block->IsDirty();
+    return p_shared_material_block == nullptr;
 }
 }
 

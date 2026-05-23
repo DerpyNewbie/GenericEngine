@@ -16,31 +16,25 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
 
     auto new_group = std::make_shared<GpuResourceGroup>();
 
-    for (const auto &data : material_block->m_constant_buffer_data_)
+    for (const auto &data : material_block->m_constant_buffer_data_ | std::views::values)
     {
-        auto cb = std::make_shared<>();
+        auto cb = std::make_shared<ConstantBuffer>(data->Size());
+
+        new_group->Insert(cb, data, kBufferType_ConstantBuffer);
     }
-    
-    for (const auto &data : material_block->material_data)
+    for (const auto &data : material_block->m_structured_buffer_data_ | std::views::values)
     {
-        switch (data->BufferType())
-        {
-            case kBufferType_ConstantBuffer: {
-                auto cb = std::make_shared<ConstantBuffer>(data->SizeInBytes());
-                new_group->Insert(cb, data);
-                break;
-            }
-            case kBufferType_StructuredBuffer: {
-                auto sb = std::make_shared<StructuredBuffer>(data->SizeInBytes(), data->Count());
-                new_group->Insert(sb, data);
-            }
-            case kBufferType_Texture2D: {
-                auto texture = data->Data();
-                auto texture_buffer = TextureCollection::GetTexture(*static_cast<AssetPtr<Texture2D> *>(texture));
-                new_group->Insert(texture_buffer, data);
-                break;
-            }
-        }
+        auto sb = std::make_shared<StructuredBuffer>(data->Stride(), data->Count());
+
+        new_group->Insert(sb, data, kBufferType_StructuredBuffer);
+    }
+    for (const auto &data : material_block->m_texture_buffer_data_ | std::views::values)
+    {
+        auto texture = data->Data();
+
+        auto texture_buffer = TextureCollection::GetTexture(texture);
+
+        new_group->Insert(texture_buffer, data, kBufferType_Texture2D);
     }
 
     m_material_block_buffer_map_.insert({material_block, new_group});

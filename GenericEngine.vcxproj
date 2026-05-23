@@ -449,6 +449,7 @@
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
             <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+            <AdditionalOptions>/bigobj</AdditionalOptions>
         </ClCompile>
         <Link>
             <SubSystem>Windows</SubSystem>

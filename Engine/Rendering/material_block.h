@@ -15,9 +15,8 @@ class MaterialBlock : public Object, public Inspectable
     std::unordered_map<std::string, std::shared_ptr<ConstantBufferData>> m_constant_buffer_data_;
     std::unordered_map<std::string, std::shared_ptr<StructuredBufferData>> m_structured_buffer_data_;
     std::unordered_map<std::string, std::shared_ptr<TextureBufferData>> m_texture_buffer_data_;
-    
+
 public:
-    
     MaterialBlock() = default;
 
     void OnInspectorGui() override;
@@ -25,16 +24,9 @@ public:
     std::shared_ptr<ConstantBufferData> GetConstantBufferData(const std::string &name);
     std::shared_ptr<StructuredBufferData> GetStructuredBufferData(const std::string &name);
     std::shared_ptr<TextureBufferData> GetTextureBufferData(const std::string &name);
+
+    void LoadShaderParameters(const std::vector<ShaderParameter> &shader_params);
     
-    void LoadShaderParameters(
-        const std::vector<ShaderParameter> &shader_params,
-        const std::vector<std::shared_ptr<MaterialDataBase>> &resource_material_data = {}
-    );
-
-    std::shared_ptr<MaterialDataBase> FindMaterialDataByName(const std::string &name);
-
-    bool IsDirty();
-
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {

@@ -17,7 +17,9 @@ void StructuredBufferData::SetStride(const size_t stride)
     m_stride_ = stride;
 
     m_data_.resize(m_stride_ * m_count_);
+
     is_dirty = true;
+    is_size_changed = true;
 }
 
 void StructuredBufferData::SetCount(const size_t count)
@@ -25,7 +27,9 @@ void StructuredBufferData::SetCount(const size_t count)
     m_count_ = count;
 
     m_data_.resize(m_stride_ * m_count_);
+
     is_dirty = true;
+    is_size_changed = true;
 }
 
 void StructuredBufferData::SetData(const void *data)

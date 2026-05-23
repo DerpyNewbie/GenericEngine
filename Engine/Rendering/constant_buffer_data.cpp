@@ -19,9 +19,17 @@ void ConstantBufferData::AddFloatData(const std::string &name)
     m_data_.resize(m_current_offset_);
 }
 
-void ConstantBufferData::AddVectorData(const std::string &name)
+void ConstantBufferData::AddVector2Data(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Vector, m_current_offset_));
+    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Vector2, m_current_offset_));
+
+    m_current_offset_ += sizeof(Vector2);
+    m_data_.resize(m_current_offset_);
+}
+
+void ConstantBufferData::AddVector3Data(const std::string &name)
+{
+    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Vector3, m_current_offset_));
 
     m_current_offset_ += sizeof(Vector3);
     m_data_.resize(m_current_offset_);
@@ -55,8 +63,11 @@ ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : Ma
             case kConstantBufferDataType::kConstantBufferDataType_Float:
                 AddFloatData(variable.name);
                 break;
-            case kConstantBufferDataType::kConstantBufferDataType_Vector:
-                AddVectorData(variable.name);
+            case kConstantBufferDataType::kConstantBufferDataType_Vector2:
+                AddVector2Data(variable.name);
+                break;
+            case kConstantBufferDataType::kConstantBufferDataType_Vector3:
+                AddVector3Data(variable.name);
                 break;
             case kConstantBufferDataType::kConstantBufferDataType_Color:
                 AddColorData(variable.name);
@@ -89,10 +100,16 @@ void ConstantBufferData::OnInspectorGui()
                     SetFloatData(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Vector: {
+            case kConstantBufferDataType::kConstantBufferDataType_Vector2: {
+                auto data = *reinterpret_cast<Vector2 *>(m_data_.data() + offset);
+                if (Gui::PropertyField(name.c_str(), data))
+                    SetVector2Data(name, data);
+                break;
+            }
+            case kConstantBufferDataType::kConstantBufferDataType_Vector3: {
                 auto data = *reinterpret_cast<Vector3 *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetVectorData(name, data);
+                    SetVector3Data(name, data);
                 break;
             }
             case kConstantBufferDataType::kConstantBufferDataType_Color: {
@@ -141,11 +158,25 @@ bool ConstantBufferData::SetFloatData(const std::string &name, const float data)
     return true;
 }
 
-bool ConstantBufferData::SetVectorData(const std::string &name, const Vector3 data)
+bool ConstantBufferData::SetVector2Data(const std::string &name, const Vector2 data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Vector)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Vector2)
+        return false;
+
+    const auto dst = m_data_.data() + it->second.second;
+    memcpy(dst, &data, sizeof(Vector2));
+
+    is_dirty = true;
+    return true;
+}
+
+bool ConstantBufferData::SetVector3Data(const std::string &name, const Vector3 data)
+{
+    const auto it = m_data_type_offset_pairs_.find(name);
+
+    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Vector3)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;

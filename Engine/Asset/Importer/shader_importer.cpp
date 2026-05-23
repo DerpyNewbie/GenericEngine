@@ -56,6 +56,9 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
         D3D12_SHADER_INPUT_BIND_DESC bind_desc;
         shader->GetResourceBindingDesc(i, &bind_desc);
 
+        if (IsReservedBufferName(bind_desc.Name))
+            continue;
+        
         if (bind_desc.Type == D3D_SIT_CBUFFER)
         {
             ID3D12ShaderReflectionConstantBuffer *cb_reflect = shader->GetConstantBufferByName(bind_desc.Name);
@@ -107,31 +110,6 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
         }
     }
 
-    for (UINT i = 0; i < shader_desc.ConstantBuffers; ++i)
-    {
-        ID3D12ShaderReflectionConstantBuffer *constant_buffer = shader->GetConstantBufferByIndex(i);
-
-        D3D12_SHADER_BUFFER_DESC buffer_desc;
-        constant_buffer->GetDesc(&buffer_desc);
-
-        if (IsReservedBufferName(buffer_desc.Name))
-            continue;
-
-        auto cb_parameters = ReadConstantBufferVariables(shader, constant_buffer);
-        shader_parameters.insert(shader_parameters.end(), cb_parameters.begin(), cb_parameters.end());
-    }
-
-    for (UINT i = 0; i < shader_desc.BoundResources; ++i)
-    {
-        D3D12_SHADER_INPUT_BIND_DESC bind_desc;
-        shader->GetResourceBindingDesc(i, &bind_desc);
-
-        if (IsReservedBufferName(bind_desc.Name))
-            continue;
-
-        auto buffer_parameters = ConvertToShaderParameter(&bind_desc);
-        shader_parameters.emplace_back(buffer_parameters);
-    }
     return shader_parameters;
 }
 
@@ -155,13 +133,18 @@ kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SH
                 case D3D_SVC_VECTOR:
                     switch (type_desc.Columns)
                     {
+                        case 2:
+                            return kConstantBufferDataType::kConstantBufferDataType_Vector2;
                         case 3:
-                            return kConstantBufferDataType::kConstantBufferDataType_Vector;
+                            return kConstantBufferDataType::kConstantBufferDataType_Vector3;
                         case 4:
                             return kConstantBufferDataType::kConstantBufferDataType_Color;
-                default:
+                        default:
                             return kConstantBufferDataType::kConstantBufferDataType_Unknown;
                     }
+                case D3D_SVC_MATRIX_COLUMNS:
+                    if (type_desc.Rows == 4 && type_desc.Columns == 4)
+                        return kConstantBufferDataType::kConstantBufferDataType_Matrix;
             }
         default:
             return kConstantBufferDataType::kConstantBufferDataType_Unknown;

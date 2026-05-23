@@ -1,5 +1,8 @@
 #include "pch.h"
 #include "material_block.h"
+
+#include <assimp/material.h>
+
 #include "material_data.h"
 
 namespace
@@ -60,66 +63,29 @@ std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std
     return m_texture_buffer_data_.find(name)->second;
 }
 
-void MaterialBlock::LoadShaderParameters(
-    const std::vector<ShaderParameter> &shader_params,
-    const std::vector<std::shared_ptr<MaterialDataBase>> &resource_material_data
-)
+void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &shader_params)
 {
-
     //TODO : パラメーターの順番が正しいとは限らないので、パラメーターのインデックス見に行った方がいいかも。 要検証。
     for (auto &param : shader_params)
     {
-        bool found = false;
-        if (!resource_material_data.empty())
-        {
-            for (auto res_data : resource_material_data)
-            {
-                if (param.name == res_data->parameter.name)
-                {
-                    material_data.emplace_back(res_data);
-                    found = true;
-                    break;
-                }
-            }
-        }
+        const auto data = CreateMaterialData(param);
 
-        if (!found)
-        {
-            const auto data = CreateMaterialData(param);
+        if (data == nullptr)
+            continue;
 
-            if (data != nullptr)
-            {
-                material_data.emplace_back(data);
-            }
+        switch (param.buffer_type)
+        {
+            case kBufferType_ConstantBuffer:
+                m_constant_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
+                break;
+            case kBufferType_StructuredBuffer:
+                m_structured_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
+                break;
+            case kBufferType_Texture2D:
+                m_texture_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
+                break;
         }
     }
-}
-
-std::shared_ptr<MaterialDataBase> MaterialBlock::FindMaterialDataByName(const std::string &name)
-{
-    const auto it = std::ranges::find_if(material_data, [&name](const std::shared_ptr<MaterialDataBase> &data) {
-        return data->parameter.name == name;
-    });
-    if (it != material_data.end())
-    {
-        return *it;
-    }
-
-    return {};
-}
-
-bool MaterialBlock::IsDirty()
-{
-    const auto it = std::ranges::find_if(material_data, [](const std::shared_ptr<MaterialDataBase> &data) {
-        return data->is_dirty;
-    });
-
-    if (it != material_data.end())
-    {
-        return true;
-    }
-
-    return false;
 }
 }
 

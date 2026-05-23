@@ -11,6 +11,9 @@ class StructuredBufferData : public MaterialDataBase
     std::vector<uint8_t> m_data_;
 
 public:
+    bool is_size_changed = true;
+
+    StructuredBufferData() = default;
     StructuredBufferData(const ShaderParameter &shader_param);
 
     void OnInspectorGui() override;

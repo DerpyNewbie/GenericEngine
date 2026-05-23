@@ -39,7 +39,7 @@ class GpuResourceGroup
     std::vector<GpuResource> m_gpu_resources_;
 
 public:
-    void Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, bool is_external = false);
+    void Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, kBufferType buffer_type, bool is_external = false);
     bool Empty(kGpuUploadType buffer_type) const;
     std::vector<GpuResource>::iterator Begin(kGpuUploadType buffer_type);
     std::vector<GpuResource>::iterator End(kGpuUploadType buffer_type);
