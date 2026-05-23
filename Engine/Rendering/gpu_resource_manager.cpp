@@ -16,6 +16,11 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
 
     auto new_group = std::make_shared<GpuResourceGroup>();
 
+    for (const auto &data : material_block->m_constant_buffer_data_)
+    {
+        auto cb = std::make_shared<>();
+    }
+    
     for (const auto &data : material_block->material_data)
     {
         switch (data->BufferType())

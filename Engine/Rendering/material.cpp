@@ -52,14 +52,6 @@ void Material::OnConstructed()
 
 void Material::CreateMaterialBlock()
 {
-    if (p_shared_material_block)
-    {
-        auto material_data = p_shared_material_block->material_data;
-        p_shared_material_block->DestroyThis();
-        p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
-        p_shared_material_block->LoadShaderParameters(shader.CastedLock()->parameters, material_data);
-    }
-
     if (shader.CastedLock() == nullptr)
     {
         Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");

@@ -59,7 +59,7 @@ int ShaderDataIndex::GetFullLength() const
     return cbv_length + srv_length + uav_length;
 }
 
-void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<IMaterialData> &material_data, bool is_external)
+void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<MaterialDataBase> &material_data, bool is_external)
 {
     auto data = buffer;
 
@@ -113,7 +113,7 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
         if (gpu_resource.buffer == nullptr || gpu_resource.handle == nullptr)
             return false;
 
-        auto it = std::ranges::find_if(material_data, [&gpu_resource](const std::shared_ptr<IMaterialData> &material_data) {
+        auto it = std::ranges::find_if(material_data, [&gpu_resource](const std::shared_ptr<MaterialDataBase> &material_data) {
             return material_data->parameter.name == gpu_resource.name;
         });
 

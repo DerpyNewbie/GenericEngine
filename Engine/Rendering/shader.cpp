@@ -71,7 +71,6 @@ void Shader::OnInspectorGui()
                 Gui::ReadOnlyStringField("Index", std::to_string(param.index));
                 Gui::ReadOnlyStringField("Name", param.name);
                 ImGui::InputText("Display Name", &param.display_name);
-                Gui::ReadOnlyStringField("Type", param.type_hint);
                 ImGui::Unindent();
             }
             ImGui::PopID();

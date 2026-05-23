@@ -16,7 +16,7 @@ class ShaderImporter : public AssetImporter
     static std::vector<ShaderParameter> ReadConstantBufferVariables(const ComPtr<ID3D12ShaderReflection> &shader, ID3D12ShaderReflectionConstantBuffer *constant_buffer);
     static ShaderParameter ConvertToShaderParameter(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc);
     static ShaderParameter ConvertToShaderParameter(UINT register_idx, const D3D12_SHADER_VARIABLE_DESC &variable_desc, const D3D12_SHADER_TYPE_DESC &type_desc);
-    static std::string GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc);
+    static kConstantBufferDataType GetConstantBufferDataType(const D3D12_SHADER_TYPE_DESC &type_desc);
     static std::string GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc);
     static void EmplaceShaderParameters(std::vector<ShaderParameter> &base_parameters, const std::vector<ShaderParameter> &src_parameters);
     static void UpdateShaderParameters(const std::shared_ptr<Shader> &shader);

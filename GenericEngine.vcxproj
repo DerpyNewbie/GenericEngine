@@ -133,6 +133,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
+        <ClCompile Include="Engine\Rendering\constant_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
         <ClCompile Include="Engine\Rendering\gpu_resource_group.cpp"/>
@@ -170,8 +171,10 @@
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
+        <ClCompile Include="Engine\Rendering\structured_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\texture_buffer.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\texture_collection.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
@@ -309,6 +312,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
+        <ClInclude Include="Engine\Rendering\constant_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_group.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_manager.h"/>
@@ -347,8 +351,10 @@
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
+        <ClInclude Include="Engine\Rendering\structured_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\texture_buffer.h"/>
+        <ClInclude Include="Engine\Rendering\texture_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\texture_collection.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>

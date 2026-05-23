@@ -51,6 +51,62 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
     D3D12_SHADER_DESC shader_desc;
     shader->GetDesc(&shader_desc);
 
+    for (UINT i = 0; i < shader_desc.BoundResources; ++i)
+    {
+        D3D12_SHADER_INPUT_BIND_DESC bind_desc;
+        shader->GetResourceBindingDesc(i, &bind_desc);
+
+        if (bind_desc.Type == D3D_SIT_CBUFFER)
+        {
+            ID3D12ShaderReflectionConstantBuffer *cb_reflect = shader->GetConstantBufferByName(bind_desc.Name);
+
+            D3D12_SHADER_BUFFER_DESC cb_desc;
+            cb_reflect->GetDesc(&cb_desc);
+
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ConstantBuffer, cb_desc.Size};
+
+            for (UINT j = 0; j < cb_desc.Variables; ++j)
+            {
+                auto var_reflect = cb_reflect->GetVariableByIndex(j);
+                auto type_reflect = var_reflect->GetType();
+
+                D3D12_SHADER_VARIABLE_DESC var_desc;
+                var_reflect->GetDesc(&var_desc);
+
+                D3D12_SHADER_TYPE_DESC type_desc;
+                type_reflect->GetDesc(&type_desc);
+
+                ShaderVariableDesc variable_info;
+                variable_info.name = var_desc.Name;
+                variable_info.data_type = GetConstantBufferDataType(type_desc);
+
+                shader_param.variables.emplace_back(variable_info);
+            }
+
+            shader_parameters.emplace_back(shader_param);
+        }
+        if (bind_desc.Type == D3D_SIT_STRUCTURED)
+        {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
+            shader_parameters.emplace_back(shader_param);
+        }
+        if (bind_desc.Type == D3D_SIT_UAV_RWSTRUCTURED)
+        {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
+            shader_parameters.emplace_back(shader_param);
+        }
+        if (bind_desc.Type == D3D_SIT_TEXTURE)
+        {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
+            shader_parameters.emplace_back(shader_param);
+        }
+        if (bind_desc.Type == D3D_SIT_UAV_RWTYPED)
+        {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
+            shader_parameters.emplace_back(shader_param);
+        }
+    }
+
     for (UINT i = 0; i < shader_desc.ConstantBuffers; ++i)
     {
         ID3D12ShaderReflectionConstantBuffer *constant_buffer = shader->GetConstantBufferByIndex(i);
@@ -79,43 +135,7 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
     return shader_parameters;
 }
 
-std::vector<ShaderParameter> ShaderImporter::ReadConstantBufferVariables(const ComPtr<ID3D12ShaderReflection> &shader, ID3D12ShaderReflectionConstantBuffer *constant_buffer)
-{
-    std::vector<ShaderParameter> result;
-
-    D3D12_SHADER_BUFFER_DESC buffer_desc;
-    constant_buffer->GetDesc(&buffer_desc);
-
-    D3D12_SHADER_INPUT_BIND_DESC bind_desc;
-    shader->GetResourceBindingDescByName(buffer_desc.Name, &bind_desc);
-
-    for (auto i = 0; i < buffer_desc.Variables; ++i)
-    {
-        const auto variable = constant_buffer->GetVariableByIndex(i);
-        D3D12_SHADER_VARIABLE_DESC variable_desc;
-        variable->GetDesc(&variable_desc);
-
-        const auto variable_type = variable->GetType();
-        D3D12_SHADER_TYPE_DESC type_desc;
-        variable_type->GetDesc(&type_desc);
-
-        result.emplace_back(ConvertToShaderParameter(bind_desc.BindPoint, variable_desc, type_desc));
-    }
-
-    return result;
-}
-
-ShaderParameter ShaderImporter::ConvertToShaderParameter(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
-{
-    return ShaderParameter{static_cast<int>(bind_desc->BindPoint), bind_desc->Name, bind_desc->Name, GetTypeHint(bind_desc)};
-}
-
-ShaderParameter ShaderImporter::ConvertToShaderParameter(const UINT register_idx, const D3D12_SHADER_VARIABLE_DESC &variable_desc, const D3D12_SHADER_TYPE_DESC &type_desc)
-{
-    return ShaderParameter{static_cast<int>(register_idx), variable_desc.Name, variable_desc.Name, GetTypeHint(type_desc)};
-}
-
-std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc)
+kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SHADER_TYPE_DESC &type_desc)
 {
     switch (type_desc.Type)
     {
@@ -123,49 +143,28 @@ std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc)
             switch (type_desc.Class)
             {
                 case D3D_SVC_SCALAR:
-                    return "int";
+                    return kConstantBufferDataType::kConstantBufferDataType_Int;
                 default:
-                    return std::format("type_desc_not_supported_int_class_{}", static_cast<int>(type_desc.Class));
+                    return kConstantBufferDataType::kConstantBufferDataType_Unknown;
             }
         case D3D_SVT_FLOAT:
             switch (type_desc.Class)
             {
                 case D3D_SVC_SCALAR:
-                    return "float";
+                    return kConstantBufferDataType::kConstantBufferDataType_Float;
                 case D3D_SVC_VECTOR:
                     switch (type_desc.Columns)
                     {
-                        case 2:
-                            return "float2";
                         case 3:
-                            return "float3";
+                            return kConstantBufferDataType::kConstantBufferDataType_Vector;
                         case 4:
-                            return "color";
-                        default:
-                            return std::format("type_desc_not_supported_float_vector_col_{}", static_cast<int>(type_desc.Columns));
+                            return kConstantBufferDataType::kConstantBufferDataType_Color;
+                default:
+                            return kConstantBufferDataType::kConstantBufferDataType_Unknown;
                     }
-                default:
-                    return std::format("type_desc_not_supported_float_class_{}", static_cast<int>(type_desc.Class));
             }
         default:
-            return std::format("type_desc_not_supported_type_{}", static_cast<int>(type_desc.Type));
-    }
-}
-
-std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
-{
-    switch (bind_desc->Type)
-    {
-        case D3D_SIT_TEXTURE:
-            switch (bind_desc->Dimension)
-            {
-                case D3D_SRV_DIMENSION_TEXTURE2D:
-                    return "texture2d";
-                default:
-                    return std::format("input_bind_not_supported_texture_dimension_{}", static_cast<int>(bind_desc->Dimension));
-            }
-        default:
-            return std::format("input_bind_not_supported_type_{}", static_cast<int>(bind_desc->Type));
+            return kConstantBufferDataType::kConstantBufferDataType_Unknown;
     }
 }
 

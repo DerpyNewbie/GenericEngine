@@ -2,12 +2,37 @@
 
 namespace engine
 {
+enum class kConstantBufferDataType
+{
+    kConstantBufferDataType_Int,
+    kConstantBufferDataType_Float,
+    kConstantBufferDataType_Vector,
+    kConstantBufferDataType_Color,
+    kConstantBufferDataType_Matrix,
+    kConstantBufferDataType_Unknown
+};
+
+enum kBufferType
+{
+    kBufferType_ConstantBuffer,
+    kBufferType_StructuredBuffer,
+    kBufferType_Texture2D
+};
+
+struct ShaderVariableDesc
+{
+    std::string name;
+    kConstantBufferDataType data_type;
+};
+
 struct ShaderParameter
 {
     int index;
     std::string name;
     std::string display_name;
-    std::string type_hint;
+    kBufferType buffer_type;
+    size_t total_size;
+    std::vector<ShaderVariableDesc> variables;
 
     bool operator==(const ShaderParameter &other) const
     {
@@ -22,7 +47,8 @@ struct ShaderParameter
             CEREAL_NVP(index),
             CEREAL_NVP(name),
             CEREAL_NVP(display_name),
-            CEREAL_NVP(type_hint)
+            CEREAL_NVP(total_size),
+            CEREAL_NVP(variables)
         );
     }
 };

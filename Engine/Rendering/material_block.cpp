@@ -1,60 +1,22 @@
 #include "pch.h"
 #include "material_block.h"
 #include "material_data.h"
-#include "Asset/Importer/texture_2d_importer.h"
 
 namespace
 {
 using namespace engine;
-using MaterialFactory =
-std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
 
-std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-    {"int",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<int>>(0, param);
-     }
-    },
-    {"float",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<float>>(0.0F, param);
-     }
-    },
-    {"color",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Color>>(Color(), param);
-     }
-    },
-    {"float2",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector2>>(Vector2::Zero, param);
-     }
-    },
-    {"float3",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
-     }
-    },
-    {"texture2d",
-     [](const ShaderParameter &param) {
-         auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
-         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
-             texture,
-             param
-         );
-     }
-    }
-};
-
-std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_param)
+std::shared_ptr<MaterialDataBase> CreateMaterialData(const ShaderParameter &shader_param)
 {
-    const auto func = g_material_data_factory[shader_param.type_hint];
-    if (func != nullptr)
+    switch (shader_param.buffer_type)
     {
-        auto material_data = func(shader_param);
-        return material_data;
+        case kBufferType_ConstantBuffer:
+            return std::make_shared<ConstantBufferData>(shader_param);
+        case kBufferType_StructuredBuffer:
+            return std::make_shared<StructuredBufferData>(shader_param);
+        case kBufferType_Texture2D:
+            return std::make_shared<TextureBufferData>(shader_param);
     }
-    return nullptr;
 }
 }
 
@@ -63,7 +25,19 @@ namespace engine
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : material_data)
+    for (auto &data : m_constant_buffer_data_ | std::views::values)
+    {
+        ImGui::PushID(data.get());
+        data->OnInspectorGui();
+        ImGui::PopID();
+    }
+    for (auto &data : m_structured_buffer_data_ | std::views::values)
+    {
+        ImGui::PushID(data.get());
+        data->OnInspectorGui();
+        ImGui::PopID();
+    }
+    for (auto &data : m_texture_buffer_data_ | std::views::values)
     {
         ImGui::PushID(data.get());
         data->OnInspectorGui();
@@ -71,9 +45,24 @@ void MaterialBlock::OnInspectorGui()
     }
 }
 
+std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const std::string &name)
+{
+    return m_constant_buffer_data_.find(name)->second;
+}
+
+std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(const std::string &name)
+{
+    return m_structured_buffer_data_.find(name)->second;
+}
+
+std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std::string &name)
+{
+    return m_texture_buffer_data_.find(name)->second;
+}
+
 void MaterialBlock::LoadShaderParameters(
     const std::vector<ShaderParameter> &shader_params,
-    const std::vector<std::shared_ptr<IMaterialData>> &resource_material_data
+    const std::vector<std::shared_ptr<MaterialDataBase>> &resource_material_data
 )
 {
 
@@ -106,9 +95,9 @@ void MaterialBlock::LoadShaderParameters(
     }
 }
 
-std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
+std::shared_ptr<MaterialDataBase> MaterialBlock::FindMaterialDataByName(const std::string &name)
 {
-    const auto it = std::ranges::find_if(material_data, [&name](const std::shared_ptr<IMaterialData> &data) {
+    const auto it = std::ranges::find_if(material_data, [&name](const std::shared_ptr<MaterialDataBase> &data) {
         return data->parameter.name == name;
     });
     if (it != material_data.end())
@@ -121,7 +110,7 @@ std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::
 
 bool MaterialBlock::IsDirty()
 {
-    const auto it = std::ranges::find_if(material_data, [](const std::shared_ptr<IMaterialData> &data) {
+    const auto it = std::ranges::find_if(material_data, [](const std::shared_ptr<MaterialDataBase> &data) {
         return data->is_dirty;
     });
 
