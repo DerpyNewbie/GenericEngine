@@ -141,12 +141,26 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
 {
     for (auto gpu_resource : m_gpu_resources_)
     {
-        if (gpu_resource.buffer == nullptr || gpu_resource.handle == nullptr)
+        if (gpu_resource.handle == nullptr)
+            return false;
+
+        auto global_resource = GpuResourceManager::GetGlobalBuffer(gpu_resource.name);
+        if (global_resource != nullptr)
+        {
+            gpu_resource.is_external = true;
+            gpu_resource.buffer = global_resource;
+            gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+            continue;
+        }
+
+        if (gpu_resource.buffer == nullptr)
             return false;
 
         if (gpu_resource.is_external)
             continue;
 
+        
+        
         switch (gpu_resource.buffer_type)
         {
             case kBufferType_ConstantBuffer: {

@@ -14,6 +14,7 @@
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
+#include "Components/global_resource_tester_component.h"
 #include "Components/mesh_renderer.h"
 #include "Components/rotator_component.h"
 #include "Components/rect_transform.h"
@@ -70,6 +71,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<AnimationComponent>("Animation");
     RegisterComponentFactory<RenderingSettingsComponent>("Rendering");
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
+    RegisterComponentFactory<GlobalResourceTesterComponent>("Debug");
     RegisterComponentFactory<CoroutineTest>("Debug");
 }
 
