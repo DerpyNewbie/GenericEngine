@@ -36,7 +36,7 @@ void StructuredBuffer::CreateBuffer()
     m_gpu_address_ = m_default_buffer_->GetGPUVirtualAddress();
 }
 
-void StructuredBuffer::UpdateBuffer(void *data)
+void StructuredBuffer::UpdateBuffer(const void *data)
 {
     if (m_upload_buffer_ == nullptr || m_default_buffer_ == nullptr)
     {

@@ -94,7 +94,7 @@ void TextureCube::CreateBuffer()
     cmd_list->ResourceBarrier(1, &barrier);
 }
 
-void TextureCube::UpdateBuffer(void *data)
+void TextureCube::UpdateBuffer(const void *data)
 {
     Logger::Error<TextureCube>("UpdateBuffer is not supported");
 }

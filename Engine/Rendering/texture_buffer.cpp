@@ -61,7 +61,7 @@ void TextureBuffer::CreateBuffer()
     }
 }
 
-void TextureBuffer::UpdateBuffer(void *data)
+void TextureBuffer::UpdateBuffer(const void *data)
 {
     Logger::Error("Can not Update Texture2D");
 }

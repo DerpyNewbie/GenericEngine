@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "gpu_resource_group.h"
 
+#include "gpu_resource_manager.h"
+
 namespace engine
 {
 int *ShaderDataIndex::GetLengthField(kGpuUploadType type)

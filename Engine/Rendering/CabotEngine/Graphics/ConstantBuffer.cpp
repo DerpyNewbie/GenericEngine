@@ -36,7 +36,7 @@ void ConstantBuffer::CreateBuffer()
 
     if (m_buffer_ == nullptr)
     {
-        engine::Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
+        Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
         return;
     }
 
@@ -44,7 +44,7 @@ void ConstantBuffer::CreateBuffer()
     const auto hr = m_buffer_->Map(0, &unreadable_range, &m_p_mapped_ptr_);
     if (FAILED(hr))
     {
-        engine::Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
+        Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
         return;
     }
 
@@ -55,7 +55,7 @@ void ConstantBuffer::CreateBuffer()
     m_buffer_->SetName(L"ConstantBuffer");
 }
 
-void ConstantBuffer::UpdateBuffer(void *data)
+void ConstantBuffer::UpdateBuffer(const void *data)
 {
     memcpy(m_p_mapped_ptr_, data, m_size_);
 }
