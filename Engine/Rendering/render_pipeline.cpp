@@ -92,7 +92,7 @@ bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_b
         const int root_param_idx = param_i +
                                    engine::RootSignature::kPreDefinedVariableCount;
         const auto itr = resource_group->Begin(param_type);
-        const auto desc_handle = itr->handle->handle_gpu;
+        const auto desc_handle = itr.handle->handle_gpu;
         cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
     }
     return true;

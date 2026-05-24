@@ -190,11 +190,11 @@ bool ConstantBufferData::SetColorData(const std::string &name, const Color data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Float)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Color)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
-    memcpy(dst, &data, sizeof(float));
+    memcpy(dst, &data, sizeof(Color));
 
     is_dirty = true;
     return true;
@@ -204,11 +204,11 @@ bool ConstantBufferData::SetMatrixData(const std::string &name, const Matrix &da
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Float)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Matrix)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
-    memcpy(dst, &data, sizeof(float));
+    memcpy(dst, &data, sizeof(Matrix));
 
     is_dirty = true;
     return true;

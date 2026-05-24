@@ -1,4 +1,5 @@
 ﻿#pragma once
+#include "RenderEngine.h"
 #include "Rendering/buffer_base.h"
 
 namespace engine
@@ -8,10 +9,10 @@ class ConstantBuffer : public BufferBase
     uint64_t m_size_aligned_;
     uint64_t m_size_;
 
-    ComPtr<ID3D12Resource> m_buffer_;
-    D3D12_CONSTANT_BUFFER_VIEW_DESC m_desc_;
+    std::array<ComPtr<ID3D12Resource>, RenderEngine::kFrame_Buffer_Count> m_buffers_;
+    std::array<D3D12_CONSTANT_BUFFER_VIEW_DESC, RenderEngine::kFrame_Buffer_Count> m_desc_;
 
-    void *m_p_mapped_ptr_ = nullptr;
+    std::array<void *, RenderEngine::kFrame_Buffer_Count> m_p_mapped_ptrs_ = {nullptr};
 
 public:
     ConstantBuffer() = default;
