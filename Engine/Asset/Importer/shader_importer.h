@@ -17,7 +17,7 @@ class ShaderImporter : public AssetImporter
     static kConstantBufferDataType GetConstantBufferDataType(const D3D12_SHADER_TYPE_DESC &type_desc);
     static void EmplaceShaderParameters(std::vector<ShaderParameter> &base_parameters, const std::vector<ShaderParameter> &src_parameters);
     static void UpdateShaderParameters(const std::shared_ptr<Shader> &shader);
-    static bool CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path);
+    static bool CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path, std::string &error_msg);
     static bool WriteShaderMeta(const std::shared_ptr<Shader> &shader, PersistentDataStore data_store);
     static bool IsReservedBufferName(std::string_view buffer_name);
 
