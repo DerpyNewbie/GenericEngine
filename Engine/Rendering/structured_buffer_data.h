@@ -1,9 +1,9 @@
 #pragma once
-#include "material_data_base.h"
+#include "buffer_data_base.h"
 
 namespace engine
 {
-class StructuredBufferData : public MaterialDataBase
+class StructuredBufferData : public BufferDataBase
 {
     size_t m_stride_ = 4;
     size_t m_count_ = 1;
@@ -28,11 +28,13 @@ public:
     [[nodiscard]] size_t Count() const;
     [[nodiscard]] size_t Size() const;
 
+    kBufferType BufferType() override;
+
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            cereal::base_class<MaterialDataBase>(this),
+            cereal::base_class<BufferDataBase>(this),
             CEREAL_NVP(m_stride_),
             CEREAL_NVP(m_count_),
             CEREAL_NVP(m_data_)

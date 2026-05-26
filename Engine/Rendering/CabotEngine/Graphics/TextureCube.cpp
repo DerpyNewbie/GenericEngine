@@ -91,6 +91,7 @@ void TextureCube::CreateBuffer()
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
     );
 
+    m_current_state_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     cmd_list->ResourceBarrier(1, &barrier);
 }
 
@@ -99,7 +100,7 @@ void TextureCube::UpdateBuffer(const void *data)
     Logger::Error<TextureCube>("UpdateBuffer is not supported");
 }
 
-void TextureCube::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
+void TextureCube::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)
 {
     const auto view_desc = ViewDesc();
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
@@ -113,6 +114,20 @@ std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
 bool TextureCube::IsValid()
 {
     return m_buffer_ != nullptr;
+}
+
+bool TextureCube::Transition(const D3D12_RESOURCE_STATES new_state)
+{
+    if (m_current_state_ == new_state)
+        return false;
+
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_buffer_.Get(), m_current_state_,
+        new_state);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+
+    m_current_state_ = new_state;
+    return true;
 }
 
 ID3D12Resource *TextureCube::Resource()

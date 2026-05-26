@@ -16,25 +16,40 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
 
     auto new_group = std::make_shared<GpuResourceGroup>();
 
-    for (const auto &data : material_block->m_constant_buffer_data_ | std::views::values)
+    for (const auto &data : material_block->m_buffer_data_ | std::views::values)
     {
-        auto cb = std::make_shared<ConstantBuffer>(data->Size());
+        switch (data->BufferType())
+        {
+            case kBufferType_ConstantBuffer: {
+                const auto cb_data = std::reinterpret_pointer_cast<ConstantBufferData>(data);
+                auto cb = std::make_shared<ConstantBuffer>(cb_data->Size());
 
-        new_group->Insert(cb, data, kBufferType_ConstantBuffer);
-    }
-    for (const auto &data : material_block->m_structured_buffer_data_ | std::views::values)
-    {
-        auto sb = std::make_shared<StructuredBuffer>(data->Stride(), data->Count());
+                new_group->Insert(cb, data, kBufferType_ConstantBuffer, kGpuBufferType_CBV);
+                break;
+            }
+            case kBufferType_StructuredBuffer: {
+                const auto sb_data = std::reinterpret_pointer_cast<StructuredBufferData>(data);
+                auto sb = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
 
-        new_group->Insert(sb, data, kBufferType_StructuredBuffer);
-    }
-    for (const auto &data : material_block->m_texture_buffer_data_ | std::views::values)
-    {
-        auto texture = data->Data();
+                new_group->Insert(sb, data, kBufferType_StructuredBuffer, data->parameter.is_unordered_access ? kGpuBufferType_UAV : kGpuBufferType_SRV);
+                break;
+            }
+            case kBufferType_Texture2D: {
+                const auto tex_data = std::reinterpret_pointer_cast<TextureBufferData>(data);
+                auto texture = tex_data->Data();
+                auto texture_buffer = texture == nullptr ? nullptr : TextureCollection::GetTexture(texture);
 
-        auto texture_buffer = TextureCollection::GetTexture(texture);
+                new_group->Insert(texture_buffer, data, kBufferType_Texture2D, kGpuBufferType_SRV);
+                break;
+            }
+            case kBufferType_UavTexture:
+                const auto uav_tex_data = std::reinterpret_pointer_cast<UavTextureBufferData>(data);
+                auto texture = uav_tex_data->Data();
+                auto texture_buffer = texture == nullptr ? nullptr : TextureCollection::GetRenderTexture(texture);
 
-        new_group->Insert(texture_buffer, data, kBufferType_Texture2D);
+                new_group->Insert(texture_buffer, data, kBufferType_UavTexture, kGpuBufferType_UAV);
+                break;
+        }
     }
 
     m_material_block_buffer_map_.insert({material_block, new_group});

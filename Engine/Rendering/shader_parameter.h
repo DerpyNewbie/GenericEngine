@@ -17,7 +17,8 @@ enum kBufferType
 {
     kBufferType_ConstantBuffer,
     kBufferType_StructuredBuffer,
-    kBufferType_Texture2D
+    kBufferType_Texture2D,
+    kBufferType_UavTexture
 };
 
 struct ShaderVariableDesc
@@ -37,12 +38,13 @@ struct ShaderVariableDesc
 
 struct ShaderParameter
 {
-    int index;
+    int index = 0;
     std::string name;
     std::string display_name;
     kBufferType buffer_type;
-    size_t total_size;
-    std::vector<ShaderVariableDesc> variables;
+    bool is_unordered_access = false;
+    size_t total_size = 0;
+    std::vector<ShaderVariableDesc> variables = {};
 
     bool operator==(const ShaderParameter &other) const
     {
@@ -57,6 +59,7 @@ struct ShaderParameter
             CEREAL_NVP(index),
             CEREAL_NVP(name),
             CEREAL_NVP(display_name),
+            CEREAL_NVP(is_unordered_access),
             CEREAL_NVP(total_size),
             CEREAL_NVP(variables)
         );

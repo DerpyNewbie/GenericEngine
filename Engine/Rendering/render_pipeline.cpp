@@ -75,9 +75,10 @@ bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_b
 {
     const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
     const auto cmd_list = RenderEngine::CommandList();
-    if (!resource_group->SetBufferToDescriptorTable())
-        return false;
+    
     if (!resource_group->UpdateBuffer(material_block))
+        return false;
+    if (!resource_group->SetBufferToDescriptorTable())
         return false;
 
     for (int param_i = 0; param_i < engine::kGpuBufferType_Count; ++param_i)
@@ -125,17 +126,15 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    const auto render_texture_buffer = camera.render_texture ? TextureCollection::GetRenderTexture(camera.render_texture) : nullptr;
-    if (render_texture_buffer)
+    if (const auto render_texture_buffer = camera.render_texture ? TextureCollection::GetRenderTexture(camera.render_texture) : nullptr)
     {
-        render_texture_buffer->BeginRender(camera.background_color);
+        render_texture_buffer->Transition(D3D12_RESOURCE_STATE_RENDER_TARGET);
         rtv_heap = render_texture_buffer->GetHeap();
     }
 
-    const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::GetDepthTexture(camera.depth_texture) : nullptr;
-    if (depth_texture_buffer)
+    if (const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::GetDepthTexture(camera.depth_texture) : nullptr)
     {
-        depth_texture_buffer->BeginRender();
+        depth_texture_buffer->Transition(D3D12_RESOURCE_STATE_DEPTH_WRITE);
         dsv_heap = depth_texture_buffer->GetHeap();
     }
 
@@ -152,12 +151,6 @@ void RenderPipeline::RenderCamera(const Camera &camera)
 
     RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
     Render(view, proj);
-
-    if (render_texture_buffer)
-        render_texture_buffer->EndRender();
-
-    if (depth_texture_buffer)
-        depth_texture_buffer->EndRender();
 }
 
 void RenderPipeline::RenderVoid()
@@ -379,10 +372,10 @@ void RenderPipeline::ExecuteRenderCommands()
 
             if (current_material != material)
             {
-                if (material->p_shared_material_block == nullptr)
+                if (material->shared_material_block == nullptr)
                     material->CreateMaterialBlock();
 
-                if (!SetDescriptorTable(material->p_shared_material_block))
+                if (!SetDescriptorTable(material->shared_material_block))
                     continue;
 
                 current_material = material;
@@ -448,7 +441,7 @@ void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<Asset
         if (casted_material == nullptr)
             continue;
 
-        const auto casted_shader = casted_material->shader.CastedLock();
+        const auto casted_shader = casted_material->GetShader().CastedLock();
         if (!casted_shader)
         {
             continue;

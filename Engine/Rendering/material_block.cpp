@@ -3,13 +3,13 @@
 
 #include <assimp/material.h>
 
-#include "material_data_base.h"
+#include "buffer_data_base.h"
 
 namespace
 {
 using namespace engine;
 
-std::shared_ptr<MaterialDataBase> CreateMaterialData(const ShaderParameter &shader_param)
+std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader_param)
 {
     switch (shader_param.buffer_type)
     {
@@ -19,6 +19,8 @@ std::shared_ptr<MaterialDataBase> CreateMaterialData(const ShaderParameter &shad
             return std::make_shared<StructuredBufferData>(shader_param);
         case kBufferType_Texture2D:
             return std::make_shared<TextureBufferData>(shader_param);
+        case kBufferType_UavTexture:
+            return std::make_shared<UavTextureBufferData>(shader_param);
     }
 }
 }
@@ -28,19 +30,7 @@ namespace engine
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : m_constant_buffer_data_ | std::views::values)
-    {
-        ImGui::PushID(data.get());
-        data->OnInspectorGui();
-        ImGui::PopID();
-    }
-    for (auto &data : m_structured_buffer_data_ | std::views::values)
-    {
-        ImGui::PushID(data.get());
-        data->OnInspectorGui();
-        ImGui::PopID();
-    }
-    for (auto &data : m_texture_buffer_data_ | std::views::values)
+    for (auto &data : m_buffer_data_ | std::views::values)
     {
         ImGui::PushID(data.get());
         data->OnInspectorGui();
@@ -50,22 +40,42 @@ void MaterialBlock::OnInspectorGui()
 
 std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const std::string &name)
 {
-    return m_constant_buffer_data_.find(name)->second;
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_ConstantBuffer)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<ConstantBufferData>(it->second);
 }
 
 std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(const std::string &name)
 {
-    return m_structured_buffer_data_.find(name)->second;
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_StructuredBuffer)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<StructuredBufferData>(it->second);
 }
 
 std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std::string &name)
 {
-    return m_texture_buffer_data_.find(name)->second;
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_Texture2D)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<TextureBufferData>(it->second);
+}
+
+std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_UavTexture)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<UavTextureBufferData>(it->second);
 }
 
 void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &shader_params)
 {
-    //TODO : パラメーターの順番が正しいとは限らないので、パラメーターのインデックス見に行った方がいいかも。 要検証。
     for (auto &param : shader_params)
     {
         const auto data = CreateMaterialData(param);
@@ -76,13 +86,17 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
         switch (param.buffer_type)
         {
             case kBufferType_ConstantBuffer:
-                m_constant_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
                 break;
             case kBufferType_StructuredBuffer:
-                m_structured_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
                 break;
-            case kBufferType_Texture2D:
-                m_texture_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
+            case kBufferType_Texture2D: {
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
+                break;
+            }
+            case kBufferType_UavTexture:
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
                 break;
         }
     }

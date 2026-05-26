@@ -43,6 +43,7 @@ void DepthTextureBuffer::CreateBuffer()
     resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL;
     resource_desc.MipLevels = 1;
 
+    m_current_state_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     m_buffer_ = DirectXResourceFactory::CreateBuffer(
         heap_prop,
         resource_desc,
@@ -64,25 +65,6 @@ void DepthTextureBuffer::CreateBuffer()
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
     device->CreateDepthStencilView(m_buffer_.Get(), &dsv_desc, dsv_handle);
-}
-
-void DepthTextureBuffer::BeginRender()
-{
-    if (m_buffer_ == nullptr)
-        CreateBuffer();
-
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        D3D12_RESOURCE_STATE_DEPTH_WRITE);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
-}
-
-void DepthTextureBuffer::EndRender()
-{
-    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_DEPTH_WRITE,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
 void DepthTextureBuffer::SetResource(const std::shared_ptr<Texture2DArray> &texture_array, int index)

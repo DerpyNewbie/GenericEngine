@@ -74,7 +74,7 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
             }
 
             case D3D_SIT_UAV_RWSTRUCTURED: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
+                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer, true};
                 shader_parameters.emplace_back(shader_param);
                 break;
             }
@@ -86,7 +86,7 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
             }
 
             case D3D_SIT_UAV_RWTYPED: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
+                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_UavTexture, true};
                 shader_parameters.emplace_back(shader_param);
                 break;
             }
@@ -101,7 +101,7 @@ ShaderParameter ShaderImporter::ReadConstantVariables(ID3D12ShaderReflectionCons
     D3D12_SHADER_BUFFER_DESC cb_desc;
     cb_reflect->GetDesc(&cb_desc);
 
-    ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ConstantBuffer, cb_desc.Size};
+    ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ConstantBuffer, false, cb_desc.Size};
 
     for (UINT j = 0; j < cb_desc.Variables; ++j)
     {
@@ -222,6 +222,20 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         &error_blob
     );
 
+    if (FAILED(hr))
+    {
+        if (error_blob != nullptr)
+        {
+            // 1. error_blob からエラー文字列の先頭ポインタを取得
+            auto error_message = static_cast<const char *>(error_blob->GetBufferPointer());
+
+            // 2. Visual Studio の「出力」ウインドウに表示する場合（超おすすめ）
+            OutputDebugStringA("\n================ HLSL Compile Error ================\n");
+            OutputDebugStringA(error_message);
+            OutputDebugStringA("====================================================\n\n");
+        }
+    }
+    
     hr = D3DCompileFromFile(
         file_path.c_str(),
         nullptr,

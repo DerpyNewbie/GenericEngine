@@ -5,9 +5,8 @@
 
 namespace engine
 {
-TextureBufferData::TextureBufferData(const ShaderParameter &shader_param) : MaterialDataBase(shader_param)
+TextureBufferData::TextureBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {
-    SetTexture(Texture2DImporter::GetColorTexture(DirectX::PackedVector::XMCOLOR(0.5f, 0.5f, 0.5f, 1.0f)));
 }
 
 void TextureBufferData::OnInspectorGui()
@@ -26,6 +25,11 @@ void TextureBufferData::SetTexture(const AssetPtr<Texture2D> &texture)
 AssetPtr<Texture2D> TextureBufferData::Data()
 {
     return m_texture_;
+}
+
+kBufferType TextureBufferData::BufferType()
+{
+    return kBufferType_Texture2D;
 }
 }
 

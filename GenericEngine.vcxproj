@@ -155,7 +155,7 @@
         <ClCompile Include="Engine\Rendering\lighting.cpp"/>
         <ClCompile Include="Engine\Rendering\light_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
-        <ClCompile Include="Engine\Rendering\material_data_base.cpp"/>
+        <ClCompile Include="Engine\Rendering\buffer_data_base.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
@@ -177,6 +177,7 @@
         <ClCompile Include="Engine\Rendering\texture_buffer.cpp"/>
         <ClCompile Include="Engine\Rendering\texture_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\texture_collection.cpp"/>
+        <ClCompile Include="Engine\Rendering\uav_texture_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
@@ -335,7 +336,7 @@
         <ClInclude Include="Engine\Rendering\lighting.h"/>
         <ClInclude Include="Engine\Rendering\light_data.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
-        <ClInclude Include="Engine\Rendering\material_data_base.h"/>
+        <ClInclude Include="Engine\Rendering\buffer_data_base.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
@@ -354,10 +355,10 @@
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
         <ClInclude Include="Engine\Rendering\structured_buffer_data.h"/>
-        <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
         <ClInclude Include="Engine\Rendering\texture_buffer.h"/>
         <ClInclude Include="Engine\Rendering\texture_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\texture_collection.h"/>
+        <ClInclude Include="Engine\Rendering\uav_texture_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>

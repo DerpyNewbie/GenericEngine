@@ -1,8 +1,8 @@
-cbuffer Transform : register(b0)
+cbuffer WorldMatrix : register(b0)
 {
     float4x4 World;
 }
-cbuffer Transforms : register(b1)
+cbuffer ViewProjMatrix : register(b1)
 {
     float4x4 View;
     float4x4 Proj;

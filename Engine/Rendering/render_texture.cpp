@@ -2,13 +2,34 @@
 
 #include "render_texture.h"
 #include "application.h"
-#include "logger.h"
-#include "CabotEngine/Graphics/RenderEngine.h"
-#include <directx/d3dx12_barriers.h>
+#include "gui.h"
 
-void engine::RenderTexture::OnInspectorGui()
+namespace engine
 {
-    //TODO : ここにWidthとHeightと出来ればFormatのPropertyField書いといてね
+RenderTexture::RenderTexture() : Texture2D(Application::WindowWidth(), Application::WindowHeight(), 0, DXGI_FORMAT_R8G8B8A8_UNORM)
+{}
+
+void RenderTexture::OnInspectorGui()
+{
+    int width = m_width_;
+    if (Gui::PropertyField("Width", width))
+    {
+        m_width_ = width;
+    }
+
+    int height = m_height_;
+    if (Gui::PropertyField("Height", height))
+    {
+        m_height_ = height;
+    }
+
+    Gui::BoolField("Allow Uav", m_allow_uav_);
+}
+
+bool RenderTexture::AllowUav() const
+{
+    return m_allow_uav_;
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::RenderTexture)

@@ -11,6 +11,7 @@ class ConstantBuffer : public BufferBase
 
     std::array<ComPtr<ID3D12Resource>, RenderEngine::kFrame_Buffer_Count> m_buffers_;
     std::array<D3D12_CONSTANT_BUFFER_VIEW_DESC, RenderEngine::kFrame_Buffer_Count> m_desc_;
+    std::array<D3D12_RESOURCE_STATES, RenderEngine::kFrame_Buffer_Count> m_current_state_;
 
     std::array<void *, RenderEngine::kFrame_Buffer_Count> m_p_mapped_ptrs_ = {nullptr};
 
@@ -27,13 +28,14 @@ public:
     
     void CreateBuffer() override;
     void UpdateBuffer(const void *data) override;
-    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
     kGpuUploadType BufferType() const override
     {
         return kGpuBufferType_CBV;
     }
     bool IsValid() override;
+    bool Transition(D3D12_RESOURCE_STATES new_state) override;
 
     void *GetPtr() const;
 

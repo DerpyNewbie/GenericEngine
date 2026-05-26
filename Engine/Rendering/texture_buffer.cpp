@@ -29,6 +29,7 @@ void TextureBuffer::CreateBuffer()
 
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0);
 
+    m_current_state_ = D3D12_RESOURCE_STATE_GENERIC_READ;
     auto hr = RenderEngine::Device()->CreateCommittedResource(
         &prop,
         D3D12_HEAP_FLAG_NONE,
@@ -66,7 +67,7 @@ void TextureBuffer::UpdateBuffer(const void *data)
     Logger::Error("Can not Update Texture2D");
 }
 
-void TextureBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
+void TextureBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)
 {
     const auto view_desc = ViewDesc();
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
@@ -80,6 +81,20 @@ std::shared_ptr<DescriptorHandle> TextureBuffer::UploadBuffer()
 bool TextureBuffer::IsValid()
 {
     return m_buffer_ != nullptr;
+}
+
+bool TextureBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
+{
+    if (m_current_state_ == new_state)
+        return false;
+
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_buffer_.Get(), m_current_state_,
+        new_state);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+
+    m_current_state_ = new_state;
+    return true;
 }
 
 ID3D12Resource *TextureBuffer::Resource()

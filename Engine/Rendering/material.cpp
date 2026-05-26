@@ -15,9 +15,9 @@ void Material::OnInspectorGui()
         render_queue = std::clamp(render_queue, static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
     }
 
-    if (Gui::ExpandablePropertyField<Shader>("shader", shader))
+    if (Gui::ExpandablePropertyField<Shader>("shader", m_shader_))
     {
-        if (shader.CastedLock())
+        if (m_shader_.CastedLock())
         {
             CreateMaterialBlock();
             return;
@@ -29,20 +29,20 @@ void Material::OnInspectorGui()
         CreateMaterialBlock();
     }
 
-    if (p_shared_material_block == nullptr)
+    if (shared_material_block == nullptr)
     {
         ImGui::Text("Material Block is not created.");
     }
     else
     {
-        p_shared_material_block->OnInspectorGui();
+        shared_material_block->OnInspectorGui();
     }
 }
 
 void Material::OnConstructed()
 {
-    shader = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
-    if (shader.Lock() == nullptr)
+    m_shader_ = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
+    if (m_shader_.Lock() == nullptr)
     {
         Logger::Warn<Material>("Failed to find Engine Assets");
     }
@@ -52,19 +52,24 @@ void Material::OnConstructed()
 
 void Material::CreateMaterialBlock()
 {
-    if (shader.CastedLock() == nullptr)
+    if (m_shader_.CastedLock() == nullptr)
     {
         Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");
         return;
     }
 
-    p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
-    p_shared_material_block->LoadShaderParameters(shader.CastedLock()->parameters);
+    shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
+    shared_material_block->LoadShaderParameters(m_shader_.CastedLock()->parameters);
+}
+
+AssetPtr<Shader> Material::GetShader()
+{
+    return m_shader_;
 }
 
 void Material::UpdateBuffer()
 {
-    if (p_shared_material_block == nullptr)
+    if (shared_material_block == nullptr)
     {
         Logger::Log<Material>("MaterialBlock is null. Instantiating!");
         CreateMaterialBlock();
@@ -73,7 +78,13 @@ void Material::UpdateBuffer()
 
 bool Material::IsDirty() const
 {
-    return p_shared_material_block == nullptr;
+    return shared_material_block == nullptr;
+}
+
+void Material::SetShader(const AssetPtr<Shader> &shader)
+{
+    m_shader_ = shader;
+    CreateMaterialBlock();
 }
 }
 

@@ -29,8 +29,11 @@ protected:
     DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
     std::string m_path_;
     uint64_t m_id_ = -1;
+    bool m_enable_read_write_ = false;
 
 public:
+    Texture2D() = default;
+    Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format);
     ~Texture2D() override;
 
     void LoadFromAiTexture(aiTexture *ai_texture);
@@ -44,7 +47,7 @@ public:
     [[nodiscard]] uint32_t Height();
 
     [[nodiscard]] uint16_t MipLevel();
-
+    
     [[nodiscard]] DXGI_FORMAT Format();
 
     template <class Archive>

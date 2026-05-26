@@ -38,6 +38,8 @@ void ConstantBuffer::CreateBuffer()
             desc,
             D3D12_RESOURCE_STATE_GENERIC_READ);
 
+        m_current_state_[i] = D3D12_RESOURCE_STATE_GENERIC_READ;
+
         if (m_buffers_[i] == nullptr)
         {
             Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
@@ -65,7 +67,8 @@ void ConstantBuffer::UpdateBuffer(const void *data)
     const auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     memcpy(m_p_mapped_ptrs_[current_back_buffer_idx], data, m_size_);
 }
-void ConstantBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle)
+
+void ConstantBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)
 {
     const auto view_desc = ViewDesc();
     RenderEngine::Device()->CreateConstantBufferView(&view_desc, desc_handle->handle_cpu);
@@ -79,6 +82,21 @@ std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 bool ConstantBuffer::IsValid()
 {
     return m_buffers_[0] != nullptr;
+}
+
+bool ConstantBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
+{
+    const auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    if (m_current_state_[current_back_buffer_idx] == new_state)
+        return false;
+
+    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+        m_buffers_[current_back_buffer_idx].Get(), m_current_state_[current_back_buffer_idx],
+        new_state);
+    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+
+    m_current_state_[current_back_buffer_idx] = new_state;
+    return true;
 }
 
 void *ConstantBuffer::GetPtr() const

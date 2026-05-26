@@ -1,14 +1,12 @@
 #pragma once
-#include "material_data_base.h"
+#include "buffer_data_base.h"
 #include "Asset/asset_ptr.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {
-class TextureBufferData : public MaterialDataBase
+class TextureBufferData : public BufferDataBase
 {
-    friend class ShaderImporter;
-
     AssetPtr<Texture2D> m_texture_;
 
 public:
@@ -19,11 +17,14 @@ public:
 
     void SetTexture(const AssetPtr<Texture2D> &texture);
     AssetPtr<Texture2D> Data();
+
+    kBufferType BufferType() override;
+    
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            cereal::base_class<MaterialDataBase>(this),
+            cereal::base_class<BufferDataBase>(this),
             CEREAL_NVP(m_texture_)
         );
     }

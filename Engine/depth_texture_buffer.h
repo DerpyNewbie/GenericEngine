@@ -13,8 +13,6 @@ public:
     DepthTextureBuffer(const std::shared_ptr<DepthTexture> &depth_texture);
     
     void CreateBuffer() override;
-    void BeginRender();
-    void EndRender();
 
     void SetResource(const std::shared_ptr<Texture2DArray> &texture_array, int index);
 

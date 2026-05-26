@@ -13,6 +13,7 @@ public:
     static std::shared_ptr<GpuResourceGroup> GetBuffersForMaterial(std::shared_ptr<MaterialBlock> material_block);
     static std::shared_ptr<BufferBase> GetGlobalBuffer(const std::string &name);
 
+    static void SetGlobalConstantBufferData(const std::string &name, const std::shared_ptr<ConstantBufferData> &buffer);
     static void SetGlobalBuffer(const std::string &name, const std::shared_ptr<ConstantBuffer> &buffer);
     static void SetGlobalBuffer(const std::string &name, const std::shared_ptr<StructuredBuffer> &buffer);
     static void SetGlobalTexture(const std::string &name, const std::shared_ptr<Texture2D> &texture);

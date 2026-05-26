@@ -3,7 +3,7 @@
 
 namespace engine
 {
-StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) : MaterialDataBase(shader_param)
+StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {}
 
 void StructuredBufferData::OnInspectorGui()
@@ -59,6 +59,11 @@ size_t StructuredBufferData::Count() const
 size_t StructuredBufferData::Size() const
 {
     return m_stride_ * m_count_;
+}
+
+kBufferType StructuredBufferData::BufferType()
+{
+    return kBufferType_StructuredBuffer;
 }
 }
 

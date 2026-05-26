@@ -154,7 +154,7 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
             const int index = std::stoi(ai_texture_path.C_Str() + 1);
             const auto texture = out_conversion_mapping.to_texture.at(index);
             const auto texture_ptr = AssetPtr<Texture2D>::FromManaged(texture);
-            const auto texture_buff_data = material_asset->p_shared_material_block->GetTextureBufferData("_MainTex");
+            const auto texture_buff_data = material_asset->shared_material_block->GetTextureBufferData("_MainTex");
             texture_buff_data->SetTexture(texture_ptr);
         }
         else
@@ -162,7 +162,7 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
             // external texture
             const std::string file_path = ai_texture_path.C_Str();
             const auto texture = AssetDatabase::GetAsset<Texture2D>(file_path);
-            const auto texture_buff_data = material_asset->p_shared_material_block->GetTextureBufferData("_MainTex");
+            const auto texture_buff_data = material_asset->shared_material_block->GetTextureBufferData("_MainTex");
             texture_buff_data->SetTexture(texture);
         }
 

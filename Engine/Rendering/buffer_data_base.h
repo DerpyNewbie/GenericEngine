@@ -9,23 +9,21 @@
 
 namespace engine
 {
-struct MaterialDataBase : Object, Inspectable
+struct BufferDataBase : Inspectable
 {
     bool is_dirty = true;
     ShaderParameter parameter;
     kGpuUploadType upload_type;
 
+    BufferDataBase() = default;
+    explicit BufferDataBase(const ShaderParameter &param);
 
-    MaterialDataBase() = default;
-    explicit MaterialDataBase(const ShaderParameter &param);
-
-    void OnDeserialized() override;
-
+    virtual kBufferType BufferType() = 0;
+    
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            cereal::base_class<Object>(this),
             CEREAL_NVP(parameter),
             CEREAL_NVP(upload_type)
         );
@@ -33,4 +31,4 @@ struct MaterialDataBase : Object, Inspectable
 };
 }
 
-CEREAL_CLASS_VERSION(engine::MaterialDataBase, 1)
+CEREAL_CLASS_VERSION(engine::BufferDataBase, 1)

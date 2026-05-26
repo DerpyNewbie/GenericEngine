@@ -2,11 +2,17 @@
 #include "render_texture_buffer.h"
 #include "application.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
+#include "CabotEngine/Graphics/DescriptorHeap.h"
 
 namespace engine
 {
-RenderTextureBuffer::RenderTextureBuffer(const std::shared_ptr<RenderTexture> &render_texture) : TextureBuffer(std::static_pointer_cast<Texture2D>(render_texture))
-{}
+RenderTextureBuffer::RenderTextureBuffer(const std::shared_ptr<RenderTexture> &render_texture) : m_is_unordered_access_(render_texture->m_allow_uav_)
+{
+    m_format_ = render_texture->Format();
+    m_width_ = render_texture->Width();
+    m_height_ = render_texture->Height();
+    m_mip_level_ = render_texture->MipLevel();
+}
 
 void RenderTextureBuffer::CreateBuffer()
 {
@@ -14,22 +20,18 @@ void RenderTextureBuffer::CreateBuffer()
     auto res_desc = RenderEngine::BBuffDesc();
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    D3D12_CLEAR_VALUE clearValue = {};
-    clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    clearValue.Color[0] = 0.5f;
-    clearValue.Color[1] = 0.5f;
-    clearValue.Color[2] = 0.5f;
-    clearValue.Color[3] = 0.5f;
-
     m_width_ = Application::WindowWidth();
     m_height_ = Application::WindowHeight();
 
+    res_desc.Flags = (m_is_unordered_access_ ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE) | D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+
+    m_current_state_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
     HRESULT hr = device->CreateCommittedResource(
         &heapProps,
         D3D12_HEAP_FLAG_NONE,
         &res_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        &clearValue,
+        nullptr,
         IID_PPV_ARGS(m_buffer_.ReleaseAndGetAddressOf())
     );
     m_buffer_->SetName(L"RenderTexture");
@@ -54,30 +56,35 @@ void RenderTextureBuffer::CreateBuffer()
     device->CreateRenderTargetView(m_buffer_.Get(), &rtv_desc, m_rtv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
 
-void RenderTextureBuffer::BeginRender(Color background_color)
+void RenderTextureBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)
 {
-    if (!m_buffer_)
+    const auto device = RenderEngine::Device();
+    if (is_uav)
     {
-        CreateBuffer();
+        const auto uav_desc = UavDesc();
+        device->CreateUnorderedAccessView(Resource(), nullptr, &uav_desc, desc_handle->handle_cpu);
+
     }
-
-    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        D3D12_RESOURCE_STATE_RENDER_TARGET);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
-}
-
-void RenderTextureBuffer::EndRender() const
-{
-    const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+    else
+    {
+        const auto view_desc = ViewDesc();
+        device->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
+    }
 }
 
 ID3D12DescriptorHeap *RenderTextureBuffer::GetHeap() const
 {
     return m_rtv_heap_.Get();
+}
+
+D3D12_UNORDERED_ACCESS_VIEW_DESC RenderTextureBuffer::UavDesc()
+{
+    D3D12_UNORDERED_ACCESS_VIEW_DESC uav_desc;
+    uav_desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+    uav_desc.Format = DXGI_FORMAT_R8G8B8A8_UINT;
+    uav_desc.Texture2D.MipSlice = 0;
+    uav_desc.Texture2D.PlaneSlice = 0;
+    return uav_desc;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC RenderTextureBuffer::ViewDesc()

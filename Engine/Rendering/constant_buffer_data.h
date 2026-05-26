@@ -1,24 +1,15 @@
 #pragma once
-#include "material_data_base.h"
+#include "buffer_data_base.h"
 
 namespace engine
 {
 
-class ConstantBufferData : public MaterialDataBase
+class ConstantBufferData : public BufferDataBase
 {
-    friend class MaterialBlock;
-
     size_t m_current_offset_ = 0;
     using DataTypeOffsetPair = std::pair<kConstantBufferDataType, size_t>;
     std::unordered_map<std::string, DataTypeOffsetPair> m_data_type_offset_pairs_;
     std::vector<uint8_t> m_data_;
-
-    void AddIntData(const std::string &name);
-    void AddFloatData(const std::string &name);
-    void AddVector2Data(const std::string &name);
-    void AddVector3Data(const std::string &name);
-    void AddColorData(const std::string &name);
-    void AddMatrixData(const std::string &name);
 
 public:
     ConstantBufferData() = default;
@@ -26,6 +17,13 @@ public:
 
     void OnInspectorGui() override;
 
+    void AddIntData(const std::string &name);
+    void AddFloatData(const std::string &name);
+    void AddVector2Data(const std::string &name);
+    void AddVector3Data(const std::string &name);
+    void AddColorData(const std::string &name);
+    void AddMatrixData(const std::string &name);
+    
     bool SetIntData(const std::string &name, int data);
     bool SetFloatData(const std::string &name, float data);
     bool SetVector2Data(const std::string &name, Vector2 data);
@@ -36,12 +34,13 @@ public:
     void *Data();
 
     size_t Size() const;
+    kBufferType BufferType() override;
 
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            cereal::base_class<MaterialDataBase>(this),
+            cereal::base_class<BufferDataBase>(this),
             CEREAL_NVP(m_data_type_offset_pairs_),
             CEREAL_NVP(m_data_)
         );

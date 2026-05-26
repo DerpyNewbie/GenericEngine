@@ -6,6 +6,8 @@
 
 #include "DescriptorHeap.h"
 #include <assimp/texture.h>
+
+#include "gui.h"
 #include "RenderEngine.h"
 #include "Asset/asset_database.h"
 #include "Rendering/texture_collection.h"
@@ -196,6 +198,9 @@ DXGI_FORMAT Texture2D::Format()
     CacheData();
     return m_format_;
 }
+
+Texture2D::Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format) : m_width_(width), m_height_(height), m_mip_level_(mip_level), m_format_(format)
+{}
 
 Texture2D::~Texture2D()
 {

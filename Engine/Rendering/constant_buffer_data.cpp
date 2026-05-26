@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "constant_buffer_data.h"
 
+#include "CabotEngine/Graphics/ConstantBuffer.h"
+
 namespace engine
 {
 void ConstantBufferData::AddIntData(const std::string &name)
@@ -51,7 +53,7 @@ void ConstantBufferData::AddMatrixData(const std::string &name)
     m_data_.resize(m_current_offset_);
 }
 
-ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : MaterialDataBase(shader_param)
+ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {
     for (auto variable : shader_param.variables)
     {
@@ -222,6 +224,11 @@ void *ConstantBufferData::Data()
 size_t ConstantBufferData::Size() const
 {
     return m_data_.size() * sizeof(uint8_t);
+}
+
+kBufferType ConstantBufferData::BufferType()
+{
+    return kBufferType_ConstantBuffer;
 }
 }
 
