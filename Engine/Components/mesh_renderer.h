@@ -18,7 +18,7 @@ protected:
     
     AssetPtr<Mesh> m_shared_mesh_;
 
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
+    std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
     void DrawBounds();
     void RecalculateBoundingBox();

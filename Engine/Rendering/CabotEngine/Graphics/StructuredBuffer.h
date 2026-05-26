@@ -6,14 +6,15 @@ namespace engine
 {
 class StructuredBuffer final : public BufferBase, public ShaderResource
 {
-    ComPtr<ID3D12Resource> m_default_buffer_;
-    ComPtr<ID3D12Resource> m_upload_buffer_;
+    ComPtr<ID3D12Resource> m_default_resource_;
+    ComPtr<ID3D12Resource> m_upload_resource_;
     D3D12_GPU_VIRTUAL_ADDRESS m_gpu_address_;
     size_t m_element_count_ = 0;
     size_t m_stride_ = 0;
     D3D12_RESOURCE_STATES m_current_state_;
     
 public:
+    ~StructuredBuffer() override;
     explicit StructuredBuffer(const size_t stride, const size_t elem_count)
     {
         m_stride_ = stride;

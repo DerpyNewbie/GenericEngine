@@ -75,7 +75,7 @@ bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_b
 {
     const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
     const auto cmd_list = RenderEngine::CommandList();
-    
+
     if (!resource_group->UpdateBuffer(material_block))
         return false;
     if (!resource_group->SetBufferToDescriptorTable())
@@ -168,13 +168,10 @@ void RenderPipeline::RenderVoid()
 
 void RenderPipeline::InvokeDrawCall()
 {
-    for (auto &view_proj_matrices_buffers : m_view_proj_matrix_buffers_)
-    {
-        view_proj_matrices_buffers.ReturnAll();
-    }
+    m_view_proj_matrix_buffers_.ReturnAll();
 
     SetSceneData();
-    
+
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
@@ -206,8 +203,7 @@ void RenderPipeline::SetCurrentCamera(const Camera &camera)
 void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 {
     const auto cmd_list = RenderEngine::CommandList();
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto view_projection_buffer = *m_view_proj_matrix_buffers_[current_buffer_idx].Get();
+    const auto view_projection_buffer = *m_view_proj_matrix_buffers_.Get();
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -272,7 +268,7 @@ void RenderPipeline::DepthRender()
             return;
         }
     }
-    
+
     const auto cmd_list = RenderEngine::CommandList();
     PSOManager::SetPipelineState(cmd_list, m_depth_shader_.get(), DXGI_FORMAT_R32_FLOAT, 0);
 
@@ -511,10 +507,8 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
-    for (auto &view_proj_matrices_buffers : instance->m_view_proj_matrix_buffers_)
-    {
-        view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
-    }
+
+    instance->m_view_proj_matrix_buffers_.SetMaxSize(kStableCameraCount);
 }
 RenderPipeline *RenderPipeline::Instance()
 {

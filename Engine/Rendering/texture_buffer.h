@@ -8,7 +8,7 @@ namespace engine
 class TextureBuffer : public BufferBase, public ShaderResource
 {
 protected:
-    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
+    ComPtr<ID3D12Resource> m_resource_ = nullptr;
 
     std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_ = {};
     uint32_t m_width_ = -1;
@@ -18,6 +18,7 @@ protected:
     D3D12_RESOURCE_STATES m_current_state_;
 
 public:
+    ~TextureBuffer() override;
     TextureBuffer() = default;
     TextureBuffer(const std::shared_ptr<Texture2D> &texture);
     

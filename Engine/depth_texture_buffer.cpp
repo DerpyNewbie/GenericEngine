@@ -44,14 +44,14 @@ void DepthTextureBuffer::CreateBuffer()
     resource_desc.MipLevels = 1;
 
     m_current_state_ = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
-    m_buffer_ = DirectXResourceFactory::CreateBuffer(
+    m_resource_ = DirectXResourceFactory::CreateBuffer(
         heap_prop,
         resource_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         D3D12_HEAP_FLAG_NONE,
         &dsv_clear_value);
 
-    if (m_buffer_ == nullptr)
+    if (m_resource_ == nullptr)
     {
         Logger::Error<DepthTexture>("Failed To Create Depth Resource");
     }
@@ -64,7 +64,7 @@ void DepthTextureBuffer::CreateBuffer()
     const D3D12_CPU_DESCRIPTOR_HANDLE dsv_handle =
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
 
-    device->CreateDepthStencilView(m_buffer_.Get(), &dsv_desc, dsv_handle);
+    device->CreateDepthStencilView(m_resource_.Get(), &dsv_desc, dsv_handle);
 }
 
 void DepthTextureBuffer::SetResource(const std::shared_ptr<Texture2DArray> &texture_array, int index)
@@ -92,7 +92,7 @@ void DepthTextureBuffer::SetResource(const std::shared_ptr<Texture2DArray> &text
         m_dsv_heap_->GetCPUDescriptorHandleForHeapStart();
     device->CreateDepthStencilView(texture_array->Resource(), &dsvDesc, dsv_handle);
 
-    m_buffer_ = texture_array->Resource();
+    m_resource_ = texture_array->Resource();
 }
 
 ID3D12DescriptorHeap *DepthTextureBuffer::GetHeap() const

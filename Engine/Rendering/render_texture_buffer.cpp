@@ -32,9 +32,9 @@ void RenderTextureBuffer::CreateBuffer()
         &res_desc,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
         nullptr,
-        IID_PPV_ARGS(m_buffer_.ReleaseAndGetAddressOf())
+        IID_PPV_ARGS(m_resource_.ReleaseAndGetAddressOf())
     );
-    m_buffer_->SetName(L"RenderTexture");
+    m_resource_->SetName(L"RenderTexture");
 
     if (FAILED(hr))
     {
@@ -53,7 +53,7 @@ void RenderTextureBuffer::CreateBuffer()
     rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
     rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-    device->CreateRenderTargetView(m_buffer_.Get(), &rtv_desc, m_rtv_heap_->GetCPUDescriptorHandleForHeapStart());
+    device->CreateRenderTargetView(m_resource_.Get(), &rtv_desc, m_rtv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
 
 void RenderTextureBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)

@@ -6,12 +6,15 @@
 
 namespace engine
 {
+ConstantBuffer::~ConstantBuffer()
+{
+    for (const auto &resource : m_resources_)
+        DirectXResourceFactory::ReleaseResource(resource);
+}
+
 ConstantBuffer::ConstantBuffer(const size_t size)
 {
-    m_size_ = size;
-
-    constexpr size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
-    m_size_aligned_ = ((size + (align - 1)) & ~(align - 1));
+    SetBufferSize(size);
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS ConstantBuffer::GetAddress() const
@@ -33,21 +36,21 @@ void ConstantBuffer::CreateBuffer()
 
     for (auto i = 0; i < RenderEngine::kFrame_Buffer_Count; ++i)
     {
-        m_buffers_[i] = DirectXResourceFactory::CreateBuffer(
+        m_resources_[i] = DirectXResourceFactory::CreateBuffer(
             prop,
             desc,
             D3D12_RESOURCE_STATE_GENERIC_READ);
 
         m_current_state_[i] = D3D12_RESOURCE_STATE_GENERIC_READ;
 
-        if (m_buffers_[i] == nullptr)
+        if (m_resources_[i] == nullptr)
         {
             Logger::Error<ConstantBuffer>("failed to create constant buffer resource");
             return;
         }
 
         constexpr D3D12_RANGE unreadable_range = {0, 0};
-        const auto hr = m_buffers_[i]->Map(0, &unreadable_range, &m_p_mapped_ptrs_[i]);
+        const auto hr = m_resources_[i]->Map(0, &unreadable_range, &m_p_mapped_ptrs_[i]);
         if (FAILED(hr))
         {
             Logger::Error<ConstantBuffer>("failed to constant buffer mapping");
@@ -55,10 +58,10 @@ void ConstantBuffer::CreateBuffer()
         }
 
         m_desc_[i] = {};
-        m_desc_[i].BufferLocation = m_buffers_[i]->GetGPUVirtualAddress();
+        m_desc_[i].BufferLocation = m_resources_[i]->GetGPUVirtualAddress();
         m_desc_[i].SizeInBytes = static_cast<UINT>(m_size_aligned_);
 
-        m_buffers_[i]->SetName(L"ConstantBuffer");
+        m_resources_[i]->SetName(L"ConstantBuffer");
     }
 }
 
@@ -81,7 +84,7 @@ std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
 
 bool ConstantBuffer::IsValid()
 {
-    return m_buffers_[0] != nullptr;
+    return m_resources_[0] != nullptr;
 }
 
 bool ConstantBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
@@ -91,7 +94,7 @@ bool ConstantBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
         return false;
 
     const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffers_[current_back_buffer_idx].Get(), m_current_state_[current_back_buffer_idx],
+        m_resources_[current_back_buffer_idx].Get(), m_current_state_[current_back_buffer_idx],
         new_state);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 

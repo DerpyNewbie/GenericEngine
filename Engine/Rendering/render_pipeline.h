@@ -38,9 +38,8 @@ class RenderPipeline
     Camera m_current_camera_;
     std::vector<Camera> m_requesting_cameras_;
     uint32_t m_current_view_proj_matrix_index_;
-    std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
-        = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
-    
+    ObjectPool<std::shared_ptr<ConstantBuffer>> m_view_proj_matrix_buffers_ = ObjectPool(0, kOnViewProjBuffCreate);
+
     std::unordered_map<std::shared_ptr<MaterialBlock>, std::shared_ptr<GpuResourceGroup>> m_material_block_gpu_resource_groups_map_;
     void InvokeDrawCall();
 
@@ -48,7 +47,7 @@ class RenderPipeline
     void RenderCamera(const Camera &camera);
     void RenderVoid();
     void Render(const Matrix &view, const Matrix &proj);
-    
+
     void SetCurrentCamera(const Camera &camera);
     void SetSceneData();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);

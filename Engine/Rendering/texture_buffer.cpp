@@ -3,10 +3,16 @@
 
 #include "texture_buffer.h"
 #include "CabotEngine/Graphics/DescriptorHeap.h"
+#include "CabotEngine/Graphics/DirectXResourceFactory.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
+TextureBuffer::~TextureBuffer()
+{
+    DirectXResourceFactory::ReleaseResource(m_resource_);
+}
+
 TextureBuffer::TextureBuffer(const std::shared_ptr<Texture2D> &texture)
 {
     m_tex_data_ = texture->GetPixels();
@@ -36,7 +42,7 @@ void TextureBuffer::CreateBuffer()
         &desc,
         D3D12_RESOURCE_STATE_GENERIC_READ,
         nullptr,
-        IID_PPV_ARGS(&m_buffer_)
+        IID_PPV_ARGS(&m_resource_)
     );
 
     if (FAILED(hr))
@@ -45,10 +51,10 @@ void TextureBuffer::CreateBuffer()
         return;
     }
 
-    m_buffer_->SetName(L"Texture");
+    m_resource_->SetName(L"Texture");
 
     const D3D12_BOX dest_region = {0, 0, 0, m_width_, m_height_, 1};
-    hr = m_buffer_->WriteToSubresource(
+    hr = m_resource_->WriteToSubresource(
         0,
         &dest_region,
         m_tex_data_.data(),
@@ -58,7 +64,7 @@ void TextureBuffer::CreateBuffer()
 
     if (FAILED(hr))
     {
-        m_buffer_ = nullptr;
+        m_resource_ = nullptr;
     }
 }
 
@@ -80,7 +86,7 @@ std::shared_ptr<DescriptorHandle> TextureBuffer::UploadBuffer()
 
 bool TextureBuffer::IsValid()
 {
-    return m_buffer_ != nullptr;
+    return m_resource_ != nullptr;
 }
 
 bool TextureBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
@@ -89,7 +95,7 @@ bool TextureBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
         return false;
 
     const auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), m_current_state_,
+        m_resource_.Get(), m_current_state_,
         new_state);
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
@@ -104,7 +110,7 @@ ID3D12Resource *TextureBuffer::Resource()
         CreateBuffer();
     }
 
-    return m_buffer_ != nullptr ? m_buffer_.Get() : nullptr;
+    return m_resource_ != nullptr ? m_resource_.Get() : nullptr;
 }
 
 D3D12_SHADER_RESOURCE_VIEW_DESC TextureBuffer::ViewDesc()

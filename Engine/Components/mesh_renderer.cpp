@@ -16,19 +16,14 @@ bool MeshRenderer::m_draw_bounds_ = false;
 
 void MeshRenderer::UpdateWorldBuffer()
 {
-    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
+    if (!m_world_matrix_buffer_)
     {
-        if (!world_matrix_buffer)
-        {
-            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-            world_matrix_buffer->CreateBuffer();
-        }
+        m_world_matrix_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+        m_world_matrix_buffer_->CreateBuffer();
     }
-    
+
     const auto world_matrix = GameObject()->Transform()->WorldMatrix();
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
-    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
+    const auto ptr = m_world_matrix_buffer_->GetPtr<Matrix>();
     *ptr = world_matrix;
 }
 
@@ -91,8 +86,7 @@ void MeshRenderer::DepthRender()
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, mesh->vertex_buffer->View());
 
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
+    const auto world_matrix_buffer = m_world_matrix_buffer_->GetAddress();
     cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
 
     cmd_list->IASetIndexBuffer(mesh->index_buffers[0]->View());
@@ -119,8 +113,8 @@ void MeshRenderer::Render()
 {
     UpdateWorldBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    
-    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+
+    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
 }
 
 void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)
