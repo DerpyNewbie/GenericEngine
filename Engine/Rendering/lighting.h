@@ -16,8 +16,7 @@ class Lighting
     std::array<Matrix, RenderingConstants::kMaxShadowMapCount> m_light_view_proj_matrices_;
     std::shared_ptr<StructuredBuffer> m_light_view_proj_matrices_buffer_;
     std::shared_ptr<DescriptorHandle> m_light_view_proj_handle_;
-    std::shared_ptr<StructuredBuffer> m_lights_buffer_;
-    std::shared_ptr<ConstantBuffer> m_light_count_buffer_;
+    std::shared_ptr<StructuredBufferData> m_lights_buffer_;
     std::shared_ptr<DescriptorHandle> m_lights_buffer_handle_;
 
     // depth textures related
@@ -26,11 +25,8 @@ class Lighting
     std::shared_ptr<Texture2DArray> m_depth_textures_;
     std::shared_ptr<DescriptorHandle> m_shadow_map_handle_;
     std::set<int> m_free_depth_texture_handles_;
-    std::shared_ptr<ConstantBuffer> m_cascade_slices_buffer_;
 
-    void UpdateLightCountBuffer();
-    void UpdateLightBuffer();
-    void SetLightCountBuffer();
+    static void SetLightCountBuffer();
     void SetLightBuffer();
     void SetBuffers();
 
@@ -42,7 +38,6 @@ public:
     static Lighting *Instance();
 
     void UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix &proj);
-    void SetCascadeSlicesBuffer();
     void SetLightsViewProjMatrix() const;
     void SetShadowMap();
 

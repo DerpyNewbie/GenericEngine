@@ -168,10 +168,12 @@ void RenderPipeline::RenderVoid()
 
 void RenderPipeline::InvokeDrawCall()
 {
-    for (auto view_proj_matrices_buffers : m_view_proj_matrix_buffers_)
+    for (auto &view_proj_matrices_buffers : m_view_proj_matrix_buffers_)
     {
         view_proj_matrices_buffers.ReturnAll();
     }
+
+    SetSceneData();
     
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
@@ -193,6 +195,7 @@ void RenderPipeline::InvokeDrawCall()
     }
 
     on_rendering.Invoke();
+    m_requesting_cameras_.clear();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera &camera)
@@ -215,32 +218,29 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 
 void RenderPipeline::SetSceneData()
 {
-    if (m_scene_data_buffer_ == nullptr)
+    if (m_scene_data_buffer_data_ == nullptr)
     {
-        m_scene_data_buffer_ = std::make_shared<ConstantBuffer>(sizeof(SceneData));
-        m_scene_data_buffer_->CreateBuffer();
+        m_scene_data_buffer_data_ = std::make_shared<ConstantBufferData>();
+        m_scene_data_buffer_data_->AddVector2Data("screen_size");
+        m_scene_data_buffer_data_->AddVector2Data("shadow_map_size");
+        m_scene_data_buffer_data_->AddFloatData("time");
+        m_scene_data_buffer_data_->AddFloatData("delta_time");
     }
 
-    const auto cmd_list = RenderEngine::CommandList();
-    SceneData scene_data;
-    scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
-    scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
-    scene_data.time = Time::Get()->TimeSinceStartUp();
-    scene_data.delta_time = Time::GetDeltaTime();
+    m_scene_data_buffer_data_->SetVector2Data("screen_size", Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight())));
+    m_scene_data_buffer_data_->SetVector2Data("shadow_map_size", RenderingConstants::kShadowMapSize);
+    m_scene_data_buffer_data_->SetFloatData("time", Time::Get()->TimeSinceStartUp());
+    m_scene_data_buffer_data_->SetFloatData("delta_time", Time::GetDeltaTime());
 
-    m_scene_data_buffer_->UpdateBuffer(&scene_data);
-
-    cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
+    GpuResourceManager::SetGlobalBufferData("SceneData", m_scene_data_buffer_data_);
 }
 
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(view, proj);
-    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
-    lighting_instance->SetCascadeSlicesBuffer();
     lighting_instance->SetBuffers();
     Skybox::Instance()->Render();
 }
@@ -511,7 +511,7 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
-    for (auto view_proj_matrices_buffers : instance->m_view_proj_matrix_buffers_)
+    for (auto &view_proj_matrices_buffers : instance->m_view_proj_matrix_buffers_)
     {
         view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
     }

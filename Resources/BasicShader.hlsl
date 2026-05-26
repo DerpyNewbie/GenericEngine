@@ -112,7 +112,7 @@ float4 pix(VSOutput input) : SV_TARGET
     {
         float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
         float4 mainColor = _MainTex.Sample(smp, flippedUV);
-        return float4(mainColor.rgb, mainColor.a);
+        return mainColor;
     }
 
     float4 viewPos = mul(View, float4(input.worldpos, 1.0));
@@ -122,7 +122,11 @@ float4 pix(VSOutput input) : SV_TARGET
     for (int i = 0; i < SHADOW_CASCADE_COUNT; ++i)
     {
         if (depth < cascade_slices[i])
-            cascade_index = 0;
+        {
+            cascade_index = i;
+            break;
+        }
+        
     }
 
     int current_shadowmap_count = 0;
@@ -132,11 +136,11 @@ float4 pix(VSOutput input) : SV_TARGET
         switch (Lights[i].type)
         {
         case 0:
-            brightness += CalcDirectionalShadow(Lights[i],N,input.worldpos,current_shadowmap_count);
+            brightness += CalcDirectionalShadow(Lights[i],N,input.worldpos,current_shadowmap_count + itr);
             current_shadowmap_count += 3;
             break;
 				case 1:
-						brightness += CalcSpotShadow(Lights[i],N,input.worldpos,current_shadowmap_count);
+						brightness += CalcSpotShadow(Lights[i],N,input.worldpos,current_shadowmap_count + itr);
 						current_shadowmap_count += 1;
             break;
         default:

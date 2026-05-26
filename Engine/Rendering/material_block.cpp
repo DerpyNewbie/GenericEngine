@@ -1,9 +1,8 @@
 #include "pch.h"
 #include "material_block.h"
 
-#include <assimp/material.h>
-
 #include "buffer_data_base.h"
+#include "gpu_resource_manager.h"
 
 namespace
 {
@@ -30,8 +29,11 @@ namespace engine
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : m_buffer_data_ | std::views::values)
+    for (auto &[name, data] : m_buffer_data_)
     {
+        if (GpuResourceManager::GetGlobalBuffer(name))
+            continue;
+        
         ImGui::PushID(data.get());
         data->OnInspectorGui();
         ImGui::PopID();

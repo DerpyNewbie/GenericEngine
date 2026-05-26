@@ -65,6 +65,66 @@ std::shared_ptr<BufferBase> GpuResourceManager::GetGlobalBuffer(const std::strin
     return it->second;
 }
 
+void GpuResourceManager::SetGlobalBufferData(const std::string &name, const std::shared_ptr<BufferDataBase> &buffer_data)
+{
+    const auto it = m_global_resources_.find(name);
+    if (it == m_global_resources_.end())
+    {
+        std::shared_ptr<BufferBase> buffer;
+        switch (buffer_data->BufferType())
+        {
+            case kBufferType_ConstantBuffer: {
+                const auto cb_data = std::reinterpret_pointer_cast<ConstantBufferData>(buffer_data);
+                buffer = std::make_shared<ConstantBuffer>(cb_data->Size());
+                break;
+            }
+            case kBufferType_StructuredBuffer: {
+                const auto sb_data = std::reinterpret_pointer_cast<StructuredBufferData>(buffer_data);
+                buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
+                break;
+            }
+            case kBufferType_Texture2D: {
+                const auto tex_data = std::reinterpret_pointer_cast<TextureBufferData>(buffer_data);
+                buffer = TextureCollection::GetTexture(tex_data->Data());
+                break;
+            }
+            case kBufferType_UavTexture: {
+                const auto uav_tex_data = std::reinterpret_pointer_cast<UavTextureBufferData>(buffer_data);
+                buffer = TextureCollection::GetRenderTexture(uav_tex_data->Data());
+                break;
+            }
+        }
+
+        m_global_resources_[name] = buffer;
+    }
+    else
+    {
+        switch (buffer_data->BufferType())
+        {
+            case kBufferType_ConstantBuffer: {
+                const auto cb_data = std::reinterpret_pointer_cast<ConstantBufferData>(buffer_data);
+                it->second->UpdateBuffer(cb_data->Data());
+                break;
+            }
+            case kBufferType_StructuredBuffer: {
+                const auto sb_data = std::reinterpret_pointer_cast<StructuredBufferData>(buffer_data);
+                it->second->UpdateBuffer(sb_data->Data());
+                break;
+            }
+            case kBufferType_Texture2D: {
+                const auto tex_data = std::reinterpret_pointer_cast<TextureBufferData>(buffer_data);
+                it->second = TextureCollection::GetTexture(tex_data->Data());
+                break;
+            }
+            case kBufferType_UavTexture: {
+                const auto uav_tex_data = std::reinterpret_pointer_cast<UavTextureBufferData>(buffer_data);
+                it->second = TextureCollection::GetRenderTexture(uav_tex_data->Data());
+                break;
+            }
+        }
+    }
+}
+
 void GpuResourceManager::SetGlobalBuffer(const std::string &name, const std::shared_ptr<ConstantBuffer> &buffer)
 {
     m_global_resources_[name] = buffer;

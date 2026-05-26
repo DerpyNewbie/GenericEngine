@@ -33,7 +33,7 @@ class RenderPipeline
 
     std::vector<RenderCommand> m_commands_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
-    std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
+    std::shared_ptr<ConstantBufferData> m_scene_data_buffer_data_;
 
     Camera m_current_camera_;
     std::vector<Camera> m_requesting_cameras_;

@@ -47,6 +47,9 @@ void StructuredBuffer::UpdateBuffer(const void *data)
         return;
     }
 
+    if (data == nullptr)
+        return;
+
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_buffer_.Get(),
         D3D12_RESOURCE_STATE_COMMON,

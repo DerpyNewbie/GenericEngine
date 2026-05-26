@@ -10,7 +10,7 @@
 
 namespace
 {
-constexpr std::array<std::string_view, 11> kReservedBufferNames = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "SceneData", "ShadowCascadeSlices", "LightCount", "LightViewProj", "Lights", "ShadowMaps", "smp", "shadowSampler"};
+constexpr std::array<std::string_view, 9> kReservedBufferNames = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "LightViewProj", "ShadowMaps", "smp", "shadowSampler"};
 }
 
 namespace engine
@@ -198,8 +198,8 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         "vrt",
         "vs_5_0",
-        0,
-        0,
+        D3DCOMPILE_SKIP_OPTIMIZATION,
+        D3DCOMPILE_DEBUG,
         &shader->m_vs_blob_,
         &error_blob
     );
@@ -216,25 +216,11 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         "pix",
         "ps_5_0",
-        0,
-        0,
+        D3DCOMPILE_SKIP_OPTIMIZATION,
+        D3DCOMPILE_DEBUG,
         &shader->m_ps_blob_,
         &error_blob
     );
-
-    if (FAILED(hr))
-    {
-        if (error_blob != nullptr)
-        {
-            // 1. error_blob からエラー文字列の先頭ポインタを取得
-            auto error_message = static_cast<const char *>(error_blob->GetBufferPointer());
-
-            // 2. Visual Studio の「出力」ウインドウに表示する場合（超おすすめ）
-            OutputDebugStringA("\n================ HLSL Compile Error ================\n");
-            OutputDebugStringA(error_message);
-            OutputDebugStringA("====================================================\n\n");
-        }
-    }
     
     hr = D3DCompileFromFile(
         file_path.c_str(),

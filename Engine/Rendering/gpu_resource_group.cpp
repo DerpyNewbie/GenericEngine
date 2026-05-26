@@ -22,6 +22,7 @@ void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const s
     {
         sb_data->is_size_changed = false;
         gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
+        gpu_resource.buffer->CreateBuffer();
         if (gpu_resource.handle != nullptr)
             gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
     }
@@ -81,6 +82,12 @@ bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource)
         return false;
     }
 
+    if (!global_resource->IsValid())
+        global_resource->CreateBuffer();
+
+    if (!global_resource->IsValid() || gpu_resource.handle == nullptr)
+        return false;
+    
     gpu_resource.buffer = global_resource;
     gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
 
@@ -155,7 +162,10 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
 
     for (int i = 0; i < kGpuBufferType_Count; ++i)
     {
-        if (m_gpu_resources_[i].empty() || m_gpu_resources_[i].begin()->second.handle != nullptr)
+        auto it = std::ranges::find_if(m_gpu_resources_[i], [](const std::pair<int, GpuResource> &a) {
+            return a.second.handle == nullptr;
+        });
+        if (m_gpu_resources_[i].empty() || it == m_gpu_resources_[i].end())
             continue;
 
         auto itr = 0;
