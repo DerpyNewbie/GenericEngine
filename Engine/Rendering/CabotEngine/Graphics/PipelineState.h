@@ -33,7 +33,6 @@ class PipelineState
 public:
     PipelineState(const PipelineStateSettings &setting);
     [[nodiscard]] bool IsValid() const;
-
-
+    
     ID3D12PipelineState *Get() const;
 };

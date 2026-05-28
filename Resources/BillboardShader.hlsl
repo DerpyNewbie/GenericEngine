@@ -1,12 +1,16 @@
-cbuffer WorldMatrix : register(b0)
+#include "Light.hlsli"
+
+cbuffer WorldMatrix : register (b0)
 {
     float4x4 World;
 }
-cbuffer ViewProjMatrix : register(b1)
+cbuffer ViewProjMatrix : register (b1)
 {
     float4x4 View;
     float4x4 Proj;
 }
+
+StructuredBuffer<float4x4> BoneMatrices : register (t0);
 
 struct VSInput
 {
@@ -65,13 +69,9 @@ VSOutput vrt(VSInput input)
     return output;
 }
 
-SamplerState smp : register(s0);
-Texture2DArray ShadowMaps : register (t3);
-Texture2D _MainTex : register(t4);
-
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float4 mainColor = ShadowMaps.Sample(smp, float3(input.uv, 0));
+    float4 mainColor = _MainTex.Sample(smp, input.uv);
 
     return mainColor;
 }

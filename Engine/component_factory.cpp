@@ -10,6 +10,7 @@
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
 #include "Components/component_event_tester.h"
+#include "Components/compute_shader_test_component.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
@@ -73,6 +74,7 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
     RegisterComponentFactory<GlobalResourceTesterComponent>("Debug");
     RegisterComponentFactory<CoroutineTest>("Debug");
+    RegisterComponentFactory<ComputeShaderTestComponent>("Debug");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :

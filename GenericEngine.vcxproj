@@ -53,6 +53,7 @@
         <ClCompile Include="Engine\Asset\dummy_asset.cpp"/>
         <ClCompile Include="Engine\Asset\fbx_meta.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\audio_clip_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\compute_shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\fbx_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\font_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\import_log.cpp"/>
@@ -75,6 +76,7 @@
         <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component_event_tester.cpp"/>
+        <ClCompile Include="Engine\Components\compute_shader_test_component.cpp"/>
         <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\global_resource_tester_component.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
@@ -131,9 +133,11 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ComputePipelineState.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
+        <ClCompile Include="Engine\Rendering\compute_shader.cpp"/>
         <ClCompile Include="Engine\Rendering\constant_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
@@ -224,6 +228,7 @@
         <ClInclude Include="Engine\Asset\dummy_asset.h"/>
         <ClInclude Include="Engine\Asset\fbx_meta.h"/>
         <ClInclude Include="Engine\Asset\Importer\audio_clip_importer.h"/>
+        <ClInclude Include="Engine\Asset\Importer\compute_shader_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\fbx_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\font_importer.h"/>
         <ClInclude Include="Engine\Asset\Importer\import_log.h"/>
@@ -247,6 +252,7 @@
         <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
         <ClInclude Include="Engine\Components\component_event_tester.h"/>
+        <ClInclude Include="Engine\Components\compute_shader_test_component.h"/>
         <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\global_resource_tester_component.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
@@ -311,10 +317,12 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComputePipelineState.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
+        <ClInclude Include="Engine\Rendering\compute_shader.h"/>
         <ClInclude Include="Engine\Rendering\constant_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_group.h"/>

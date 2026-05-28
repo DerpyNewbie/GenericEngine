@@ -12,8 +12,6 @@ cbuffer ViewProjMatrix : register (b1)
 
 StructuredBuffer<float4x4> BoneMatrices : register (t0);
 
-RWTexture2D<float4> OutputTexture : register(u1);
-
 struct VSInput
 {
     float3 pos : POSITION;
@@ -101,11 +99,6 @@ VSOutput vrt(VSInput input)
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    uint2 size;
-    OutputTexture.GetDimensions(size.x, size.y);
-	uint2 pixelCoord = (uint2)(input.uv * (float2)size);
-    OutputTexture[pixelCoord] = float4(1.0f, 0.0f, 0.0f, 1.0f);
-
     float3 N = normalize(input.normal);
     float3 brightness = float3(0, 0, 0);
     if (light_count == 0)

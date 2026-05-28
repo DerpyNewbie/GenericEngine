@@ -1,0 +1,31 @@
+// ① 読み書き用の2Dテクスチャ（UAV）を定義
+// register(u0) で、C++側のUAVスロット0番にバインドする
+RWTexture2D<float4> OutputTexture : register(u1);
+
+// ② 2次元のスレッドグループを定義（横8 × 縦8 ＝ 計64スレッド）
+// テクスチャの2D座標（X, Y）にそのままマッピングしやすいように、スレッドも2Dの塊にするよ
+[numthreads(8, 8, 1)]
+void compute(uint3 globalID : SV_DispatchThreadID) // ③ エントリーポイント
+{
+    // テクスチャのサイズ（解像度）を取得する
+    uint width, height;
+    OutputTexture.GetDimensions(width, height);
+
+    // 現在のスレッドが処理しているピクセル座標（X, Y）
+    uint2 texCoord = globalID.xy;
+
+    // 念のため、テクスチャの解像度をはみ出していないかチェック（ガード判定）
+    if (texCoord.x >= width || texCoord.y >= height)
+    {
+        return;
+    }
+
+    // ④ ピクセル座標を 0.0 ～ 1.0 の範囲の比率（UVっぽいやつ）に変換する
+    float r = (float)texCoord.x / (float)width;  // 右にいくほど赤くなる
+    float g = (float)texCoord.y / (float)height; // 下にいくほど緑くなる
+    float b = 0.0f;                             // 青は0
+    float a = 1.0f;                             // 不透明度1.0
+
+    // ⑤ テクスチャの特定のピクセル座標に、色を直接書き込む！
+    OutputTexture[texCoord] = float4(r, g, b, a);
+}

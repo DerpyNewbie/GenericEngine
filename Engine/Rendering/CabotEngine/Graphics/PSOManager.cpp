@@ -32,6 +32,18 @@ bool PSOManager::Register(const engine::Shader *shader, const std::string &pso_n
     return true;
 }
 
+bool PSOManager::Register(const engine::ComputeShader *shader, const std::string &pso_name)
+{
+    auto pso = std::make_shared<engine::ComputePipelineState>(shader);
+    if (!pso->IsValid())
+    {
+        return false;
+    }
+
+    Instance()->m_compute_cache_[pso_name] = pso;
+    return true;
+}
+
 bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader, const DXGI_FORMAT rtv_format, const UINT num_render_targets)
 {
     std::string pso_name = shader->Name();
@@ -46,5 +58,22 @@ bool PSOManager::SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const eng
     }
 
     cmd_list->SetPipelineState(Instance()->m_pso_cache_[pso_name][rtv_format]->Get());
+    return true;
+}
+
+bool PSOManager::SetComputePipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::ComputeShader *shader)
+{
+    std::string pso_name = shader->Name();
+    auto it = Instance()->m_compute_cache_.find(pso_name);
+    if (it == Instance()->m_compute_cache_.end())
+    {
+        if (!Register(shader, pso_name))
+        {
+            engine::Logger::Error<PSOManager>("Failed to register PSO for shader: %s", pso_name);
+            return false;
+        }
+    }
+
+    cmd_list->SetPipelineState(Instance()->m_compute_cache_[pso_name]->Get());
     return true;
 }

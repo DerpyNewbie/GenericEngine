@@ -258,21 +258,6 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         &error_blob
     );
 
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Geometry Shader!");
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        return false;
-    }
-
     // Add shader variants here if you want to
     return true;
 }
