@@ -2,6 +2,7 @@
 #include "render_pipeline.h"
 
 #include "application.h"
+#include "compute_command.h"
 #include "engine_time.h"
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
@@ -172,10 +173,14 @@ void RenderPipeline::InvokeDrawCall()
 
     SetSceneData();
 
+    
     const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
+
+    ExecuteComputeCommands();
+    
+    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
 
     for (const auto camera : m_requesting_cameras_)
     {
@@ -248,7 +253,7 @@ void RenderPipeline::Render(const Matrix &view, const Matrix &proj)
     const auto camera_pos = GetCurrentCamera().GetWorldMatrix().Translation();
     auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
 
-    SortCommands(m_commands_, camera_pos);
+    SortCommands(m_render_commands_, camera_pos);
 
     ExecuteRenderCommands();
     Gizmos::Render();
@@ -317,7 +322,7 @@ void RenderPipeline::ExecuteRenderCommands()
     bool is_sprite_bath_active = false;
     auto sprite_batch = FontData::SpriteBatch();
 
-    for (auto &command : m_commands_)
+    for (auto &command : m_render_commands_)
     {
         if (command.type == CommandType::Mesh)
         {
@@ -412,6 +417,47 @@ void RenderPipeline::ExecuteRenderCommands()
 
             sprite_font->DrawString(sprite_batch.get(), string, *position, *color);
         }
+        else if (command.type == CommandType::ProceduralMesh)
+        {
+            if (is_sprite_bath_active)
+            {
+                sprite_batch->End();
+                sprite_batch->End();
+                RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+                current_material = nullptr;
+                current_shader = nullptr;
+                current_mesh = nullptr;
+            }
+
+            const auto &[shader, material, vertex_count] = command.procedural_mesh_data;
+
+            if (shader == nullptr || material == nullptr)
+            {
+                Logger::Error<RenderPipeline>("render command is invalid!");
+                continue;
+            }
+
+            cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
+
+            if (current_shader != shader)
+            {
+                current_shader = shader;
+                PSOManager::SetPipelineState(cmd_list, current_shader);
+            }
+
+            if (current_material != material)
+            {
+                if (material->shared_material_block == nullptr)
+                    material->CreateMaterialBlock();
+
+                if (!SetDescriptorTable(material->shared_material_block))
+                    continue;
+
+                current_material = material;
+            }
+
+            cmd_list->DrawInstanced(vertex_count, 1, 0, 0);
+        }
     }
 
     if (is_sprite_bath_active)
@@ -420,7 +466,17 @@ void RenderPipeline::ExecuteRenderCommands()
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     }
 
-    m_commands_.clear();
+    m_render_commands_.clear();
+}
+
+void RenderPipeline::ExecuteComputeCommands()
+{
+    for (auto &compute_command : m_compute_commands_)
+    {
+        compute_command.Execute();
+    }
+
+    m_compute_commands_.clear();
 }
 
 void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
@@ -453,11 +509,11 @@ void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<Asset
         cmd.mesh_data.world_matrix_buffer_address = world_matrix_address;
         cmd.mesh_data.bone_matrices_buffer_handle = bone_matrices_handle;
 
-        instance->m_commands_.emplace_back(cmd);
+        instance->m_render_commands_.emplace_back(cmd);
     }
 }
 
-void RenderPipeline::Submit(AssetPtr<FontData> font_data, Vector2 position, const std::string &string, Color color)
+void RenderPipeline::Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color)
 {
     const auto casted_font_data = font_data.CastedLock();
     if (casted_font_data == nullptr)
@@ -470,7 +526,37 @@ void RenderPipeline::Submit(AssetPtr<FontData> font_data, Vector2 position, cons
     cmd.text_data.string = string.c_str();
     cmd.text_data.color = &color;
 
-    Instance()->m_commands_.emplace_back(cmd);
+    Instance()->m_render_commands_.emplace_back(cmd);
+}
+
+void RenderPipeline::Submit(const std::vector<AssetPtr<Material>> &materials, const uint32_t vertex_count)
+{
+    const auto instance = Instance();
+
+    if (materials.empty())
+        return;
+
+    for (auto i = 0; i < materials.size(); ++i)
+    {
+        const auto casted_material = materials[i].CastedLock();
+
+        if (casted_material == nullptr)
+            continue;
+
+        const auto casted_shader = casted_material->GetShader().CastedLock();
+        if (!casted_shader)
+        {
+            continue;
+        }
+
+        RenderCommand cmd;
+        cmd.type = CommandType::ProceduralMesh;
+        cmd.procedural_mesh_data.shader = casted_shader.get();
+        cmd.procedural_mesh_data.material = materials[i].CastedLock().get();
+        cmd.procedural_mesh_data.vertex_count = vertex_count;
+
+        instance->m_render_commands_.emplace_back(cmd);
+    }
 }
 
 uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const float depth, const Shader &shader)
@@ -502,6 +588,12 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
     }
 
     return key;
+}
+
+void RenderPipeline::Submit(const AssetPtr<ComputeShader> &compute_shader, const std::shared_ptr<MaterialBlock> &material_block, const uint32_t group_count_x, const uint32_t group_count_y, const uint32_t group_count_z)
+{
+    ComputeCommand cmd(compute_shader, material_block, group_count_x, group_count_y, group_count_z);
+    Instance()->m_compute_commands_.emplace_back(cmd);
 }
 
 void RenderPipeline::Init()

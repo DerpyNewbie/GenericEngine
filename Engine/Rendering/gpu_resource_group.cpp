@@ -122,6 +122,53 @@ GpuResource GpuResourceGroup::End(const kGpuUploadType buffer_type)
     return m_gpu_resources_[buffer_type].begin()->second;
 }
 
+void GpuResourceGroup::SetBuffer(const std::string &name, const std::shared_ptr<BufferBase> &buffer)
+{
+    if (buffer == nullptr)
+        return;
+
+    bool find = false;
+    GpuResource find_gpu_resource;
+    for (auto &gpu_resources : m_gpu_resources_)
+    {
+        auto it = std::ranges::find_if(gpu_resources,
+                                       [&name](auto &gpu_resource) {
+                                           return gpu_resource.second.name == name;
+                                       });
+
+        if (it != gpu_resources.end())
+        {
+            find = true;
+            find_gpu_resource = it->second;
+            break;
+        }
+    }
+
+    if (!find)
+        return;
+
+    if (!buffer->IsValid())
+        buffer->CreateBuffer();
+
+    find_gpu_resource.buffer = buffer;
+}
+
+std::shared_ptr<BufferBase> GpuResourceGroup::GetBuffer(const std::string &name)
+{
+    for (auto &gpu_resources : m_gpu_resources_)
+    {
+        auto it = std::ranges::find_if(gpu_resources,
+                                       [&name](auto &gpu_resource) {
+                                           return gpu_resource.second.name == name;
+                                       });
+
+        if (it != gpu_resources.end())
+            return it->second.buffer;
+    }
+
+    return nullptr;
+}
+
 bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block)
 {
     for (auto &gpu_resources : m_gpu_resources_)

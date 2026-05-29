@@ -9,8 +9,8 @@ namespace engine
 enum class CommandType
 {
     Mesh,
-    Effekseer,
-    Text
+    Text,
+    ProceduralMesh
 };
 
 struct RenderCommand
@@ -39,6 +39,13 @@ struct RenderCommand
             const char *string;
             Color *color;
         } text_data;
+
+        struct
+        {
+            Shader *shader;
+            Material *material;
+            uint32_t vertex_count;
+        } procedural_mesh_data;
     };
 };
 }

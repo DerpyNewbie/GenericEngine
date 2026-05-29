@@ -1,0 +1,25 @@
+struct Particle {
+    float2 position;
+    float2 velocity;
+};
+
+RWStructuredBuffer<Particle> ParticleBuffer : register(u1);
+
+[numthreads(64, 1, 1)]
+void compute(uint3 globalID : SV_DispatchThreadID)
+{
+    uint index = globalID.x;
+    
+    // 自分のパーティクルデータを読み込む
+    Particle p = ParticleBuffer[index];
+    
+    // 1. 座標を速度に従って動かす
+    p.position += p.velocity * 0.01f; // 0.01fはDeltaTimeの代わり
+    
+    // 2. 画面外（-1.0 ～ 1.0）に出たら跳ね返る簡易物理
+    if (p.position.x < -1.0f || p.position.x > 1.0f) p.velocity.x *= -1.0f;
+    if (p.position.y < -1.0f || p.position.y > 1.0f) p.velocity.y *= -1.0f;
+    
+    // データをバッファに書き戻す
+    ParticleBuffer[index] = p;
+}

@@ -130,6 +130,7 @@ D3D12_UNORDERED_ACCESS_VIEW_DESC StructuredBuffer::UavDesc() const
     uav_desc.Format = DXGI_FORMAT_UNKNOWN;
     uav_desc.Buffer.FirstElement = 0;
     uav_desc.Buffer.StructureByteStride = m_stride_;
+    uav_desc.Buffer.NumElements = m_element_count_;
     uav_desc.Buffer.CounterOffsetInBytes = 0;
     uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 

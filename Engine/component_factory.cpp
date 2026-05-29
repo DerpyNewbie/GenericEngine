@@ -10,13 +10,15 @@
 #include "Components/billboard_renderer.h"
 #include "Components/camera_component.h"
 #include "Components/component_event_tester.h"
-#include "Components/compute_shader_test_component.h"
+#include "Components/compute_shader_component.h"
+#include "Components/compute_shader_tester_component.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
 #include "Components/frame_meta_data.h"
 #include "Components/global_resource_tester_component.h"
 #include "Components/mesh_renderer.h"
+#include "Components/procedural_renderer.h"
 #include "Components/rotator_component.h"
 #include "Components/rect_transform.h"
 #include "Components/renderer_2d.h"
@@ -74,7 +76,9 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CinemaCameraTransitioner>("Rendering/Cinema");
     RegisterComponentFactory<GlobalResourceTesterComponent>("Debug");
     RegisterComponentFactory<CoroutineTest>("Debug");
-    RegisterComponentFactory<ComputeShaderTestComponent>("Debug");
+    RegisterComponentFactory<ComputeShaderComponent>("Compute");
+    RegisterComponentFactory<ProceduralRenderer>("Rendering/Renderer");
+    RegisterComponentFactory<ComputeShaderTesterComponent>("Debug");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :

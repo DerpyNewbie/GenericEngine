@@ -31,6 +31,9 @@ public:
     GpuResource Begin(kGpuUploadType buffer_type);
     GpuResource End(kGpuUploadType buffer_type);
 
+    void SetBuffer(const std::string &name, const std::shared_ptr<BufferBase> &buffer);
+    std::shared_ptr<BufferBase> GetBuffer(const std::string &name);
+
     bool UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block);
     bool SetBufferToDescriptorTable();
 };

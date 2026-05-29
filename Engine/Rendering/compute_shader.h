@@ -13,8 +13,6 @@ class ComputeShader : public Object, public Inspectable
 
     ComPtr<ID3DBlob> m_shader_blob_;
 
-    static bool SetDescriptorTable(const std::shared_ptr<MaterialBlock> &material_block);
-
 public:
     std::vector<ShaderParameter> parameters;
 
@@ -24,8 +22,6 @@ public:
     {
         return m_shader_blob_.Get();
     }
-
-    void Dispatch(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z, const std::shared_ptr<MaterialBlock> &material_block) const;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

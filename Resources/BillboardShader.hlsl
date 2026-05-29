@@ -1,4 +1,3 @@
-#include "Light.hlsli"
 
 cbuffer WorldMatrix : register (b0)
 {
@@ -11,6 +10,8 @@ cbuffer ViewProjMatrix : register (b1)
 }
 
 StructuredBuffer<float4x4> BoneMatrices : register (t0);
+Texture2D _MainTex : register (t3);
+SamplerState smp : register (s0);
 
 struct VSInput
 {

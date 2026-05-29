@@ -76,10 +76,12 @@
         <ClCompile Include="Engine\Components\Cinema\cinema_brain_component.cpp"/>
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component_event_tester.cpp"/>
-        <ClCompile Include="Engine\Components\compute_shader_test_component.cpp"/>
+        <ClCompile Include="Engine\Components\compute_shader_component.cpp"/>
+        <ClCompile Include="Engine\Components\compute_shader_tester_component.cpp"/>
         <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\global_resource_tester_component.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
+        <ClCompile Include="Engine\Components\procedural_renderer.cpp"/>
         <ClCompile Include="Engine\Components\renderer_2d.cpp"/>
         <ClCompile Include="Engine\Components\canvas.cpp"/>
         <ClCompile Include="Engine\Components\camera_component.cpp"/>
@@ -137,6 +139,7 @@
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
+        <ClCompile Include="Engine\Rendering\compute_command.cpp"/>
         <ClCompile Include="Engine\Rendering\compute_shader.cpp"/>
         <ClCompile Include="Engine\Rendering\constant_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
@@ -252,10 +255,12 @@
         <ClInclude Include="Engine\Components\Cinema\cinema_brain_component.h"/>
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
         <ClInclude Include="Engine\Components\component_event_tester.h"/>
-        <ClInclude Include="Engine\Components\compute_shader_test_component.h"/>
+        <ClInclude Include="Engine\Components\compute_shader_component.h"/>
+        <ClInclude Include="Engine\Components\compute_shader_tester_component.h"/>
         <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\global_resource_tester_component.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
+        <ClInclude Include="Engine\Components\procedural_renderer.h"/>
         <ClInclude Include="Engine\Components\renderer_2d.h"/>
         <ClInclude Include="Engine\Components\canvas.h"/>
         <ClInclude Include="Engine\Components\camera_component.h"/>
@@ -322,6 +327,7 @@
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
+        <ClInclude Include="Engine\Rendering\compute_command.h"/>
         <ClInclude Include="Engine\Rendering\compute_shader.h"/>
         <ClInclude Include="Engine\Rendering\constant_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>

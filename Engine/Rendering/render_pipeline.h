@@ -1,5 +1,7 @@
 #pragma once
 #include "camera.h"
+#include "compute_command.h"
+#include "compute_shader.h"
 #include "event.h"
 #include "material.h"
 #include "object_pool.h"
@@ -31,7 +33,8 @@ class RenderPipeline
 
     std::shared_ptr<Shader> m_depth_shader_;
 
-    std::vector<RenderCommand> m_commands_;
+    std::vector<RenderCommand> m_render_commands_;
+    std::vector<ComputeCommand> m_compute_commands_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
     std::shared_ptr<ConstantBufferData> m_scene_data_buffer_data_;
 
@@ -53,7 +56,9 @@ class RenderPipeline
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void DepthRender();
+    
     void ExecuteRenderCommands();
+    void ExecuteComputeCommands();
 
 public:
     Event<> on_rendering;
@@ -64,8 +69,10 @@ public:
     static Camera GetCurrentCamera();
     static uint64_t GenerateSortKey(uint64_t render_queue, float depth, const Shader &shader);
 
+    static void Submit(const AssetPtr<ComputeShader> &compute_shader, const std::shared_ptr<MaterialBlock> &material_block, uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z);
     static void Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
-    static void Submit(AssetPtr<FontData> font_data, Vector2 position, const std::string &string, Color color);
+    static void Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color);
+    static void Submit(const std::vector<AssetPtr<Material>> &materials, uint32_t vertex_count);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
     static void RequestRender(Camera camera);
