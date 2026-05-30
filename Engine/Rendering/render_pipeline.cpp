@@ -317,7 +317,6 @@ void RenderPipeline::ExecuteRenderCommands()
     const Mesh *current_mesh = nullptr;
 
     auto cmd_list = RenderEngine::CommandList();
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     bool is_sprite_bath_active = false;
     auto sprite_batch = FontData::SpriteBatch();
@@ -331,13 +330,12 @@ void RenderPipeline::ExecuteRenderCommands()
                 sprite_batch->End();
                 sprite_batch->End();
                 RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
-                cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
                 current_material = nullptr;
                 current_shader = nullptr;
                 current_mesh = nullptr;
             }
 
-            const auto &[pos, shader, material, mesh, sub_mesh_index, world_address, bone_handle] = command.mesh_data;
+            const auto &[pos, shader, material, mesh, sub_mesh_index, instance_count , world_address, bone_handle] = command.mesh_data;
 
             if (mesh == nullptr || shader == nullptr || material == nullptr)
             {
@@ -350,7 +348,8 @@ void RenderPipeline::ExecuteRenderCommands()
                 current_shader = shader;
                 PSOManager::SetPipelineState(cmd_list, current_shader);
             }
-
+            cmd_list->IASetPrimitiveTopology(DX_PrimitiveTopology[shader->ShaderSettings().primitive_topology_type]);
+            
             if (current_mesh != mesh)
             {
                 current_mesh = mesh;
@@ -389,7 +388,7 @@ void RenderPipeline::ExecuteRenderCommands()
                     ? mesh->sub_meshes[0].base_index
                     : mesh->indices.size();
 
-                cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
+                cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), instance_count, 0, 0, 0);
             }
             else
             {
@@ -437,13 +436,12 @@ void RenderPipeline::ExecuteRenderCommands()
                 continue;
             }
 
-            cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
-
             if (current_shader != shader)
             {
                 current_shader = shader;
                 PSOManager::SetPipelineState(cmd_list, current_shader);
             }
+            cmd_list->IASetPrimitiveTopology(DX_PrimitiveTopology[shader->ShaderSettings().primitive_topology_type]);
 
             if (current_material != material)
             {
@@ -479,7 +477,7 @@ void RenderPipeline::ExecuteComputeCommands()
     m_compute_commands_.clear();
 }
 
-void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
+void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, const std::vector<AssetPtr<Material>> &materials, uint32_t instance_count, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
 {
     const auto instance = Instance();
 
@@ -506,6 +504,7 @@ void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<Asset
         cmd.mesh_data.pos = &pos;
         cmd.mesh_data.mesh = mesh.get();
         cmd.mesh_data.sub_mesh_index = i - 1;
+        cmd.mesh_data.instance_count = instance_count;
         cmd.mesh_data.world_matrix_buffer_address = world_matrix_address;
         cmd.mesh_data.bone_matrices_buffer_handle = bone_matrices_handle;
 

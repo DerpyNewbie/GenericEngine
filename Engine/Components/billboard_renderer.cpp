@@ -87,7 +87,7 @@ void BillboardRenderer::Render()
     UpdateWorldBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    RenderPipeline::Submit(Primitives::GetQuadMesh(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), shared_materials, 1, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
 }
 
 Matrix BillboardRenderer::BoundsOrigin()

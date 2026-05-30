@@ -27,6 +27,27 @@ std::shared_ptr<Shader> Shader::GetDefault()
     return m_default_shader_;
 }
 
+D3D12_PRIMITIVE_TOPOLOGY_TYPE Shader::GetPrimitiveTopologyType() const
+{
+    switch (DX_PrimitiveTopology[m_shader_settings_.primitive_topology_type])
+    {
+    case D3D_PRIMITIVE_TOPOLOGY_POINTLIST:
+        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
+
+    case D3D_PRIMITIVE_TOPOLOGY_LINELIST:
+    case D3D_PRIMITIVE_TOPOLOGY_LINESTRIP:
+        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
+
+    case D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
+    case D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP:
+        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+
+    default:
+        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
+
+    }
+}
+
 void Shader::DrawShaderSettings()
 {
     ImGui::Combo("ZTest", &m_shader_settings_.z_test, ZTestNames, IM_ARRAYSIZE(ZTestNames));

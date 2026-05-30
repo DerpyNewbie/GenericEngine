@@ -70,7 +70,7 @@ public:
     static uint64_t GenerateSortKey(uint64_t render_queue, float depth, const Shader &shader);
 
     static void Submit(const AssetPtr<ComputeShader> &compute_shader, const std::shared_ptr<MaterialBlock> &material_block, uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z);
-    static void Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
+    static void Submit(const std::shared_ptr<Mesh> &mesh, const std::vector<AssetPtr<Material>> &materials, uint32_t instance_count, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
     static void Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color);
     static void Submit(const std::vector<AssetPtr<Material>> &materials, uint32_t vertex_count);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);

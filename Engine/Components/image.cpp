@@ -48,7 +48,7 @@ void Image::Render()
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     std::vector materials = {shared_material};
 
-    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffer_->GetAddress());
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, 1, Vector3::Zero, m_world_matrix_buffer_->GetAddress());
 }
 }
 

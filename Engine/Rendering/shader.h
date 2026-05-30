@@ -49,6 +49,8 @@ public:
         }
     }
 
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const;
+
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {

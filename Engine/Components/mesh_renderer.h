@@ -15,9 +15,9 @@ class MeshRenderer : public Renderer
 
 protected:
     static bool m_draw_bounds_;
-    
-    AssetPtr<Mesh> m_shared_mesh_;
 
+    uint32_t m_instance_count_ = 1;
+    AssetPtr<Mesh> m_shared_mesh_;
     std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
     void DrawBounds();
@@ -45,8 +45,13 @@ public:
             cereal::base_class<Renderer>(this),
             CEREAL_NVP(m_shared_mesh_)
         );
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(m_instance_count_));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::MeshRenderer, 1)
+CEREAL_CLASS_VERSION(engine::MeshRenderer, 2)

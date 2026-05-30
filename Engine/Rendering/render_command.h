@@ -28,6 +28,7 @@ struct RenderCommand
             Material *material;
             Mesh *mesh;
             int sub_mesh_index;
+            uint32_t instance_count;
             D3D12_GPU_VIRTUAL_ADDRESS world_matrix_buffer_address;
             D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_buffer_handle;
         } mesh_data;

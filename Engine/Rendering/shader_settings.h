@@ -112,11 +112,11 @@ constexpr const char *RenderQueueNames[] = {
 };
 
 constexpr const char *PrimitiveTopologyNames[] = {
-    "Undefined",
-    "Point",
-    "Line",
-    "Triangle",
-    "Patch"
+    "PointList",
+    "LineList",
+    "LineStrip",
+    "TriangleList",
+    "TriangleStrip"
 };
 
 constexpr D3D12_COMPARISON_FUNC DX_ZTest[] = {
@@ -172,10 +172,10 @@ constexpr UINT8 DX_ColorMask[] = {
     0
 };
 
-constexpr D3D12_PRIMITIVE_TOPOLOGY_TYPE DX_PrimitiveTopologyType[] = {
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED,
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT,
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE,
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE_PATCH
+constexpr D3D_PRIMITIVE_TOPOLOGY DX_PrimitiveTopology[] = {
+    D3D_PRIMITIVE_TOPOLOGY_POINTLIST,
+    D3D_PRIMITIVE_TOPOLOGY_LINELIST,
+    D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
+    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+    D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
 };
