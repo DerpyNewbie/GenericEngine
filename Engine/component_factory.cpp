@@ -11,7 +11,6 @@
 #include "Components/camera_component.h"
 #include "Components/component_event_tester.h"
 #include "Components/compute_shader_component.h"
-#include "Components/compute_shader_tester_component.h"
 #include "Components/controller.h"
 #include "Components/coroutine_test.h"
 #include "Components/directional_light.h"
@@ -78,7 +77,6 @@ void IComponentFactory::Init()
     RegisterComponentFactory<CoroutineTest>("Debug");
     RegisterComponentFactory<ComputeShaderComponent>("Compute");
     RegisterComponentFactory<ProceduralRenderer>("Rendering/Renderer");
-    RegisterComponentFactory<ComputeShaderTesterComponent>("Debug");
 }
 
 IComponentFactory::IComponentFactory(const std::string &name, const std::string &friendly_name, const std::string &category) :

@@ -77,7 +77,6 @@
         <ClCompile Include="Engine\Components\Cinema\cinema_camera_component.cpp"/>
         <ClCompile Include="Engine\Components\component_event_tester.cpp"/>
         <ClCompile Include="Engine\Components\compute_shader_component.cpp"/>
-        <ClCompile Include="Engine\Components\compute_shader_tester_component.cpp"/>
         <ClCompile Include="Engine\Components\coroutine_test.cpp"/>
         <ClCompile Include="Engine\Components\global_resource_tester_component.cpp"/>
         <ClCompile Include="Engine\Components\image.cpp"/>
@@ -256,7 +255,6 @@
         <ClInclude Include="Engine\Components\Cinema\cinema_camera_component.h"/>
         <ClInclude Include="Engine\Components\component_event_tester.h"/>
         <ClInclude Include="Engine\Components\compute_shader_component.h"/>
-        <ClInclude Include="Engine\Components\compute_shader_tester_component.h"/>
         <ClInclude Include="Engine\Components\coroutine_test.h"/>
         <ClInclude Include="Engine\Components\global_resource_tester_component.h"/>
         <ClInclude Include="Engine\Components\image.h"/>
