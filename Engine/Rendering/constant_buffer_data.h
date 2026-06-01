@@ -17,6 +17,7 @@ public:
 
     void OnInspectorGui() override;
 
+    void AddData(const std::string &name, size_t data_size, kConstantBufferDataType data_type);
     void AddIntData(const std::string &name);
     void AddFloatData(const std::string &name);
     void AddVector2Data(const std::string &name);

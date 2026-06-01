@@ -7,49 +7,44 @@ namespace engine
 {
 void ConstantBufferData::AddIntData(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Int, m_current_offset_));
-
-    m_current_offset_ += sizeof(int);
-    m_data_.resize(m_current_offset_);
+    AddData(name, sizeof(int), kConstantBufferDataType::kConstantBufferDataType_Int);
 }
 
 void ConstantBufferData::AddFloatData(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Float, m_current_offset_));
-
-    m_current_offset_ += sizeof(float);
-    m_data_.resize(m_current_offset_);
+    AddData(name, sizeof(float), kConstantBufferDataType::kConstantBufferDataType_Float);
 }
 
 void ConstantBufferData::AddVector2Data(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Vector2, m_current_offset_));
-
-    m_current_offset_ += sizeof(Vector2);
-    m_data_.resize(m_current_offset_);
+    AddData(name, sizeof(Vector2), kConstantBufferDataType::kConstantBufferDataType_Vector2);
 }
 
 void ConstantBufferData::AddVector3Data(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Vector3, m_current_offset_));
-
-    m_current_offset_ += sizeof(Vector3);
-    m_data_.resize(m_current_offset_);
+    AddData(name, sizeof(Vector3), kConstantBufferDataType::kConstantBufferDataType_Vector3);
 }
 
 void ConstantBufferData::AddColorData(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Color, m_current_offset_));
-
-    m_current_offset_ += sizeof(Color);
-    m_data_.resize(m_current_offset_);
+    AddData(name, sizeof(Color), kConstantBufferDataType::kConstantBufferDataType_Color);
 }
 
 void ConstantBufferData::AddMatrixData(const std::string &name)
 {
-    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(kConstantBufferDataType::kConstantBufferDataType_Matrix, m_current_offset_));
+    AddData(name, sizeof(Matrix), kConstantBufferDataType::kConstantBufferDataType_Matrix);
+}
 
-    m_current_offset_ += sizeof(Matrix);
+void ConstantBufferData::AddData(const std::string &name, const size_t data_size, kConstantBufferDataType data_type)
+{
+    //1行に収まらなかった場合アラインメントします。
+    const size_t current_row_offset = m_current_offset_ % 16;
+    if (current_row_offset + data_size > 16)
+        m_current_offset_ = (m_current_offset_ + 15) & ~15;
+
+    m_data_type_offset_pairs_.try_emplace(name, std::make_pair(data_type, m_current_offset_));
+
+    m_current_offset_ += data_size;
     m_data_.resize(m_current_offset_);
 }
 
@@ -59,26 +54,26 @@ ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : Bu
     {
         switch (variable.data_type)
         {
-            case kConstantBufferDataType::kConstantBufferDataType_Int:
-                AddIntData(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Float:
-                AddFloatData(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Vector2:
-                AddVector2Data(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Vector3:
-                AddVector3Data(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Color:
-                AddColorData(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Matrix:
-                AddMatrixData(variable.name);
-                break;
-            case kConstantBufferDataType::kConstantBufferDataType_Unknown:
-                break;
+        case kConstantBufferDataType::kConstantBufferDataType_Int:
+            AddIntData(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Float:
+            AddFloatData(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Vector2:
+            AddVector2Data(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Vector3:
+            AddVector3Data(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Color:
+            AddColorData(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Matrix:
+            AddMatrixData(variable.name);
+            break;
+        case kConstantBufferDataType::kConstantBufferDataType_Unknown:
+            break;
         }
     }
 }
@@ -90,44 +85,44 @@ void ConstantBufferData::OnInspectorGui()
         auto offset = data_type_offset_pair.second;
         switch (data_type_offset_pair.first)
         {
-            case kConstantBufferDataType::kConstantBufferDataType_Int: {
-                auto data = *reinterpret_cast<int *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Int: {
+            auto data = *reinterpret_cast<int *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetIntData(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Float: {
-                auto data = *reinterpret_cast<float *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Float: {
+            auto data = *reinterpret_cast<float *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetFloatData(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Vector2: {
-                auto data = *reinterpret_cast<Vector2 *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Vector2: {
+            auto data = *reinterpret_cast<Vector2 *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetVector2Data(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Vector3: {
-                auto data = *reinterpret_cast<Vector3 *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Vector3: {
+            auto data = *reinterpret_cast<Vector3 *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetVector3Data(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Color: {
-                auto data = *reinterpret_cast<Color *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Color: {
+            auto data = *reinterpret_cast<Color *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetColorData(name, data);
                 break;
             }
-            case kConstantBufferDataType::kConstantBufferDataType_Matrix: {
-                auto data = *reinterpret_cast<Matrix *>(m_data_.data() + offset);
+        case kConstantBufferDataType::kConstantBufferDataType_Matrix: {
+            auto data = *reinterpret_cast<Matrix *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetMatrixData(name, data);
                 break;
             }
-            default:
-                break;
+        default:
+            break;
         }
     }
 }
@@ -136,7 +131,8 @@ bool ConstantBufferData::SetIntData(const std::string &name, const int data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Int)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Int)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
@@ -150,7 +146,8 @@ bool ConstantBufferData::SetFloatData(const std::string &name, const float data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Float)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Float)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
@@ -164,7 +161,8 @@ bool ConstantBufferData::SetVector2Data(const std::string &name, const Vector2 d
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Vector2)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Vector2)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
@@ -178,7 +176,8 @@ bool ConstantBufferData::SetVector3Data(const std::string &name, const Vector3 d
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Vector3)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Vector3)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
@@ -192,7 +191,8 @@ bool ConstantBufferData::SetColorData(const std::string &name, const Color data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Color)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Color)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
@@ -206,7 +206,8 @@ bool ConstantBufferData::SetMatrixData(const std::string &name, const Matrix &da
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
-    if (it == m_data_type_offset_pairs_.end() || it->second.first != kConstantBufferDataType::kConstantBufferDataType_Matrix)
+    if (it == m_data_type_offset_pairs_.end() || it->second.first !=
+        kConstantBufferDataType::kConstantBufferDataType_Matrix)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;
