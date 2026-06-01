@@ -258,6 +258,29 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         &error_blob
     );
 
+    if (FAILED(hr))
+    {
+        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
+        {
+            std::string temp_error = static_cast<const char *>(error_blob->GetBufferPointer());
+
+            if (temp_error.find("entrypoint not found") != std::string::npos)
+            {
+                shader->m_gs_blob_ = nullptr;
+                return true;
+            }
+
+            error_msg = temp_error;
+        }
+        else
+        {
+            error_msg = "NULL";
+        }
+
+        Logger::Error<ShaderImporter>("Failed to Compile Geometry Shader!");
+        return false;
+    }
+
     // Add shader variants here if you want to
     return true;
 }
