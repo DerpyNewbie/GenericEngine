@@ -12,9 +12,14 @@ class ComputeShaderComponent : public Component
     uint32_t m_group_count_y_ = 1;
     uint32_t m_group_count_z_ = 1;
 
+    bool m_enable_update_ = false;
+
+    void CreateMaterialBlock();
+    
 public:
     void OnConstructed() override;
     void OnInspectorGui() override;
+    void OnUpdate() override;
 
     void Execute() const;
 
@@ -41,7 +46,11 @@ public:
     {
         ar(
             cereal::base_class<Component>(this),
-            CEREAL_NVP(m_compute_shader_)
+            CEREAL_NVP(m_compute_shader_),
+            CEREAL_NVP(m_material_block_),
+            CEREAL_NVP(m_group_count_x_),
+            CEREAL_NVP(m_group_count_y_),
+            CEREAL_NVP(m_group_count_z_)
         );
     }
 };
