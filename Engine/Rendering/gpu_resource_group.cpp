@@ -74,7 +74,7 @@ void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const s
     gpu_resource.buffer->Transition(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 }
 
-bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource)
+bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource, bool is_uav)
 {
     auto global_resource = GpuResourceManager::GetGlobalBuffer(gpu_resource.name);
     if (global_resource == nullptr)
@@ -89,7 +89,7 @@ bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource)
         return false;
     
     gpu_resource.buffer = global_resource;
-    gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+    gpu_resource.buffer->UploadBuffer(gpu_resource.handle, is_uav);
 
     return true;
 }
@@ -171,11 +171,11 @@ std::shared_ptr<BufferBase> GpuResourceGroup::GetBuffer(const std::string &name)
 
 bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block)
 {
-    for (auto &gpu_resources : m_gpu_resources_)
+    for (int i = 0; i < kGpuBufferType_Count; ++i)
     {
-        for (auto &gpu_resource : gpu_resources | std::views::values)
+        for (auto &gpu_resource : m_gpu_resources_[i] | std::views::values)
         {
-            if (SetGlobalResource(gpu_resource))
+            if (SetGlobalResource(gpu_resource, i == kGpuBufferType_UAV))
                 continue;
 
             switch (gpu_resource.buffer_type)

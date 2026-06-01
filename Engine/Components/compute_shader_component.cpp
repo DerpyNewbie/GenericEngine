@@ -7,10 +7,19 @@ namespace engine
 {
 void ComputeShaderComponent::Execute() const
 {
-    if (m_compute_shader_ == nullptr)
+    if (m_compute_shader_.CastedLock() == nullptr)
         return;
 
     RenderPipeline::Submit(m_compute_shader_, m_material_block_, m_group_count_x_, m_group_count_y_, m_group_count_z_);
+}
+
+void ComputeShaderComponent::CreateMaterialBlock()
+{
+    if (m_compute_shader_.CastedLock() == nullptr)
+        return;
+
+    m_material_block_ = Instantiate<MaterialBlock>("Material Block of " + Name());
+    m_material_block_->LoadShaderParameters(m_compute_shader_->parameters);
 }
 
 void ComputeShaderComponent::OnConstructed()
@@ -39,13 +48,25 @@ void ComputeShaderComponent::OnInspectorGui()
 
     m_material_block_->OnInspectorGui();
 
-    if (m_compute_shader_ == nullptr)
+    if (ImGui::Button("Reconstruct Material Block"))
+    {
+        CreateMaterialBlock();
+    }
+
+    if (m_compute_shader_.CastedLock() == nullptr)
         return;
+
+    ImGui::Checkbox("Enable Update", &m_enable_update_);
     
     if (ImGui::Button("Execute"))
     {
         Execute();
     }
+}
+void ComputeShaderComponent::OnUpdate()
+{
+    if (m_enable_update_)
+        Execute();
 }
 
 void ComputeShaderComponent::SetGroupCount(const uint32_t group_count_x, const uint32_t group_count_y, const uint32_t group_count_z)

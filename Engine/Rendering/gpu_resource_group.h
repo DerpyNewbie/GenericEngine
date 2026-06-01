@@ -23,7 +23,7 @@ class GpuResourceGroup
     static void UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
     static void UpdateUavTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
 
-    static bool SetGlobalResource(GpuResource &gpu_resource);
+    static bool SetGlobalResource(GpuResource &gpu_resource, bool is_uav);
     
 public:
     void Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<BufferDataBase> &material_data, kBufferType buffer_type, kGpuUploadType gpu_upload_type);

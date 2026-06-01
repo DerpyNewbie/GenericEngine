@@ -1,5 +1,4 @@
 #pragma once
-#include "buffer_base.h"
 #include "gpu_resource_group.h"
 #include "inspectable.h"
 #include "object.h"
