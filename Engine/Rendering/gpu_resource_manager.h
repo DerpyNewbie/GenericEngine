@@ -1,6 +1,7 @@
 #pragma once
 #include "gpu_resource_group.h"
 #include "material.h"
+#include "CabotEngine/Graphics/ByteAddressBuffer.h"
 
 namespace engine
 {
@@ -16,6 +17,7 @@ public:
     static void SetGlobalBufferData(const std::string &name, const std::shared_ptr<BufferDataBase> &buffer_data);
     static void SetGlobalBuffer(const std::string &name, const std::shared_ptr<ConstantBuffer> &buffer);
     static void SetGlobalBuffer(const std::string &name, const std::shared_ptr<StructuredBuffer> &buffer);
+    static void SetGlobalBuffer(const std::string &name, const std::shared_ptr<ByteAddressBuffer> &buffer);
     static void SetGlobalTexture(const std::string &name, const std::shared_ptr<Texture2D> &texture);
     static void SetGlobalInt(const std::string &name, int data);
     static void SetGlobalFloat(const std::string &name, float data);

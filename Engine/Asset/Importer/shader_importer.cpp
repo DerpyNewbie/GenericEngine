@@ -61,35 +61,45 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
 
         switch (bind_desc.Type)
         {
-            case D3D_SIT_CBUFFER: {
-                ID3D12ShaderReflectionConstantBuffer *cb_reflect = shader_reflect->GetConstantBufferByName(bind_desc.Name);
-                shader_parameters.emplace_back(ReadConstantVariables(cb_reflect, bind_desc));
-                break;
-            }
+        case D3D_SIT_CBUFFER: {
+            ID3D12ShaderReflectionConstantBuffer *cb_reflect = shader_reflect->GetConstantBufferByName(bind_desc.Name);
+            shader_parameters.emplace_back(ReadConstantVariables(cb_reflect, bind_desc));
+            break;
+        }
 
-            case D3D_SIT_STRUCTURED: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
-                shader_parameters.emplace_back(shader_param);
-                break;
-            }
+        case D3D_SIT_STRUCTURED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
 
-            case D3D_SIT_UAV_RWSTRUCTURED: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer, true};
-                shader_parameters.emplace_back(shader_param);
-                break;
-            }
+        case D3D_SIT_UAV_RWSTRUCTURED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer, true};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
 
-            case D3D_SIT_TEXTURE: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
-                shader_parameters.emplace_back(shader_param);
-                break;
-            }
+        case D3D_SIT_TEXTURE: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
 
-            case D3D_SIT_UAV_RWTYPED: {
-                ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_UavTexture, true};
-                shader_parameters.emplace_back(shader_param);
-                break;
-            }
+        case D3D_SIT_UAV_RWTYPED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_UavTexture, true};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+        case D3D_SIT_BYTEADDRESS: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ByteAddressBuffer, false};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+        case D3D_SIT_UAV_RWBYTEADDRESS: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ByteAddressBuffer, true};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
         }
     }
 
@@ -128,37 +138,37 @@ kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SH
 {
     switch (type_desc.Type)
     {
-        case D3D_SVT_INT:
-            switch (type_desc.Class)
-            {
-                case D3D_SVC_SCALAR:
-                    return kConstantBufferDataType::kConstantBufferDataType_Int;
-                default:
-                    return kConstantBufferDataType::kConstantBufferDataType_Unknown;
-            }
-        case D3D_SVT_FLOAT:
-            switch (type_desc.Class)
-            {
-                case D3D_SVC_SCALAR:
-                    return kConstantBufferDataType::kConstantBufferDataType_Float;
-                case D3D_SVC_VECTOR:
-                    switch (type_desc.Columns)
-                    {
-                        case 2:
-                            return kConstantBufferDataType::kConstantBufferDataType_Vector2;
-                        case 3:
-                            return kConstantBufferDataType::kConstantBufferDataType_Vector3;
-                        case 4:
-                            return kConstantBufferDataType::kConstantBufferDataType_Color;
-                        default:
-                            return kConstantBufferDataType::kConstantBufferDataType_Unknown;
-                    }
-                case D3D_SVC_MATRIX_COLUMNS:
-                    if (type_desc.Rows == 4 && type_desc.Columns == 4)
-                        return kConstantBufferDataType::kConstantBufferDataType_Matrix;
-            }
+    case D3D_SVT_INT:
+        switch (type_desc.Class)
+        {
+        case D3D_SVC_SCALAR:
+            return kConstantBufferDataType::kConstantBufferDataType_Int;
         default:
             return kConstantBufferDataType::kConstantBufferDataType_Unknown;
+        }
+    case D3D_SVT_FLOAT:
+        switch (type_desc.Class)
+        {
+        case D3D_SVC_SCALAR:
+            return kConstantBufferDataType::kConstantBufferDataType_Float;
+        case D3D_SVC_VECTOR:
+            switch (type_desc.Columns)
+            {
+            case 2:
+                return kConstantBufferDataType::kConstantBufferDataType_Vector2;
+            case 3:
+                return kConstantBufferDataType::kConstantBufferDataType_Vector3;
+            case 4:
+                return kConstantBufferDataType::kConstantBufferDataType_Color;
+            default:
+                return kConstantBufferDataType::kConstantBufferDataType_Unknown;
+            }
+        case D3D_SVC_MATRIX_COLUMNS:
+            if (type_desc.Rows == 4 && type_desc.Columns == 4)
+                return kConstantBufferDataType::kConstantBufferDataType_Matrix;
+        }
+    default:
+        return kConstantBufferDataType::kConstantBufferDataType_Unknown;
     }
 }
 
@@ -245,7 +255,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
 
         return false;
     }
-    
+
     hr = D3DCompileFromFile(
         file_path.c_str(),
         nullptr,

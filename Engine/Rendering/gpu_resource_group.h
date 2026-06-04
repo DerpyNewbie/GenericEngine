@@ -22,6 +22,7 @@ class GpuResourceGroup
     static void UpdateStructuredBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
     static void UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
     static void UpdateUavTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
+    static void UpdateByteAddressBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block);
 
     static bool SetGlobalResource(GpuResource &gpu_resource, bool is_uav);
     

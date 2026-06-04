@@ -18,7 +18,8 @@ enum kBufferType
     kBufferType_ConstantBuffer,
     kBufferType_StructuredBuffer,
     kBufferType_Texture2D,
-    kBufferType_UavTexture
+    kBufferType_UavTexture,
+    kBufferType_ByteAddressBuffer,
 };
 
 struct ShaderVariableDesc

@@ -76,6 +76,15 @@ std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(con
     return std::reinterpret_pointer_cast<UavTextureBufferData>(it->second);
 }
 
+std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end())
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<ByteAddressBufferData>(it->second);
+}
+
 void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &shader_params)
 {
     for (auto &param : shader_params)

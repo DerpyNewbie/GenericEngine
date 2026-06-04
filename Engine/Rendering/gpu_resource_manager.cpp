@@ -1,8 +1,11 @@
 #include "pch.h"
 #include "gpu_resource_manager.h"
+
+#include "byte_address_buffer_data.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 #include "texture_collection.h"
+#include "CabotEngine/Graphics/ByteAddressBuffer.h"
 
 namespace engine
 {
@@ -42,13 +45,20 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(std:
                 new_group->Insert(texture_buffer, data, kBufferType_Texture2D, kGpuBufferType_SRV);
                 break;
             }
-            case kBufferType_UavTexture:
+        case kBufferType_UavTexture: {
                 const auto uav_tex_data = std::reinterpret_pointer_cast<UavTextureBufferData>(data);
                 auto texture = uav_tex_data->Data();
                 auto texture_buffer = texture == nullptr ? nullptr : TextureCollection::GetRenderTexture(texture);
 
                 new_group->Insert(texture_buffer, data, kBufferType_UavTexture, kGpuBufferType_UAV);
                 break;
+        }
+        case kBufferType_ByteAddressBuffer: {
+            const auto byte_address_data = std::reinterpret_pointer_cast<ByteAddressBufferData>(data);
+            auto byte_address_buffer = std::make_shared<ByteAddressBuffer>(byte_address_data->Count());
+
+            new_group->Insert(byte_address_buffer, data, kBufferType_ByteAddressBuffer, data->parameter.is_unordered_access ? kGpuBufferType_UAV : kGpuBufferType_SRV);
+        }
         }
     }
 
@@ -131,6 +141,11 @@ void GpuResourceManager::SetGlobalBuffer(const std::string &name, const std::sha
 }
 
 void GpuResourceManager::SetGlobalBuffer(const std::string &name, const std::shared_ptr<StructuredBuffer> &buffer)
+{
+    m_global_resources_[name] = buffer;
+}
+
+void GpuResourceManager::SetGlobalBuffer(const std::string &name, const std::shared_ptr<ByteAddressBuffer> &buffer)
 {
     m_global_resources_[name] = buffer;
 }

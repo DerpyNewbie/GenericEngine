@@ -2,6 +2,7 @@
 #include "gpu_resource_group.h"
 
 #include "gpu_resource_manager.h"
+#include "CabotEngine/Graphics/ByteAddressBuffer.h"
 
 namespace engine
 {
@@ -72,6 +73,23 @@ void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const s
         gpu_resource.buffer->CreateBuffer();
 
     gpu_resource.buffer->Transition(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+}
+
+void GpuResourceGroup::UpdateByteAddressBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+{
+    auto byte_address_data = material_block->GetByteAddressBufferData(gpu_resource.name);
+    if (byte_address_data->is_size_changed)
+    {
+        byte_address_data->is_size_changed = false;
+        gpu_resource.buffer = std::make_shared<ByteAddressBuffer>(byte_address_data->Count());
+        gpu_resource.buffer->CreateBuffer();
+        if (gpu_resource.handle != nullptr)
+            gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+    }
+    if (byte_address_data->is_dirty)
+        gpu_resource.buffer->UpdateBuffer(byte_address_data->Data());
+
+    gpu_resource.buffer->Transition(byte_address_data->parameter.is_unordered_access ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource, bool is_uav)
@@ -195,6 +213,8 @@ bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &materi
                 case kBufferType_UavTexture:
                     UpdateUavTextureBuffer(gpu_resource, material_block);
                     break;
+                case kBufferType_ByteAddressBuffer:
+                    UpdateByteAddressBuffer(gpu_resource, material_block);
             }
         }
     }
