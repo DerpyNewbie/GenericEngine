@@ -12,14 +12,16 @@ std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader
 {
     switch (shader_param.buffer_type)
     {
-        case kBufferType_ConstantBuffer:
-            return std::make_shared<ConstantBufferData>(shader_param);
-        case kBufferType_StructuredBuffer:
-            return std::make_shared<StructuredBufferData>(shader_param);
-        case kBufferType_Texture2D:
-            return std::make_shared<TextureBufferData>(shader_param);
-        case kBufferType_UavTexture:
-            return std::make_shared<UavTextureBufferData>(shader_param);
+    case kBufferType_ConstantBuffer:
+        return std::make_shared<ConstantBufferData>(shader_param);
+    case kBufferType_StructuredBuffer:
+        return std::make_shared<StructuredBufferData>(shader_param);
+    case kBufferType_Texture2D:
+        return std::make_shared<TextureBufferData>(shader_param);
+    case kBufferType_UavTexture:
+        return std::make_shared<UavTextureBufferData>(shader_param);
+    case kBufferType_ByteAddressBuffer:
+        return std::make_shared<ByteAddressBufferData>(shader_param);
     }
 }
 }
@@ -33,7 +35,7 @@ void MaterialBlock::OnInspectorGui()
     {
         if (GpuResourceManager::GetGlobalBuffer(name))
             continue;
-        
+
         ImGui::PushID(data.get());
         data->OnInspectorGui();
         ImGui::PopID();
@@ -96,19 +98,22 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
 
         switch (param.buffer_type)
         {
-            case kBufferType_ConstantBuffer:
-                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
-                break;
-            case kBufferType_StructuredBuffer:
-                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
-                break;
-            case kBufferType_Texture2D: {
-                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
-                break;
-            }
-            case kBufferType_UavTexture:
-                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
-                break;
+        case kBufferType_ConstantBuffer:
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
+            break;
+        case kBufferType_StructuredBuffer:
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
+            break;
+        case kBufferType_Texture2D: {
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
+            break;
+        }
+        case kBufferType_UavTexture:
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
+            break;
+        case kBufferType_ByteAddressBuffer:
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ByteAddressBufferData>(data));
+            break;
         }
     }
 }
