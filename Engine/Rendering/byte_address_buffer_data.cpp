@@ -6,8 +6,9 @@ engine::ByteAddressBufferData::ByteAddressBufferData(const ShaderParameter &shad
 
 void engine::ByteAddressBufferData::OnInspectorGui()
 {
-    if (Gui::PropertyField("Count", m_element_count_))
-        SetCount(m_element_count_);
+    int elem_count = static_cast<int>(m_element_count_);
+    if (Gui::PropertyField("Count", elem_count))
+        SetCount(static_cast<size_t>(elem_count));
 }
 
 void engine::ByteAddressBufferData::SetCount(const size_t count)
