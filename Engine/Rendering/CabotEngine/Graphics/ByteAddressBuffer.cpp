@@ -12,7 +12,7 @@ void ByteAddressBuffer::CreateBuffer()
 {
     D3D12_RESOURCE_DESC resource_desc;
     resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
-    resource_desc.Width = m_element_count_;
+    resource_desc.Width = m_element_count_ * sizeof(uint32_t);
     resource_desc.Height = 1;
     resource_desc.DepthOrArraySize = 1;
     resource_desc.MipLevels = 1;
@@ -61,14 +61,14 @@ void ByteAddressBuffer::UpdateBuffer(const void *data)
 
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_resource_.Get(),
-        D3D12_RESOURCE_STATE_COMMON,
+        m_current_state_,
         D3D12_RESOURCE_STATE_COPY_DEST
     );
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     void *mapped = nullptr;
     m_upload_resource_->Map(0, nullptr, &mapped);
-    memcpy(mapped, data, m_element_count_ * sizeof(uint8_t));
+    memcpy(mapped, data, m_element_count_ * sizeof(uint32_t));
     m_upload_resource_->Unmap(0, nullptr);
 
     RenderEngine::CommandList()->CopyBufferRegion(
@@ -76,13 +76,16 @@ void ByteAddressBuffer::UpdateBuffer(const void *data)
         0,
         m_upload_resource_.Get(),
         0,
-        m_element_count_ * sizeof(uint8_t)
+        m_element_count_ * sizeof(uint32_t)
     );
     barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_resource_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
         D3D12_RESOURCE_STATE_COMMON
     );
+
+    m_current_state_ = D3D12_RESOURCE_STATE_COMMON;
+    
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 }
 
@@ -135,7 +138,7 @@ D3D12_UNORDERED_ACCESS_VIEW_DESC ByteAddressBuffer::UavDesc() const
     uav_desc.Buffer.StructureByteStride = 0;
     uav_desc.Buffer.NumElements = static_cast<UINT>(m_element_count_);
     uav_desc.Buffer.CounterOffsetInBytes = 0;
-    uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+    uav_desc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
 
     return uav_desc;
 }
@@ -145,11 +148,11 @@ D3D12_SHADER_RESOURCE_VIEW_DESC ByteAddressBuffer::ViewDesc()
     D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
     srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
     srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+    srvDesc.Format = DXGI_FORMAT_R32_TYPELESS;
     srvDesc.Buffer.FirstElement = 0;
     srvDesc.Buffer.StructureByteStride = 0;
     srvDesc.Buffer.NumElements = static_cast<UINT>(m_element_count_);
-    srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
+    srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
     return srvDesc;
 }
 
