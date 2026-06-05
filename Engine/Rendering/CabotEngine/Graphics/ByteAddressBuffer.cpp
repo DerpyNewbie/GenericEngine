@@ -5,6 +5,32 @@
 
 namespace engine
 {
+void ByteAddressBuffer::CreateReadBackResource()
+{
+    D3D12_RESOURCE_DESC resource_desc;
+    resource_desc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+    resource_desc.Width = m_element_count_ * sizeof(uint32_t);
+    resource_desc.Height = 1;
+    resource_desc.DepthOrArraySize = 1;
+    resource_desc.MipLevels = 1;
+    resource_desc.Format = DXGI_FORMAT_UNKNOWN;
+    resource_desc.SampleDesc.Count = 1;
+    resource_desc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+    resource_desc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
+
+    const auto default_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+
+    m_current_state_ = D3D12_RESOURCE_STATE_COMMON;
+    m_default_resource_ = DirectXResourceFactory::CreateBuffer(default_heap_prop, resource_desc, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_FLAG_NONE, nullptr);
+
+    if (m_default_resource_ == nullptr)
+    {
+        Logger::Error<ByteAddressBuffer>("Failed to create ByteAddressBuffer");
+        return;
+    }
+    m_default_resource_->SetName(L"ByteAddressBufferDefault");
+}
+
 ByteAddressBuffer::ByteAddressBuffer(const size_t elem_count) : m_element_count_(elem_count)
 {}
 
@@ -104,11 +130,6 @@ void ByteAddressBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> des
     }
 }
 
-std::shared_ptr<DescriptorHandle> ByteAddressBuffer::UploadBuffer()
-{
-    return DescriptorHeap::Register(this);
-}
-
 bool ByteAddressBuffer::IsValid()
 {
     return m_default_resource_ != nullptr;
@@ -125,6 +146,46 @@ bool ByteAddressBuffer::Transition(D3D12_RESOURCE_STATES new_state)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     m_current_state_ = new_state;
+    return true;
+}
+
+void ByteAddressBuffer::RequestReadBack()
+{
+    if (m_readback_resource_ == nullptr)
+        CreateReadBackResource();
+
+    auto cmd_list = RenderEngine::CommandList();
+
+    Transition(D3D12_RESOURCE_STATE_COPY_DEST);
+
+    cmd_list->CopyBufferRegion(
+        m_readback_resource_.Get(),
+        0,
+        m_default_resource_.Get(),
+        0,
+        sizeof(uint32_t) * m_element_count_);
+
+    m_read_back_fence_value_ = RenderEngine::FenceNextValue();
+}
+
+bool ByteAddressBuffer::FetchBufferData(void *data)
+{
+    if (m_readback_resource_ == nullptr || data == nullptr)
+    {
+        Logger::Error<ByteAddressBuffer>("FetchBufferData failed: Readback resource is not initialized or output pointer is null");
+        return false;
+    }
+
+    if (!RenderEngine::IsFenceComplete(m_read_back_fence_value_))
+        return false;
+
+    D3D12_RANGE readback_range = {0, sizeof(uint32_t) * m_element_count_};
+    D3D12_RANGE write_range = {0, 0};
+
+    void *mapped = nullptr;
+    m_readback_resource_->Map(0, &readback_range, &mapped);
+    memcpy(data, mapped, sizeof(uint32_t) * m_element_count_);
+    m_readback_resource_->Unmap(0, &write_range);
     return true;
 }
 

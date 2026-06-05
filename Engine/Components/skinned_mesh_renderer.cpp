@@ -19,7 +19,8 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
         {
             m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
             m_bone_matrix_buffers_[i]->CreateBuffer();
-            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
+            m_bone_matrix_buffer_handles_[i] = DescriptorHeap::Allocate();
+            m_bone_matrix_buffers_[i]->UploadBuffer(m_bone_matrix_buffer_handles_[i]);
         }
     }
 

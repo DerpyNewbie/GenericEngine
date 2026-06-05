@@ -6,6 +6,25 @@
 
 namespace engine
 {
+void StructuredBuffer::CreateReadBackResource()
+{
+    const auto total_size = m_stride_ * m_element_count_;
+    CD3DX12_RESOURCE_DESC resource_desc = CD3DX12_RESOURCE_DESC::Buffer(total_size);
+    resource_desc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+    const auto default_heap_prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_READBACK);
+
+    m_current_state_ = D3D12_RESOURCE_STATE_COMMON;
+    m_readback_resource_ = DirectXResourceFactory::CreateBuffer(default_heap_prop, resource_desc, D3D12_RESOURCE_STATE_COMMON, D3D12_HEAP_FLAG_NONE, nullptr);
+
+    if (m_readback_resource_ == nullptr)
+    {
+        Logger::Error<StructuredBuffer>("Failed to Create StructuredBuffer Resource");
+        return;
+    }
+    m_readback_resource_->SetName(L"StructuredBuffer_Default");
+}
+
 StructuredBuffer::~StructuredBuffer()
 {
     DirectXResourceFactory::ReleaseResource(m_upload_resource_);
@@ -98,11 +117,6 @@ void StructuredBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc
     }
 }
 
-std::shared_ptr<DescriptorHandle> StructuredBuffer::UploadBuffer()
-{
-    return DescriptorHeap::Register(this);
-}
-
 bool StructuredBuffer::IsValid()
 {
     return m_default_resource_ != nullptr;
@@ -119,6 +133,46 @@ bool StructuredBuffer::Transition(D3D12_RESOURCE_STATES new_state)
     RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
 
     m_current_state_ = new_state;
+    return true;
+}
+
+void StructuredBuffer::RequestReadBack()
+{
+    if (m_readback_resource_ == nullptr)
+        CreateReadBackResource();
+
+    auto cmd_list = RenderEngine::CommandList();
+
+    Transition(D3D12_RESOURCE_STATE_COPY_DEST);
+
+    cmd_list->CopyBufferRegion(
+        m_readback_resource_.Get(),
+        0,
+        m_default_resource_.Get(),
+        0,
+        m_stride_ * m_element_count_);
+
+    m_read_back_fence_value_ = RenderEngine::FenceNextValue();
+}
+
+bool StructuredBuffer::FetchBufferData(void *data)
+{
+    if (m_readback_resource_ == nullptr || data == nullptr)
+    {
+        Logger::Error<StructuredBuffer>("FetchBufferData failed: Readback resource is not initialized or output pointer is null");
+        return false;
+    }
+
+    if (!RenderEngine::IsFenceComplete(m_read_back_fence_value_))
+        return false;
+
+    D3D12_RANGE readback_range = {0, m_stride_ * m_element_count_};
+    D3D12_RANGE write_range = {0, 0};
+
+    void *mapped = nullptr;
+    m_readback_resource_->Map(0, &readback_range, &mapped);
+    memcpy(data, mapped, m_stride_ * m_element_count_);
+    m_readback_resource_->Unmap(0, &write_range);
     return true;
 }
 

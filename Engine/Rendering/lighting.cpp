@@ -146,7 +146,8 @@ void Lighting::UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(
             sizeof(Matrix), RenderingConstants::kMaxShadowMapCount);
         m_light_view_proj_matrices_buffer_->CreateBuffer();
-        m_light_view_proj_handle_ = m_light_view_proj_matrices_buffer_->UploadBuffer();
+        m_light_view_proj_handle_ = DescriptorHeap::Allocate();
+        m_light_view_proj_matrices_buffer_->UploadBuffer(m_light_view_proj_handle_);
     }
 
     m_light_view_proj_matrices_buffer_->UpdateBuffer(m_light_view_proj_matrices_.data());

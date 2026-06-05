@@ -215,14 +215,17 @@ void Texture2D::OnInspectorGui()
     ImGui::Text("Mip Level: %d", m_mip_level_);
 
     auto texture_buffer = TextureCollection::GetTexture(shared_from_base<Texture2D>());
-    if (const auto desc_heap = texture_buffer->UploadBuffer())
+
+    auto desc_handle = DescriptorHeap::Allocate();
+    texture_buffer->UploadBuffer(desc_handle);
+    if (desc_handle != nullptr)
     {
         const auto ratio = m_height_ > 0 ? static_cast<float>(m_width_) / static_cast<float>(m_height_) : 1.0f;
         const auto max_width = ImGui::CalcItemWidth();
         static float scale = 1.0f;
         ImGui::SliderFloat("Preview Scale", &scale, 0.1f, 1.0f);
-        ImGui::Image(desc_heap->handle_gpu.ptr, ImVec2(scale * max_width, scale * max_width * ratio));
-        DescriptorHeap::Free(desc_heap);
+        ImGui::Image(desc_handle->handle_gpu.ptr, ImVec2(scale * max_width, scale * max_width * ratio));
+        DescriptorHeap::Free(desc_handle);
     }
     else
     {

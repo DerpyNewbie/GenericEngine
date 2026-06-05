@@ -111,11 +111,6 @@ void TextureCube::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_hand
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
 }
 
-std::shared_ptr<DescriptorHandle> TextureCube::UploadBuffer()
-{
-    return DescriptorHeap::Register(this);
-}
-
 bool TextureCube::IsValid()
 {
     return m_resource_ != nullptr;
@@ -133,6 +128,17 @@ bool TextureCube::Transition(const D3D12_RESOURCE_STATES new_state)
 
     m_current_state_ = new_state;
     return true;
+}
+
+void TextureCube::RequestReadBack()
+{
+    Logger::Warn<TextureCube>("RequestReadBack() not implemented");
+}
+
+bool TextureCube::FetchBufferData(void *data)
+{
+    Logger::Warn<TextureCube>("FetchBufferData() not implemented");
+    return false;
 }
 
 ID3D12Resource *TextureCube::Resource()

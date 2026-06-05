@@ -77,11 +77,6 @@ void ConstantBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_h
     RenderEngine::Device()->CreateConstantBufferView(&view_desc, desc_handle->handle_cpu);
 }
 
-std::shared_ptr<DescriptorHandle> ConstantBuffer::UploadBuffer()
-{
-    return DescriptorHeap::Register(*this);
-}
-
 bool ConstantBuffer::IsValid()
 {
     return m_resources_[0] != nullptr;
@@ -100,6 +95,17 @@ bool ConstantBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
 
     m_current_state_[current_back_buffer_idx] = new_state;
     return true;
+}
+
+void ConstantBuffer::RequestReadBack()
+{
+    Logger::Warn<ConstantBuffer>("RequestReadBack() not implemented");
+}
+
+bool ConstantBuffer::FetchBufferData(void *data)
+{
+    Logger::Warn<ConstantBuffer>("FetchBufferData() not implemented");
+    return false;
 }
 
 void *ConstantBuffer::GetPtr() const

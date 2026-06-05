@@ -209,6 +209,16 @@ void RenderEngine::MoveToNextFrame()
     }
 }
 
+bool RenderEngine::IsFenceComplete(const uint64_t fence_value)
+{
+    const auto instance = Instance();
+    if (instance->m_p_fence_ == nullptr)
+        return false;
+
+    const uint64_t completed_fence_value = instance->m_p_fence_->GetCompletedValue();
+    return completed_fence_value >= fence_value;
+}
+
 void RenderEngine::SetBackgroundColor(const Color color)
 {
     m_background_color_ = color;

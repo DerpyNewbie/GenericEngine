@@ -79,11 +79,6 @@ void TextureBuffer::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_ha
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
 }
 
-std::shared_ptr<DescriptorHandle> TextureBuffer::UploadBuffer()
-{
-    return DescriptorHeap::Register(this);
-}
-
 bool TextureBuffer::IsValid()
 {
     return m_resource_ != nullptr;
@@ -101,6 +96,17 @@ bool TextureBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
 
     m_current_state_ = new_state;
     return true;
+}
+
+void TextureBuffer::RequestReadBack()
+{
+    Logger::Warn<TextureBuffer>("RequestReadBack() not implemented");
+}
+
+bool TextureBuffer::FetchBufferData(void *data)
+{
+    Logger::Warn<TextureBuffer>("FetchBufferData() not implemented");
+    return false;
 }
 
 ID3D12Resource *TextureBuffer::Resource()
