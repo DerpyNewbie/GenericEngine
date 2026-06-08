@@ -17,6 +17,8 @@ class ByteAddressBuffer : public BufferBase, public ShaderResource
     void CreateReadBackResource();
 
 public:
+    ~ByteAddressBuffer();
+    
     ByteAddressBuffer(size_t elem_count);
 
     void CreateBuffer() override;

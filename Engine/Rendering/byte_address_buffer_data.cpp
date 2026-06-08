@@ -44,3 +44,5 @@ engine::kBufferType engine::ByteAddressBufferData::BufferType()
 {
     return kBufferType_ByteAddressBuffer;
 }
+
+CEREAL_REGISTER_TYPE(engine::ByteAddressBufferData)
