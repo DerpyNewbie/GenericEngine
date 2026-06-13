@@ -3,6 +3,10 @@
 
 namespace engine
 {
+StructuredBufferData::StructuredBufferData() : BufferDataBase(ShaderParameter())
+{
+}
+
 StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {}
 

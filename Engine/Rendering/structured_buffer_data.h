@@ -13,7 +13,7 @@ class StructuredBufferData : public BufferDataBase
 public:
     bool is_size_changed = true;
 
-    StructuredBufferData() = default;
+    StructuredBufferData();
     StructuredBufferData(const ShaderParameter &shader_param);
 
     void OnInspectorGui() override;
