@@ -15,8 +15,7 @@ class MeshRenderer : public Renderer
 
 protected:
     static bool m_draw_bounds_;
-
-    uint32_t m_instance_count_ = 1;
+    
     AssetPtr<Mesh> m_shared_mesh_;
     std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
@@ -24,7 +23,8 @@ protected:
     void RecalculateBoundingBox();
 
 public:
-    
+
+    uint32_t instance_count = 1;
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
@@ -46,12 +46,12 @@ public:
             CEREAL_NVP(m_shared_mesh_)
         );
 
-        if (version >= 2)
+        if (version >= 3)
         {
-            ar(CEREAL_NVP(m_instance_count_));
+            ar(CEREAL_NVP(instance_count));
         }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::MeshRenderer, 2)
+CEREAL_CLASS_VERSION(engine::MeshRenderer, 3)

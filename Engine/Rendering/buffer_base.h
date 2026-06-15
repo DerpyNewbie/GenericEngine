@@ -26,6 +26,7 @@ public:
     virtual kGpuUploadType BufferType() const = 0;
     virtual bool IsValid() = 0;
     virtual bool Transition(D3D12_RESOURCE_STATES new_state) = 0;
+    virtual ID3D12Resource *Resource() = 0;
     virtual void RequestReadBack() = 0;
     virtual bool FetchBufferData(void *data) = 0;
 };

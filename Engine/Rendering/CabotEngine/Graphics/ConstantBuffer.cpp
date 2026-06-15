@@ -29,6 +29,12 @@ D3D12_CONSTANT_BUFFER_VIEW_DESC ConstantBuffer::ViewDesc() const
     return m_desc_[current_back_buffer_idx];
 }
 
+ID3D12Resource* ConstantBuffer::Resource()
+{
+    const auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    return m_resources_[current_back_buffer_idx].Get();
+}
+
 void ConstantBuffer::CreateBuffer()
 {
     const auto prop = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);

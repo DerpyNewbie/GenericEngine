@@ -37,5 +37,6 @@ public:
 
     bool UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block);
     bool SetBufferToDescriptorTable();
+    void WaitUavWrite();
 };
 }

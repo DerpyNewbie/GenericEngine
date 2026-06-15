@@ -43,6 +43,7 @@ public:
 
     D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;
     D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc() const;
+    ID3D12Resource* Resource() override;
 
     template <typename T>
     T *GetPtr()

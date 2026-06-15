@@ -52,8 +52,13 @@ public:
             CEREAL_NVP(m_group_count_y_),
             CEREAL_NVP(m_group_count_z_)
         );
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(m_enable_update_));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::ComputeShaderComponent, 1)
+CEREAL_CLASS_VERSION(engine::ComputeShaderComponent, 2)

@@ -72,9 +72,9 @@ void MeshRenderer::OnInspectorGui()
         ImGui::Unindent();
     }
 
-    int instance_count = static_cast<int>(m_instance_count_);
-    if (Gui::PropertyField("InstanceCount", instance_count))
-        m_instance_count_ = static_cast<uint32_t>(instance_count);
+    int instance_count_int = static_cast<int>(instance_count);
+    if (Gui::PropertyField("InstanceCount", instance_count_int))
+        instance_count = static_cast<uint32_t>(instance_count_int);
 }
 
 void MeshRenderer::DepthRender()
@@ -117,7 +117,7 @@ void MeshRenderer::Render()
 {
     UpdateWorldBuffer();
 
-    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, m_instance_count_, GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
+    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, instance_count, GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
 }
 
 void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)

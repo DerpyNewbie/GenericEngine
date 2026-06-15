@@ -4,7 +4,7 @@
 
 namespace engine
 {
-class StructuredBuffer final : public BufferBase, public ShaderResource
+class StructuredBuffer final : public BufferBase
 {
     ComPtr<ID3D12Resource> m_default_resource_;
     ComPtr<ID3D12Resource> m_upload_resource_;
@@ -40,7 +40,7 @@ public:
     bool FetchBufferData(void *data) override;
 
     [[nodiscard]] D3D12_UNORDERED_ACCESS_VIEW_DESC UavDesc() const;
-    [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    [[nodiscard]] D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc();
     [[nodiscard]] ID3D12Resource *Resource() override;
 
     [[nodiscard]] D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;

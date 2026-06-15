@@ -3,6 +3,7 @@
 
 #include "gpu_resource_manager.h"
 #include "CabotEngine/Graphics/ByteAddressBuffer.h"
+#include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
@@ -257,5 +258,17 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
     m_is_dirty_ = false;
 
     return true;
+}
+
+void GpuResourceGroup::WaitUavWrite()
+{
+    for (auto &gpu_resource : m_gpu_resources_[kGpuBufferType_UAV] | std::views::values)
+    {
+        D3D12_RESOURCE_BARRIER uavBarrier = {};
+        uavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
+        uavBarrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+        uavBarrier.UAV.pResource = gpu_resource.buffer->Resource();
+        RenderEngine::CommandList()->ResourceBarrier(1, &uavBarrier);
+    }
 }
 }
