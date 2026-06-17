@@ -282,6 +282,11 @@ void RigidbodyComponent::OnEnabled()
     RegisterToPhysics();
 }
 
+void RigidbodyComponent::OnUpdate()
+{
+    
+}
+
 void RigidbodyComponent::OnDisabled()
 {
     UnregisterFromPhysics();

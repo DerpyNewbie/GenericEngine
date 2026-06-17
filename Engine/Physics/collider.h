@@ -45,6 +45,8 @@ public:
             CEREAL_NVP(m_offset_),
             CEREAL_NVP(m_is_trigger_)
         );
+        
+        UpdateShape();
     }
 };
 }

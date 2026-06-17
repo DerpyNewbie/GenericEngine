@@ -82,6 +82,7 @@ class RigidbodyComponent : public Component
 
 public:
     void OnEnabled() override;
+    void OnUpdate() override;
     void OnDisabled() override;
     void OnDestroy() override;
 
