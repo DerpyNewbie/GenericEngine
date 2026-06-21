@@ -12,8 +12,9 @@ StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) 
 
 void StructuredBufferData::OnInspectorGui()
 {
-    if (Gui::PropertyField("Count", m_count_))
-        SetCount(m_count_);
+    int count = static_cast<int>(m_count_);
+    if (Gui::PropertyField("Count", count))
+        SetCount(static_cast<size_t>(count));
 }
 
 void StructuredBufferData::SetStride(const size_t stride)
