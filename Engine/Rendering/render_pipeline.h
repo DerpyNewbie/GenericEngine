@@ -61,6 +61,7 @@ class RenderPipeline
     void ExecuteComputeCommands();
 
 public:
+    Event<> on_cmd_list_open;
     Event<> on_rendering;
 
     static void Init();

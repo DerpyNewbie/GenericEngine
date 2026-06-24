@@ -312,6 +312,8 @@ void RenderPipeline::DepthRender()
 
 void RenderPipeline::ExecuteRenderCommands()
 {
+    on_cmd_list_open.Invoke();
+    
     const Shader *current_shader = nullptr;
     const Material *current_material = nullptr;
     const Mesh *current_mesh = nullptr;

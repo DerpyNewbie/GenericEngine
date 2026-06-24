@@ -17,6 +17,7 @@ bool ComputeCommand::SetDescriptorTable(const std::shared_ptr<MaterialBlock> &ma
         return false;
     if (!resource_group->SetBufferToDescriptorTable())
         return false;
+    resource_group->WaitUavWrite();
 
     for (int param_i = 0; param_i < kGpuBufferType_Count; ++param_i)
     {
