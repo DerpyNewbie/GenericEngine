@@ -7,6 +7,7 @@
 #include <d3dcompiler.h>
 
 #include "serializer.h"
+#include "Rendering/shader_compiler.h"
 
 namespace
 {
@@ -87,16 +88,6 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
 
         case D3D_SIT_UAV_RWTYPED: {
             ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_UavTexture, true};
-            shader_parameters.emplace_back(shader_param);
-            break;
-        }
-        case D3D_SIT_BYTEADDRESS: {
-            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ByteAddressBuffer, false};
-            shader_parameters.emplace_back(shader_param);
-            break;
-        }
-        case D3D_SIT_UAV_RWBYTEADDRESS: {
-            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ByteAddressBuffer, true};
             shader_parameters.emplace_back(shader_param);
             break;
         }
@@ -198,103 +189,6 @@ void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shade
     shader->parameters = parameters;
 }
 
-bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path, std::string &error_msg)
-{
-    ComPtr<ID3DBlob> error_blob;
-
-    HRESULT hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "vrt",
-        "vs_5_0",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
-        &shader->m_vs_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        return false;
-    }
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "pix",
-        "ps_5_0",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
-        &shader->m_ps_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        return false;
-    }
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "geo",
-        "gs_5_0",
-        0,
-        0,
-        &shader->m_gs_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            std::string temp_error = static_cast<const char *>(error_blob->GetBufferPointer());
-
-            if (temp_error.find("entrypoint not found") != std::string::npos)
-            {
-                shader->m_gs_blob_ = nullptr;
-                return true;
-            }
-
-            error_msg = temp_error;
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        Logger::Error<ShaderImporter>("Failed to Compile Geometry Shader!");
-        return false;
-    }
-
-    // Add shader variants here if you want to
-    return true;
-}
-
 bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
 {
     std::stringstream string_buffer;
@@ -377,7 +271,7 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
     }
 
     std::string error_msg;
-    if (!CompileShader(shader, ctx->AssetPath(), error_msg))
+    if (!ShaderCompiler::CompileShader(shader, ctx->AssetPath(), error_msg))
     {
         ctx->LogImportError(error_msg);
         return;
