@@ -5,32 +5,32 @@
 
 namespace engine
 {
-void ConstantBufferData::AddIntData(const std::string &name)
+void ConstantBufferData::AddInt(const std::string &name)
 {
     AddData(name, sizeof(int), kConstantBufferDataType::kInt);
 }
 
-void ConstantBufferData::AddFloatData(const std::string &name)
+void ConstantBufferData::AddFloat(const std::string &name)
 {
     AddData(name, sizeof(float), kConstantBufferDataType::kFloat);
 }
 
-void ConstantBufferData::AddVector2Data(const std::string &name)
+void ConstantBufferData::AddVector2(const std::string &name)
 {
     AddData(name, sizeof(Vector2), kConstantBufferDataType::kVector2);
 }
 
-void ConstantBufferData::AddVector3Data(const std::string &name)
+void ConstantBufferData::AddVector3(const std::string &name)
 {
     AddData(name, sizeof(Vector3), kConstantBufferDataType::kVector3);
 }
 
-void ConstantBufferData::AddColorData(const std::string &name)
+void ConstantBufferData::AddColor(const std::string &name)
 {
     AddData(name, sizeof(Color), kConstantBufferDataType::kColor);
 }
 
-void ConstantBufferData::AddMatrixData(const std::string &name)
+void ConstantBufferData::AddMatrix(const std::string &name)
 {
     AddData(name, sizeof(Matrix), kConstantBufferDataType::kMatrix);
 }
@@ -55,22 +55,22 @@ ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : Bu
         switch (variable.data_type)
         {
         case kConstantBufferDataType::kInt:
-            AddIntData(variable.name);
+            AddInt(variable.name);
             break;
         case kConstantBufferDataType::kFloat:
-            AddFloatData(variable.name);
+            AddFloat(variable.name);
             break;
         case kConstantBufferDataType::kVector2:
-            AddVector2Data(variable.name);
+            AddVector2(variable.name);
             break;
         case kConstantBufferDataType::kVector3:
-            AddVector3Data(variable.name);
+            AddVector3(variable.name);
             break;
         case kConstantBufferDataType::kColor:
-            AddColorData(variable.name);
+            AddColor(variable.name);
             break;
         case kConstantBufferDataType::kMatrix:
-            AddMatrixData(variable.name);
+            AddMatrix(variable.name);
             break;
         case kConstantBufferDataType::kUnknown:
             break;
@@ -88,37 +88,37 @@ void ConstantBufferData::OnInspectorGui()
         case kConstantBufferDataType::kInt: {
             auto data = *reinterpret_cast<int *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetIntData(name, data);
+                    SetInt(name, data);
                 break;
             }
         case kConstantBufferDataType::kFloat: {
             auto data = *reinterpret_cast<float *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetFloatData(name, data);
+                    SetFloat(name, data);
                 break;
             }
         case kConstantBufferDataType::kVector2: {
             auto data = *reinterpret_cast<Vector2 *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetVector2Data(name, data);
+                    SetVector2(name, data);
                 break;
             }
         case kConstantBufferDataType::kVector3: {
             auto data = *reinterpret_cast<Vector3 *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetVector3Data(name, data);
+                    SetVector3(name, data);
                 break;
             }
         case kConstantBufferDataType::kColor: {
             auto data = *reinterpret_cast<Color *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetColorData(name, data);
+                    SetColor(name, data);
                 break;
             }
         case kConstantBufferDataType::kMatrix: {
             auto data = *reinterpret_cast<Matrix *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
-                    SetMatrixData(name, data);
+                    SetMatrix(name, data);
                 break;
             }
         default:
@@ -127,7 +127,7 @@ void ConstantBufferData::OnInspectorGui()
     }
 }
 
-bool ConstantBufferData::SetIntData(const std::string &name, const int data)
+bool ConstantBufferData::SetInt(const std::string &name, const int data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
@@ -142,7 +142,7 @@ bool ConstantBufferData::SetIntData(const std::string &name, const int data)
     return true;
 }
 
-bool ConstantBufferData::SetFloatData(const std::string &name, const float data)
+bool ConstantBufferData::SetFloat(const std::string &name, const float data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
@@ -157,7 +157,7 @@ bool ConstantBufferData::SetFloatData(const std::string &name, const float data)
     return true;
 }
 
-bool ConstantBufferData::SetVector2Data(const std::string &name, const Vector2 data)
+bool ConstantBufferData::SetVector2(const std::string &name, const Vector2 data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
@@ -172,7 +172,7 @@ bool ConstantBufferData::SetVector2Data(const std::string &name, const Vector2 d
     return true;
 }
 
-bool ConstantBufferData::SetVector3Data(const std::string &name, const Vector3 data)
+bool ConstantBufferData::SetVector3(const std::string &name, const Vector3 data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
@@ -187,7 +187,7 @@ bool ConstantBufferData::SetVector3Data(const std::string &name, const Vector3 d
     return true;
 }
 
-bool ConstantBufferData::SetColorData(const std::string &name, const Color data)
+bool ConstantBufferData::SetColor(const std::string &name, const Color data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 
@@ -202,7 +202,7 @@ bool ConstantBufferData::SetColorData(const std::string &name, const Color data)
     return true;
 }
 
-bool ConstantBufferData::SetMatrixData(const std::string &name, const Matrix &data)
+bool ConstantBufferData::SetMatrix(const std::string &name, const Matrix &data)
 {
     const auto it = m_data_type_offset_pairs_.find(name);
 

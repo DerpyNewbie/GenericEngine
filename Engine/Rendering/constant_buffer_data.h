@@ -18,19 +18,19 @@ public:
     void OnInspectorGui() override;
 
     void AddData(const std::string &name, size_t data_size, kConstantBufferDataType data_type);
-    void AddIntData(const std::string &name);
-    void AddFloatData(const std::string &name);
-    void AddVector2Data(const std::string &name);
-    void AddVector3Data(const std::string &name);
-    void AddColorData(const std::string &name);
-    void AddMatrixData(const std::string &name);
-    
-    bool SetIntData(const std::string &name, int data);
-    bool SetFloatData(const std::string &name, float data);
-    bool SetVector2Data(const std::string &name, Vector2 data);
-    bool SetVector3Data(const std::string &name, Vector3 data);
-    bool SetColorData(const std::string &name, Color data);
-    bool SetMatrixData(const std::string &name, const Matrix &data);
+    void AddInt(const std::string &name);
+    void AddFloat(const std::string &name);
+    void AddVector2(const std::string &name);
+    void AddVector3(const std::string &name);
+    void AddColor(const std::string &name);
+    void AddMatrix(const std::string &name);
+
+    bool SetInt(const std::string &name, int data);
+    bool SetFloat(const std::string &name, float data);
+    bool SetVector2(const std::string &name, Vector2 data);
+    bool SetVector3(const std::string &name, Vector3 data);
+    bool SetColor(const std::string &name, Color data);
+    bool SetMatrix(const std::string &name, const Matrix &data);
 
     void *Data();
 

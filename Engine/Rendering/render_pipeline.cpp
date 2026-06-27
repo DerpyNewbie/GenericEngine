@@ -217,16 +217,16 @@ void RenderPipeline::SetSceneData()
     if (m_scene_data_buffer_data_ == nullptr)
     {
         m_scene_data_buffer_data_ = std::make_shared<ConstantBufferData>();
-        m_scene_data_buffer_data_->AddVector2Data("screen_size");
-        m_scene_data_buffer_data_->AddVector2Data("shadow_map_size");
-        m_scene_data_buffer_data_->AddFloatData("time");
-        m_scene_data_buffer_data_->AddFloatData("delta_time");
+        m_scene_data_buffer_data_->AddVector2("screen_size");
+        m_scene_data_buffer_data_->AddVector2("shadow_map_size");
+        m_scene_data_buffer_data_->AddFloat("time");
+        m_scene_data_buffer_data_->AddFloat("delta_time");
     }
 
-    m_scene_data_buffer_data_->SetVector2Data("screen_size", Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight())));
-    m_scene_data_buffer_data_->SetVector2Data("shadow_map_size", RenderingConstants::kShadowMapSize);
-    m_scene_data_buffer_data_->SetFloatData("time", Time::Get()->TimeSinceStartUp());
-    m_scene_data_buffer_data_->SetFloatData("delta_time", Time::GetDeltaTime());
+    m_scene_data_buffer_data_->SetVector2("screen_size", Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight())));
+    m_scene_data_buffer_data_->SetVector2("shadow_map_size", RenderingConstants::kShadowMapSize);
+    m_scene_data_buffer_data_->SetFloat("time", Time::Get()->TimeSinceStartUp());
+    m_scene_data_buffer_data_->SetFloat("delta_time", Time::GetDeltaTime());
 
     GpuResourceManager::SetGlobalBufferData("SceneData", m_scene_data_buffer_data_);
 }
