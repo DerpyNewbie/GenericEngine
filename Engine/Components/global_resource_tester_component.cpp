@@ -13,6 +13,10 @@ void GlobalResourceTesterComponent::OnInspectorGui()
         GpuResourceManager::SetGlobalTexture("_MainTex", m_texture_);
     }
 }
+void GlobalResourceTesterComponent::OnDeserialized()
+{
+    GpuResourceManager::SetGlobalTexture("_MainTex", m_texture_);
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::GlobalResourceTesterComponent)

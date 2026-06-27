@@ -11,6 +11,7 @@ class GlobalResourceTesterComponent : public Component
 
 public:
     void OnInspectorGui() override;
+    void OnDeserialized() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
