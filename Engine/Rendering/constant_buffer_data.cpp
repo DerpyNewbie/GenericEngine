@@ -221,6 +221,11 @@ void *ConstantBufferData::Data()
 {
     return m_data_.data();
 }
+void ConstantBufferData::Remove(const std::string &name)
+{
+    m_data_type_offset_pairs_.erase(name);
+    is_dirty = true;
+}
 
 size_t ConstantBufferData::Size() const
 {

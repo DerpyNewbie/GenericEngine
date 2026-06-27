@@ -34,6 +34,8 @@ public:
 
     void *Data();
 
+    void Remove(const std::string &name);
+
     size_t Size() const;
     kBufferType BufferType() override;
 
