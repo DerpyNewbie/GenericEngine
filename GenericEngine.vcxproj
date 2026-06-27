@@ -137,6 +137,7 @@
         <ClCompile Include="Engine\Rendering\constant_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
+        <ClCompile Include="Engine\Rendering\gpu_resource.cpp"/>
         <ClCompile Include="Engine\Rendering\gpu_resource_group.cpp"/>
         <ClCompile Include="Engine\Rendering\gpu_resource_manager.cpp"/>
         <ClCompile Include="Engine\Rendering\buffer_base.cpp"/>
@@ -318,6 +319,7 @@
         <ClInclude Include="Engine\Rendering\camera.h"/>
         <ClInclude Include="Engine\Rendering\constant_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
+        <ClInclude Include="Engine\Rendering\gpu_resource.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_group.h"/>
         <ClInclude Include="Engine\Rendering\gpu_resource_manager.h"/>
         <ClInclude Include="Engine\Rendering\buffer_base.h"/>
