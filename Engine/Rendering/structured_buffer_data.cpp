@@ -19,7 +19,7 @@ void StructuredBufferData::SetStride(const size_t stride)
     m_data_.resize(m_stride_ * m_count_);
 
     is_dirty = true;
-    is_size_changed = true;
+    m_is_size_changed_ = true;
 }
 
 void StructuredBufferData::SetCount(const size_t count)
@@ -29,7 +29,7 @@ void StructuredBufferData::SetCount(const size_t count)
     m_data_.resize(m_stride_ * m_count_);
 
     is_dirty = true;
-    is_size_changed = true;
+    m_is_size_changed_ = true;
 }
 
 void StructuredBufferData::SetData(const void *data)
@@ -39,6 +39,15 @@ void StructuredBufferData::SetData(const void *data)
     memcpy(dst, data, Size());
 
     is_dirty = true;
+}
+void StructuredBufferData::SetIsSizeChanged(bool is_size_changed)
+{
+    m_is_size_changed_ = is_size_changed;
+}
+
+bool StructuredBufferData::GetIsSizeChanged() const
+{
+    return m_is_size_changed_;
 }
 
 void *StructuredBufferData::Data()

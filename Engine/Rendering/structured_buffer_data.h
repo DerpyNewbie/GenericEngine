@@ -9,9 +9,9 @@ class StructuredBufferData : public BufferDataBase
     size_t m_count_ = 1;
 
     std::vector<uint8_t> m_data_;
+    bool m_is_size_changed_ = true;
 
 public:
-    bool is_size_changed = true;
 
     StructuredBufferData() = default;
     StructuredBufferData(const ShaderParameter &shader_param);
@@ -21,6 +21,9 @@ public:
     void SetStride(size_t stride);
     void SetCount(size_t count);
     void SetData(const void *data);
+
+    void SetIsSizeChanged(bool is_size_changed);
+    bool GetIsSizeChanged() const;
 
     void *Data();
 

@@ -20,10 +20,10 @@ void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const s
     auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
     if (sb_data == nullptr)
         return;
-    
-    if (sb_data->is_size_changed)
+
+    if (sb_data->GetIsSizeChanged())
     {
-        sb_data->is_size_changed = false;
+        sb_data->SetIsSizeChanged(false);
         gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());
         gpu_resource.buffer->CreateBuffer();
         if (gpu_resource.handle != nullptr)
