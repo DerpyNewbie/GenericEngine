@@ -11,13 +11,16 @@ void GpuResourceGroup::UpdateConstantBuffer(const GpuResource &gpu_resource, con
         gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
 
     const auto cb_data = material_block->GetConstantBufferData(gpu_resource.name);
-    if (cb_data->is_dirty)
+    if (cb_data != nullptr && cb_data->is_dirty)
         gpu_resource.buffer->UpdateBuffer(cb_data->Data());
 }
 
 void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
 {
     auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
+    if (sb_data == nullptr)
+        return;
+    
     if (sb_data->is_size_changed)
     {
         sb_data->is_size_changed = false;
@@ -35,7 +38,7 @@ void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const s
 void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
 {
     auto tex_data = material_block->GetTextureBufferData(gpu_resource.name);
-    if (tex_data->is_dirty)
+    if (tex_data != nullptr && tex_data->is_dirty)
     {
         auto texture = tex_data->Data();
         if (texture == nullptr)
@@ -56,7 +59,7 @@ void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std:
 void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
 {
     auto tex_data = material_block->GetUavTextureBufferData(gpu_resource.name);
-    if (tex_data->is_dirty)
+    if (tex_data != nullptr && tex_data->is_dirty)
     {
         auto texture = tex_data->Data();
         if (texture == nullptr)
