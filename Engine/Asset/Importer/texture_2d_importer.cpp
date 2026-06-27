@@ -9,7 +9,6 @@ using namespace DirectX;
 
 namespace engine
 {
-
 AssetPtr<Texture2D> Texture2DImporter::GetColorTexture(PackedVector::XMCOLOR color)
 {
     const auto texture_2d = Object::Instantiate<Texture2D>("Generated Color Texture");
@@ -39,6 +38,6 @@ std::vector<std::string> Texture2DImporter::SupportedExtensions()
 
 void Texture2DImporter::OnImport(AssetDescriptor *ctx)
 {
-    ctx->SetMainObject(std::make_shared<Texture2D>());
+    ctx->SetMainObject(Object::Instantiate<Texture2D>());
 }
 }
