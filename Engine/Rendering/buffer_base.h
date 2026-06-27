@@ -24,7 +24,6 @@ public:
     virtual void UpdateBuffer(const void *data) = 0;
     virtual void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) = 0;
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
-    virtual kGpuUploadType BufferType() const = 0;
     virtual bool IsValid() = 0;
     virtual bool Transition(D3D12_RESOURCE_STATES new_state) = 0;
 };

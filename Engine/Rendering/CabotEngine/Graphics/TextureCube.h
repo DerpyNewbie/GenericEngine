@@ -20,10 +20,6 @@ public:
     void UpdateBuffer(const void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    kGpuUploadType BufferType() const override
-    {
-        return kGpuBufferType_SRV;
-    }
     bool IsValid() override;
     bool Transition(D3D12_RESOURCE_STATES new_state) override;
 
