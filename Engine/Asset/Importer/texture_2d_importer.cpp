@@ -39,6 +39,6 @@ std::vector<std::string> Texture2DImporter::SupportedExtensions()
 
 void Texture2DImporter::OnImport(AssetDescriptor *ctx)
 {
-    ctx->SetMainObject(std::make_shared<Texture2D>());
+    ctx->SetMainObject(Object::Instantiate<Texture2D>());
 }
 }
