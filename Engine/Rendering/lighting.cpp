@@ -176,7 +176,7 @@ void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)
     const auto go = light->GameObject();
     const auto shadow_map_count = light->ShadowMapCount();
 
-    if (m_free_depth_texture_handles_.size() < shadow_map_count)
+    if (m_free_depth_texture_handles_.size() > shadow_map_count)
     {
         light->m_light_data_.cast_shadow = false;
         m_waiting_lights_.emplace_back(light);
