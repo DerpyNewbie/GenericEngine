@@ -16,7 +16,8 @@ class ShaderImporter;
 /// </remarks>
 class Shader : public Object, public Inspectable
 {
-    friend ShaderImporter;
+    friend class ShaderCompiler;
+    friend class ShaderImporter;
     static std::shared_ptr<Shader> m_default_shader_;
 
     ComPtr<ID3DBlob> m_vs_blob_;
