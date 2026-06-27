@@ -58,7 +58,7 @@ void Material::CreateMaterialBlock()
         return;
     }
 
-    shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
+    shared_material_block = std::make_shared<MaterialBlock>();
     shared_material_block->LoadShaderParameters(m_shader_.CastedLock()->parameters);
 }
 

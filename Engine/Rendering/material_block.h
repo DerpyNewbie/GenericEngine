@@ -9,7 +9,7 @@
 
 namespace engine
 {
-class MaterialBlock : public Object, public Inspectable
+class MaterialBlock : public Inspectable
 {
     friend class GpuResourceManager;
 
@@ -31,7 +31,6 @@ public:
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
-            cereal::base_class<Object>(this),
             CEREAL_NVP(m_buffer_data_)
         );
     }
