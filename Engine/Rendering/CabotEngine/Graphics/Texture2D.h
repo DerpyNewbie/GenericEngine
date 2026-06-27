@@ -27,9 +27,6 @@ protected:
     uint32_t m_height_ = UINT32_MAX;
     uint16_t m_mip_level_ = UINT16_MAX;
     DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
-    std::string m_path_;
-    uint64_t m_id_ = -1;
-    bool m_enable_read_write_ = false;
 
 public:
     Texture2D() = default;
