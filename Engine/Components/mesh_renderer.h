@@ -5,6 +5,7 @@
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 
 namespace engine
 {
@@ -18,7 +19,7 @@ protected:
     
     AssetPtr<Mesh> m_shared_mesh_;
 
-    std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
+    std::unique_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
     void DrawBounds();
     void RecalculateBoundingBox();

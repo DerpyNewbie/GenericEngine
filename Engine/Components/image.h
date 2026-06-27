@@ -9,7 +9,7 @@ namespace engine
 {
 class Image : public Renderer2D
 {
-    std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
+    std::unique_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
     void UpdateWorldBuffer();
     

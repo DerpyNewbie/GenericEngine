@@ -16,7 +16,7 @@ void Image::UpdateWorldBuffer()
 {
     if (!m_world_matrix_buffer_)
     {
-        m_world_matrix_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+        m_world_matrix_buffer_ = std::make_unique<ConstantBuffer>(sizeof(Matrix));
         m_world_matrix_buffer_->CreateBuffer();
     }
 
@@ -45,7 +45,6 @@ void Image::Render()
 {
     UpdateWorldBuffer();
 
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     std::vector materials = {shared_material};
 
     RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffer_->GetAddress());

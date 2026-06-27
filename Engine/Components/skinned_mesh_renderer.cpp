@@ -41,7 +41,7 @@ void SkinnedMeshRenderer::UpdateWorldBuffer()
 {
     if (!m_world_matrix_buffer_)
     {
-        m_world_matrix_buffer_ = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+        m_world_matrix_buffer_ = std::make_unique<ConstantBuffer>(sizeof(Matrix));
         m_world_matrix_buffer_->CreateBuffer();
     }
 
