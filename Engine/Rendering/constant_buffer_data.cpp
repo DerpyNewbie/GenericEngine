@@ -7,7 +7,7 @@ namespace engine
 {
 void ConstantBufferData::AddIntData(const std::string &name)
 {
-    AddData(name, sizeof(int), kConstantBufferDataType::k_Int);
+    AddData(name, sizeof(int), kConstantBufferDataType::kInt);
 }
 
 void ConstantBufferData::AddFloatData(const std::string &name)
@@ -54,7 +54,7 @@ ConstantBufferData::ConstantBufferData(const ShaderParameter &shader_param) : Bu
     {
         switch (variable.data_type)
         {
-        case kConstantBufferDataType::k_Int:
+        case kConstantBufferDataType::kInt:
             AddIntData(variable.name);
             break;
         case kConstantBufferDataType::kFloat:
@@ -85,7 +85,7 @@ void ConstantBufferData::OnInspectorGui()
         auto offset = data_type_offset_pair.second;
         switch (data_type_offset_pair.first)
         {
-        case kConstantBufferDataType::k_Int: {
+        case kConstantBufferDataType::kInt: {
             auto data = *reinterpret_cast<int *>(m_data_.data() + offset);
                 if (Gui::PropertyField(name.c_str(), data))
                     SetIntData(name, data);
@@ -132,7 +132,7 @@ bool ConstantBufferData::SetIntData(const std::string &name, const int data)
     const auto it = m_data_type_offset_pairs_.find(name);
 
     if (it == m_data_type_offset_pairs_.end() || it->second.first !=
-        kConstantBufferDataType::k_Int)
+        kConstantBufferDataType::kInt)
         return false;
 
     const auto dst = m_data_.data() + it->second.second;

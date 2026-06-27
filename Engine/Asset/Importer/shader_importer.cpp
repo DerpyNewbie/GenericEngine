@@ -132,7 +132,7 @@ kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SH
             switch (type_desc.Class)
             {
                 case D3D_SVC_SCALAR:
-                    return kConstantBufferDataType::k_Int;
+                    return kConstantBufferDataType::kInt;
                 default:
                     return kConstantBufferDataType::kUnknown;
             }
