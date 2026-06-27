@@ -4,13 +4,13 @@ namespace engine
 {
 enum class kConstantBufferDataType
 {
-    kConstantBufferDataType_Int,
-    kConstantBufferDataType_Float,
-    kConstantBufferDataType_Vector2,
-    kConstantBufferDataType_Vector3,
-    kConstantBufferDataType_Color,
-    kConstantBufferDataType_Matrix,
-    kConstantBufferDataType_Unknown
+    kInt,
+    kFloat,
+    kVector2,
+    kVector3,
+    kColor,
+    kMatrix,
+    kUnknown
 };
 
 enum kBufferType

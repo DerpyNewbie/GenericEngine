@@ -132,33 +132,33 @@ kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SH
             switch (type_desc.Class)
             {
                 case D3D_SVC_SCALAR:
-                    return kConstantBufferDataType::kConstantBufferDataType_Int;
+                    return kConstantBufferDataType::k_Int;
                 default:
-                    return kConstantBufferDataType::kConstantBufferDataType_Unknown;
+                    return kConstantBufferDataType::kUnknown;
             }
         case D3D_SVT_FLOAT:
             switch (type_desc.Class)
             {
                 case D3D_SVC_SCALAR:
-                    return kConstantBufferDataType::kConstantBufferDataType_Float;
+                    return kConstantBufferDataType::kFloat;
                 case D3D_SVC_VECTOR:
                     switch (type_desc.Columns)
                     {
                         case 2:
-                            return kConstantBufferDataType::kConstantBufferDataType_Vector2;
+                            return kConstantBufferDataType::kVector2;
                         case 3:
-                            return kConstantBufferDataType::kConstantBufferDataType_Vector3;
+                            return kConstantBufferDataType::kVector3;
                         case 4:
-                            return kConstantBufferDataType::kConstantBufferDataType_Color;
+                            return kConstantBufferDataType::kColor;
                         default:
-                            return kConstantBufferDataType::kConstantBufferDataType_Unknown;
+                            return kConstantBufferDataType::kUnknown;
                     }
                 case D3D_SVC_MATRIX_COLUMNS:
                     if (type_desc.Rows == 4 && type_desc.Columns == 4)
-                        return kConstantBufferDataType::kConstantBufferDataType_Matrix;
+                        return kConstantBufferDataType::kMatrix;
             }
         default:
-            return kConstantBufferDataType::kConstantBufferDataType_Unknown;
+            return kConstantBufferDataType::kUnknown;
     }
 }
 
