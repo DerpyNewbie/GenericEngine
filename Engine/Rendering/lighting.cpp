@@ -192,7 +192,7 @@ void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)
         light->m_depth_texture_handle_.emplace_back(handle);
 
         auto depth_texture = Object::Instantiate<DepthTexture>();
-        const auto depth_texture_buffer = TextureCollection::GetDepthTexture(depth_texture);
+        const auto depth_texture_buffer = TextureCollection::LoadDepthTexture(depth_texture);
         depth_texture_buffer->SetResource(m_depth_textures_, handle);
         if (m_shadow_maps_.size() <= handle)
             m_shadow_maps_.emplace_back(depth_texture);

@@ -18,12 +18,12 @@ class TextureCollection
     inline static std::unordered_map<std::shared_ptr<DepthTexture>, std::shared_ptr<DepthTextureBuffer>> m_depth_texture_buffer_map_;
 
 public:
-    static std::shared_ptr<TextureBuffer> GetTexture(const std::shared_ptr<Texture2D> &texture);
-    static std::shared_ptr<RenderTextureBuffer> GetRenderTexture(const std::shared_ptr<RenderTexture> &render_texture);
-    static std::shared_ptr<DepthTextureBuffer> GetDepthTexture(std::shared_ptr<DepthTexture> depth_texture);
+    static std::shared_ptr<TextureBuffer> LoadTexture(const std::shared_ptr<Texture2D> &texture);
+    static std::shared_ptr<RenderTextureBuffer> LoadRenderTexture(const std::shared_ptr<RenderTexture> &render_texture);
+    static std::shared_ptr<DepthTextureBuffer> LoadDepthTexture(std::shared_ptr<DepthTexture> depth_texture);
 
-    static bool DeleteTexture(const std::shared_ptr<Texture2D> &texture);
-    static bool DeleteRenderTexture(const std::shared_ptr<RenderTexture> &render_texture);
-    static bool DeleteDepthTexture(const std::shared_ptr<DepthTexture> &depth_texture);
+    static bool FreeTexture(const std::shared_ptr<Texture2D> &texture);
+    static bool FreeRenderTexture(const std::shared_ptr<RenderTexture> &render_texture);
+    static bool FreeDepthTexture(const std::shared_ptr<DepthTexture> &depth_texture);
 };
 }

@@ -44,7 +44,7 @@ void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std:
         if (texture == nullptr)
             return;
 
-        gpu_resource.buffer = TextureCollection::GetTexture(texture);
+        gpu_resource.buffer = TextureCollection::LoadTexture(texture);
 
         if (gpu_resource.handle != nullptr)
             gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
@@ -65,7 +65,7 @@ void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const s
         if (texture == nullptr)
             return;
 
-        gpu_resource.buffer = TextureCollection::GetRenderTexture(texture);
+        gpu_resource.buffer = TextureCollection::LoadRenderTexture(texture);
 
         if (gpu_resource.handle != nullptr)
             gpu_resource.buffer->UploadBuffer(gpu_resource.handle);

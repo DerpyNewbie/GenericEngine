@@ -48,7 +48,7 @@ void TextureCube::CreateBuffer()
         }
     }
 
-    const D3D12_RESOURCE_DESC ref_desc = TextureCollection::GetTexture(m_textures_[0])->Resource()->GetDesc();
+    const D3D12_RESOURCE_DESC ref_desc = TextureCollection::LoadTexture(m_textures_[0])->Resource()->GetDesc();
     D3D12_RESOURCE_DESC cube_desc = ref_desc;
     cube_desc.DepthOrArraySize = 6;
     cube_desc.MipLevels = 1;
@@ -77,7 +77,7 @@ void TextureCube::CreateBuffer()
     for (int i = 0; i < 6; ++i)
     {
         D3D12_TEXTURE_COPY_LOCATION src_loc = {};
-        const auto texture_buffer = TextureCollection::GetTexture(m_textures_[i]);
+        const auto texture_buffer = TextureCollection::LoadTexture(m_textures_[i]);
         src_loc.pResource = texture_buffer->Resource();
         src_loc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src_loc.SubresourceIndex = 0;

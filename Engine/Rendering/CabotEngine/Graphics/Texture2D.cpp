@@ -204,7 +204,7 @@ Texture2D::Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_F
 
 Texture2D::~Texture2D()
 {
-    TextureCollection::DeleteTexture(AssetPtr<Texture2D>::FromManaged(shared_from_base<Texture2D>()));
+    TextureCollection::FreeTexture(AssetPtr<Texture2D>::FromManaged(shared_from_base<Texture2D>()));
 }
 
 void Texture2D::OnInspectorGui()
@@ -214,7 +214,7 @@ void Texture2D::OnInspectorGui()
     ImGui::Text("Height: %d", m_height_);
     ImGui::Text("Mip Level: %d", m_mip_level_);
 
-    auto texture_buffer = TextureCollection::GetTexture(shared_from_base<Texture2D>());
+    auto texture_buffer = TextureCollection::LoadTexture(shared_from_base<Texture2D>());
     if (const auto desc_heap = texture_buffer->UploadBuffer())
     {
         const auto ratio = m_height_ > 0 ? static_cast<float>(m_width_) / static_cast<float>(m_height_) : 1.0f;

@@ -126,13 +126,13 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    if (const auto render_texture_buffer = camera.render_texture ? TextureCollection::GetRenderTexture(camera.render_texture) : nullptr)
+    if (const auto render_texture_buffer = camera.render_texture ? TextureCollection::LoadRenderTexture(camera.render_texture) : nullptr)
     {
         render_texture_buffer->Transition(D3D12_RESOURCE_STATE_RENDER_TARGET);
         rtv_heap = render_texture_buffer->GetHeap();
     }
 
-    if (const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::GetDepthTexture(camera.depth_texture) : nullptr)
+    if (const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::LoadDepthTexture(camera.depth_texture) : nullptr)
     {
         depth_texture_buffer->Transition(D3D12_RESOURCE_STATE_DEPTH_WRITE);
         dsv_heap = depth_texture_buffer->GetHeap();

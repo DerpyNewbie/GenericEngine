@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "texture_collection.h"
 
-std::shared_ptr<engine::TextureBuffer> engine::TextureCollection::GetTexture(const std::shared_ptr<Texture2D> &texture)
+std::shared_ptr<engine::TextureBuffer> engine::TextureCollection::LoadTexture(const std::shared_ptr<Texture2D> &texture)
 {
     const auto it = m_textures_buffer_map_.find(texture);
     if (it != m_textures_buffer_map_.end())
@@ -13,7 +13,7 @@ std::shared_ptr<engine::TextureBuffer> engine::TextureCollection::GetTexture(con
     return texture_buffer;
 }
 
-std::shared_ptr<engine::RenderTextureBuffer> engine::TextureCollection::GetRenderTexture(const std::shared_ptr<RenderTexture> &render_texture)
+std::shared_ptr<engine::RenderTextureBuffer> engine::TextureCollection::LoadRenderTexture(const std::shared_ptr<RenderTexture> &render_texture)
 {
     const auto it = m_render_texture_buffer_map_.find(render_texture);
     if (it != m_render_texture_buffer_map_.end())
@@ -26,7 +26,7 @@ std::shared_ptr<engine::RenderTextureBuffer> engine::TextureCollection::GetRende
     return render_texture_buffer;
 }
 
-std::shared_ptr<engine::DepthTextureBuffer> engine::TextureCollection::GetDepthTexture(std::shared_ptr<DepthTexture> depth_texture)
+std::shared_ptr<engine::DepthTextureBuffer> engine::TextureCollection::LoadDepthTexture(std::shared_ptr<DepthTexture> depth_texture)
 {
     const auto it = m_depth_texture_buffer_map_.find(depth_texture);
     if (it != m_depth_texture_buffer_map_.end())
@@ -39,19 +39,19 @@ std::shared_ptr<engine::DepthTextureBuffer> engine::TextureCollection::GetDepthT
     return depth_texture_buffer;
 }
 
-bool engine::TextureCollection::DeleteTexture(const std::shared_ptr<Texture2D> &texture)
+bool engine::TextureCollection::FreeTexture(const std::shared_ptr<Texture2D> &texture)
 {
     return m_textures_buffer_map_.erase(texture) == 1;
 }
 
-bool engine::TextureCollection::DeleteRenderTexture(const std::shared_ptr<RenderTexture> &render_texture)
+bool engine::TextureCollection::FreeRenderTexture(const std::shared_ptr<RenderTexture> &render_texture)
 {
     const auto erase_count = m_textures_buffer_map_.erase(render_texture) + m_render_texture_buffer_map_.erase(render_texture);
 
     return erase_count > 0;
 }
 
-bool engine::TextureCollection::DeleteDepthTexture(const std::shared_ptr<DepthTexture> &depth_texture)
+bool engine::TextureCollection::FreeDepthTexture(const std::shared_ptr<DepthTexture> &depth_texture)
 {
     const auto erase_count = m_textures_buffer_map_.erase(depth_texture) + m_depth_texture_buffer_map_.erase(depth_texture);
 

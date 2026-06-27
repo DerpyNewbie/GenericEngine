@@ -33,7 +33,7 @@ void Texture2DArray::CopyResource()
             );
 
         D3D12_TEXTURE_COPY_LOCATION src = {};
-        auto texture_buffer = TextureCollection::GetTexture(m_textures_[i]);
+        auto texture_buffer = TextureCollection::LoadTexture(m_textures_[i]);
         src.pResource = texture_buffer->Resource();
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src.SubresourceIndex = 0;
