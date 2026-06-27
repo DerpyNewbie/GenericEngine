@@ -200,83 +200,59 @@ void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shade
 
 bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path, std::string &error_msg)
 {
+    if (!CompileBlob(shader->m_vs_blob_, file_path, "vrt", "vs_5_0", error_msg))
+    {
+        error_msg = static_cast<const std::string &>("Failed to Compile Vertex Shader!") + static_cast<const std::string &>("\n") + error_msg;
+        
+        return false;
+    }
+
+    if (!CompileBlob(shader->m_ps_blob_, file_path, "pix", "ps_5_0", error_msg))
+    {
+        error_msg = static_cast<const std::string &>("Failed to Compile Pixel Shader!") + static_cast<const std::string &>("\n") + error_msg;
+
+        return false;
+    }
+
+    if (!CompileBlob(shader->m_gs_blob_, file_path, "geo", "gs_5_0", error_msg))
+    {
+        error_msg = static_cast<const std::string &>("Failed to Compile Geometry Shader!") + static_cast<const std::string &>("\n") + error_msg;
+        
+        return false;
+    }
+
+    // Add shader variants here if you want to
+    return true;
+}
+
+bool ShaderImporter::CompileBlob(ComPtr<ID3DBlob> &shader_blob, const std::wstring &file_path, const std::string &entry_point, const std::string &target, std::string &error_msg)
+{
     ComPtr<ID3DBlob> error_blob;
 
-    HRESULT hr = D3DCompileFromFile(
+    auto hr = D3DCompileFromFile(
         file_path.c_str(),
         nullptr,
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "vrt",
-        "vs_5_0",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
-        &shader->m_vs_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        return false;
-    }
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "pix",
-        "ps_5_0",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
-        &shader->m_ps_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Pixel Shader!");
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
-        {
-            error_msg = static_cast<const char *>(error_blob->GetBufferPointer());
-        }
-        else
-        {
-            error_msg = "NULL";
-        }
-
-        return false;
-    }
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "geo",
-        "gs_5_0",
+        entry_point.c_str(),
+        target.c_str(),
         0,
         0,
-        &shader->m_gs_blob_,
+        &shader_blob,
         &error_blob
     );
 
     if (FAILED(hr))
     {
-        if (error_blob && error_blob->GetBufferPointer() && error_blob->GetBufferSize() > 0)
+        if (error_blob && error_blob
+            ->
+            GetBufferPointer() && error_blob->GetBufferSize() > 0
+        )
         {
             std::string temp_error = static_cast<const char *>(error_blob->GetBufferPointer());
 
             if (temp_error.find("entrypoint not found") != std::string::npos)
             {
-                shader->m_gs_blob_ = nullptr;
+                shader_blob = nullptr;
                 return true;
             }
 
@@ -284,14 +260,12 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         }
         else
         {
-            error_msg = "NULL";
+            error_msg = "\0";
         }
-
-        Logger::Error<ShaderImporter>("Failed to Compile Geometry Shader!");
+        
         return false;
     }
 
-    // Add shader variants here if you want to
     return true;
 }
 
