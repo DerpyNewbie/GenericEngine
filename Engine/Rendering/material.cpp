@@ -42,7 +42,7 @@ void Material::OnInspectorGui()
 void Material::OnConstructed()
 {
     m_shader_ = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
-    if (m_shader_.Lock() == nullptr)
+    if (m_shader_ == nullptr)
     {
         Logger::Warn<Material>("Failed to find Engine Assets");
     }
@@ -52,7 +52,7 @@ void Material::OnConstructed()
 
 void Material::CreateMaterialBlock()
 {
-    if (m_shader_.CastedLock() == nullptr)
+    if (m_shader_ == nullptr)
     {
         Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");
         return;
