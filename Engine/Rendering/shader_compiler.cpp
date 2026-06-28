@@ -19,7 +19,7 @@ bool ShaderCompiler::CompileShader(const std::shared_ptr<Shader> &shader, const 
         return false;
     }
 
-    if (!CompileBlob(shader->m_gs_blob_, file_path, "geo", "gs_5_0", error_msg))
+    if (!CompileBlob(shader->m_gs_blob_, file_path, "geo", "gs_5_0", error_msg) && error_msg.find("entrypoint not found") == std::string::npos)
     {
         error_msg = static_cast<const std::string &>("Failed to Compile Geometry Shader!") + static_cast<const std::string &>("\n") + error_msg;
 
@@ -54,12 +54,6 @@ bool ShaderCompiler::CompileBlob(ComPtr<ID3DBlob> &shader_blob, const std::wstri
         )
         {
             std::string temp_error = static_cast<const char *>(error_blob->GetBufferPointer());
-
-            if (temp_error.find("entrypoint not found") != std::string::npos)
-            {
-                shader_blob = nullptr;
-                return true;
-            }
 
             error_msg = temp_error;
         }
