@@ -168,6 +168,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
         auto it = std::ranges::find_if(m_gpu_resources_[i], [](const std::pair<int, GpuResource> &a) {
             return a.second.handle == nullptr;
         });
+        //現在のBufferTypeがemptyまたはすでにhandleが確保されていたら次に進む
         if (m_gpu_resources_[i].empty() || it == m_gpu_resources_[i].end())
             continue;
 
@@ -175,6 +176,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
         const auto handles = DescriptorHeap::AllocateLinedUp(m_gpu_resources_[i].size());
         for (auto &gpu_resource : m_gpu_resources_[i] | std::views::values)
         {
+            //BufferがなかったらSetできないのでHandleをすべて手放して早期リターン
             if (gpu_resource.buffer == nullptr)
             {
                 for (auto handle : handles)
