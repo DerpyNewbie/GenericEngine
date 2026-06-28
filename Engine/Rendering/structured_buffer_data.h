@@ -5,25 +5,28 @@ namespace engine
 {
 class StructuredBufferData : public BufferDataBase
 {
+    friend class GpuResourceGroup;
+    
     size_t m_stride_ = 4;
     size_t m_count_ = 1;
 
     std::vector<uint8_t> m_data_;
     bool m_is_size_changed_ = true;
 
+    void SetIsSizeChanged(bool is_size_changed);
+    
 public:
 
     StructuredBufferData() = default;
     StructuredBufferData(const ShaderParameter &shader_param);
 
     void OnInspectorGui() override;
-
+    
     void SetStride(size_t stride);
     void SetCount(size_t count);
     void SetData(const void *data);
 
-    void SetIsSizeChanged(bool is_size_changed);
-    bool GetIsSizeChanged() const;
+    bool IsSizeChanged() const;
 
     void *Data();
 

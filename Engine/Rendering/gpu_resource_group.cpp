@@ -21,7 +21,7 @@ void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const s
     if (sb_data == nullptr)
         return;
 
-    if (sb_data->GetIsSizeChanged())
+    if (sb_data->IsSizeChanged())
     {
         sb_data->SetIsSizeChanged(false);
         gpu_resource.buffer = std::make_shared<StructuredBuffer>(sb_data->Stride(), sb_data->Count());

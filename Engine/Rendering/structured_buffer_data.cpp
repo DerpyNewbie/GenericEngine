@@ -3,6 +3,11 @@
 
 namespace engine
 {
+void StructuredBufferData::SetIsSizeChanged(bool is_size_changed)
+{
+    m_is_size_changed_ = is_size_changed;
+}
+
 StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {}
 
@@ -40,12 +45,8 @@ void StructuredBufferData::SetData(const void *data)
 
     is_dirty = true;
 }
-void StructuredBufferData::SetIsSizeChanged(bool is_size_changed)
-{
-    m_is_size_changed_ = is_size_changed;
-}
 
-bool StructuredBufferData::GetIsSizeChanged() const
+bool StructuredBufferData::IsSizeChanged() const
 {
     return m_is_size_changed_;
 }
