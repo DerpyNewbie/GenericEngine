@@ -306,6 +306,8 @@ Task Editor::ApplyLastSceneSnapshot() const
 
     co_await WaitForFrames(2);
 
+    Application::SetPlayMode(m_mode_ == EditorMode::kPlay);
+
     const auto snapshot = m_scene_snapshots_.front();
     Logger::Log<Editor>("Restoring %d scenes", snapshot.size());
     for (auto serialized_scene : snapshot)
@@ -329,17 +331,17 @@ void Editor::SetEditorMode(const EditorMode mode)
     if (last_mode == m_mode_)
         return;
 
-    if (m_mode_ == EditorMode::kPlay)
+    switch (m_mode_)
     {
-        PushSceneSnapshot();
-        Engine::coroutine.Start(ApplyLastSceneSnapshot());
-    }
-
-    Application::SetPlayMode(mode == EditorMode::kPlay);
-
-    if (m_mode_ == EditorMode::kEdit)
-    {
-        Engine::coroutine.Start(PopSceneSnapshot());
+        case EditorMode::kPlay: {
+            PushSceneSnapshot();
+            Engine::coroutine.Start(ApplyLastSceneSnapshot());
+            break;
+        }
+        case EditorMode::kEdit: {
+            Engine::coroutine.Start(PopSceneSnapshot());
+            break;
+        }
     }
 }
 
