@@ -7,7 +7,7 @@ namespace engine
 {
 void Component::EnsurePrepared()
 {
-    InvokeOnEnabled();
+    InvokeOnStart();
 }
 
 void Component::InvokeOnAwake()
