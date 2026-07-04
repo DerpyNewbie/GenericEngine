@@ -3,6 +3,7 @@
 
 #include "enable_shared_from_base.h"
 #include "event_receivers.h"
+#include "Coroutine/task.h"
 
 namespace editor
 {
@@ -64,7 +65,8 @@ public:
     void Finalize();
 
     void PushSceneSnapshot();
-    void PopSceneSnapshot();
+    engine::Task ApplyLastSceneSnapshot() const;
+    engine::Task PopSceneSnapshot();
 
     void SetEditorMode(EditorMode mode);
     EditorMode GetEditorMode() const;

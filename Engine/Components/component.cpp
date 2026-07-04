@@ -5,6 +5,65 @@
 
 namespace engine
 {
+void Component::EnsurePrepared()
+{
+    InvokeOnEnabled();
+}
+
+void Component::InvokeOnAwake()
+{
+    if (!m_has_called_awake_)
+    {
+        OnAwake();
+        m_has_called_awake_ = true;
+    }
+}
+void Component::InvokeOnStart()
+{
+    InvokeOnEnabled();
+
+    if (!m_has_called_start_)
+    {
+        OnStart();
+        m_has_called_start_ = true;
+    }
+}
+
+void Component::InvokeOnEnabled()
+{
+    InvokeOnAwake();
+
+    if (!m_has_called_enabled_)
+    {
+        OnEnabled();
+        m_has_called_enabled_ = true;
+        m_has_called_disabled_ = false;
+    }
+}
+
+void Component::InvokeOnDisabled()
+{
+    if (!m_has_called_disabled_)
+    {
+        OnDisabled();
+        m_has_called_enabled_ = false;
+        m_has_called_disabled_ = true;
+    }
+}
+
+void Component::InvokeOnUpdate()
+{
+    EnsurePrepared();
+    OnUpdate();
+}
+
+void Component::InvokeOnFixedUpdate()
+{
+    EnsurePrepared();
+    OnFixedUpdate();
+}
+
+
 Component::Component() : Object()
 { }
 void Component::OnInspectorGui()

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "application.h"
 #include "engine_util.h"
 #include "Components/component.h"
 #include "Components/transform.h"
@@ -10,12 +11,12 @@ class Scene;
 
 class GameObject final : public Object
 {
-    friend class RectTransform;
-
 public:
     explicit GameObject();
 
     void OnConstructed() override;
+
+    void OnDeserialized() override;
 
     void OnDestroy() override;
 
@@ -46,12 +47,14 @@ public:
         instance->m_game_object_ = shared_from_base<GameObject>();
         m_components_.push_back(instance);
 
-        instance->OnAwake();
-        instance->m_has_called_awake_ = true;
+        if (Application::IsPlayMode())
+        {
+            instance->InvokeOnAwake();
+        }
 
         if (IsActiveInHierarchy())
         {
-            instance->OnEnabled();
+            instance->InvokeOnEnabled();
         }
 
         Logger::Log<GameObject>("[%s]: Added component '%s'", Path().c_str(), instance->Name().c_str());
@@ -164,18 +167,14 @@ private:
     friend class Physics;
 
     bool m_is_active_self_ = true;
-    mutable bool m_is_active_in_hierarchy_ = true;
+    mutable bool m_is_active_in_hierarchy_ = false;
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
 
-    static void EnsureComponentPrepared(const std::shared_ptr<Component> &component);
-    static void InvokeComponentOnEnabled(const std::shared_ptr<Component> &component);
-    static void InvokeComponentOnDisabled(const std::shared_ptr<Component> &component);
-
-    void InvokeUpdate();
-    void InvokeFixedUpdate() const;
+    void InvokeOnUpdate();
+    void InvokeOnFixedUpdate() const;
     void InvokeOnValidate() const;
-    void UpdateActiveInHierarchy() const;
+    void UpdateActiveInHierarchy(bool invoke_component_events) const;
 
     void InvokeOnCollisionEnter(const Collision &collision) const;
     void InvokeOnCollisionStay(const Collision &collision) const;
