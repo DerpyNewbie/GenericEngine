@@ -20,7 +20,15 @@ void GameObject::OnConstructed()
     SceneManager::MoveGameObject(shared_from_base<GameObject>(), SceneManager::GetActiveScene());
     if (Transform() == nullptr)
         AddComponent<engine::Transform>();
+
+    UpdateActiveInHierarchy(!Application::IsPlayMode());
 }
+
+void GameObject::OnDeserialized()
+{
+    UpdateActiveInHierarchy(!Application::IsPlayMode());
+}
+
 void GameObject::OnDestroy()
 {
     // notify the scene that there is a destroying game object
@@ -60,7 +68,7 @@ void GameObject::SetActive(const bool is_active)
     }
 
     m_is_active_self_ = is_active;
-    UpdateActiveInHierarchy();
+    UpdateActiveInHierarchy(true);
 }
 
 std::shared_ptr<Scene> GameObject::Scene() const
@@ -85,53 +93,9 @@ std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent) cons
     return path.substr(parent_path.size());
 }
 
-void GameObject::EnsureComponentPrepared(const std::shared_ptr<Component> &component)
+void GameObject::InvokeOnUpdate()
 {
-    if (!component->m_has_called_awake_)
-    {
-        component->OnAwake();
-        component->m_has_called_awake_ = true;
-    }
-
-    if (!component->m_has_called_enabled_)
-    {
-        component->OnEnabled();
-        component->m_has_called_enabled_ = true;
-        component->m_has_called_disabled_ = false;
-    }
-
-    if (!component->m_has_called_start_)
-    {
-        component->OnStart();
-        component->m_has_called_start_ = true;
-    }
-}
-
-void GameObject::InvokeComponentOnEnabled(const std::shared_ptr<Component> &component)
-{
-    EnsureComponentPrepared(component);
-    if (component->m_has_called_enabled_)
-        return;
-
-    component->OnEnabled();
-    component->m_has_called_enabled_ = true;
-    component->m_has_called_disabled_ = false;
-}
-
-void GameObject::InvokeComponentOnDisabled(const std::shared_ptr<Component> &component)
-{
-    EnsureComponentPrepared(component);
-    if (component->m_has_called_disabled_)
-        return;
-
-    component->OnDisabled();
-    component->m_has_called_enabled_ = false;
-    component->m_has_called_disabled_ = true;
-}
-
-void GameObject::InvokeUpdate()
-{
-    if (IsDestroying() || IsActiveInHierarchy() == false)
+    if (IsDestroying() || !IsActiveInHierarchy())
     {
         return;
     }
@@ -145,15 +109,16 @@ void GameObject::InvokeUpdate()
             continue;
         }
 
-        EnsureComponentPrepared(component);
-        component->OnUpdate();
+        component->InvokeOnUpdate();
     }
 
     if (has_destroying_component)
     {
         std::erase_if(
             m_components_,
-            [](const auto &component) { return component->IsDestroying(); }
+            [](const auto &component) {
+                return component->IsDestroying();
+            }
         );
     }
 
@@ -162,23 +127,22 @@ void GameObject::InvokeUpdate()
     {
         for (int i = 0; i < transform->ChildCount(); i++)
         {
-            const auto child = transform->GetChild(i)->GameObject();
-            child->InvokeUpdate();
+            const auto child_game_object = transform->GetChild(i)->GameObject();
+            child_game_object->InvokeOnUpdate();
         }
     }
 }
 
-void GameObject::InvokeFixedUpdate() const
+void GameObject::InvokeOnFixedUpdate() const
 {
-    if (IsActiveInHierarchy() == false)
+    if (!IsActiveInHierarchy())
     {
         return;
     }
 
     for (auto &component : m_components_)
     {
-        EnsureComponentPrepared(component);
-        component->OnFixedUpdate();
+        component->InvokeOnFixedUpdate();
     }
 
     const auto transform = Transform();
@@ -186,8 +150,8 @@ void GameObject::InvokeFixedUpdate() const
     {
         for (int i = 0; i < transform->ChildCount(); i++)
         {
-            const auto child = transform->GetChild(i)->GameObject();
-            child->InvokeFixedUpdate();
+            const auto child_game_object = transform->GetChild(i)->GameObject();
+            child_game_object->InvokeOnFixedUpdate();
         }
     }
 }
@@ -200,7 +164,7 @@ void GameObject::InvokeOnValidate() const
     }
 }
 
-void GameObject::UpdateActiveInHierarchy() const
+void GameObject::UpdateActiveInHierarchy(const bool invoke_component_events) const
 {
     const auto transform = Transform();
     const auto parent = transform != nullptr ? transform->Parent() : nullptr;
@@ -213,31 +177,31 @@ void GameObject::UpdateActiveInHierarchy() const
 
     m_is_active_in_hierarchy_ = active_in_hierarchy;
 
-    // not clean but it works
-    if (Application::IsPlayMode())
+    if (invoke_component_events)
     {
         for (const auto &component : m_components_)
         {
             if (m_is_active_in_hierarchy_)
             {
-                InvokeComponentOnEnabled(component);
+                component->InvokeOnEnabled();
             }
             else
             {
-                InvokeComponentOnDisabled(component);
+                component->InvokeOnDisabled();
             }
         }
-    }
-    else
-    {
-        InvokeOnValidate();
+
+        if (!Application::IsPlayMode())
+        {
+            InvokeOnValidate();
+        }
     }
 
     if (transform != nullptr)
     {
         for (int i = 0; i < transform->ChildCount(); i++)
         {
-            transform->GetChild(i)->GameObject()->UpdateActiveInHierarchy();
+            transform->GetChild(i)->GameObject()->UpdateActiveInHierarchy(invoke_component_events);
         }
     }
 }

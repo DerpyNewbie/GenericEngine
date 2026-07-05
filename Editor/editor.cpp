@@ -290,14 +290,12 @@ void Editor::PushSceneSnapshot()
     m_scene_snapshots_.emplace(serialized_scenes);
 }
 
-void Editor::PopSceneSnapshot()
+Task Editor::ApplyLastSceneSnapshot() const
 {
-    Logger::Log<Editor>("Popping scene snapshot");
-
+    Logger::Log<Editor>("Applying last scene snapshot");
     if (m_scene_snapshots_.empty())
     {
-        throw std::runtime_error("No scene snapshots to pop");
-        return;
+        throw std::runtime_error("No scene snapshots to apply");
     }
 
     const auto scenes = SceneManager::GetCurrentScenes();
@@ -306,14 +304,23 @@ void Editor::PopSceneSnapshot()
         SceneManager::DestroyScene(scene->Name());
     }
 
-    const auto snapshot = m_scene_snapshots_.front();
-    m_scene_snapshots_.pop();
+    co_await WaitForFrames(2);
 
+    Application::SetPlayMode(m_mode_ == EditorMode::kPlay);
+
+    const auto snapshot = m_scene_snapshots_.front();
     Logger::Log<Editor>("Restoring %d scenes", snapshot.size());
     for (auto serialized_scene : snapshot)
     {
         SceneManager::DeserializeScene(serialized_scene);
     }
+}
+
+Task Editor::PopSceneSnapshot()
+{
+    Logger::Log<Editor>("Popping scene snapshot");
+    co_await ApplyLastSceneSnapshot();
+    m_scene_snapshots_.pop();
 }
 
 void Editor::SetEditorMode(const EditorMode mode)
@@ -324,16 +331,17 @@ void Editor::SetEditorMode(const EditorMode mode)
     if (last_mode == m_mode_)
         return;
 
-    if (m_mode_ == EditorMode::kPlay)
+    switch (m_mode_)
     {
-        PushSceneSnapshot();
-    }
-
-    Application::SetPlayMode(mode == EditorMode::kPlay);
-
-    if (m_mode_ == EditorMode::kEdit)
-    {
-        PopSceneSnapshot();
+        case EditorMode::kPlay: {
+            PushSceneSnapshot();
+            Engine::coroutine.Start(ApplyLastSceneSnapshot());
+            break;
+        }
+        case EditorMode::kEdit: {
+            Engine::coroutine.Start(PopSceneSnapshot());
+            break;
+        }
     }
 }
 
