@@ -15,6 +15,14 @@ class Component : public Object
     bool m_has_called_disabled_ = false;
     std::weak_ptr<GameObject> m_game_object_ = {};
 
+    void EnsurePrepared();
+    void InvokeOnAwake();
+    void InvokeOnEnabled();
+    void InvokeOnStart();
+    void InvokeOnDisabled();
+    void InvokeOnUpdate();
+    void InvokeOnFixedUpdate();
+
 public:
     Component();
 
