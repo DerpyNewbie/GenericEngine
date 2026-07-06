@@ -13,7 +13,7 @@ void TextureCube::OnInspectorGui()
 {
     for (int i = 0; i < 6; ++i)
     {
-        constexpr const char *dir_labels[] = { "Right", "Left", "Top", "Bottom", "Front", "Back" };
+        constexpr const char *dir_labels[] = {"Right", "Left", "Top", "Bottom", "Front", "Back"};
         if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
         {
             m_buffer_ = nullptr;
@@ -24,19 +24,17 @@ void TextureCube::OnInspectorGui()
 
 void TextureCube::CreateBuffer()
 {
-    std::array<std::shared_ptr<Texture2D>, 6> locked_textures;
     for (int i = 0; i < 6; ++i)
     {
-        locked_textures[i] = m_textures_[i].CastedLock();
-        if (locked_textures[i] == nullptr)
+        if (m_textures_[i] == nullptr)
         {
             Logger::Error<TextureCube>("Texture at index %d was invalid", i);
             m_buffer_ = nullptr;
             return;
         }
 
-        if (locked_textures[0]->Width() != locked_textures[i]->Width() ||
-            locked_textures[0]->Height() != locked_textures[i]->Height())
+        if (m_textures_[0]->Width() != m_textures_[i]->Width() ||
+            m_textures_[0]->Height() != m_textures_[i]->Height())
         {
             Logger::Error<TextureCube>("Texture at index %d was not the same size as the first texture", i);
             m_buffer_ = nullptr;
@@ -44,7 +42,7 @@ void TextureCube::CreateBuffer()
         }
     }
 
-    const D3D12_RESOURCE_DESC ref_desc = locked_textures[0]->Resource()->GetDesc();
+    const D3D12_RESOURCE_DESC ref_desc = m_textures_[0]->Resource()->GetDesc();
     D3D12_RESOURCE_DESC cube_desc = ref_desc;
     cube_desc.DepthOrArraySize = 6;
     cube_desc.MipLevels = 1;
@@ -73,7 +71,7 @@ void TextureCube::CreateBuffer()
     for (int i = 0; i < 6; ++i)
     {
         D3D12_TEXTURE_COPY_LOCATION src_loc = {};
-        src_loc.pResource = locked_textures[i]->Resource();
+        src_loc.pResource = m_textures_[i]->Resource();
         src_loc.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src_loc.SubresourceIndex = 0;
 
@@ -89,7 +87,7 @@ void TextureCube::CreateBuffer()
         m_buffer_.Get(),
         D3D12_RESOURCE_STATE_COPY_DEST,
         D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
-    );
+        );
 
     cmd_list->ResourceBarrier(1, &barrier);
 }

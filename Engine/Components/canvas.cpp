@@ -21,7 +21,7 @@ void GetSiblingIndices(const std::shared_ptr<engine::Transform> &a, std::vector<
 
         if (current->GameObject()->GetComponent<engine::Canvas>() != nullptr)
             break;
-        
+
         current = current->Parent();
     }
 }
@@ -84,7 +84,7 @@ void Canvas::OnStart()
 
 void Canvas::Render()
 {
-    if (RenderPipeline::GetCurrentCamera() == m_target_camera_.CastedLock()->GetCamera())
+    if (RenderPipeline::GetCurrentCamera() == m_target_camera_->GetCamera())
         for (const auto it : m_child_renderers_)
             it->Render();
 }
@@ -119,9 +119,10 @@ void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
 
 void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
 {
-    std::erase_if(m_child_renderers_, [renderer](const std::shared_ptr<Renderer2D> &a) {
-        return a == renderer;
-    });
+    std::erase_if(m_child_renderers_,
+                  [renderer](const std::shared_ptr<Renderer2D> &a) {
+                      return a == renderer;
+                  });
 }
 }
 

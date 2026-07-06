@@ -35,16 +35,16 @@ void AnimationState::UpdateTime()
     {
         time = 0;
         just_looped = true;
-        clip.CastedLock()->Initialize();
+        clip->Initialize();
         return;
     }
     just_looped = false;
-    
+
     if (wrap_mode == kWrapMode::kPingPong)
     {
         if (time > length)
             time += Time::GetDeltaTime();
-        clip.CastedLock()->Initialize();
+        clip->Initialize();
     }
 }
 
@@ -86,6 +86,6 @@ void AnimationState::Stop()
 {
     enabled = false;
     time = 0;
-    clip.CastedLock()->Initialize();
+    clip->Initialize();
 }
 }

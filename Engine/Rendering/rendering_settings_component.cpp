@@ -29,9 +29,9 @@ void RenderingSettingsComponent::OnAwake()
     ApplySettings();
 }
 
-void RenderingSettingsComponent::ApplySettings()
+void RenderingSettingsComponent::ApplySettings() const
 {
-    Skybox::Instance()->SetTextureCube(m_skybox_cube_.CastedLock());
+    Skybox::Instance()->SetTextureCube(m_skybox_cube_);
     Lighting::Instance()->SetCascadeSlices(m_cascade_slices_);
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
 }

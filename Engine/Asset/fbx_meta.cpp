@@ -18,28 +18,27 @@ void SetupMeshRenderer(const std::shared_ptr<MeshRenderer> &mesh_renderer, const
         [](auto a) {
             return AssetPtr<Material>::FromManaged(a.lock());
         }
-    );
+        );
 }
 
 void PostProcessGameObjects(
     std::map<std::shared_ptr<ObjectMeta>, std::pair<AssetPtr<Mesh>, std::vector<AssetPtr<Material>>>> mesh_objects_map,
     std::map<std::shared_ptr<ObjectMeta>, std::shared_ptr<GameObject>> &conversion_map
-)
+    )
 {
     for (const auto &[meta, mesh_material_pair] : mesh_objects_map)
     {
         AssetPtr<Mesh> mesh = mesh_material_pair.first;
-        auto locked_mesh = mesh.CastedLock();
         std::vector<AssetPtr<Material>> materials = mesh_material_pair.second;
 
-        if (locked_mesh == nullptr)
+        if (mesh == nullptr)
         {
             Logger::Warn<FbxMeta>("Instantiate: Mesh '%s' not found", meta->name.c_str());
             continue;
         }
 
         const auto go = conversion_map.at(meta);
-        if (!locked_mesh->HasBoneWeights())
+        if (!mesh->HasBoneWeights())
         {
             const auto mesh_renderer = go->AddComponent<MeshRenderer>();
             SetupMeshRenderer(mesh_renderer, mesh, meta);
@@ -57,12 +56,12 @@ void PostProcessGameObjects(
             }
 
             std::ranges::transform(
-                locked_mesh->bind_poses,
+                mesh->bind_poses,
                 std::back_inserter(skinned_mesh_renderer->inverted_bind_poses),
                 [](auto a) {
                     return a.Invert();
                 }
-            );
+                );
 
             std::ranges::transform(
                 meta->mesh.bones,
@@ -70,7 +69,7 @@ void PostProcessGameObjects(
                 [conversion_map](auto a) {
                     return conversion_map.at(a.lock())->Transform();
                 }
-            );
+                );
         }
     }
 }
@@ -79,7 +78,7 @@ std::shared_ptr<GameObject> CreateGameObjects(
     const std::shared_ptr<GameObject> &parent,
     const std::shared_ptr<ObjectMeta> &meta,
     std::map<std::shared_ptr<ObjectMeta>, std::shared_ptr<GameObject>> &conversion_map
-)
+    )
 {
     const auto go = GameObject::Instantiate<GameObject>(meta->name);
     conversion_map.emplace(meta, go);
