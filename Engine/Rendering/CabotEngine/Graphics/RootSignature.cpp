@@ -22,9 +22,6 @@ RootSignature::RootSignature()
 
     rootParam[kWorldCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kSceneDataCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kCascadeSlicesCBV].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kLightCountCBV].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
     CD3DX12_DESCRIPTOR_RANGE tableRangeBone = {};
     tableRangeBone.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     rootParam[kBoneSRV].InitAsDescriptorTable(1, &tableRangeBone, D3D12_SHADER_VISIBILITY_ALL);
@@ -33,21 +30,17 @@ RootSignature::RootSignature()
     tableRangeLightVP.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
     rootParam[kLightViewProj].InitAsDescriptorTable(1, &tableRangeLightVP, D3D12_SHADER_VISIBILITY_ALL);
     
-    CD3DX12_DESCRIPTOR_RANGE tableRangeLight = {};
-    tableRangeLight.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-    rootParam[kLightSRV].InitAsDescriptorTable(1, &tableRangeLight, D3D12_SHADER_VISIBILITY_ALL);
-    
     CD3DX12_DESCRIPTOR_RANGE tableRangeShadowMap = {};
-    tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
+    tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
     rootParam[kShadowMapSRV].InitAsDescriptorTable(1, &tableRangeShadowMap, D3D12_SHADER_VISIBILITY_ALL);
 
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 5);
-    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 4);
-    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 2);
+    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3);
+    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 1);
 
     rootParam[kMaterialCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kMaterialSRV].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_ALL);

@@ -6,10 +6,12 @@
 #include "render_command.h"
 #include "render_texture.h"
 #include "view_projection.h"
+#include "CabotEngine/Graphics/ConstantBuffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
+class GpuResourceGroup;
 struct CameraProperty;
 class Renderer;
 class DepthTexture;
@@ -31,22 +33,21 @@ class RenderPipeline
 
     std::vector<RenderCommand> m_commands_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
-    std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
+    std::shared_ptr<ConstantBufferData> m_scene_data_buffer_data_;
 
     Camera m_current_camera_;
     std::vector<Camera> m_requesting_cameras_;
     uint32_t m_current_view_proj_matrix_index_;
-    std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
-        = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
+    ObjectPool<std::shared_ptr<ConstantBuffer>> m_view_proj_matrix_buffers_ = ObjectPool(0, kOnViewProjBuffCreate);
 
-
+    std::unordered_map<std::shared_ptr<MaterialBlock>, std::shared_ptr<GpuResourceGroup>> m_material_block_gpu_resource_groups_map_;
     void InvokeDrawCall();
 
     void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
     void RenderCamera(const Camera &camera);
     void RenderVoid();
     void Render(const Matrix &view, const Matrix &proj);
-    
+
     void SetCurrentCamera(const Camera &camera);
     void SetSceneData();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);

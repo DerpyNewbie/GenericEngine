@@ -6,6 +6,8 @@
 #include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 #include "Rendering/material_block.h"
 
+namespace engine
+{
 std::shared_ptr<DescriptorHeap> DescriptorHeap::m_instance_;
 
 std::shared_ptr<DescriptorHeap> DescriptorHeap::Instance()
@@ -65,14 +67,14 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(engine::ShaderResourc
     return desc_handle;
 }
 
-std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(ConstantBuffer &constant_buffer)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Register(const ConstantBuffer &constant_buffer)
 {
-    auto pHandle = Instance()->Allocate();
+    auto p_handle = Instance()->Allocate();
 
-    auto view_desc = constant_buffer.ViewDesc();
-    RenderEngine::Device()->CreateConstantBufferView(&view_desc, pHandle->handle_cpu);
+    const auto view_desc = constant_buffer.ViewDesc();
+    RenderEngine::Device()->CreateConstantBufferView(&view_desc, p_handle->handle_cpu);
 
-    return pHandle;
+    return p_handle;
 }
 
 std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
@@ -118,7 +120,79 @@ std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate()
     return pHandle;
 }
 
-void DescriptorHeap::Free(std::shared_ptr<DescriptorHandle> handle)
+std::shared_ptr<DescriptorHandle> DescriptorHeap::Allocate(const uint32_t index)
+{
+    auto instance = Instance();
+    if (index >= kHandleMax)
+        return nullptr;
+
+    auto it = std::ranges::find(instance->m_free_indices_, index);
+    if (it == instance->m_free_indices_.end())
+        return nullptr;
+
+    auto p_handle = std::make_shared<DescriptorHandle>();
+    p_handle->index = index;
+
+    auto handle_cpu = instance->m_p_heap_->GetCPUDescriptorHandleForHeapStart();
+    handle_cpu.ptr += instance->m_increment_size_ * index;
+
+    auto handle_gpu = instance->m_p_heap_->GetGPUDescriptorHandleForHeapStart();
+    handle_gpu.ptr += instance->m_increment_size_ * index;
+
+    p_handle->handle_cpu = handle_cpu;
+    p_handle->handle_gpu = handle_gpu;
+
+    instance->m_free_indices_.erase(it);
+    if (index < instance->m_p_handles_.size())
+    {
+        instance->m_p_handles_[index] = p_handle;
+    }
+    else
+    {
+        instance->m_p_handles_.push_back(p_handle);
+    }
+    return p_handle;
+}
+
+std::vector<std::shared_ptr<DescriptorHandle>> DescriptorHeap::AllocateLinedUp(size_t count)
+{
+    if (count == 0)
+        return {};
+    
+    std::vector<std::shared_ptr<DescriptorHandle>> handles;
+    handles.reserve(count);
+
+    auto instance = Instance();
+    uint32_t before_index = 0;
+    uint32_t free_count = 0;
+    for (auto &free_index : instance->m_free_indices_)
+    {
+        if (free_index != before_index + free_count)
+        {
+            free_count = 0;
+            before_index = free_index;
+        }
+
+        ++free_count;
+
+        if (free_count == count)
+        {
+            for (uint32_t i = before_index; i < before_index + count; ++i)
+            {
+                if (auto handle = Allocate(i))
+                    handles.push_back(handle);
+                else
+                    for (const auto &h : handles)
+                        Free(h);
+            }
+            break;
+        }
+    }
+
+    return handles;
+}
+
+void DescriptorHeap::Free(const std::shared_ptr<DescriptorHandle> &handle)
 {
     if (!handle || handle->index >= m_instance_->m_p_handles_.size())
         return;
@@ -132,4 +206,5 @@ void DescriptorHeap::Release()
     auto instance = Instance();
     instance->m_p_handles_.clear();
     instance->m_free_indices_.clear();
+}
 }

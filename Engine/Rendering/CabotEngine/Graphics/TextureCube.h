@@ -1,22 +1,27 @@
 #pragma once
 #include "Texture2D.h"
-#include "Rendering/ibuffer.h"
+#include "Rendering/buffer_base.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class TextureCube final : public Object, public Inspectable, public IBuffer, public ShaderResource
+class TextureCube final : public Object, public BufferBase, public Inspectable, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer_;
-
+    Microsoft::WRL::ComPtr<ID3D12Resource> m_resource_;
+    D3D12_RESOURCE_STATES m_current_state_;
+    
 public:
+    ~TextureCube() override;
+    
     void OnInspectorGui() override;
     void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
+    void UpdateBuffer(const void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool CanUpdate() override;
     bool IsValid() override;
+    bool Transition(D3D12_RESOURCE_STATES new_state) override;
 
     ID3D12Resource *Resource() override;
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;

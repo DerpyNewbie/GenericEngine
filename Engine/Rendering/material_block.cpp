@@ -1,265 +1,107 @@
 #include "pch.h"
 #include "material_block.h"
-#include "material_data.h"
-#include "Asset/Importer/texture_2d_importer.h"
+
+#include "buffer_data_base.h"
+#include "gpu_resource_manager.h"
 
 namespace
 {
 using namespace engine;
-using MaterialFactory =
-std::function<std::shared_ptr<IMaterialData>(const ShaderParameter &)>;
 
-std::unordered_map<std::string, MaterialFactory> g_material_data_factory = {
-    {"int",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<int>>(0, param);
-     }
-    },
-    {"float",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<float>>(0.0F, param);
-     }
-    },
-    {"color",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Color>>(Color(), param);
-     }
-    },
-    {"float2",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector2>>(Vector2::Zero, param);
-     }
-    },
-    {"float3",
-     [](const ShaderParameter &param) {
-         return std::make_shared<MaterialData<Vector3>>(Vector3::Zero, param);
-     }
-    },
-    {"texture2d",
-     [](const ShaderParameter &param) {
-         auto texture = Texture2DImporter::GetColorTexture({0.7f, 0.7f, 0.7f, 1.0f});
-         return std::make_shared<MaterialData<AssetPtr<Texture2D>>>(
-             AssetPtr<Texture2D>::FromIAssetPtr(texture),
-             param
-         );
-     }
-    }
-};
-
-std::shared_ptr<IMaterialData> CreateMaterialData(const ShaderParameter &shader_param)
+std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader_param)
 {
-    const auto func = g_material_data_factory[shader_param.type_hint];
-    if (func != nullptr)
+    switch (shader_param.buffer_type)
     {
-        auto material_data = func(shader_param);
-        return material_data;
+        case kBufferType_ConstantBuffer:
+            return std::make_shared<ConstantBufferData>(shader_param);
+        case kBufferType_StructuredBuffer:
+            return std::make_shared<StructuredBufferData>(shader_param);
+        case kBufferType_Texture2D:
+            return std::make_shared<TextureBufferData>(shader_param);
+        case kBufferType_UavTexture:
+            return std::make_shared<UavTextureBufferData>(shader_param);
     }
-    return nullptr;
 }
 }
 
 namespace engine
 {
-int *ShaderDataIndex::GetLengthField(kParameterBufferType type)
-{
-    switch (type)
-    {
-        case kParameterBufferType_CBV:
-            return &cbv_length;
-        case kParameterBufferType_SRV:
-            return &srv_length;
-        case kParameterBufferType_UAV:
-            return &uav_length;
-        default:
-            static_assert("Invalid buffer type");
-            return nullptr;
-    }
-}
-
-int ShaderDataIndex::GetLength(const kParameterBufferType type) const
-{
-    switch (type)
-    {
-        case kParameterBufferType_CBV:
-            return cbv_length;
-        case kParameterBufferType_SRV:
-            return srv_length;
-        case kParameterBufferType_UAV:
-            return uav_length;
-        default:
-            static_assert("Invalid buffer type");
-            return 0;
-    }
-}
-
-int ShaderDataIndex::GetOffset(kParameterBufferType type) const
-{
-    int offset = 0;
-
-    // fall-through
-    switch (type)
-    {
-        case kParameterBufferType_UAV:
-            offset += srv_length;
-        case kParameterBufferType_SRV:
-            offset += cbv_length;
-        case kParameterBufferType_CBV:
-        default:
-            break;
-    }
-
-    return offset;
-}
-
-int ShaderDataIndex::GetFullLength() const
-{
-    return cbv_length + srv_length + uav_length;
-}
-
-MaterialBlock::~MaterialBlock()
-{
-    for (auto &desc_handle : material_data | std::views::transform(&MaterialDataPair::handle))
-    {
-        DescriptorHeap::Free(desc_handle);
-        desc_handle = nullptr;
-    }
-}
 
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
+    for (auto &[name, data] : m_buffer_data_)
     {
+        if (GpuResourceManager::GetGlobalBuffer(name))
+            continue;
+        
         ImGui::PushID(data.get());
         data->OnInspectorGui();
         ImGui::PopID();
     }
 }
 
-void MaterialBlock::LoadShaderParameters(
-    const std::vector<ShaderParameter> &shader_params,
-    const std::vector<MaterialDataPair> &resource_material_data
-)
+std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_ConstantBuffer)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<ConstantBufferData>(it->second);
+}
+
+std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_StructuredBuffer)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<StructuredBufferData>(it->second);
+}
+
+std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_Texture2D)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<TextureBufferData>(it->second);
+}
+
+std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_UavTexture)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<UavTextureBufferData>(it->second);
+}
+
+void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &shader_params)
 {
     for (auto &param : shader_params)
     {
-        bool found = false;
-        if (!resource_material_data.empty())
-        {
-            for (auto material_data_pair : resource_material_data)
-            {
-                if (param.name == material_data_pair.data->parameter.name)
-                {
-                    Insert(material_data_pair.data);
-                    found = true;
-                    break;
-                }
-            }
-        }
+        const auto data = CreateMaterialData(param);
 
-        if (!found)
-        {
-            const auto material_data = CreateMaterialData(param);
+        if (data == nullptr)
+            continue;
 
-            if (material_data != nullptr)
-            {
-                Insert(material_data);
+        switch (param.buffer_type)
+        {
+            case kBufferType_ConstantBuffer:
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
+                break;
+            case kBufferType_StructuredBuffer:
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
+                break;
+            case kBufferType_Texture2D: {
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
+                break;
             }
+            case kBufferType_UavTexture:
+                m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
+                break;
         }
     }
-    UpdateBuffer();
-}
-
-void MaterialBlock::Insert(const std::shared_ptr<IMaterialData> &data)
-{
-    Logger::Log<MaterialBlock>("Inserting data %s", data->parameter.name.c_str());
-
-    const auto buffer_type = data->BufferType();
-    data->CreateBuffer();
-    material_data.insert(End(buffer_type), {data, nullptr});
-    data->is_dirty = false;
-
-    const auto field = shader_index.GetLengthField(buffer_type);
-    ++(*field);
-}
-
-bool MaterialBlock::Empty(const kParameterBufferType buffer_type)
-{
-    return shader_index.GetLength(buffer_type) == 0;
-}
-
-std::vector<MaterialDataPair>::iterator MaterialBlock::Begin(
-    const kParameterBufferType buffer_type
-)
-{
-    const auto buffer_offset = shader_index.GetOffset(buffer_type);
-    return material_data.begin() + buffer_offset;
-}
-
-std::vector<MaterialDataPair>::iterator MaterialBlock::End(
-    const kParameterBufferType buffer_type
-)
-{
-    return Begin(buffer_type) + shader_index.GetLength(buffer_type);
-}
-
-std::shared_ptr<IMaterialData> MaterialBlock::FindMaterialDataByName(const std::string &name)
-{
-    for (auto &data : material_data | std::views::transform(&MaterialDataPair::data))
-    {
-        if (data->parameter.name == name)
-            return data;
-    }
-
-    return {};
-}
-
-void MaterialBlock::UpdateBuffer()
-{
-    for (auto &[data, handle] : material_data)
-    {
-        if (data->is_dirty)
-        {
-            Logger::Log<MaterialBlock>("Updating data in MaterialBlock: %s", data->parameter.name.c_str());
-
-            if (data->buffer == nullptr)
-            {
-                data->buffer = data->CreateBuffer();
-            }
-
-            if (data->CanUpdateBuffer())
-            {
-                data->UpdateBuffer();
-            }
-            else
-            {
-                if (handle != nullptr)
-                {
-                    DescriptorHeap::Free(handle);
-                    handle = nullptr;
-                }
-            }
-
-            data->is_dirty = false;
-        }
-
-        if (handle == nullptr)
-        {
-            handle = data->UploadBuffer();
-        }
-    }
-}
-
-bool MaterialBlock::IsDirty()
-{
-    for (const auto &data : material_data | std::views::transform(&MaterialDataPair::data))
-    {
-        if (data->is_dirty)
-        {
-            return true;
-        }
-    }
-
-    return false;
 }
 }
 

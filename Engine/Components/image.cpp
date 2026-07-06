@@ -14,13 +14,10 @@ namespace engine
 {
 void Image::UpdateWorldBuffer()
 {
-    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
+    if (!m_world_matrix_buffer_)
     {
-        if (!world_matrix_buffer)
-        {
-            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-            world_matrix_buffer->CreateBuffer();
-        }
+        m_world_matrix_buffer_ = std::make_unique<ConstantBuffer>(sizeof(Matrix));
+        m_world_matrix_buffer_->CreateBuffer();
     }
 
     auto rect = NormalizedRect();
@@ -33,9 +30,8 @@ void Image::UpdateWorldBuffer()
     const auto trans_mat = Matrix::CreateTranslation(rect.pos.x, rect.pos.y, 0.0f);
 
     const auto world_mat = scale_mat * trans_mat;
-    
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
+
+    const auto &world_matrix_buffer = m_world_matrix_buffer_;
     const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
     *ptr = world_mat;
 }
@@ -48,11 +44,10 @@ void Image::OnInspectorGui()
 void Image::Render()
 {
     UpdateWorldBuffer();
-    
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+
     std::vector materials = {shared_material};
 
-    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, Vector3::Zero, m_world_matrix_buffer_->GetAddress());
 }
 }
 

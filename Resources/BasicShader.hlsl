@@ -12,6 +12,8 @@ cbuffer ViewProjMatrix : register (b1)
 
 StructuredBuffer<float4x4> BoneMatrices : register (t0);
 
+RWTexture2D<float4> OutputTexture : register(u1);
+
 struct VSInput
 {
     float3 pos : POSITION;
@@ -99,13 +101,18 @@ VSOutput vrt(VSInput input)
 
 float4 pix(VSOutput input) : SV_TARGET
 {
+    uint2 size;
+    OutputTexture.GetDimensions(size.x, size.y);
+	uint2 pixelCoord = (uint2)(input.uv * (float2)size);
+    OutputTexture[pixelCoord] = float4(1.0f, 0.0f, 0.0f, 1.0f);
+
     float3 N = normalize(input.normal);
     float3 brightness = float3(0, 0, 0);
     if (light_count == 0)
     {
         float2 flippedUV = float2(input.uv.x, 1.0 - input.uv.y);
         float4 mainColor = _MainTex.Sample(smp, flippedUV);
-        return float4(mainColor.rgb, mainColor.a);
+        return mainColor;
     }
 
     float4 viewPos = mul(View, float4(input.worldpos, 1.0));
@@ -115,7 +122,11 @@ float4 pix(VSOutput input) : SV_TARGET
     for (int i = 0; i < SHADOW_CASCADE_COUNT; ++i)
     {
         if (depth < cascade_slices[i])
-            cascade_index = 0;
+        {
+            cascade_index = i;
+            break;
+        }
+        
     }
 
     int current_shadowmap_count = 0;
@@ -125,11 +136,11 @@ float4 pix(VSOutput input) : SV_TARGET
         switch (Lights[i].type)
         {
         case 0:
-            brightness += CalcDirectionalShadow(Lights[i],N,input.worldpos,current_shadowmap_count);
+            brightness += CalcDirectionalShadow(Lights[i],N,input.worldpos,current_shadowmap_count + itr);
             current_shadowmap_count += 3;
             break;
 				case 1:
-						brightness += CalcSpotShadow(Lights[i],N,input.worldpos,current_shadowmap_count);
+						brightness += CalcSpotShadow(Lights[i],N,input.worldpos,current_shadowmap_count + itr);
 						current_shadowmap_count += 1;
             break;
         default:
@@ -138,6 +149,6 @@ float4 pix(VSOutput input) : SV_TARGET
     }
 
     float4 main_color = _MainTex.Sample(smp, input.uv);
-
+    
     return float4(main_color.rgb * brightness, main_color.a);
 }

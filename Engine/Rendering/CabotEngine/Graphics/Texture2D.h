@@ -1,78 +1,57 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
-#include "Rendering/shader_resource.h"
+#include <assimp/texture.h>
+#include "Asset/asset_ptr.h"
 
 namespace engine
 {
-class Texture2DImporter;
-}
 
-struct aiTexture;
-class DescriptorHeap;
-class DescriptorHandle;
-
-class Texture2D : public engine::Object, public engine::Inspectable, public IBuffer, public engine::ShaderResource
+class Texture2D : public Object, public Inspectable
 {
-    friend class engine::Texture2DImporter;
+    friend class Texture2DImporter;
+
+    enum class kImageFormat : uint8_t
+    {
+        kUnknown = 0,
+        kWic,
+        kTga
+    };
+
+    static kImageFormat GetImageFormat(const std::filesystem::path &file_path);
+
+    static void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch);
+    void CacheData();
 
 protected:
-    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
-    uint32_t m_width_ = 0;
-    uint32_t m_height_ = 0;
-    uint16_t m_mip_level_;
-    DXGI_FORMAT m_format_;
-
-    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
+    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_ = {};
+    uint32_t m_width_ = UINT32_MAX;
+    uint32_t m_height_ = UINT32_MAX;
+    uint16_t m_mip_level_ = UINT16_MAX;
+    DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
 
 public:
+    Texture2D() = default;
+    Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format);
+    ~Texture2D() override;
+
+    void LoadFromAiTexture(aiTexture *ai_texture);
+    
     void OnInspectorGui() override;
-    void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool CanUpdate() override;
-    bool IsValid() override;
 
-    void LoadFromAiTexture(const aiTexture *ai_texture);
+    std::vector<DirectX::PackedVector::XMCOLOR> GetPixels();
 
-    ID3D12Resource *Resource() override;
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    [[nodiscard]] uint32_t Width();
 
-    std::vector<DirectX::PackedVector::XMCOLOR> GetTexData()
-    {
-        return m_tex_data_;
-    }
+    [[nodiscard]] uint32_t Height();
 
-    void SetTexData(const std::vector<DirectX::PackedVector::XMCOLOR> &resource)
-    {
-        m_tex_data_ = resource;
-    }
-
-    [[nodiscard]] uint32_t Width() const
-    {
-        return m_width_;
-    }
-
-    [[nodiscard]] uint32_t Height() const
-    {
-        return m_height_;
-    }
-
-    [[nodiscard]] uint16_t MipLevel() const
-    {
-        return m_mip_level_;
-    }
-
-    [[nodiscard]] DXGI_FORMAT Format() const
-    {
-        return m_format_;
-    }
+    [[nodiscard]] uint16_t MipLevel();
+    
+    [[nodiscard]] DXGI_FORMAT Format();
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Object>(this),
-            cereal::make_nvp("tex_data", m_tex_data_),
             cereal::make_nvp("width", m_width_),
             cereal::make_nvp("height", m_height_),
             cereal::make_nvp("format", m_format_),
@@ -80,5 +59,6 @@ public:
         );
     }
 };
+}
 
-CEREAL_CLASS_VERSION(Texture2D, 1)
+CEREAL_CLASS_VERSION(engine::Texture2D, 1)

@@ -7,10 +7,11 @@
 #include <d3dcompiler.h>
 
 #include "serializer.h"
+#include "Rendering/shader_compiler.h"
 
 namespace
 {
-constexpr std::array<std::string_view, 11> kReservedBufferNames = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "SceneData", "ShadowCascadeSlices", "LightCount", "LightViewProj", "Lights", "ShadowMaps", "smp", "shadowSampler"};
+constexpr std::array<std::string_view, 9> kReservedBufferNames = {"WorldMatrix", "ViewProjMatrix", "BoneMatrices", "LightViewProj", "ShadowMaps", "smp", "shadowSampler"};
 }
 
 namespace engine
@@ -45,127 +46,120 @@ std::vector<ShaderParameter> ShaderImporter::ReadShaderBlob(const ComPtr<ID3D10B
 {
     std::vector<ShaderParameter> shader_parameters;
 
-    ComPtr<ID3D12ShaderReflection> shader;
-    D3DReflect(shader_blob->GetBufferPointer(), shader_blob->GetBufferSize(), IID_PPV_ARGS(&shader));
+    ComPtr<ID3D12ShaderReflection> shader_reflect;
+    D3DReflect(shader_blob->GetBufferPointer(), shader_blob->GetBufferSize(), IID_PPV_ARGS(&shader_reflect));
 
     D3D12_SHADER_DESC shader_desc;
-    shader->GetDesc(&shader_desc);
-
-    for (UINT i = 0; i < shader_desc.ConstantBuffers; ++i)
-    {
-        ID3D12ShaderReflectionConstantBuffer *constant_buffer = shader->GetConstantBufferByIndex(i);
-
-        D3D12_SHADER_BUFFER_DESC buffer_desc;
-        constant_buffer->GetDesc(&buffer_desc);
-
-        if (IsReservedBufferName(buffer_desc.Name))
-            continue;
-
-        auto cb_parameters = ReadConstantBufferVariables(shader, constant_buffer);
-        shader_parameters.insert(shader_parameters.end(), cb_parameters.begin(), cb_parameters.end());
-    }
+    shader_reflect->GetDesc(&shader_desc);
 
     for (UINT i = 0; i < shader_desc.BoundResources; ++i)
     {
         D3D12_SHADER_INPUT_BIND_DESC bind_desc;
-        shader->GetResourceBindingDesc(i, &bind_desc);
+        shader_reflect->GetResourceBindingDesc(i, &bind_desc);
 
         if (IsReservedBufferName(bind_desc.Name))
             continue;
 
-        auto buffer_parameters = ConvertToShaderParameter(&bind_desc);
-        shader_parameters.emplace_back(buffer_parameters);
+        switch (bind_desc.Type)
+        {
+        case D3D_SIT_CBUFFER: {
+            ID3D12ShaderReflectionConstantBuffer *cb_reflect = shader_reflect->GetConstantBufferByName(bind_desc.Name);
+            shader_parameters.emplace_back(ReadConstantVariables(cb_reflect, bind_desc));
+            break;
+        }
+
+        case D3D_SIT_STRUCTURED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+
+        case D3D_SIT_UAV_RWSTRUCTURED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_StructuredBuffer, true};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+
+        case D3D_SIT_TEXTURE: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_Texture2D};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+
+        case D3D_SIT_UAV_RWTYPED: {
+            ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_UavTexture, true};
+            shader_parameters.emplace_back(shader_param);
+            break;
+        }
+        }
     }
+
     return shader_parameters;
 }
 
-std::vector<ShaderParameter> ShaderImporter::ReadConstantBufferVariables(const ComPtr<ID3D12ShaderReflection> &shader, ID3D12ShaderReflectionConstantBuffer *constant_buffer)
+ShaderParameter ShaderImporter::ReadConstantVariables(ID3D12ShaderReflectionConstantBuffer *cb_reflect, const D3D12_SHADER_INPUT_BIND_DESC &bind_desc)
 {
-    std::vector<ShaderParameter> result;
+    D3D12_SHADER_BUFFER_DESC cb_desc;
+    cb_reflect->GetDesc(&cb_desc);
 
-    D3D12_SHADER_BUFFER_DESC buffer_desc;
-    constant_buffer->GetDesc(&buffer_desc);
+    ShaderParameter shader_param = {static_cast<int>(bind_desc.BindPoint), bind_desc.Name, bind_desc.Name, kBufferType_ConstantBuffer, false, cb_desc.Size};
 
-    D3D12_SHADER_INPUT_BIND_DESC bind_desc;
-    shader->GetResourceBindingDescByName(buffer_desc.Name, &bind_desc);
-
-    for (auto i = 0; i < buffer_desc.Variables; ++i)
+    for (UINT j = 0; j < cb_desc.Variables; ++j)
     {
-        const auto variable = constant_buffer->GetVariableByIndex(i);
-        D3D12_SHADER_VARIABLE_DESC variable_desc;
-        variable->GetDesc(&variable_desc);
+        const auto var_reflect = cb_reflect->GetVariableByIndex(j);
+        const auto type_reflect = var_reflect->GetType();
 
-        const auto variable_type = variable->GetType();
+        D3D12_SHADER_VARIABLE_DESC var_desc;
+        var_reflect->GetDesc(&var_desc);
+
         D3D12_SHADER_TYPE_DESC type_desc;
-        variable_type->GetDesc(&type_desc);
+        type_reflect->GetDesc(&type_desc);
 
-        result.emplace_back(ConvertToShaderParameter(bind_desc.BindPoint, variable_desc, type_desc));
+        ShaderVariableDesc variable_info;
+        variable_info.name = var_desc.Name;
+        variable_info.data_type = GetConstantBufferDataType(type_desc);
+
+        shader_param.variables.emplace_back(variable_info);
     }
 
-    return result;
+    return shader_param;
 }
 
-ShaderParameter ShaderImporter::ConvertToShaderParameter(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
-{
-    return ShaderParameter{static_cast<int>(bind_desc->BindPoint), bind_desc->Name, bind_desc->Name, GetTypeHint(bind_desc)};
-}
-
-ShaderParameter ShaderImporter::ConvertToShaderParameter(const UINT register_idx, const D3D12_SHADER_VARIABLE_DESC &variable_desc, const D3D12_SHADER_TYPE_DESC &type_desc)
-{
-    return ShaderParameter{static_cast<int>(register_idx), variable_desc.Name, variable_desc.Name, GetTypeHint(type_desc)};
-}
-
-std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc)
+kConstantBufferDataType ShaderImporter::GetConstantBufferDataType(const D3D12_SHADER_TYPE_DESC &type_desc)
 {
     switch (type_desc.Type)
     {
-        case D3D_SVT_INT:
-            switch (type_desc.Class)
-            {
-                case D3D_SVC_SCALAR:
-                    return "int";
-                default:
-                    return std::format("type_desc_not_supported_int_class_{}", static_cast<int>(type_desc.Class));
-            }
-        case D3D_SVT_FLOAT:
-            switch (type_desc.Class)
-            {
-                case D3D_SVC_SCALAR:
-                    return "float";
-                case D3D_SVC_VECTOR:
-                    switch (type_desc.Columns)
-                    {
-                        case 2:
-                            return "float2";
-                        case 3:
-                            return "float3";
-                        case 4:
-                            return "color";
-                        default:
-                            return std::format("type_desc_not_supported_float_vector_col_{}", static_cast<int>(type_desc.Columns));
-                    }
-                default:
-                    return std::format("type_desc_not_supported_float_class_{}", static_cast<int>(type_desc.Class));
-            }
+    case D3D_SVT_INT:
+        switch (type_desc.Class)
+        {
+        case D3D_SVC_SCALAR:
+            return kConstantBufferDataType::kInt;
         default:
-            return std::format("type_desc_not_supported_type_{}", static_cast<int>(type_desc.Type));
-    }
-}
-
-std::string ShaderImporter::GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc)
-{
-    switch (bind_desc->Type)
-    {
-        case D3D_SIT_TEXTURE:
-            switch (bind_desc->Dimension)
+            return kConstantBufferDataType::kUnknown;
+        }
+    case D3D_SVT_FLOAT:
+        switch (type_desc.Class)
+        {
+        case D3D_SVC_SCALAR:
+            return kConstantBufferDataType::kFloat;
+        case D3D_SVC_VECTOR:
+            switch (type_desc.Columns)
             {
-                case D3D_SRV_DIMENSION_TEXTURE2D:
-                    return "texture2d";
-                default:
-                    return std::format("input_bind_not_supported_texture_dimension_{}", static_cast<int>(bind_desc->Dimension));
+            case 2:
+                return kConstantBufferDataType::kVector2;
+            case 3:
+                return kConstantBufferDataType::kVector3;
+            case 4:
+                return kConstantBufferDataType::kColor;
+            default:
+                return kConstantBufferDataType::kUnknown;
             }
-        default:
-            return std::format("input_bind_not_supported_type_{}", static_cast<int>(bind_desc->Type));
+        case D3D_SVC_MATRIX_COLUMNS:
+            if (type_desc.Rows == 4 && type_desc.Columns == 4)
+                return kConstantBufferDataType::kMatrix;
+        }
+    default:
+        return kConstantBufferDataType::kUnknown;
     }
 }
 
@@ -193,56 +187,6 @@ void ShaderImporter::UpdateShaderParameters(const std::shared_ptr<Shader> &shade
     }
 
     shader->parameters = parameters;
-}
-
-bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path)
-{
-    ComPtr<ID3DBlob> error_blob;
-
-    HRESULT hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "vrt",
-        "vs_5_0",
-        0,
-        0,
-        &shader->m_vs_blob_,
-        &error_blob
-    );
-
-    if (FAILED(hr))
-    {
-        Logger::Error<ShaderImporter>("Failed to Compile Vertex Shader!");
-        return false;
-    }
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "pix",
-        "ps_5_0",
-        0,
-        0,
-        &shader->m_ps_blob_,
-        &error_blob
-    );
-
-    hr = D3DCompileFromFile(
-        file_path.c_str(),
-        nullptr,
-        D3D_COMPILE_STANDARD_FILE_INCLUDE,
-        "geo",
-        "gs_5_0",
-        0,
-        0,
-        &shader->m_gs_blob_,
-        &error_blob
-    );
-
-    // Add shader variants here if you want to
-    return true;
 }
 
 bool ShaderImporter::WriteShaderMeta(const std::shared_ptr<Shader> &shader, const PersistentDataStore data_store)
@@ -326,9 +270,10 @@ void ShaderImporter::OnImport(AssetDescriptor *ctx)
         shader_meta = ctx->DataStore().GetString(kShaderMetaKey);
     }
 
-    if (!CompileShader(shader, ctx->AssetPath()))
+    std::string error_msg;
+    if (!ShaderCompiler::CompileShader(shader, ctx->AssetPath(), error_msg))
     {
-        ctx->LogImportError("Failed to compile shader!");
+        ctx->LogImportError(error_msg);
         return;
     }
 

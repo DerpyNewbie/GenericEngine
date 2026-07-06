@@ -3,7 +3,10 @@
 
 #include "DescriptorHeap.h"
 #include "RenderEngine.h"
+#include "Rendering/texture_collection.h"
 
+namespace engine
+{
 void Texture2DArray::CopyResource()
 {
     const auto texture = m_textures_[0].CastedLock();
@@ -30,7 +33,8 @@ void Texture2DArray::CopyResource()
             );
 
         D3D12_TEXTURE_COPY_LOCATION src = {};
-        src.pResource = m_textures_[i].CastedLock()->Resource();
+        auto texture_buffer = TextureCollection::LoadTexture(m_textures_[i]);
+        src.pResource = texture_buffer->Resource();
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src.SubresourceIndex = 0;
 
@@ -91,7 +95,7 @@ bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count,
 
     if (FAILED(hr))
     {
-        engine::Logger::Error<Texture2DArray>("failed to create texture2d array resource");
+        Logger::Error<Texture2DArray>("failed to create texture2d array resource");
         return false;
     }
 
@@ -133,16 +137,16 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2DArray::ViewDesc()
     return view_desc;
 }
 
-void Texture2DArray::AddTexture(engine::AssetPtr<Texture2D> texture)
+void Texture2DArray::AddTexture(AssetPtr<Texture2D> texture)
 {
     ++m_element_count_;
     m_textures_.emplace_back(texture);
     CopyResource();
 }
 
-void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
+void Texture2DArray::RemoveTexture(AssetPtr<Texture2D> texture)
 {
-    std::erase_if(m_textures_, [texture](const engine::AssetPtr<Texture2D> &texture1) {
+    std::erase_if(m_textures_, [texture](const AssetPtr<Texture2D> &texture1) {
         return texture == texture1;
     });
     if (m_textures_.empty())
@@ -156,4 +160,5 @@ void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
 void Texture2DArray::SetFormat(const DXGI_FORMAT format)
 {
     m_format_ = format;
+}
 }

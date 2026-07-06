@@ -1,10 +1,11 @@
 #pragma once
 #include "component.h"
 #include "renderer.h"
-#include "Rendering/material_data.h"
+#include "Rendering/buffer_data_base.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CabotEngine/Graphics/ConstantBuffer.h"
 
 namespace engine
 {
@@ -18,7 +19,7 @@ protected:
     
     AssetPtr<Mesh> m_shared_mesh_;
 
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
+    std::unique_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
     void DrawBounds();
     void RecalculateBoundingBox();

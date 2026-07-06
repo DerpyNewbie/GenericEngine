@@ -1,8 +1,8 @@
-cbuffer Transform : register(b0)
+cbuffer WorldMatrix : register(b0)
 {
     float4x4 World;
 }
-cbuffer Transforms : register(b1)
+cbuffer ViewProjMatrix : register(b1)
 {
     float4x4 View;
     float4x4 Proj;
@@ -71,7 +71,7 @@ Texture2D _MainTex : register(t4);
 
 float4 pix(VSOutput input) : SV_TARGET
 {
-    float4 mainColor = _MainTex.Sample(smp, input.uv);
+    float4 mainColor = ShadowMaps.Sample(smp, float3(input.uv, 0));
 
     return mainColor;
 }

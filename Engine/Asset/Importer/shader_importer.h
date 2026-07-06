@@ -10,23 +10,21 @@ class ShaderImporter : public AssetImporter
 {
     static constexpr auto kShaderMetaVersionKey = "shader_meta_version";
     static constexpr auto kShaderMetaKey = "shader_meta";
-
+    
     static std::vector<ShaderParameter> ReadShaderParameters(const std::shared_ptr<Shader> &shader);
-    static std::vector<ShaderParameter> ReadShaderBlob(const ComPtr<ID3D10Blob> &shader_blob);
-    static std::vector<ShaderParameter> ReadConstantBufferVariables(const ComPtr<ID3D12ShaderReflection> &shader, ID3D12ShaderReflectionConstantBuffer *constant_buffer);
-    static ShaderParameter ConvertToShaderParameter(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc);
-    static ShaderParameter ConvertToShaderParameter(UINT register_idx, const D3D12_SHADER_VARIABLE_DESC &variable_desc, const D3D12_SHADER_TYPE_DESC &type_desc);
-    static std::string GetTypeHint(const D3D12_SHADER_TYPE_DESC &type_desc);
-    static std::string GetTypeHint(const D3D12_SHADER_INPUT_BIND_DESC *bind_desc);
+    static ShaderParameter ReadConstantVariables(ID3D12ShaderReflectionConstantBuffer *cb_reflect, const D3D12_SHADER_INPUT_BIND_DESC &bind_desc);
+    static kConstantBufferDataType GetConstantBufferDataType(const D3D12_SHADER_TYPE_DESC &type_desc);
     static void EmplaceShaderParameters(std::vector<ShaderParameter> &base_parameters, const std::vector<ShaderParameter> &src_parameters);
     static void UpdateShaderParameters(const std::shared_ptr<Shader> &shader);
-    static bool CompileShader(const std::shared_ptr<Shader> &shader, const std::wstring &file_path);
+    
     static bool WriteShaderMeta(const std::shared_ptr<Shader> &shader, PersistentDataStore data_store);
     static bool IsReservedBufferName(std::string_view buffer_name);
-
+    
 public:
     static constexpr int kShaderMetaVersion = 4;
 
+    static std::vector<ShaderParameter> ReadShaderBlob(const ComPtr<ID3D10Blob> &shader_blob);
+    
     std::vector<std::string> SupportedExtensions() override;
     bool IsCompatibleWith(std::shared_ptr<Object> object) override;
     void OnImport(AssetDescriptor *ctx) override;

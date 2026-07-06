@@ -19,7 +19,7 @@ cbuffer SceneData : register(b2)
     float2 screen_size;
     float2 shadow_map_size;
     float time;
-    float deltatime;
+    float delta_time;
 }
 
 cbuffer ShadowCascadeSlices : register(b3)
@@ -33,8 +33,8 @@ cbuffer LightCount : register (b4)
 }
 
 StructuredBuffer<float4x4> LightViewProj : register(t1);
-StructuredBuffer<Light> Lights : register (t2);
-Texture2DArray ShadowMaps : register (t3);
+Texture2DArray ShadowMaps : register (t2);
+StructuredBuffer<Light> Lights : register (t3);
 Texture2D _MainTex : register (t4);
 SamplerState smp : register (s0);
 SamplerComparisonState shadowSampler : register (s1);
