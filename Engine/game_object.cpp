@@ -93,6 +93,16 @@ std::string GameObject::PathFrom(const std::shared_ptr<GameObject> &parent) cons
     return path.substr(parent_path.size());
 }
 
+void GameObject::RemoveDestroyedComponents()
+{
+    std::erase_if(
+        m_components_,
+        [](const auto &component) {
+            return component->IsDestroying();
+        }
+    );
+}
+
 void GameObject::InvokeOnUpdate()
 {
     if (IsDestroying() || !IsActiveInHierarchy())
@@ -100,27 +110,7 @@ void GameObject::InvokeOnUpdate()
         return;
     }
 
-    bool has_destroying_component = false;
-    for (const auto &component : m_components_)
-    {
-        if (component->IsDestroying())
-        {
-            has_destroying_component = true;
-            continue;
-        }
-
-        component->InvokeOnUpdate();
-    }
-
-    if (has_destroying_component)
-    {
-        std::erase_if(
-            m_components_,
-            [](const auto &component) {
-                return component->IsDestroying();
-            }
-        );
-    }
+    RemoveDestroyedComponents();
 
     const auto transform = Transform();
     if (transform != nullptr)
@@ -156,15 +146,17 @@ void GameObject::InvokeOnFixedUpdate() const
     }
 }
 
-void GameObject::InvokeOnValidate() const
+void GameObject::InvokeOnValidate()
 {
+    RemoveDestroyedComponents();
+
     for (const auto &component : m_components_)
     {
         component->OnValidate();
     }
 }
 
-void GameObject::UpdateActiveInHierarchy(const bool invoke_component_events) const
+void GameObject::UpdateActiveInHierarchy(const bool invoke_component_events)
 {
     const auto transform = Transform();
     const auto parent = transform != nullptr ? transform->Parent() : nullptr;
