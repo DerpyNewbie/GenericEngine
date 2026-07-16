@@ -72,7 +72,7 @@ public:
         for (const auto &comp : m_components_)
         {
             auto instance = std::dynamic_pointer_cast<T>(comp);
-            if (instance != nullptr)
+            if (instance != nullptr && !instance->IsDestroying())
                 return instance;
         }
 
@@ -91,7 +91,7 @@ public:
         for (const auto &comp : m_components_)
         {
             auto instance = std::dynamic_pointer_cast<T>(comp);
-            if (instance != nullptr)
+            if (instance != nullptr && !instance->IsDestroying())
                 results.push_back(instance);
         }
 
@@ -100,7 +100,13 @@ public:
 
     [[nodiscard]] std::vector<std::shared_ptr<Component>> GetComponents() const
     {
-        return m_components_;
+        auto filtered = m_components_ | std::ranges::views::filter(
+                            [](const auto &comp) {
+                                return !comp->IsDestroying();
+                            }
+                        );
+
+        return std::vector(filtered.begin(), filtered.end());
     }
 
     template <typename T>
@@ -171,10 +177,12 @@ private:
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
 
+    void RemoveDestroyedComponents();
+
     void InvokeOnUpdate();
     void InvokeOnFixedUpdate() const;
-    void InvokeOnValidate() const;
-    void UpdateActiveInHierarchy(bool invoke_component_events) const;
+    void InvokeOnValidate();
+    void UpdateActiveInHierarchy(bool invoke_component_events);
 
     void InvokeOnCollisionEnter(const Collision &collision) const;
     void InvokeOnCollisionStay(const Collision &collision) const;
