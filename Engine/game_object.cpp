@@ -148,12 +148,12 @@ void GameObject::InvokeOnFixedUpdate() const
 
 void GameObject::InvokeOnValidate()
 {
-    RemoveDestroyedComponents();
-
     for (const auto &component : m_components_)
     {
         component->OnValidate();
     }
+
+    RemoveDestroyedComponents();
 }
 
 void GameObject::UpdateActiveInHierarchy(const bool invoke_component_events)
