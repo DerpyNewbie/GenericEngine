@@ -110,6 +110,11 @@ void GameObject::InvokeOnUpdate()
         return;
     }
 
+    for (const auto &component : m_components_)
+    {
+        component->InvokeOnUpdate();
+    }
+
     RemoveDestroyedComponents();
 
     const auto transform = Transform();
