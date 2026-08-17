@@ -15,6 +15,7 @@ class MeshRenderer : public Renderer
 
 protected:
     static bool m_draw_bounds_;
+    bool m_cast_shadow_ = true;
     
     AssetPtr<Mesh> m_shared_mesh_;
     std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
@@ -50,8 +51,13 @@ public:
         {
             ar(CEREAL_NVP(instance_count));
         }
+
+        if (version >= 4)
+        {
+            ar(CEREAL_NVP(m_cast_shadow_));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::MeshRenderer, 3)
+CEREAL_CLASS_VERSION(engine::MeshRenderer, 4)

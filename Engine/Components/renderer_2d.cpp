@@ -12,6 +12,10 @@ void Renderer2D::OnAwake()
     const auto game_obj = GameObject();
     if (game_obj->GetComponent<RectTransform>() == nullptr)
         game_obj->AddComponent<RectTransform>();
+
+    m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
+    if (auto canvas = m_canvas_.CastedLock())
+        canvas->AddRenderer(shared_from_base<Renderer2D>());
 }
 
 void Renderer2D::OnEnabled()
@@ -41,7 +45,7 @@ Rect Renderer2D::NormalizedRect()
                     Vector2::Zero};
     }
 
-    auto canvas_size = m_canvas_.CastedLock()->CanvasSize();
+    auto canvas_size = m_canvas_.CastedLock()->CanvasSize() * 0.5f;
     auto rect_transform = GameObject()->GetComponent<RectTransform>();
     auto rect = rect_transform->CalculateScreenRect();
     return Rect{

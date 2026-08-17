@@ -21,6 +21,8 @@ void RenderingSettingsComponent::OnInspectorGui()
     has_changed |= Gui::PropertyField("Skybox Cube", m_skybox_cube_);
     has_changed |= ShadowCascadeInspector();
 
+    ImGui::Checkbox("Apply Settings", &has_changed);
+    
     if (has_changed)
         ApplySettings();
 }

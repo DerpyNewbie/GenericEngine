@@ -13,6 +13,10 @@ public:
     AssetPtr<FontData> font_data;
     std::string string;
     Color color;
+    float rotation;
+    Vector2 origin;
+    float scale = 1.0f;
+    uint16_t render_queue;
 
     void OnInspectorGui() override;
     void Render() override;
@@ -29,8 +33,17 @@ public:
             CEREAL_NVP(color),
             CEREAL_NVP(string)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(rotation),
+                CEREAL_NVP(origin),
+                CEREAL_NVP(scale)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::TextRenderer, 1)
+CEREAL_CLASS_VERSION(engine::TextRenderer, 2)

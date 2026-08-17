@@ -51,6 +51,7 @@ void MeshRenderer::RecalculateBoundingBox()
 void MeshRenderer::OnInspectorGui()
 {
     ImGui::Checkbox("Draw Bounds", &m_draw_bounds_);
+    ImGui::Checkbox("Cast Shadow", &m_cast_shadow_);
     Renderer::OnInspectorGui();
 
     Gui::ExpandablePropertyField("Mesh", m_shared_mesh_);
@@ -79,6 +80,9 @@ void MeshRenderer::OnInspectorGui()
 
 void MeshRenderer::DepthRender()
 {
+    if (!m_cast_shadow_)
+        return;
+    
     const auto cmd_list = RenderEngine::CommandList();
     const auto mesh = m_shared_mesh_.CastedLock();
     if (mesh == nullptr)
@@ -86,6 +90,9 @@ void MeshRenderer::DepthRender()
         Logger::Error<MeshRenderer>("Mesh is null!");
         return;
     }
+
+    if (mesh->vertex_buffer == nullptr)
+        mesh->ReconstructMeshesBuffer();
 
     cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     cmd_list->IASetVertexBuffers(0, 1, mesh->vertex_buffer->View());
@@ -96,8 +103,8 @@ void MeshRenderer::DepthRender()
     cmd_list->IASetIndexBuffer(mesh->index_buffers[0]->View());
 
     const auto index_count = mesh->HasSubMeshes()
-        ? mesh->sub_meshes[0].base_index
-        : mesh->indices.size();
+                                 ? mesh->sub_meshes[0].base_index
+                                 : mesh->indices.size();
 
     cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
 
@@ -117,10 +124,11 @@ void MeshRenderer::Render()
 {
     UpdateWorldBuffer();
 
-    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, instance_count, GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
+    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, instance_count,
+                           GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
 }
 
-void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)
+void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh>& mesh)
 {
     m_shared_mesh_ = mesh;
     RecalculateBoundingBox();

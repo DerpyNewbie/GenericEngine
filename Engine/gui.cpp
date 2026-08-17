@@ -10,7 +10,7 @@
 
 namespace
 {
-bool ShowWindowsDialog(const std::string &title, const std::string &content, const UINT flags)
+bool ShowWindowsDialog(const std::string& title, const std::string& content, const UINT flags)
 {
     const int result = MessageBox(engine::Application::WindowHandle(), content.c_str(), title.c_str(), flags);
     return result == IDOK;
@@ -25,20 +25,20 @@ UINT Gui::MbDialogOption::Flags() const
 
     switch (icon)
     {
-        case MbDialogIcon::kNone:
-            break;
-        case MbDialogIcon::kError:
-            result |= MB_ICONERROR;
-            break;
-        case MbDialogIcon::kWarning:
-            result |= MB_ICONEXCLAMATION;
-            break;
-        case MbDialogIcon::kInfo:
-            result |= MB_ICONINFORMATION;
-            break;
-        case MbDialogIcon::kHelp:
-            result |= MB_ICONQUESTION;
-            break;
+    case MbDialogIcon::kNone:
+        break;
+    case MbDialogIcon::kError:
+        result |= MB_ICONERROR;
+        break;
+    case MbDialogIcon::kWarning:
+        result |= MB_ICONEXCLAMATION;
+        break;
+    case MbDialogIcon::kInfo:
+        result |= MB_ICONINFORMATION;
+        break;
+    case MbDialogIcon::kHelp:
+        result |= MB_ICONQUESTION;
+        break;
     }
 
     return result;
@@ -49,16 +49,16 @@ void Gui::NothingToShowInspectable::OnInspectorGui()
     ImGui::Text("Nothing to show...");
 }
 
-bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters)
+bool Gui::OpenFileDialog(std::string& file_path, const std::vector<FilterSpec>& filters)
 {
     Logger::Log<Gui>("Opening file dialog at '%s'", file_path.c_str());
-    IFileOpenDialog *p_file_open;
+    IFileOpenDialog* p_file_open;
     HRESULT hr = CoCreateInstance(
         CLSID_FileOpenDialog,
         nullptr,
         CLSCTX_ALL,
         IID_IFileOpenDialog,
-        reinterpret_cast<void **>(&p_file_open)
+        reinterpret_cast<void**>(&p_file_open)
     );
 
     if (FAILED(hr))
@@ -75,7 +75,7 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
         }
     }
 
-    IShellItem *p_default_folder = nullptr;
+    IShellItem* p_default_folder = nullptr;
     hr = SHCreateItemFromParsingName(
         StringUtil::ConvertToWString(file_path).c_str(),
         nullptr,
@@ -99,7 +99,7 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
         return false;
     }
 
-    IShellItem *p_item;
+    IShellItem* p_item;
     hr = p_file_open->GetResult(&p_item);
     if (FAILED(hr))
     {
@@ -118,23 +118,22 @@ bool Gui::OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &
     file_path = StringUtil::Utf16ToUtf8(std::wstring(path));
     CoTaskMemFree(path);
     return true;
-
 }
 
 bool Gui::SaveFileDialog(
-    std::string &file_path, const std::string &default_name,
-    const std::vector<FilterSpec> &filters
+    std::string& file_path, const std::string& default_name,
+    const std::vector<FilterSpec>& filters
 )
 {
     Logger::Log<Gui>("Opening file save dialog at '%s'", file_path.c_str());
-    IFileSaveDialog *p_file_save;
+    IFileSaveDialog* p_file_save;
 
     HRESULT hr = CoCreateInstance(
         CLSID_FileSaveDialog,
         nullptr,
         CLSCTX_ALL,
         IID_IFileSaveDialog,
-        reinterpret_cast<void **>(&p_file_save)
+        reinterpret_cast<void**>(&p_file_save)
     );
 
     if (FAILED(hr))
@@ -161,7 +160,7 @@ bool Gui::SaveFileDialog(
         return false;
     }
 
-    IShellItem *p_item;
+    IShellItem* p_item;
     hr = p_file_save->GetResult(&p_item);
     if (FAILED(hr))
     {
@@ -181,19 +180,20 @@ bool Gui::SaveFileDialog(
     CoTaskMemFree(path);
     return true;
 }
-bool Gui::OkDialog(const std::string &title, const std::string &content, const MbDialogOption options)
+
+bool Gui::OkDialog(const std::string& title, const std::string& content, const MbDialogOption options)
 {
     const auto flags = MB_OK | options.Flags();
     return ShowWindowsDialog(title, content, flags);
 }
 
-bool Gui::OkCancelDialog(const std::string &title, const std::string &content, const MbDialogOption options)
+bool Gui::OkCancelDialog(const std::string& title, const std::string& content, const MbDialogOption options)
 {
     const auto flags = MB_OKCANCEL | options.Flags();
     return ShowWindowsDialog(title, content, flags);
 }
 
-bool Gui::ObjectHeader(const std::shared_ptr<Object> &object, std::string name)
+bool Gui::ObjectHeader(const std::shared_ptr<Object>& object, std::string name)
 {
     if (name.empty())
     {
@@ -206,7 +206,7 @@ bool Gui::ObjectHeader(const std::shared_ptr<Object> &object, std::string name)
     return result;
 }
 
-void Gui::MakeDragDropSource(const std::shared_ptr<Object> &object)
+void Gui::MakeDragDropSource(const std::shared_ptr<Object>& object)
 {
     if (ImGui::BeginDragDropSource())
     {
@@ -215,7 +215,7 @@ void Gui::MakeDragDropSource(const std::shared_ptr<Object> &object)
     }
 }
 
-void Gui::SetDragDropPayload(const std::shared_ptr<Object> &object)
+void Gui::SetDragDropPayload(const std::shared_ptr<Object>& object)
 {
     SetDragDropPayload(object->Guid());
     ImGui::Text("Name: %s", NameOf(object).c_str());
@@ -229,7 +229,7 @@ void Gui::SetDragDropPayload(const xg::Guid guid)
     ImGui::Text("Guid: %s", guid.str().c_str());
 }
 
-std::shared_ptr<Object> Gui::GetDragDropPayload(const ImGuiPayload *payload)
+std::shared_ptr<Object> Gui::GetDragDropPayload(const ImGuiPayload* payload)
 {
     if (payload == nullptr)
     {
@@ -242,7 +242,7 @@ std::shared_ptr<Object> Gui::GetDragDropPayload(const ImGuiPayload *payload)
     }
 
     // search for instantiated objects
-    const auto guid_str = std::string(static_cast<char *>(payload->Data));
+    const auto guid_str = std::string(static_cast<char*>(payload->Data));
     const auto guid = xg::Guid(guid_str);
     const auto object = Object::Find(guid);
 
@@ -267,7 +267,7 @@ std::shared_ptr<Object> Gui::GetDragDropPayload()
     return GetDragDropPayload(ImGui::GetDragDropPayload());
 }
 
-std::string Gui::NameOf(const std::shared_ptr<Object> &object)
+std::string Gui::NameOf(const std::shared_ptr<Object>& object)
 {
     if (object == nullptr)
     {
@@ -296,28 +296,28 @@ ImVec2 Gui::GetFieldRect()
     return {width, height};
 }
 
-void Gui::ReadOnlyStringField(const char *label, const std::string &value)
+void Gui::ReadOnlyStringField(const char* label, const std::string& value)
 {
     auto copy = value;
     ImGui::InputText(label, &copy, ImGuiInputTextFlags_ReadOnly);
 }
 
-bool Gui::BoolField(const char *label, bool &value)
+bool Gui::BoolField(const char* label, bool& value)
 {
     return ImGui::Checkbox(label, &value);
 }
 
-bool Gui::FloatField(const char *label, float &value)
+bool Gui::FloatField(const char* label, float& value)
 {
     return ImGui::DragFloat(label, &value, 0.01F, 0.0F, 0.0F, "%.2f");
 }
 
-bool Gui::IntField(const char *label, int &value)
+bool Gui::IntField(const char* label, int& value)
 {
     return ImGui::DragInt(label, &value, 1, 0, 0, "%d");
 }
 
-bool Gui::Vector2Field(const char *label, Vector2 &value)
+bool Gui::Vector2Field(const char* label, Vector2& value)
 {
     float v[2] = {value.x, value.y};
     const auto changed = ImGui::DragFloat2(label, v, 0.01F, 0.0F, 0.0F, "%.2f");
@@ -330,7 +330,7 @@ bool Gui::Vector2Field(const char *label, Vector2 &value)
     return changed;
 }
 
-bool Gui::Vector3Field(const char *label, Vector3 &value)
+bool Gui::Vector3Field(const char* label, Vector3& value)
 {
     float v[3] = {value.x, value.y, value.z};
     const auto changed = ImGui::DragFloat3(label, v, 0.01F, 0.0F, 0.0F, "%.2f");
@@ -344,7 +344,7 @@ bool Gui::Vector3Field(const char *label, Vector3 &value)
     return changed;
 }
 
-bool Gui::QuaternionField(const char *label, Quaternion &value)
+bool Gui::QuaternionField(const char* label, Quaternion& value)
 {
     auto euler = value.ToEuler() * Mathf::kRad2Deg;
     const auto changed = Vector3Field(label, euler);
@@ -357,7 +357,7 @@ bool Gui::QuaternionField(const char *label, Quaternion &value)
     return changed;
 }
 
-bool Gui::ColorField(const char *label, Color &value)
+bool Gui::ColorField(const char* label, Color& value)
 {
     float color_buf[4] = {value.x, value.y, value.z, value.w};
     const auto changed = ImGui::ColorPicker4(label, color_buf);
@@ -373,44 +373,81 @@ bool Gui::ColorField(const char *label, Color &value)
 }
 
 template <>
-bool Gui::PropertyField<int>(const char *label, int &value)
+bool Gui::PropertyField<int>(const char* label, int& value)
 {
     return IntField(label, value);
 }
 
 template <>
-bool Gui::PropertyField<float>(const char *label, float &value)
+bool Gui::PropertyField<float>(const char* label, float& value)
 {
     return FloatField(label, value);
 }
 
 template <>
-bool Gui::PropertyField<bool>(const char *label, bool &value)
+bool Gui::PropertyField<bool>(const char* label, bool& value)
 {
     return BoolField(label, value);
 }
 
 template <>
-bool Gui::PropertyField<Vector2>(const char *label, Vector2 &value)
+bool Gui::PropertyField<Vector2>(const char* label, Vector2& value)
 {
     return Vector2Field(label, value);
 }
 
 template <>
-bool Gui::PropertyField<Vector3>(const char *label, Vector3 &value)
+bool Gui::PropertyField<Vector3>(const char* label, Vector3& value)
 {
     return Vector3Field(label, value);
 }
 
 template <>
-bool Gui::PropertyField<Quaternion>(const char *label, Quaternion &value)
+bool Gui::PropertyField<Quaternion>(const char* label, Quaternion& value)
 {
     return QuaternionField(label, value);
 }
 
 template <>
-bool Gui::PropertyField<Color>(const char *label, Color &value)
+bool Gui::PropertyField<Color>(const char* label, Color& value)
 {
     return ImGui::ColorPicker4(label, &value.x);
+}
+
+template <>
+bool Gui::PropertyField<std::string>(const char* label, std::string& value)
+{
+    char buf[256];
+    strncpy_s(buf, sizeof(buf), value.c_str(), _TRUNCATE);
+    buf[sizeof(buf) - 1] = '\0';
+
+    if (ImGui::InputText(label, buf, sizeof(buf), 0))
+    {
+        value = buf;
+    }
+}
+
+template <>
+bool Gui::PropertyField<unsigned short>(const char* label, uint16_t& value)
+{
+    if (int temp = value; PropertyField<int>(label, temp))
+    {
+        value = temp;
+        return true;
+    }
+    
+    return false;
+}
+
+template <>
+bool Gui::PropertyField<unsigned>(const char* label, uint32_t& value)
+{
+    if (int temp = value; PropertyField<int>(label, temp))
+    {
+        value = temp;
+        return true;
+    }
+    
+    return false;
 }
 }

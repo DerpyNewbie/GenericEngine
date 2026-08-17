@@ -4,9 +4,6 @@
 #include "rect_transform.h"
 #include "Rendering/primitives.h"
 #include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -43,10 +40,12 @@ void Image::OnInspectorGui()
 
 void Image::Render()
 {
+    if (shared_material == nullptr)
+        return;
+    
     UpdateWorldBuffer();
 
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    std::vector materials = {shared_material};
+    const std::vector materials = {shared_material};
 
     RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, 1, Vector3::Zero, m_world_matrix_buffer_->GetAddress());
 }

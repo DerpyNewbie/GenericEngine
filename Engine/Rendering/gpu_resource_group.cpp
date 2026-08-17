@@ -115,7 +115,7 @@ bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource, bool is_uav)
 
 void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<BufferDataBase> &material_data, kBufferType buffer_type, kGpuUploadType gpu_upload_type)
 {
-    if (buffer)
+    if (buffer && !buffer->IsValid())
         buffer->CreateBuffer();
 
     GpuResource gpu_resource;

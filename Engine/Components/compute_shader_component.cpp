@@ -88,6 +88,11 @@ std::shared_ptr<BufferBase> ComputeShaderComponent::GetBuffer(const std::string 
 
     return gpu_resource_group->GetBuffer(name);
 }
+
+std::shared_ptr<MaterialBlock> ComputeShaderComponent::GetMaterialBlock() const
+{
+    return m_material_block_;
+}
 }
 
 CEREAL_REGISTER_TYPE(engine::ComputeShaderComponent)

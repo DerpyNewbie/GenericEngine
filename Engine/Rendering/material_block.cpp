@@ -104,10 +104,9 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
         case kBufferType_StructuredBuffer:
             m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
             break;
-        case kBufferType_Texture2D: {
+        case kBufferType_Texture2D:
             m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
             break;
-        }
         case kBufferType_UavTexture:
             m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
             break;

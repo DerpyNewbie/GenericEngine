@@ -19,7 +19,7 @@ class MaterialBlock : public Object, public Inspectable
 public:
     MaterialBlock() = default;
 
-    void OnInspectorGui() override;
+void OnInspectorGui() override;
 
     std::shared_ptr<ConstantBufferData> GetConstantBufferData(const std::string &name);
     std::shared_ptr<StructuredBufferData> GetStructuredBufferData(const std::string &name);

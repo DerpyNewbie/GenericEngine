@@ -10,9 +10,10 @@ namespace engine
 {
 void Material::OnInspectorGui()
 {
-    if (Gui::PropertyField("RenderQueue", render_queue))
+    int render_queue_int = render_queue;
+    if (Gui::PropertyField("RenderQueue", render_queue_int))
     {
-        render_queue = std::clamp(render_queue, static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
+        render_queue = static_cast<uint16_t>(std::clamp(render_queue_int, 0, 10000));
     }
 
     if (Gui::ExpandablePropertyField<Shader>("shader", m_shader_))

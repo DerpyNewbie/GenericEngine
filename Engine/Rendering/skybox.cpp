@@ -38,9 +38,11 @@ Skybox::Skybox()
 
 bool Skybox::ReconstructTextureCube()
 {
-    if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
+    if (m_texture_cube_ == nullptr)
         return false;
 
+    m_texture_cube_->CreateBuffer();
+    
     m_texture_cube_handle_ = DescriptorHeap::Allocate();
     m_texture_cube_->UploadBuffer(m_texture_cube_handle_);
     return true;
@@ -54,7 +56,7 @@ std::shared_ptr<Skybox> Skybox::Instance()
 
 void Skybox::Render()
 {
-    if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
+    /*if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
         return;
 
     if (m_skybox_shader_ == nullptr)
@@ -78,7 +80,7 @@ void Skybox::Render()
     PSOManager::SetPipelineState(cmd_list, m_skybox_shader_.get());
     cmd_list->SetGraphicsRootDescriptorTable(kMaterialSRV, m_texture_cube_handle_->handle_gpu);
 
-    cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);
+    cmd_list->DrawIndexedInstanced(36, 1, 0, 0, 0);*/
 }
 
 std::shared_ptr<TextureCube> Skybox::TextureCube() const

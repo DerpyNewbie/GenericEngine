@@ -23,8 +23,12 @@ public:
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(cereal::base_class<Renderer2D>(this));
+        if (version >= 2)
+        {
+            ar(shared_material);
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Image, 1)
+CEREAL_CLASS_VERSION(engine::Image, 2)

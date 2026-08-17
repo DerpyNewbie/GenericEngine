@@ -3,7 +3,6 @@
 
 namespace engine
 {
-
 class ConstantBufferData : public BufferDataBase
 {
     size_t m_current_offset_ = 0;

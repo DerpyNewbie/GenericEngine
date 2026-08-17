@@ -73,6 +73,14 @@ void ConstantBuffer::CreateBuffer()
 
 void ConstantBuffer::UpdateBuffer(const void *data)
 {
+    if (m_is_first_update_)
+    {
+        m_is_first_update_ = false;
+        for (const auto &mapped_ptr : m_p_mapped_ptrs_)
+            memcpy(mapped_ptr, data, m_size_);
+        return;
+    }
+    
     const auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     memcpy(m_p_mapped_ptrs_[current_back_buffer_idx], data, m_size_);
 }

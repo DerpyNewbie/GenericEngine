@@ -64,21 +64,18 @@ void Canvas::OnInspectorGui()
 void Canvas::OnAwake()
 {
     Renderer::OnAwake();
-    m_canvas_size_ = Vector2{static_cast<float>(Application::WindowWidth()),
-                             static_cast<float>(Application::WindowHeight())};
     if (m_target_camera_.Lock() == nullptr)
         m_target_camera_ = AssetPtr<CameraComponent>::FromManaged(CameraComponent::Main());
 }
 
 void Canvas::OnStart()
 {
-    Renderer::OnStart();
     const auto renderers = GameObject()->GetComponentsInChildren<Renderer2D>();
 
     for (auto renderer : renderers)
     {
-        renderer->SetCanvas(shared_from_base<Canvas>());
-        AddRenderer(renderer);
+        //renderer->SetCanvas(shared_from_base<Canvas>());
+        //AddRenderer(renderer);
     }
 }
 

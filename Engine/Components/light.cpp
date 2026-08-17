@@ -15,16 +15,13 @@ void Light::OnInspectorGui()
 
     if (Gui::BoolField("CastShadow", m_has_shadow_))
     {
-        if (m_has_shadow_ == false)
-        {
-            m_light_data_.cast_shadow = false;
-            Lighting::Instance()->RemoveShadow(shared_from_base<Light>());
-        }
-        else
-        {
-            Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());
-        }
+        SetCastShadow(m_has_shadow_);
     }
+}
+
+void Light::OnDeserialized()
+{
+    SetCastShadow(m_has_shadow_);
 }
 
 void Light::OnEnabled()
@@ -42,6 +39,20 @@ void Light::OnDisabled()
 void Light::OnDestroy()
 {
     Lighting::Instance()->RemoveLight(shared_from_base<Light>());
+}
+
+void Light::SetCastShadow(const bool cast_shadow)
+{
+    m_has_shadow_ = cast_shadow;
+    if (m_has_shadow_ == false)
+    {
+        m_light_data_.cast_shadow = false;
+        Lighting::Instance()->RemoveShadow(shared_from_base<Light>());
+    }
+    else
+    {
+        Lighting::Instance()->TryApplyShadow(shared_from_base<Light>());
+    }
 }
 }
 

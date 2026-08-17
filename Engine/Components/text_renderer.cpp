@@ -13,22 +13,11 @@ namespace engine
 void TextRenderer::OnInspectorGui()
 {
     Renderer::OnInspectorGui();
-    float pos[2];
-    EngineUtil::ToFloat2(pos, position);
-    if (ImGui::InputFloat2("position", pos))
-    {
-        position.x = pos[0];
-        position.y = pos[1];
-    }
-    float col[4];
-    EngineUtil::ToFloat4(col, color);
-    if (ImGui::InputFloat4("color", col))
-    {
-        color.x = col[0];
-        color.y = col[1];
-        color.z = col[2];
-        color.w = col[3];
-    }
+    Gui::PropertyField("Render Queue", render_queue);
+    Gui::PropertyField("position", position);
+    Gui::PropertyField("Rotation", rotation);
+    Gui::PropertyField("Origin", origin);
+    Gui::PropertyField("Scale", scale);
 
     Gui::PropertyField<FontData>("font data", font_data);
     char buf[256];
@@ -39,11 +28,12 @@ void TextRenderer::OnInspectorGui()
     {
         string = buf;
     }
+    Gui::PropertyField("color", color);
 }
 
 void TextRenderer::Render()
 {
-    RenderPipeline::Submit(font_data, position, string, color);
+    RenderPipeline::Submit(font_data, position, string, color, rotation, origin, scale, render_queue);
 }
 
 Matrix TextRenderer::BoundsOrigin()

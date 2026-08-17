@@ -25,25 +25,35 @@ protected:
 
 public:
     void OnInspectorGui() override;
+    void OnDeserialized() override;
     void OnEnabled() override;
     void OnDisabled() override;
     void OnDestroy() override;
 
+    void SetCastShadow(bool cast_shadow);
+
     virtual void UpdateData() = 0;
-    virtual bool InCameraView(const std::array<Vector3, 8> &frustum) = 0;
+    virtual bool InCameraView(const std::array<Vector3, 8>& frustum) = 0;
     virtual Vector3 GetPos() = 0;
     virtual int ShadowMapCount() = 0;
-    virtual std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) = 0;
+    virtual std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8>& frustum_corners) = 0;
 
     template <class Archive>
-    void serialize(Archive &ar, const uint32_t version)
+    void serialize(Archive& ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Component>(this),
             CEREAL_NVP(m_light_data_)
         );
+
+        if (version >= 2)
+        {
+            ar(
+                CEREAL_NVP(m_has_shadow_)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::Light, 1)
+CEREAL_CLASS_VERSION(engine::Light, 2)

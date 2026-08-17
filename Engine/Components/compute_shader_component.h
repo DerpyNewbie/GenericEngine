@@ -39,7 +39,9 @@ public:
     void SetGroupCount(uint32_t group_count_x, uint32_t group_count_y, uint32_t group_count_z);
 
     void SetBuffer(const std::string &name, const std::shared_ptr<BufferBase> &buffer) const;
+
     std::shared_ptr<BufferBase> GetBuffer(const std::string &name) const;
+    std::shared_ptr<MaterialBlock> GetMaterialBlock() const;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
