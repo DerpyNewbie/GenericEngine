@@ -21,6 +21,7 @@
 #include "Physics/physics.h"
 #include "Audio/audio.h"
 #include "Rendering/render_pipeline.h"
+#include "Rendering/Effect/effekseer_controller.h"
 
 namespace engine
 {
@@ -53,6 +54,7 @@ bool Engine::Init()
     RenderPipeline::Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
+    EffekseerController::Init();
     on_init.Invoke();
     on_default_scene_creation.Invoke();
     return true;

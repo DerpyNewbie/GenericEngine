@@ -15,7 +15,9 @@
 #include "Asset/asset_database.h"
 #include "CabotEngine/Graphics/PSOManager.h"
 #include "CabotEngine/Graphics/RootSignature.h"
+#include "Components/canvas.h"
 #include "Components/light.h"
+#include "Effect/effekseer_controller.h"
 
 using namespace DirectX;
 
@@ -78,6 +80,10 @@ void SortCommands(std::vector<engine::RenderCommand>& render_commands, const Vec
 
 bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock>& material_block)
 {
+    float update_speed = Time::GetDeltaTime() * 60.0f;
+    EffekseerController::Instance()->m_manager_->Update(update_speed);
+    EffekseerController::Instance()->m_memory_pool_->NewFrame();
+    
     const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
     const auto cmd_list = RenderEngine::CommandList();
 
@@ -267,7 +273,6 @@ void RenderPipeline::Render(const Matrix& view, const Matrix& proj)
     SortCommands(m_render_commands_, camera_pos);
 
     Gizmos::Render();
-    Skybox::Instance()->Render();
     ExecuteRenderCommands();
 }
 

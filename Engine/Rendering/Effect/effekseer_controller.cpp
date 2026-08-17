@@ -56,7 +56,7 @@ void EffekseerController::Render(const Matrix &view, const Matrix &proj)
 
     instance->m_renderer_->SetCommandList(nullptr);
     EffekseerRendererDX12::EndCommandList(instance->m_effekseer_command_list_);
-    
+
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
