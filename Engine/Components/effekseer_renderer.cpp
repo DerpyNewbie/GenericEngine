@@ -29,9 +29,9 @@ void engine::EffekseerRenderer::Render()
     }
 }
 
-std::shared_ptr<engine::Transform> engine::EffekseerRenderer::BoundsOrigin()
+Matrix engine::EffekseerRenderer::BoundsOrigin()
 {
-    return GameObject()->Transform();
+    return GameObject()->Transform()->WorldMatrix();
 }
 
 void engine::EffekseerRenderer::SetPosition(const Vector3 pos) const
@@ -66,6 +66,11 @@ void engine::EffekseerRenderer::OnUpdate()
     SetRotation(rotation);
     SetScale(scale);
     SetSpeed(play_speed);
+}
+
+void engine::EffekseerRenderer::OnDestroy()
+{
+    EffekseerController::Manager()->StopAllEffects();
 }
 
 void engine::EffekseerRenderer::Play()

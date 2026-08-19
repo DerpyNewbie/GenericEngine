@@ -20,10 +20,13 @@ class EffekseerController
     EffekseerRenderer::RendererRef m_renderer_;
     Effekseer::ManagerRef m_manager_;
 
-    static EffekseerController *Instance();
+    Matrix m_view_;
+    Matrix m_proj_;
 
+    static EffekseerController *Instance();
     static void Init();
-    static void Render(const Matrix &view, const Matrix &proj);
+    static void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
+    static void Render();
 
 public:
     static Effekseer::ManagerRef Manager();

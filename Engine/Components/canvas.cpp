@@ -29,7 +29,7 @@ void GetSiblingIndices(const std::shared_ptr<engine::Transform> &a, std::vector<
 
 namespace engine
 {
-bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const std::shared_ptr<Renderer2D> &b) const
+bool RendererComparator::operator()(const std::shared_ptr<Renderer2D>& a, const std::shared_ptr<Renderer2D>& b) const
 {
     std::vector<int> a_sibling_indices = {};
     std::vector<int> b_sibling_indices = {};
@@ -37,22 +37,20 @@ bool RendererComparator::operator()(const std::shared_ptr<Renderer2D> &a, const 
     GetSiblingIndices(a->GameObject()->Transform(), a_sibling_indices);
     GetSiblingIndices(b->GameObject()->Transform(), b_sibling_indices);
 
-    const int min_sibling_indices_size = std::min(a_sibling_indices.size(), b_sibling_indices.size());
-    int itr = 0;
-    while (itr < min_sibling_indices_size)
+    size_t min_size = std::min(a_sibling_indices.size(), b_sibling_indices.size());
+
+    for (size_t itr = 1; itr <= min_size; ++itr)
     {
-        const int a_idx = a_sibling_indices[a_sibling_indices.size() - 1 - itr];//.sizeの差分の１を引いて置く
-        const int b_idx = b_sibling_indices[b_sibling_indices.size() - 1 - itr];//.sizeの差分の１を引いて置く
+        int a_idx = a_sibling_indices[a_sibling_indices.size() - itr];
+        int b_idx = b_sibling_indices[b_sibling_indices.size() - itr];
 
-        if (a_idx < b_idx)
-            return true;
-        if (b_idx < a_idx)
-            return false;
-
-        ++itr;
+        if (a_idx != b_idx)
+        {
+            return a_idx < b_idx; 
+        }
     }
 
-    return false;
+    return a_sibling_indices.size() < b_sibling_indices.size();
 }
 
 void Canvas::OnInspectorGui()
@@ -90,12 +88,13 @@ Vector2 Canvas::CanvasSize() const
 {
     return m_canvas_size_;
 }
+
 Matrix Canvas::BoundsOrigin()
 {
     return CameraComponent::Main()->GameObject()->Transform()->WorldMatrix();
 }
 
-void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
+void Canvas::AddRenderer(const std::shared_ptr<Renderer2D>& renderer)
 {
     const auto renderer_priority = renderer->GameObject()->Transform()->GetSiblingIndex();
 
@@ -114,9 +113,10 @@ void Canvas::AddRenderer(const std::shared_ptr<Renderer2D> &renderer)
     m_child_renderers_.emplace(renderer);
 }
 
-void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D> &renderer)
+void Canvas::RemoveRenderer(const std::shared_ptr<Renderer2D>& renderer)
 {
-    std::erase_if(m_child_renderers_, [renderer](const std::shared_ptr<Renderer2D> &a) {
+    std::erase_if(m_child_renderers_, [renderer](const std::shared_ptr<Renderer2D>& a)
+    {
         return a == renderer;
     });
 }

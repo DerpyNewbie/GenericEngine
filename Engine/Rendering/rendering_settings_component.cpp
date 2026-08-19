@@ -20,6 +20,7 @@ void RenderingSettingsComponent::OnInspectorGui()
     bool has_changed = false;
     has_changed |= Gui::PropertyField("Skybox Cube", m_skybox_cube_);
     has_changed |= ShadowCascadeInspector();
+    has_changed |= Gui::PropertyField("Effect Render Queue", m_effect_render_queue_);
 
     ImGui::Checkbox("Apply Settings", &has_changed);
     
@@ -36,6 +37,7 @@ void RenderingSettingsComponent::ApplySettings()
     Skybox::Instance()->SetTextureCube(m_skybox_cube_.CastedLock());
     Lighting::Instance()->SetCascadeSlices(m_cascade_slices_);
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
+    RenderPipeline::SetEffectRenderQueue(m_effect_render_queue_);
 }
 }
 

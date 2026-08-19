@@ -39,7 +39,14 @@ void EffekseerController::Init()
     instance->m_manager_->SetMaterialLoader(instance->m_renderer_->CreateMaterialLoader());
 }
 
-void EffekseerController::Render(const Matrix &view, const Matrix &proj)
+void EffekseerController::SetViewProjMatrix(const Matrix& view, const Matrix& proj)
+{
+    const auto instance = Instance();
+    instance->m_view_ = view;
+    instance->m_proj_ = proj;
+}
+
+void EffekseerController::Render()
 {
     const auto instance = Instance();
     const auto cmd_list = RenderEngine::CommandList();
@@ -47,8 +54,8 @@ void EffekseerController::Render(const Matrix &view, const Matrix &proj)
     EffekseerRendererDX12::BeginCommandList(instance->m_effekseer_command_list_, cmd_list);
     instance->m_renderer_->SetCommandList(instance->m_effekseer_command_list_);
 
-    instance->m_renderer_->SetCameraMatrix(EffekseerUtil::ToMatrix44(view));
-    instance->m_renderer_->SetProjectionMatrix(EffekseerUtil::ToMatrix44(proj));
+    instance->m_renderer_->SetCameraMatrix(EffekseerUtil::ToMatrix44(instance->m_view_));
+    instance->m_renderer_->SetProjectionMatrix(EffekseerUtil::ToMatrix44(instance->m_proj_));
 
     instance->m_renderer_->BeginRendering();
     instance->m_manager_->Draw();
@@ -60,7 +67,6 @@ void EffekseerController::Render(const Matrix &view, const Matrix &proj)
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
-
 }
 
 Effekseer::ManagerRef EffekseerController::Manager()

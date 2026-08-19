@@ -29,6 +29,8 @@ class RenderPipeline
         view_proj_buff->CreateBuffer();
         return view_proj_buff;
     };
+    
+    uint16_t m_effect_render_queue_;
 
     std::shared_ptr<Shader> m_depth_shader_;
 
@@ -50,6 +52,7 @@ class RenderPipeline
     void RenderVoid();
     void Render(const Matrix &view, const Matrix &proj);
 
+    void SetEffectCommand();
     void SetCurrentCamera(const Camera &camera);
     void SetSceneData();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
@@ -74,6 +77,7 @@ public:
     static void Submit(const std::shared_ptr<Mesh> &mesh, const std::vector<AssetPtr<Material>> &materials, uint32_t instance_count, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
     static void Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color, float rotation, Vector2 origin, float scale, uint16_t render_queue);
     static void Submit(const std::vector<AssetPtr<Material>> &materials, uint32_t vertex_count);
+    static void SetEffectRenderQueue(uint16_t render_queue);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
     static void RequestRender(Camera camera);

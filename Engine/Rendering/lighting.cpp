@@ -226,7 +226,10 @@ void Lighting::RemoveShadow(const std::shared_ptr<Light> &light)
 
     if (!m_waiting_lights_.empty())
     {
-        auto camera_pos = CameraComponent::Main()->GameObject()->Transform()->Position();
+        auto main_camera = CameraComponent::Main();
+        if (main_camera == nullptr)
+            return;
+        auto camera_pos = main_camera->GameObject()->Transform()->Position();
         auto it = std::ranges::min_element(m_waiting_lights_,
                                            [camera_pos](const std::shared_ptr<Light> &a,
                                            const std::shared_ptr<Light> &b) {

@@ -63,6 +63,11 @@ void SortCommands(std::vector<engine::RenderCommand>& render_commands, const Vec
             auto text_data = std::get<engine::TextCommand>(command.data);
             sort_key = engine::RenderPipeline::GenerateSortKey(text_data.render_queue, 0.0f);
         }
+        else if (std::holds_alternative<engine::EffectCommand>(command.data))
+        {
+            auto effect_data = std::get<engine::EffectCommand>(command.data);
+            sort_key = engine::RenderPipeline::GenerateSortKey(effect_data.render_queue, 0.0f);
+        }
         else
         {
             sort_key = UINT64_MAX;
@@ -80,10 +85,6 @@ void SortCommands(std::vector<engine::RenderCommand>& render_commands, const Vec
 
 bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock>& material_block)
 {
-    float update_speed = Time::GetDeltaTime() * 60.0f;
-    EffekseerController::Instance()->m_manager_->Update(update_speed);
-    EffekseerController::Instance()->m_memory_pool_->NewFrame();
-    
     const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
     const auto cmd_list = RenderEngine::CommandList();
 
@@ -187,8 +188,13 @@ void RenderPipeline::InvokeDrawCall()
 {
     m_view_proj_matrix_buffers_.ReturnAll();
     on_cmd_list_open.Invoke();
+    SetEffectCommand();
     SetSceneData();
 
+    float update_speed = Time::GetDeltaTime() * 60.0f;
+    EffekseerController::Instance()->m_manager_->Update(update_speed);
+    EffekseerController::Instance()->m_memory_pool_->NewFrame();
+    
     const auto cmd_list = RenderEngine::CommandList();
     const auto descriptor_heap = DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
@@ -272,8 +278,20 @@ void RenderPipeline::Render(const Matrix& view, const Matrix& proj)
     
     SortCommands(m_render_commands_, camera_pos);
 
+    EffekseerController::SetViewProjMatrix(view, proj);
     Gizmos::Render();
     ExecuteRenderCommands();
+}
+
+void RenderPipeline::SetEffectCommand()
+{
+    EffectCommand effect_command;
+    effect_command.render_queue = m_effect_render_queue_;
+
+    RenderCommand render_command;
+    render_command.data = effect_command;
+    
+    m_render_commands_.emplace_back(render_command);
 }
 
 void RenderPipeline::DepthRender()
@@ -469,6 +487,18 @@ void RenderPipeline::ExecuteRenderCommands()
 
             cmd_list->DrawInstanced(vertex_count, 1, 0, 0);
         }
+        else if (std::holds_alternative<EffectCommand>(command.data))
+        {
+            if (is_sprite_bath_active)
+            {
+                RenderEngine::CommandList()->SetGraphicsRootSignature(RootSignature::Get());
+                current_material = nullptr;
+                current_shader = nullptr;
+                current_mesh = nullptr;
+            }
+            
+            EffekseerController::Render();
+        }
     }
 
     if (is_sprite_bath_active)
@@ -580,6 +610,12 @@ void RenderPipeline::Submit(const std::vector<AssetPtr<Material>>& materials, co
 
         instance->m_render_commands_.emplace_back(cmd);
     }
+}
+
+void RenderPipeline::SetEffectRenderQueue(const uint16_t render_queue)
+{
+    const auto instance = Instance();
+    instance->m_effect_render_queue_ = render_queue;
 }
 
 uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const float depth, const Shader& shader)

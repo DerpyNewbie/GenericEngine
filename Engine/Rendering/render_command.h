@@ -38,10 +38,15 @@ struct ProceduralCommand
     size_t vertex_count;
 };
 
+struct EffectCommand
+{
+    uint16_t render_queue;
+};
+
 struct RenderCommand
 {
     uint64_t priority;
     UINT64 target_camera_id;
-    std::variant<MeshCommand, TextCommand, ProceduralCommand> data;
+    std::variant<MeshCommand, TextCommand, ProceduralCommand, EffectCommand> data;
 };
 }
