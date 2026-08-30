@@ -22,6 +22,7 @@ class Input
     DirectX::Mouse::State m_mouse_state_;
     DirectX::Mouse::ButtonStateTracker m_mouse_tracker_;
     kMouseMode m_mouse_mode_;
+    DirectX::Mouse::Mode m_next_mouse_mode_;
     Vector2 m_mouse_position_;
     Vector2 m_mouse_delta_;
 

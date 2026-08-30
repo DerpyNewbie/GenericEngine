@@ -1,6 +1,6 @@
 #pragma once
 #include <directxtk12/SimpleMath.h>
-#include <ThirdParty/Effekseer/include/Effekseer/Effekseer.h>
+#include <Effekseer.h>
 
 namespace EffekseerUtil
 {

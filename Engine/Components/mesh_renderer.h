@@ -16,7 +16,8 @@ class MeshRenderer : public Renderer
 protected:
     static bool m_draw_bounds_;
     bool m_cast_shadow_ = true;
-    
+
+    AssetPtr<Material> m_shadow_material_;
     AssetPtr<Mesh> m_shared_mesh_;
     std::shared_ptr<ConstantBuffer> m_world_matrix_buffer_;
 
@@ -32,6 +33,8 @@ public:
     void DepthRender() override;
     void Render() override;
 
+    AssetPtr<Material> GetShadowMaterial();
+    
     void SetSharedMesh(const AssetPtr<Mesh> &mesh);
 
     AssetPtr<Mesh> GetSharedMesh()
@@ -56,8 +59,13 @@ public:
         {
             ar(CEREAL_NVP(m_cast_shadow_));
         }
+
+        if (version >= 5)
+        {
+            ar(CEREAL_NVP(m_shadow_material_));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::MeshRenderer, 4)
+CEREAL_CLASS_VERSION(engine::MeshRenderer, 5)

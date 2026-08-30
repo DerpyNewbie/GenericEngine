@@ -1,7 +1,7 @@
-prefix=C:/Users/xiar5/Downloads/EffekseerForCpp/EffekseerForCpp/install_msvc2022_x64
+prefix=C:/Users/xiar5/Downloads/EffekseerForCpp1.80.6/EffekseerForCpp1.80.6/install_msvc2022_x64
 exec_prefix=${prefix}
-includedir=C:/Users/xiar5/Downloads/EffekseerForCpp/EffekseerForCpp/install_msvc2022_x64/include
-libdir=C:/Users/xiar5/Downloads/EffekseerForCpp/EffekseerForCpp/install_msvc2022_x64/lib
+includedir=C:/Users/xiar5/Downloads/EffekseerForCpp1.80.6/EffekseerForCpp1.80.6/install_msvc2022_x64/include
+libdir=C:/Users/xiar5/Downloads/EffekseerForCpp1.80.6/EffekseerForCpp1.80.6/install_msvc2022_x64/lib
 
 Name: GLFW
 Description: A multi-platform library for OpenGL, window and input

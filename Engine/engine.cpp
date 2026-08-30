@@ -18,6 +18,7 @@
 #include "application.h"
 #include "Rendering/gizmos.h"
 #include "input.h"
+#include "../../../SlimeBoom/Wave/wave_controller.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
 #include "Rendering/render_pipeline.h"

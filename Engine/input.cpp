@@ -24,34 +24,42 @@ void Input::ProcessMessage(const UINT msg, const WPARAM w_param, const LPARAM l_
 
 void Input::Update()
 {
+    if (m_mouse_mode_ == kMouseMode::kLocked && GetKeyDown(DirectX::Keyboard::Keys::Escape))
+    {
+        m_next_mouse_mode_ = m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE
+                                   ? DirectX::Mouse::MODE_RELATIVE
+                                   : DirectX::Mouse::MODE_ABSOLUTE;
+
+        Logger::Log<Input>("Mouse Lock Interrupt! %d", m_next_mouse_mode_);
+        m_mouse_->SetVisible(m_next_mouse_mode_ != DirectX::Mouse::MODE_ABSOLUTE);
+    }
+    
+    if (m_mouse_->GetState().positionMode != m_next_mouse_mode_)
+    {
+        m_mouse_->SetMode(m_next_mouse_mode_);
+    }
+    
     m_keyboard_state_ = m_keyboard_->GetState();
     m_keyboard_tracker_.Update(m_keyboard_state_);
 
+    m_mouse_->ResetScrollWheelValue();
     m_mouse_state_ = m_mouse_->GetState();
     m_mouse_tracker_.Update(m_mouse_state_);
 
     if (m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE)
     {
-        const auto mouse_pos = MousePosition();
+        const Vector2 mouse_pos = {static_cast<float>(Instance()->m_mouse_state_.x), static_cast<float>(Instance()->m_mouse_state_.y)};
         m_mouse_delta_ = mouse_pos - m_mouse_position_;
         m_mouse_position_ = mouse_pos;
     }
     else
     {
-        m_mouse_delta_ = MousePosition();
+        const Vector2 mouse_pos = {static_cast<float>(Instance()->m_mouse_state_.x), static_cast<float>(Instance()->m_mouse_state_.y)};
+        m_mouse_delta_ = mouse_pos;
+        m_mouse_position_ += mouse_pos;
     }
-
-    if (m_mouse_mode_ == kMouseMode::kLocked && GetKeyDown(DirectX::Keyboard::Keys::Escape))
-    {
-        const auto next_mode = m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE
-                                   ? DirectX::Mouse::MODE_RELATIVE
-                                   : DirectX::Mouse::MODE_ABSOLUTE;
-
-        Logger::Log<Input>("Mouse Lock Interrupt! %d", next_mode);
-        m_mouse_->SetMode(next_mode);
-        m_mouse_->SetVisible(next_mode != DirectX::Mouse::MODE_ABSOLUTE);
-    }
-
+    
+    
     if (m_mouse_mode_ == kMouseMode::kLocked && m_mouse_->IsVisible())
     {
         m_mouse_delta_ = Vector2::Zero;
@@ -111,7 +119,7 @@ bool Input::GetMouseRightUp()
 
 Vector2 Input::MousePosition()
 {
-    return {static_cast<float>(Instance()->m_mouse_state_.x), static_cast<float>(Instance()->m_mouse_state_.y)};
+    return Instance()->m_mouse_position_;
 }
 
 Vector2 Input::MouseDelta()
@@ -131,11 +139,15 @@ void Input::SetMouseMode(const kMouseMode mode)
     switch (mode)
     {
     case kMouseMode::kNormal:
-        Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+        Instance()->m_next_mouse_mode_ = DirectX::Mouse::MODE_ABSOLUTE;
+        SetCursorVisible(true);
         return;
     case kMouseMode::kLocked:
-        Instance()->m_mouse_->SetMode(DirectX::Mouse::MODE_RELATIVE);
+        Instance()->m_next_mouse_mode_ = DirectX::Mouse::MODE_RELATIVE;
+        SetCursorVisible(false);
         return;
+    default:
+        throw std::runtime_error("Invalid MouseMode");
     }
 }
 

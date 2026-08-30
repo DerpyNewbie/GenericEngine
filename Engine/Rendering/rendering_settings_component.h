@@ -33,7 +33,14 @@ public:
                 CEREAL_NVP(m_effect_render_queue_)
             );
         }
+
+        if (version >= 3)
+        {
+            ar(
+                CEREAL_NVP(m_cascade_slices_)
+            );
+        }
     }
 };
 }
-CEREAL_CLASS_VERSION(engine::RenderingSettingsComponent, 2)
+CEREAL_CLASS_VERSION(engine::RenderingSettingsComponent, 3)

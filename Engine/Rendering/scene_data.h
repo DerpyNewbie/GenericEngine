@@ -8,5 +8,7 @@ struct SceneData
     Vector2 shadow_map_size;
     float time;
     float delta_time;
+    Vector3 camera_pos;
+    Vector3 camera_dir;
 };
 }

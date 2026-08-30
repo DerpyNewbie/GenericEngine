@@ -29,6 +29,7 @@ public:
     
     void OnInspectorGui() override;
     void UpdateBuffer() override;
+    void DepthRender() override;
     void Render() override;
 
     template <class Archive>

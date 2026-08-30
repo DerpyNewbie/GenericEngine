@@ -1,17 +1,16 @@
 #pragma once
-#include <ThirdParty/Effekseer/include/Effekseer/Effekseer.h>
-#include <ThirdParty/Effekseer/include/EffekseerRendererDX12/EffekseerRendererDX12.h>
+#include <Effekseer.h>
+#include <ThirdParty/Effekseer/include/EffekseerRendererDX12.h>
 
+#include "Components/effekseer_renderer.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 
 
-namespace engine
-{
 class EffekseerController
 {
-    friend class Engine;
-    friend class RenderPipeline;
-    friend RenderEngine;
+    friend class engine::Engine;
+    friend class engine::RenderPipeline;
+    friend class RenderEngine;
 
     static constexpr float kMaxInstanceCount = 2000;
     static constexpr float kMaxSquareCount = 8000;
@@ -32,4 +31,3 @@ public:
     static Effekseer::ManagerRef Manager();
 
 };
-}

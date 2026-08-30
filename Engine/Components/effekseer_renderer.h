@@ -1,5 +1,5 @@
 #pragma once
-#include "ThirdParty/Effekseer/include/Effekseer/Effekseer.h"
+#include "Effekseer.h"
 
 #include "renderer.h"
 #include "Asset/asset_ptr.h"

@@ -247,6 +247,8 @@ void RenderPipeline::SetSceneData()
         m_scene_data_buffer_data_->AddVector2Data("shadow_map_size");
         m_scene_data_buffer_data_->AddFloatData("time");
         m_scene_data_buffer_data_->AddFloatData("delta_time");
+        m_scene_data_buffer_data_->AddVector3Data("camera_pos");
+        m_scene_data_buffer_data_->AddVector3Data("camera_dir");
     }
 
     m_scene_data_buffer_data_->SetVector2Data("screen_size",
@@ -255,6 +257,10 @@ void RenderPipeline::SetSceneData()
     m_scene_data_buffer_data_->SetVector2Data("shadow_map_size", RenderingConstants::kShadowMapSize);
     m_scene_data_buffer_data_->SetFloatData("time", Time::Get()->TimeSinceStartUp());
     m_scene_data_buffer_data_->SetFloatData("delta_time", Time::GetDeltaTime());
+    auto main_camera = CameraComponent::Main();
+    m_scene_data_buffer_data_->SetVector3Data("camera_pos", main_camera == nullptr ? Vector3::Zero : main_camera->GameObject()->Transform()->Position());
+    m_scene_data_buffer_data_->SetVector3Data("camera_dir", main_camera == nullptr ? Vector3::Zero : main_camera->GameObject()->Transform()->Forward());
+    
 
     GpuResourceManager::SetGlobalBufferData("SceneData", m_scene_data_buffer_data_);
 }
@@ -308,9 +314,6 @@ void RenderPipeline::DepthRender()
             return;
         }
     }
-
-    const auto cmd_list = RenderEngine::CommandList();
-    PSOManager::SetPipelineState(cmd_list, m_depth_shader_.get(), DXGI_FORMAT_R32_FLOAT, 0);
 
     Lighting::Instance()->BeginDepthRender();
 

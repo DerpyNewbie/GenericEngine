@@ -6,8 +6,6 @@
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
-namespace engine
-{
 EffekseerController *EffekseerController::Instance()
 {
     static EffekseerController instance;
@@ -64,13 +62,12 @@ void EffekseerController::Render()
     instance->m_renderer_->SetCommandList(nullptr);
     EffekseerRendererDX12::EndCommandList(instance->m_effekseer_command_list_);
 
-    cmd_list->SetGraphicsRootSignature(RootSignature::Get());
-    const auto descriptor_heap = DescriptorHeap::GetHeap();
+    cmd_list->SetGraphicsRootSignature(engine::RootSignature::Get());
+    const auto descriptor_heap = engine::DescriptorHeap::GetHeap();
     cmd_list->SetDescriptorHeaps(1, &descriptor_heap);
 }
 
 Effekseer::ManagerRef EffekseerController::Manager()
 {
     return Instance()->m_manager_;
-}
 }

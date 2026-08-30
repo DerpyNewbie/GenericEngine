@@ -1,14 +1,15 @@
-﻿#ifndef __EFFEKSEERRENDERER_DX12_RENDERER_H__
+﻿
+#ifndef __EFFEKSEERRENDERER_DX12_RENDERER_H__
 #define __EFFEKSEERRENDERER_DX12_RENDERER_H__
 
-#include "../../EffekseerRendererCommon/EffekseerRenderer.Renderer.h"
-#include "EffekseerRendererDX12.Base.h"
+#include "EffekseerRendererDX12.Base.Pre.h"
+#include <EffekseerRendererCommon/EffekseerRenderer.Renderer.h>
 #include <functional>
 
 namespace EffekseerRendererDX12
 {
 
-::Effekseer::Backend::GraphicsDeviceRef CreateGraphicsDevice(ID3D12Device *device, ID3D12CommandQueue *commandQueue, int32_t swapBufferCount);
+::Effekseer::Backend::GraphicsDeviceRef CreateGraphicsDevice(ID3D12Device* device, ID3D12CommandQueue* commandQueue, int32_t swapBufferCount);
 
 /**
 	@brief	Create an instance
@@ -21,11 +22,11 @@ namespace EffekseerRendererDX12
 	@return	instance
 */
 ::EffekseerRenderer::RendererRef Create(::Effekseer::Backend::GraphicsDeviceRef graphicsDevice,
-    DXGI_FORMAT *renderTargetFormats,
-    int32_t renderTargetCount,
-    DXGI_FORMAT depthFormat,
-    bool isReversedDepth,
-    int32_t squareMaxCount);
+										DXGI_FORMAT* renderTargetFormats,
+										int32_t renderTargetCount,
+										DXGI_FORMAT depthFormat,
+										bool isReversedDepth,
+										int32_t squareMaxCount);
 
 /**
 	@brief	Create an instance
@@ -39,16 +40,16 @@ namespace EffekseerRendererDX12
 	@param	squareMaxCount	The number of maximum sprites
 	@return	instance
 */
-::EffekseerRenderer::RendererRef Create(ID3D12Device *device,
-    ID3D12CommandQueue *commandQueue,
-    int32_t swapBufferCount,
-    DXGI_FORMAT *renderTargetFormats,
-    int32_t renderTargetCount,
-    DXGI_FORMAT depthFormat,
-    bool isReversedDepth,
-    int32_t squareMaxCount);
+::EffekseerRenderer::RendererRef Create(ID3D12Device* device,
+										ID3D12CommandQueue* commandQueue,
+										int32_t swapBufferCount,
+										DXGI_FORMAT* renderTargetFormats,
+										int32_t renderTargetCount,
+										DXGI_FORMAT depthFormat,
+										bool isReversedDepth,
+										int32_t squareMaxCount);
 
-Effekseer::Backend::TextureRef CreateTexture(::Effekseer::Backend::GraphicsDeviceRef graphicsDevice, ID3D12Resource *texture);
+Effekseer::Backend::TextureRef CreateTexture(::Effekseer::Backend::GraphicsDeviceRef graphicsDevice, ID3D12Resource* texture);
 
 /**
 		@brief	\~English	Properties in a texture
@@ -59,7 +60,7 @@ Effekseer::Backend::TextureRef CreateTexture(::Effekseer::Backend::GraphicsDevic
 */
 struct TextureProperty
 {
-    ID3D12Resource *TexturePtr = nullptr;
+	ID3D12Resource* TexturePtr = nullptr;
 };
 
 TextureProperty GetTextureProperty(::Effekseer::Backend::TextureRef texture);
@@ -73,7 +74,7 @@ TextureProperty GetTextureProperty(::Effekseer::Backend::TextureRef texture);
 */
 struct CommandListProperty
 {
-    ID3D12CommandList *CommandListPtr = nullptr;
+	ID3D12CommandList* CommandListPtr = nullptr;
 };
 
 CommandListProperty GetCommandListProperty(Effekseer::RefPtr<EffekseerRenderer::CommandList> commandList);
@@ -85,7 +86,7 @@ CommandListProperty GetCommandListProperty(Effekseer::RefPtr<EffekseerRenderer::
 	\~English	dx12CommandList can be null. In this case, it need to call ExecuteCommandList
 	\~Japanese	dx12CommandList はnullにできる。その場合、ExecuteCommandListを呼ぶ必要がある。
 */
-void BeginCommandList(Effekseer::RefPtr<EffekseerRenderer::CommandList> commandList, ID3D12GraphicsCommandList *dx12CommandList);
+void BeginCommandList(Effekseer::RefPtr<EffekseerRenderer::CommandList> commandList, ID3D12GraphicsCommandList* dx12CommandList);
 
 void EndCommandList(Effekseer::RefPtr<EffekseerRenderer::CommandList> commandList);
 
