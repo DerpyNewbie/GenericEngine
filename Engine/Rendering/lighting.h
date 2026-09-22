@@ -41,6 +41,8 @@ public:
     void SetLightsViewProjMatrix() const;
     void SetShadowMap();
 
+    uint32_t GetLightCount() const;
+    
     void TryApplyShadow(const std::shared_ptr<Light> &light);
     void RemoveShadow(const std::shared_ptr<Light> &light);
     void AddLight(std::shared_ptr<Light> light);

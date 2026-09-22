@@ -4,6 +4,8 @@
 #include "rect_transform.h"
 #include "Rendering/primitives.h"
 #include "Rendering/render_pipeline.h"
+#include "game_object.h"
+#include "gui.h"
 
 using namespace DirectX::SimpleMath;
 
@@ -35,6 +37,7 @@ void Image::UpdateWorldBuffer()
 
 void Image::OnInspectorGui()
 {
+    Renderer2D::OnInspectorGui();
     Gui::ExpandablePropertyField("Material", shared_material);
 }
 
@@ -47,7 +50,7 @@ void Image::Render()
 
     const std::vector materials = {shared_material};
 
-    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, 1, Vector3::Zero, m_world_matrix_buffer_->GetAddress());
+    RenderPipeline::Submit(Primitives::GetQuadMesh(), materials, 1, Vector3::Zero, m_rendering_layer_, m_world_matrix_buffer_->GetAddress());
 }
 }
 

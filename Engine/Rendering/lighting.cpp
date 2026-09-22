@@ -5,6 +5,7 @@
 #include "lighting.h"
 
 #include "gpu_resource_manager.h"
+#include "texture_collection.h"
 #include "CabotEngine/Graphics/Texture2D.h"
 
 namespace
@@ -170,6 +171,11 @@ void Lighting::SetShadowMap()
     if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
                                                  m_shadow_map_handle_->handle_gpu);
+}
+
+uint32_t Lighting::GetLightCount() const
+{
+    return static_cast<uint32_t>(m_lights_.size());
 }
 
 void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)

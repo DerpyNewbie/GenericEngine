@@ -21,7 +21,8 @@ void MaterialImporter::OnImport(AssetDescriptor *ctx)
     std::ifstream file(ctx->AssetPath());
     Serializer serializer;
 
-    ctx->SetMainObject(serializer.Load<Material>(file));
+    auto material = serializer.Load<Material>(file);
+    ctx->SetMainObject(material);
 }
 
 void MaterialImporter::OnExport(AssetDescriptor *ctx)

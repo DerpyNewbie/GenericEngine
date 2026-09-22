@@ -1,4 +1,5 @@
 #pragma once
+#include "component.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/compute_shader.h"
 

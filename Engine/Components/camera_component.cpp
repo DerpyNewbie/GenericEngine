@@ -55,9 +55,13 @@ Matrix CameraProperty::ProjectionMatrix() const
 
 void CameraComponent::OnInspectorGui()
 {
+    m_rendering_layer_.OnInspectorGui();
     property.OnInspectorGui();
     Gui::PropertyField("Render Texture", m_render_texture_);
     Gui::PropertyField("Depth Texture", m_depth_texture_);
+
+    if (ImGui::Button("Set Main Camera"))
+        SetMainCamera(shared_from_base<CameraComponent>());
 }
 
 void CameraComponent::OnValidate()
@@ -118,15 +122,25 @@ void CameraComponent::OnDisabled()
 
 Camera CameraComponent::GetCamera()
 {
-    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
+    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), m_rendering_layer_, property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
 }
 
-std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
+Layer CameraComponent::GetRenderingLayer() const
+{
+    return m_rendering_layer_;
+}
+
+std::shared_ptr<RenderTexture> CameraComponent::GetRenderTexture()
 {
     return m_render_texture_.CastedLock() != nullptr
         ? m_render_texture_.CastedLock()
         : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
         .CastedLock();
+}
+
+void CameraComponent::SetRenderTexture(const AssetPtr<RenderTexture>& render_texture)
+{
+    m_render_texture_ = render_texture;
 }
 
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)
@@ -146,10 +160,10 @@ Matrix CameraComponent::ViewMatrix() const
     const auto transform = GameObject()->Transform();
     if (transform == nullptr)
     {
-        return Matrix::CreateLookAt(Vector3::Zero, Vector3::Forward, Vector3::Up);
+        return DirectX::XMMatrixLookAtRH(Vector3::Zero, Vector3::Forward, Vector3::Up);
     }
 
-    return Matrix::CreateLookAt(
+    return DirectX::XMMatrixLookAtRH(
         transform->Position(),
         transform->Position() + transform->Forward(),
         transform->Up()

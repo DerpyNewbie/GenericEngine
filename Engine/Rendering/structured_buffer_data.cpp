@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "structured_buffer_data.h"
 
+#include "gui.h"
+
 namespace engine
 {
 StructuredBufferData::StructuredBufferData() : BufferDataBase(ShaderParameter())

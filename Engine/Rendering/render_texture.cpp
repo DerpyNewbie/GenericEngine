@@ -4,26 +4,47 @@
 #include "application.h"
 #include "gui.h"
 
+namespace
+{
+constexpr const char *TextureFormatNames[] = {
+    "RGBA8",
+    "RGBA32"
+};
+
+constexpr DXGI_FORMAT TextureFormats[] = {
+    DXGI_FORMAT_R8G8B8A8_UNORM,
+    DXGI_FORMAT_R32G32B32A32_FLOAT
+};
+}
+
 namespace engine
 {
-RenderTexture::RenderTexture() : Texture2D(Application::WindowWidth(), Application::WindowHeight(), 0, DXGI_FORMAT_R8G8B8A8_UNORM)
-{}
+RenderTexture::RenderTexture() : Texture2D()
+{
+}
+
+void RenderTexture::OnConstructed()
+{
+    m_mip_level_ = 0;
+    m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
+}
 
 void RenderTexture::OnInspectorGui()
 {
-    int width = m_width_;
-    if (Gui::PropertyField("Width", width))
-    {
-        m_width_ = width;
-    }
-
-    int height = m_height_;
-    if (Gui::PropertyField("Height", height))
-    {
-        m_height_ = height;
-    }
+    Gui::PropertyField("Width", m_width_);
+    Gui::PropertyField("Height", m_height_);
+    
+    if (ImGui::Combo("Format", &m_format_index_, TextureFormatNames, IM_ARRAYSIZE(TextureFormatNames)))
+        m_format_ = TextureFormats[m_format_index_];
 
     Gui::BoolField("Allow Uav", m_allow_uav_);
+}
+
+void RenderTexture::OnDeserialized()
+{
+    for (int i = 0; i < IM_ARRAYSIZE(TextureFormats); ++i)
+        if (TextureFormats[i] == m_format_)
+            m_format_index_ = i;
 }
 
 bool RenderTexture::AllowUav() const

@@ -30,6 +30,7 @@
 
 #include <ranges>
 
+#include "gui.h"
 #include "scene_manager.h"
 #include "serializer.h"
 
@@ -154,11 +155,21 @@ void Editor::Init()
             }
         );
 
+
         AddCreateMenu(
             "Texture Cube",
             ".cubemap",
             [] {
                 return Object::Instantiate<TextureCube>("New TextureCube");
+            }
+        );
+
+        
+        AddCreateMenu(
+            "Depth Texture",
+            ".depthtexture",
+            [] {
+                return Object::Instantiate<DepthTexture>("New DepthTexture");
             }
         );
     }

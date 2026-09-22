@@ -6,7 +6,7 @@
 void engine::EffekseerRenderer::OnInspectorGui()
 {
     Gui::PropertyField("Effekseer Effect", m_effect_asset_);
-    Gui::PropertyField("Play Speed", play_speed);
+    Gui::PropertyField("Play Speed", m_play_speed_);
     if (ImGui::Button("Play"))
     {
         Play();
@@ -65,7 +65,7 @@ void engine::EffekseerRenderer::OnUpdate()
     SetPosition(position);
     SetRotation(rotation);
     SetScale(scale);
-    SetSpeed(play_speed);
+    SetSpeed(m_play_speed_);
 }
 
 void engine::EffekseerRenderer::OnDestroy()
@@ -84,7 +84,7 @@ void engine::EffekseerRenderer::Play()
     SetPosition(position);
     SetRotation(rotation);
     SetScale(scale);
-    SetSpeed(play_speed);
+    SetSpeed(m_play_speed_);
 }
 
 void engine::EffekseerRenderer::Stop() const

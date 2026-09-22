@@ -1,5 +1,6 @@
 #pragma once
 #include "depth_texture.h"
+#include "layer.h"
 #include "render_texture.h"
 
 namespace engine
@@ -11,6 +12,7 @@ struct Camera
     friend class RenderPipeline;
 
     UINT64 id;
+    Layer layer;
     Color background_color;
     Matrix view;
     Matrix projection;

@@ -7,6 +7,11 @@
 
 namespace engine
 {
+void Renderer2D::OnInspectorGui()
+{
+    m_rendering_layer_.OnInspectorGui();
+}
+
 void Renderer2D::OnAwake()
 {
     const auto game_obj = GameObject();

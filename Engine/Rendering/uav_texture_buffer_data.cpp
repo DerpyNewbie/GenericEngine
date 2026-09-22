@@ -1,6 +1,8 @@
 #include"pch.h"
 #include "uav_texture_buffer_data.h"
 
+#include "gui.h"
+
 namespace engine
 {
 UavTextureBufferData::UavTextureBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)

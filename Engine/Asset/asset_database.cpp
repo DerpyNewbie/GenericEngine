@@ -5,6 +5,7 @@
 #include "Asset/Importer/txt_importer.h"
 #include "Importer/audio_clip_importer.h"
 #include "Importer/compute_shader_importer.h"
+#include "Importer/depth_texture_importer.h"
 #include "Importer/effekseer_effect_importer.h"
 #include "Importer/fbx_importer.h"
 #include "Importer/shader_importer.h"
@@ -12,7 +13,6 @@
 #include "Importer/material_importer.h"
 #include "Importer/render_texture_importer.h"
 #include "Importer/texture_2d_importer.h"
-#include "Importer/texture_cube_importer.h"
 
 namespace engine
 {
@@ -42,9 +42,9 @@ void AssetDatabase::Init()
     AssetImporter::Register(std::make_shared<RenderTextureImporter>());
     AssetImporter::Register(std::make_shared<AudioClipImporter>());
     AssetImporter::Register(std::make_shared<FbxImporter>());
-    AssetImporter::Register(std::make_shared<TextureCubeImporter>());
     AssetImporter::Register(std::make_shared<ComputeShaderImporter>());
     AssetImporter::Register(std::make_shared<EffekseerEffectImporter>());
+    AssetImporter::Register(std::make_shared<DepthTextureImporter>());
     SetProjectDirectory(current_path() / "Resources");
 }
 

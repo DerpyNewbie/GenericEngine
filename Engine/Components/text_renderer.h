@@ -42,8 +42,15 @@ public:
                 CEREAL_NVP(scale)
             );
         }
+
+        if (version >= 3)
+        {
+            ar(
+                CEREAL_NVP(render_queue)
+            );
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::TextRenderer, 2)
+CEREAL_CLASS_VERSION(engine::TextRenderer, 3)

@@ -18,7 +18,10 @@ bool RenderTextureImporter::IsCompatibleWith(const std::shared_ptr<Object> objec
 
 void RenderTextureImporter::OnImport(AssetDescriptor *ctx)
 {
-    ctx->SetMainObject(Object::Instantiate<RenderTexture>());
+    std::ifstream file(ctx->AssetPath());
+    Serializer serializer;
+
+    ctx->SetMainObject(serializer.Load<RenderTexture>(file));
 }
 
 void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
@@ -27,6 +30,7 @@ void RenderTextureImporter::OnExport(AssetDescriptor *ctx)
     if (render_texture == nullptr)
     {
         ctx->LogImportError("This object cannot be exported with RenderTextureExporter");
+        return;
     }
 
     std::ofstream file(ctx->AssetPath());

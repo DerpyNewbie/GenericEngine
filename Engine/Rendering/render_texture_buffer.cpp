@@ -20,8 +20,10 @@ void RenderTextureBuffer::CreateBuffer()
     auto res_desc = RenderEngine::BBuffDesc();
     auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 
-    m_width_ = Application::WindowWidth();
-    m_height_ = Application::WindowHeight();
+    res_desc.Format = m_format_;
+    res_desc.Width = m_width_;
+    res_desc.Height = m_height_;
+    res_desc.MipLevels = m_mip_level_;
 
     res_desc.Flags = (m_is_unordered_access_ ? D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS : D3D12_RESOURCE_FLAG_NONE) | D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
 
@@ -51,7 +53,7 @@ void RenderTextureBuffer::CreateBuffer()
 
     D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
     rtv_desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-    rtv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    rtv_desc.Format = m_format_;
 
     device->CreateRenderTargetView(m_resource_.Get(), &rtv_desc, m_rtv_heap_->GetCPUDescriptorHandleForHeapStart());
 }
@@ -81,7 +83,7 @@ D3D12_UNORDERED_ACCESS_VIEW_DESC RenderTextureBuffer::UavDesc()
 {
     D3D12_UNORDERED_ACCESS_VIEW_DESC uav_desc;
     uav_desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-    uav_desc.Format = DXGI_FORMAT_R8G8B8A8_UINT;
+    uav_desc.Format = m_format_;
     uav_desc.Texture2D.MipSlice = 0;
     uav_desc.Texture2D.PlaneSlice = 0;
     return uav_desc;
@@ -91,7 +93,7 @@ D3D12_SHADER_RESOURCE_VIEW_DESC RenderTextureBuffer::ViewDesc()
 {
     D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
     srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    srv_desc.Format = m_format_;
     srv_desc.Texture2D.MipLevels = 1;
     srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
     return srv_desc;

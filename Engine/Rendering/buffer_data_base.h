@@ -1,11 +1,6 @@
 #pragma once
 #include "buffer_base.h"
-#include "gui.h"
 #include "shader.h"
-#include "texture_collection.h"
-#include "Asset/asset_ptr.h"
-#include "CabotEngine/Graphics/StructuredBuffer.h"
-#include "CabotEngine/Graphics/Texture2D.h"
 
 namespace engine
 {

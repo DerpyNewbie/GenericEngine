@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "procedural_renderer.h"
+
+#include "gui.h"
 #include "Rendering/render_pipeline.h"
 
 namespace engine
@@ -42,7 +44,7 @@ Matrix ProceduralRenderer::BoundsOrigin()
 
 void ProceduralRenderer::Render()
 {
-    RenderPipeline::Submit(shared_materials, m_vertex_count_);
+    RenderPipeline::Submit(shared_materials, m_vertex_count_, m_rendering_layer_);
 }
 }
 

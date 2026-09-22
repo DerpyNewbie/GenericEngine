@@ -73,7 +73,7 @@ RootSignature::RootSignature()
     sampler[2].MaxLOD = D3D12_FLOAT32_MAX;
     sampler[2].ShaderRegister = 2;
     sampler[2].RegisterSpace = 0;
-    sampler[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL;
+    sampler[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
 
     D3D12_ROOT_SIGNATURE_DESC desc = {};
     desc.NumParameters = static_cast<UINT>(std::size(rootParam));

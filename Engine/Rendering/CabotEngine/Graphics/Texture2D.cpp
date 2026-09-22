@@ -20,7 +20,7 @@ namespace engine
 {
 constexpr std::array<std::string_view, 7> kWicFormats = {".png", ".jpg", ".jpeg", ".bmp", ".dds", ".gif", ".wdp"};
 
-Texture2D::kImageFormat Texture2D::GetImageFormat(const path &file_path)
+Texture2D::kImageFormat Texture2D::GetImageFormat(const path& file_path)
 {
     {
         auto ext = file_path.extension().string();
@@ -39,15 +39,15 @@ Texture2D::kImageFormat Texture2D::GetImageFormat(const path &file_path)
     }
 }
 
-void Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
+void Texture2D::LoadFromAiTexture(aiTexture* ai_texture)
 {
-    unsigned char *pixels;
+    unsigned char* pixels;
     int width = 0, height = 0, channels = 0;
 
     if (ai_texture->mHeight == 0)
     {
         pixels = stbi_load_from_memory(
-            reinterpret_cast<const unsigned char *>(ai_texture->pcData),
+            reinterpret_cast<const unsigned char*>(ai_texture->pcData),
             ai_texture->mWidth,
             &width,
             &height,
@@ -60,7 +60,7 @@ void Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
     {
         width = ai_texture->mWidth;
         height = ai_texture->mHeight;
-        pixels = reinterpret_cast<unsigned char *>(ai_texture->pcData);
+        pixels = reinterpret_cast<unsigned char*>(ai_texture->pcData);
     }
     m_width_ = width;
     m_height_ = height;
@@ -74,22 +74,33 @@ void Texture2D::LoadFromAiTexture(aiTexture *ai_texture)
     }
 }
 
-void Texture2D::LoadMetadata(const path &file_path, TexMetadata &metadata, ScratchImage &scratch)
+void Texture2D::LoadMetadata(const path& file_path, TexMetadata& metadata, ScratchImage& scratch)
 {
     const auto format = GetImageFormat(file_path);
     HRESULT hr;
 
     switch (format)
     {
-        case kImageFormat::kWic: {
-            hr = LoadFromWICFile(file_path.c_str(), WIC_FLAGS_NONE, &metadata, scratch);
+    case kImageFormat::kWic:
+        {
+            ScratchImage temp_scratch;
+            hr = LoadFromWICFile(file_path.c_str(), WIC_FLAGS_NONE, &metadata, temp_scratch);
+            hr = FlipRotate(
+                temp_scratch.GetImages(),
+                temp_scratch.GetImageCount(),
+                temp_scratch.GetMetadata(),
+                TEX_FR_FLIP_VERTICAL,
+                scratch
+            );
             break;
         }
-        case kImageFormat::kTga: {
+    case kImageFormat::kTga:
+        {
             hr = LoadFromTGAFile(file_path.c_str(), &metadata, scratch);
             break;
         }
-        default: {
+    default:
+        {
             Logger::Error<Texture2D>("Unsupported image format");
         }
     }
@@ -108,7 +119,7 @@ void Texture2D::CacheData()
         return;
 
     const auto path = asset_descriptor->AssetPath();
-    
+
     TexMetadata metadata;
     ScratchImage scratch;
 
@@ -135,7 +146,7 @@ std::vector<PackedVector::XMCOLOR> Texture2D::GetPixels()
     LoadMetadata(path, metadata, scratch);
 
     const auto img = scratch.GetImage(0, 0, 0);
-    const uint8_t *src = img->pixels;
+    const uint8_t* src = img->pixels;
     const size_t pixel_count = img->width * img->height;
 
     m_width_ = static_cast<UINT>(metadata.width);
@@ -199,12 +210,14 @@ DXGI_FORMAT Texture2D::Format()
     return m_format_;
 }
 
-Texture2D::Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format) : m_width_(width), m_height_(height), m_mip_level_(mip_level), m_format_(format)
-{}
-
-Texture2D::~Texture2D()
+void Texture2D::OnDestroy()
 {
     TextureCollection::DeleteTexture(AssetPtr<Texture2D>::FromManaged(shared_from_base<Texture2D>()));
+}
+
+Texture2D::Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format) : m_width_(width),
+    m_height_(height), m_mip_level_(mip_level), m_format_(format)
+{
 }
 
 void Texture2D::OnInspectorGui()

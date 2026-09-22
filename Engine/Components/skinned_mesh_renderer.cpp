@@ -2,6 +2,7 @@
 #include "skinned_mesh_renderer.h"
 
 #include "camera_component.h"
+#include "gui.h"
 #include "Asset/asset_database.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
@@ -204,7 +205,7 @@ void SkinnedMeshRenderer::Render()
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
     RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, instance_count,
-                           GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress(),
+                           GameObject()->Transform()->Position(), m_rendering_layer_, m_world_matrix_buffer_->GetAddress(),
                            m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
 }
 }

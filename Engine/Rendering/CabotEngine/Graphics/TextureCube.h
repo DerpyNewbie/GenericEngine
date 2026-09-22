@@ -6,16 +6,16 @@
 
 namespace engine
 {
-class TextureCube final : public Object, public BufferBase, public Inspectable, public ShaderResource
+class TextureCube final : public Object, public BufferBase, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
     Microsoft::WRL::ComPtr<ID3D12Resource> m_resource_;
     D3D12_RESOURCE_STATES m_current_state_;
     
 public:
+    TextureCube(const std::array<AssetPtr<Texture2D>, 6>& textures = {});
     ~TextureCube() override;
     
-    void OnInspectorGui() override;
     void CreateBuffer() override;
     void UpdateBuffer(const void *data) override;
     void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
@@ -30,6 +30,7 @@ public:
     bool FetchBufferData(void *data) override;
 
     ID3D12Resource *Resource() override;
+    D3D12_UNORDERED_ACCESS_VIEW_DESC UavDesc();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
     bool SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures);

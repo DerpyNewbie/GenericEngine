@@ -37,6 +37,11 @@ void Renderer::SetVisible(const bool visible)
     }
 }
 
+void Renderer::OnInspectorGui()
+{
+    m_rendering_layer_.OnInspectorGui();
+}
+
 void Renderer::OnValidate()
 {
     SetVisible(GameObject()->IsActiveInHierarchy());
@@ -55,6 +60,11 @@ void Renderer::OnDisabled()
 void Renderer::OnDestroy()
 {
     SetVisible(false);
+}
+
+Layer Renderer::GetRenderingLayer() const
+{
+    return m_rendering_layer_;
 }
 }
 

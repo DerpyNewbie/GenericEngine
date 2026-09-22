@@ -1,9 +1,11 @@
-#pragma once
+﻿#pragma once
 #include "asset_importer.h"
+#include "Components/component.h"
+#include "Rendering/compute_shader.h"
 
 namespace engine
 {
-class TextureCubeImporter : public AssetImporter
+class DepthTextureImporter : public engine::AssetImporter
 {
 public:
     std::vector<std::string> SupportedExtensions() override;

@@ -11,7 +11,7 @@ class ComputeShaderImporter : public AssetImporter
 
 public:
     std::vector<std::string> SupportedExtensions() override;
-    bool IsCompatibleWith(std::shared_ptr<Object> object) override;
+    auto IsCompatibleWith(std::shared_ptr<Object> object) -> bool override;
     void OnImport(AssetDescriptor *ctx) override;
 };
 }

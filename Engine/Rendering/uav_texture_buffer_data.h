@@ -1,5 +1,7 @@
 #pragma once
 #include "buffer_data_base.h"
+#include "render_texture.h"
+#include "Asset/asset_ptr.h"
 
 namespace engine
 {

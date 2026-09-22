@@ -8,8 +8,13 @@
 
 namespace engine
 {
-DepthTextureBuffer::DepthTextureBuffer(const std::shared_ptr<DepthTexture> &depth_texture) : TextureBuffer(depth_texture)
-{}
+DepthTextureBuffer::DepthTextureBuffer(const std::shared_ptr<DepthTexture> &depth_texture)
+{
+    m_format_ = depth_texture->Format();
+    m_width_ = depth_texture->Width();
+    m_height_ = depth_texture->Height();
+    m_mip_level_ = depth_texture->MipLevel();
+}
 
 void DepthTextureBuffer::CreateBuffer()
 {

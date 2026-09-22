@@ -10,22 +10,14 @@
 
 namespace engine
 {
+TextureCube::TextureCube(const std::array<AssetPtr<Texture2D>, 6>& textures)
+{
+    m_textures_ = textures;
+}
+
 TextureCube::~TextureCube()
 {
     DirectXResourceFactory::ReleaseResource(m_resource_);
-}
-
-void TextureCube::OnInspectorGui()
-{
-    for (int i = 0; i < 6; ++i)
-    {
-        constexpr const char *dir_labels[] = { "Right", "Left", "Top", "Bottom", "Front", "Back" };
-        if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
-        {
-            m_resource_ = nullptr;
-            CreateBuffer();
-        }
-    }
 }
 
 void TextureCube::CreateBuffer()
@@ -107,6 +99,9 @@ void TextureCube::UpdateBuffer(const void *data)
 
 void TextureCube::UploadBuffer(const std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav)
 {
+    if (m_resource_ == nullptr)
+        return;
+    
     const auto view_desc = ViewDesc();
     RenderEngine::Device()->CreateShaderResourceView(Resource(), &view_desc, desc_handle->handle_cpu);
 }

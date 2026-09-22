@@ -33,7 +33,7 @@ void TextRenderer::OnInspectorGui()
 
 void TextRenderer::Render()
 {
-    RenderPipeline::Submit(font_data, position, string, color, rotation, origin, scale, render_queue);
+    RenderPipeline::Submit(font_data, position, string, color, rotation, origin, scale, render_queue, m_rendering_layer_);
 }
 
 Matrix TextRenderer::BoundsOrigin()

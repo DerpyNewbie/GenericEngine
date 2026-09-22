@@ -41,7 +41,7 @@ public:
             case kShaderType_Vertex:
                 return m_vs_blob_.Get();
             case kShaderType_Pixel:
-                return m_ps_blob_.Get();
+                return m_ps_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_ps_blob_.Get();
             case kShaderType_Geometry:
                 return m_gs_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_gs_blob_.Get();
             default:

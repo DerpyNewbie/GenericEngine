@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "render_pipeline.h"
-
+#include "game_object.h"
 #include "application.h"
 #include "compute_command.h"
 #include "engine_time.h"
@@ -11,6 +11,7 @@
 #include "lighting.h"
 #include "render_command.h"
 #include "skybox.h"
+#include "texture_collection.h"
 #include "view_projection.h"
 #include "Asset/asset_database.h"
 #include "CabotEngine/Graphics/PSOManager.h"
@@ -143,6 +144,9 @@ void RenderPipeline::RenderCamera(const Camera& camera)
                                                ? TextureCollection::GetRenderTexture(camera.render_texture)
                                                : nullptr)
     {
+        if (!render_texture_buffer->IsValid())
+            render_texture_buffer->CreateBuffer();
+        
         render_texture_buffer->Transition(D3D12_RESOURCE_STATE_RENDER_TARGET);
         rtv_heap = render_texture_buffer->GetHeap();
     }
@@ -151,6 +155,9 @@ void RenderPipeline::RenderCamera(const Camera& camera)
                                               ? TextureCollection::GetDepthTexture(camera.depth_texture)
                                               : nullptr)
     {
+        if (!depth_texture_buffer->IsValid())
+            depth_texture_buffer->CreateBuffer();
+        
         depth_texture_buffer->Transition(D3D12_RESOURCE_STATE_DEPTH_WRITE);
         dsv_heap = depth_texture_buffer->GetHeap();
     }
@@ -176,7 +183,7 @@ void RenderPipeline::RenderVoid()
     const auto proj = Matrix::CreatePerspectiveFieldOfView(75 * Mathf::kDeg2Rad, Application::WindowAspectRatio(), 0.1f,
                                                            1000.0f);
 
-    SetCurrentCamera(Camera(UINT_MAX, Color(), view, proj, nullptr, nullptr));
+    SetCurrentCamera(Camera(UINT_MAX, Layer(), Color(), view, proj, nullptr, nullptr));
     Lighting::Instance()->UpdateLightsViewProjMatrixBuffer(view, proj);
     DepthRender();
 
@@ -219,6 +226,7 @@ void RenderPipeline::InvokeDrawCall()
 
     on_rendering.Invoke();
     m_requesting_cameras_.clear();
+    m_render_commands_.clear();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera& camera)
@@ -280,7 +288,12 @@ void RenderPipeline::Render(const Matrix& view, const Matrix& proj)
     UpdateBuffer(view, proj);
 
     const auto camera_pos = GetCurrentCamera().GetWorldMatrix().Translation();
-    auto renderers = FilterVisibleObjects(m_renderers_, view, proj);
+
+    auto main_camera = CameraComponent::Main();
+    Matrix main_view = main_camera != nullptr ? main_camera->ViewMatrix() : Matrix::Identity;
+    Matrix main_proj = main_camera != nullptr ? main_camera->property.ProjectionMatrix() : Matrix::Identity;
+    
+    auto renderers = FilterVisibleObjects(m_renderers_, main_view, main_proj);
     
     SortCommands(m_render_commands_, camera_pos);
 
@@ -355,12 +368,16 @@ void RenderPipeline::ExecuteRenderCommands()
     const Mesh* current_mesh = nullptr;
 
     auto cmd_list = RenderEngine::CommandList();
+    auto current_camera = GetCurrentCamera();
 
     bool is_sprite_bath_active = false;
     auto sprite_batch = FontData::SpriteBatch();
 
     for (auto &command : m_render_commands_)
     {
+        if (!current_camera.layer.IsAnyLayerEnabled(command.layer))
+            continue;
+        
         if (std::holds_alternative<MeshCommand>(command.data))
         {
             if (is_sprite_bath_active)
@@ -509,8 +526,6 @@ void RenderPipeline::ExecuteRenderCommands()
         sprite_batch->End();
         cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     }
-
-    m_render_commands_.clear();
 }
 
 void RenderPipeline::ExecuteComputeCommands()
@@ -521,98 +536,6 @@ void RenderPipeline::ExecuteComputeCommands()
     }
 
     m_compute_commands_.clear();
-}
-
-void RenderPipeline::Submit(const std::shared_ptr<Mesh>& mesh, const std::vector<AssetPtr<Material>>& materials,
-                            uint32_t instance_count, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address,
-                            D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
-{
-    const auto instance = Instance();
-
-    if (materials.empty())
-        return;
-
-    for (auto i = 0; i < materials.size(); ++i)
-    {
-        const auto casted_material = materials[i].CastedLock();
-
-        if (casted_material == nullptr)
-            continue;
-
-        const auto casted_shader = casted_material->GetShader().CastedLock();
-        if (!casted_shader)
-        {
-            continue;
-        }
-
-        MeshCommand mesh_cmd;
-        mesh_cmd.shader = casted_shader.get();
-        mesh_cmd.material = casted_material.get();
-        mesh_cmd.instance_count = instance_count;
-        mesh_cmd.pos = pos;
-        mesh_cmd.mesh = mesh.get();
-        mesh_cmd.sub_mesh_index = i - 1;
-        mesh_cmd.world_matrix_buffer_address = world_matrix_address;
-        mesh_cmd.bone_matrices_buffer_handle = bone_matrices_handle;
-
-        RenderCommand cmd;
-        cmd.data = mesh_cmd;
-        instance->m_render_commands_.emplace_back(cmd);
-    }
-}
-
-void RenderPipeline::Submit(const AssetPtr<FontData>& font_data, Vector2 position, const std::string& string,
-    Color color, float rotation, Vector2 origin, float scale, uint16_t render_queue)
-{
-    const auto casted_font_data = font_data.CastedLock();
-    if (casted_font_data == nullptr)
-        return;
-
-    TextCommand text_cmd;
-    text_cmd.font_data = casted_font_data.get();
-    text_cmd.position = position;
-    text_cmd.string = string.c_str();
-    text_cmd.color = color;
-    text_cmd.rotation = rotation;
-    text_cmd.origin = origin;
-    text_cmd.scale = scale;
-    text_cmd.render_queue = render_queue;
-    
-    RenderCommand cmd;
-    cmd.data = text_cmd;
-    Instance()->m_render_commands_.emplace_back(cmd);
-}
-
-void RenderPipeline::Submit(const std::vector<AssetPtr<Material>>& materials, const uint32_t vertex_count)
-{
-    const auto instance = Instance();
-
-    if (materials.empty())
-        return;
-
-    for (auto i = 0; i < materials.size(); ++i)
-    {
-        const auto casted_material = materials[i].CastedLock();
-
-        if (casted_material == nullptr)
-            continue;
-
-        const auto casted_shader = casted_material->GetShader().CastedLock();
-        if (!casted_shader)
-        {
-            continue;
-        }
-
-        ProceduralCommand procedural_cmd;
-        procedural_cmd.shader = casted_shader.get();
-        procedural_cmd.material = casted_material.get();
-        procedural_cmd.vertex_count = vertex_count;
-        
-        RenderCommand cmd;
-        cmd.data = procedural_cmd;
-
-        instance->m_render_commands_.emplace_back(cmd);
-    }
 }
 
 void RenderPipeline::SetEffectRenderQueue(const uint16_t render_queue)
@@ -658,6 +581,101 @@ void RenderPipeline::Submit(const AssetPtr<ComputeShader>& compute_shader,
 {
     ComputeCommand cmd(compute_shader, material_block, group_count_x, group_count_y, group_count_z);
     Instance()->m_compute_commands_.emplace_back(cmd);
+}
+
+void RenderPipeline::Submit(const std::shared_ptr<Mesh>& mesh, const std::vector<AssetPtr<Material>>& materials,
+    uint32_t instance_count, Vector3 pos, const Layer& layer, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address,
+    D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle)
+{
+    const auto instance = Instance();
+
+    if (materials.empty())
+        return;
+
+    for (auto i = 0; i < materials.size(); ++i)
+    {
+        const auto casted_material = materials[i].CastedLock();
+
+        if (casted_material == nullptr)
+            continue;
+
+        const auto casted_shader = casted_material->GetShader().CastedLock();
+        if (!casted_shader)
+        {
+            continue;
+        }
+
+        MeshCommand mesh_cmd;
+        mesh_cmd.shader = casted_shader.get();
+        mesh_cmd.material = casted_material.get();
+        mesh_cmd.instance_count = instance_count;
+        mesh_cmd.pos = pos;
+        mesh_cmd.mesh = mesh.get();
+        mesh_cmd.sub_mesh_index = i - 1;
+        mesh_cmd.world_matrix_buffer_address = world_matrix_address;
+        mesh_cmd.bone_matrices_buffer_handle = bone_matrices_handle;
+
+        RenderCommand cmd;
+        cmd.data = mesh_cmd;
+        cmd.layer = layer;
+        instance->m_render_commands_.emplace_back(cmd);
+    }
+}
+
+void RenderPipeline::Submit(const AssetPtr<FontData>& font_data, Vector2 position, const std::string& string,
+    Color color, float rotation, Vector2 origin, float scale, uint16_t render_queue, const Layer& layer)
+{
+    const auto casted_font_data = font_data.CastedLock();
+    if (casted_font_data == nullptr)
+        return;
+
+    TextCommand text_cmd;
+    text_cmd.font_data = casted_font_data.get();
+    text_cmd.position = position;
+    text_cmd.string = string.c_str();
+    text_cmd.color = color;
+    text_cmd.rotation = rotation;
+    text_cmd.origin = origin;
+    text_cmd.scale = scale;
+    text_cmd.render_queue = render_queue;
+    
+    RenderCommand cmd;
+    cmd.data = text_cmd;
+    cmd.layer = layer;
+    Instance()->m_render_commands_.emplace_back(cmd);
+}
+
+void RenderPipeline::Submit(const std::vector<AssetPtr<Material>>& materials, uint32_t vertex_count,
+    const Layer& layer)
+{
+    const auto instance = Instance();
+
+    if (materials.empty())
+        return;
+
+    for (auto i = 0; i < materials.size(); ++i)
+    {
+        const auto casted_material = materials[i].CastedLock();
+
+        if (casted_material == nullptr)
+            continue;
+
+        const auto casted_shader = casted_material->GetShader().CastedLock();
+        if (!casted_shader)
+        {
+            continue;
+        }
+
+        ProceduralCommand procedural_cmd;
+        procedural_cmd.shader = casted_shader.get();
+        procedural_cmd.material = casted_material.get();
+        procedural_cmd.vertex_count = vertex_count;
+        
+        RenderCommand cmd;
+        cmd.data = procedural_cmd;
+        cmd.layer = layer;
+        instance->m_render_commands_.emplace_back(cmd);
+    }
 }
 
 void RenderPipeline::Init()

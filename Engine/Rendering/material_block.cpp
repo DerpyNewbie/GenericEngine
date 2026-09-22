@@ -3,12 +3,13 @@
 
 #include "buffer_data_base.h"
 #include "gpu_resource_manager.h"
+#include "texture_cube_buffer_data.h"
 
 namespace
 {
 using namespace engine;
 
-std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader_param)
+std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter& shader_param)
 {
     switch (shader_param.buffer_type)
     {
@@ -22,16 +23,17 @@ std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader
         return std::make_shared<UavTextureBufferData>(shader_param);
     case kBufferType_ByteAddressBuffer:
         return std::make_shared<ByteAddressBufferData>(shader_param);
+        case kBufferType_TextureCube:
+        return std::make_shared<TextureCubeBufferData>(shader_param);
     }
 }
 }
 
 namespace engine
 {
-
 void MaterialBlock::OnInspectorGui()
 {
-    for (auto &[name, data] : m_buffer_data_)
+    for (auto& [name, data] : m_buffer_data_)
     {
         if (GpuResourceManager::GetGlobalBuffer(name))
             continue;
@@ -42,7 +44,7 @@ void MaterialBlock::OnInspectorGui()
     }
 }
 
-std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const std::string &name)
+std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const std::string& name)
 {
     auto it = m_buffer_data_.find(name);
     if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_ConstantBuffer)
@@ -51,7 +53,7 @@ std::shared_ptr<ConstantBufferData> MaterialBlock::GetConstantBufferData(const s
     return std::reinterpret_pointer_cast<ConstantBufferData>(it->second);
 }
 
-std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(const std::string &name)
+std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(const std::string& name)
 {
     auto it = m_buffer_data_.find(name);
     if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_StructuredBuffer)
@@ -60,7 +62,7 @@ std::shared_ptr<StructuredBufferData> MaterialBlock::GetStructuredBufferData(con
     return std::reinterpret_pointer_cast<StructuredBufferData>(it->second);
 }
 
-std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std::string &name)
+std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std::string& name)
 {
     auto it = m_buffer_data_.find(name);
     if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_Texture2D)
@@ -69,7 +71,7 @@ std::shared_ptr<TextureBufferData> MaterialBlock::GetTextureBufferData(const std
     return std::reinterpret_pointer_cast<TextureBufferData>(it->second);
 }
 
-std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(const std::string &name)
+std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(const std::string& name)
 {
     auto it = m_buffer_data_.find(name);
     if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_UavTexture)
@@ -78,7 +80,7 @@ std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(con
     return std::reinterpret_pointer_cast<UavTextureBufferData>(it->second);
 }
 
-std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(const std::string &name)
+std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(const std::string& name)
 {
     auto it = m_buffer_data_.find(name);
     if (it == m_buffer_data_.end())
@@ -87,9 +89,18 @@ std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(c
     return std::reinterpret_pointer_cast<ByteAddressBufferData>(it->second);
 }
 
-void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &shader_params)
+std::shared_ptr<TextureCubeBufferData> MaterialBlock::GetTextureCubeData(const std::string& name)
 {
-    for (auto &param : shader_params)
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_TextureCube)
+        return nullptr;
+    
+    return std::reinterpret_pointer_cast<TextureCubeBufferData>(it->second);
+}
+
+void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter>& shader_params)
+{
+    for (auto& param : shader_params)
     {
         const auto data = CreateMaterialData(param);
 
@@ -112,6 +123,9 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
             break;
         case kBufferType_ByteAddressBuffer:
             m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ByteAddressBufferData>(data));
+            break;
+        case kBufferType_TextureCube:
+            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
             break;
         }
     }

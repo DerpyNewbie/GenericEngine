@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "byte_address_buffer_data.h"
 
+#include "gui.h"
+
 engine::ByteAddressBufferData::ByteAddressBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {}
 

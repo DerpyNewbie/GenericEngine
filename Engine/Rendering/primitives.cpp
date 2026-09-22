@@ -16,10 +16,10 @@ std::shared_ptr<engine::Mesh> Primitives::GetQuadMesh()
     m_quad_mesh_->vertices.emplace_back(Vector3(1, -1, 0.0f));
     m_quad_mesh_->vertices.emplace_back(Vector3(1, 1, 0.0f));
 
-    m_quad_mesh_->uvs[0].emplace_back(Vector2(0, 1));
     m_quad_mesh_->uvs[0].emplace_back(Vector2(0, 0));
-    m_quad_mesh_->uvs[0].emplace_back(Vector2(1, 1));
+    m_quad_mesh_->uvs[0].emplace_back(Vector2(0, 1));
     m_quad_mesh_->uvs[0].emplace_back(Vector2(1, 0));
+    m_quad_mesh_->uvs[0].emplace_back(Vector2(1, 1));
 
     m_quad_mesh_->indices = {0, 1, 2, 2, 1, 3};
 

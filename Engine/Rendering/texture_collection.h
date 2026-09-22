@@ -17,6 +17,8 @@ class TextureCollection
     inline static std::unordered_map<std::shared_ptr<RenderTexture>, std::shared_ptr<RenderTextureBuffer>> m_render_texture_buffer_map_;
     inline static std::unordered_map<std::shared_ptr<DepthTexture>, std::shared_ptr<DepthTextureBuffer>> m_depth_texture_buffer_map_;
 
+    static std::shared_ptr<TextureBuffer> CreateTextureBuffer(const std::shared_ptr<Texture2D> &texture);
+    
 public:
     static std::shared_ptr<TextureBuffer> GetTexture(const std::shared_ptr<Texture2D> &texture);
     static std::shared_ptr<RenderTextureBuffer> GetRenderTexture(const std::shared_ptr<RenderTexture> &render_texture);

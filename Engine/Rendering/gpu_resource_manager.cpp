@@ -67,6 +67,15 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(
                 new_group->Insert(byte_address_buffer, data, kBufferType_ByteAddressBuffer,
                                   data->parameter.is_unordered_access ? kGpuBufferType_UAV : kGpuBufferType_SRV);
             }
+            break;
+        case kBufferType_TextureCube:
+            {
+                const auto tex_data = std::reinterpret_pointer_cast<TextureCubeBufferData>(data);
+                auto textures = tex_data->Textures();
+                auto texture_cube_buffer = std::make_shared<TextureCube>(textures);
+
+                new_group->Insert(texture_cube_buffer, data, kBufferType_TextureCube, kGpuBufferType_SRV);
+            }
         }
     }
 
@@ -135,7 +144,7 @@ void GpuResourceManager::SetGlobalBufferData(const std::string& name,
             {
                 const auto sb_data = std::reinterpret_pointer_cast<StructuredBufferData>(buffer_data);
                 if (it->second->IsValid())
-                it->second->UpdateBuffer(sb_data->Data());
+                    it->second->UpdateBuffer(sb_data->Data());
                 break;
             }
         case kBufferType_Texture2D:

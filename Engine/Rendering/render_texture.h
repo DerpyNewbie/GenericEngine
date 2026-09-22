@@ -8,11 +8,14 @@ class RenderTexture : public Texture2D
     friend class RenderTextureBuffer;
 
     bool m_allow_uav_;
+    int m_format_index_;
     
 public:
     RenderTexture();
-    
+
+    void OnConstructed() override;
     void OnInspectorGui() override;
+    void OnDeserialized() override;
 
     bool AllowUav() const;
     

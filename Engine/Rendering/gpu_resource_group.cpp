@@ -2,12 +2,14 @@
 #include "gpu_resource_group.h"
 
 #include "gpu_resource_manager.h"
+#include "texture_collection.h"
 #include "CabotEngine/Graphics/ByteAddressBuffer.h"
 #include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
-void GpuResourceGroup::UpdateConstantBuffer(const GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+void GpuResourceGroup::UpdateConstantBuffer(const GpuResource& gpu_resource,
+                                            const std::shared_ptr<MaterialBlock>& material_block)
 {
     if (gpu_resource.handle != nullptr)
         gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
@@ -17,7 +19,8 @@ void GpuResourceGroup::UpdateConstantBuffer(const GpuResource &gpu_resource, con
         gpu_resource.buffer->UpdateBuffer(cb_data->Data());
 }
 
-void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+void GpuResourceGroup::UpdateStructuredBuffer(GpuResource& gpu_resource,
+                                              const std::shared_ptr<MaterialBlock>& material_block)
 {
     auto sb_data = material_block->GetStructuredBufferData(gpu_resource.name);
     if (sb_data->is_size_changed)
@@ -31,10 +34,13 @@ void GpuResourceGroup::UpdateStructuredBuffer(GpuResource &gpu_resource, const s
     if (sb_data->is_dirty)
         gpu_resource.buffer->UpdateBuffer(sb_data->Data());
 
-    gpu_resource.buffer->Transition(sb_data->parameter.is_unordered_access ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    gpu_resource.buffer->Transition(sb_data->parameter.is_unordered_access
+                                        ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+                                        : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+void GpuResourceGroup::UpdateTextureBuffer(GpuResource& gpu_resource,
+                                           const std::shared_ptr<MaterialBlock>& material_block)
 {
     auto tex_data = material_block->GetTextureBufferData(gpu_resource.name);
     if (tex_data->is_dirty)
@@ -55,7 +61,8 @@ void GpuResourceGroup::UpdateTextureBuffer(GpuResource &gpu_resource, const std:
     gpu_resource.buffer->Transition(D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource& gpu_resource,
+                                              const std::shared_ptr<MaterialBlock>& material_block)
 {
     auto tex_data = material_block->GetUavTextureBufferData(gpu_resource.name);
     if (tex_data->is_dirty)
@@ -76,7 +83,8 @@ void GpuResourceGroup::UpdateUavTextureBuffer(GpuResource &gpu_resource, const s
     gpu_resource.buffer->Transition(D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
 }
 
-void GpuResourceGroup::UpdateByteAddressBuffer(GpuResource &gpu_resource, const std::shared_ptr<MaterialBlock> &material_block)
+void GpuResourceGroup::UpdateByteAddressBuffer(GpuResource& gpu_resource,
+                                               const std::shared_ptr<MaterialBlock>& material_block)
 {
     auto byte_address_data = material_block->GetByteAddressBufferData(gpu_resource.name);
     if (byte_address_data->is_size_changed)
@@ -90,10 +98,42 @@ void GpuResourceGroup::UpdateByteAddressBuffer(GpuResource &gpu_resource, const 
     if (byte_address_data->is_dirty)
         gpu_resource.buffer->UpdateBuffer(byte_address_data->Data());
 
-    gpu_resource.buffer->Transition(byte_address_data->parameter.is_unordered_access ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+    gpu_resource.buffer->Transition(byte_address_data->parameter.is_unordered_access
+                                        ? D3D12_RESOURCE_STATE_UNORDERED_ACCESS
+                                        : D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource, bool is_uav)
+void GpuResourceGroup::UpdateTextureCubeBuffer(GpuResource& gpu_resource,
+                                               const std::shared_ptr<MaterialBlock>& material_block)
+{
+    auto tex_cube_data = material_block->GetTextureCubeData(gpu_resource.name);
+    if (tex_cube_data->is_dirty && gpu_resource.handle != nullptr)
+    {
+        auto textures = tex_cube_data->Textures();
+        for (auto& texture : textures)
+        {
+            if (texture == nullptr)
+            {
+                gpu_resource.buffer = nullptr;
+                return;
+            }
+        }
+
+        gpu_resource.buffer = std::make_shared<TextureCube>(textures);
+        gpu_resource.buffer->CreateBuffer();
+        gpu_resource.buffer->UploadBuffer(gpu_resource.handle);
+
+        tex_cube_data->is_dirty = false;
+    }
+
+    if (gpu_resource.buffer != nullptr && !gpu_resource.buffer->IsValid())
+        gpu_resource.buffer->CreateBuffer();
+
+    if (gpu_resource.buffer != nullptr && gpu_resource.buffer->Resource() == nullptr)
+        gpu_resource.buffer = nullptr;
+}
+
+bool GpuResourceGroup::SetGlobalResource(GpuResource& gpu_resource, const bool is_uav)
 {
     auto global_resource = GpuResourceManager::GetGlobalBuffer(gpu_resource.name);
     if (global_resource == nullptr)
@@ -106,14 +146,16 @@ bool GpuResourceGroup::SetGlobalResource(GpuResource &gpu_resource, bool is_uav)
 
     if (!global_resource->IsValid() || gpu_resource.handle == nullptr)
         return false;
-    
+
     gpu_resource.buffer = global_resource;
     gpu_resource.buffer->UploadBuffer(gpu_resource.handle, is_uav);
 
     return true;
 }
 
-void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase> &buffer, const std::shared_ptr<BufferDataBase> &material_data, kBufferType buffer_type, kGpuUploadType gpu_upload_type)
+void GpuResourceGroup::Insert(const std::shared_ptr<BufferBase>& buffer,
+                              const std::shared_ptr<BufferDataBase>& material_data, kBufferType buffer_type,
+                              kGpuUploadType gpu_upload_type)
 {
     if (buffer && !buffer->IsValid())
         buffer->CreateBuffer();
@@ -141,17 +183,18 @@ GpuResource GpuResourceGroup::End(const kGpuUploadType buffer_type)
     return m_gpu_resources_[buffer_type].begin()->second;
 }
 
-void GpuResourceGroup::SetBuffer(const std::string &name, const std::shared_ptr<BufferBase> &buffer)
+void GpuResourceGroup::SetBuffer(const std::string& name, const std::shared_ptr<BufferBase>& buffer)
 {
     if (buffer == nullptr)
         return;
 
     bool find = false;
     GpuResource find_gpu_resource;
-    for (auto &gpu_resources : m_gpu_resources_)
+    for (auto& gpu_resources : m_gpu_resources_)
     {
         auto it = std::ranges::find_if(gpu_resources,
-                                       [&name](auto &gpu_resource) {
+                                       [&name](auto& gpu_resource)
+                                       {
                                            return gpu_resource.second.name == name;
                                        });
 
@@ -172,12 +215,13 @@ void GpuResourceGroup::SetBuffer(const std::string &name, const std::shared_ptr<
     find_gpu_resource.buffer = buffer;
 }
 
-std::shared_ptr<BufferBase> GpuResourceGroup::GetBuffer(const std::string &name)
+std::shared_ptr<BufferBase> GpuResourceGroup::GetBuffer(const std::string& name)
 {
-    for (auto &gpu_resources : m_gpu_resources_)
+    for (auto& gpu_resources : m_gpu_resources_)
     {
         auto it = std::ranges::find_if(gpu_resources,
-                                       [&name](auto &gpu_resource) {
+                                       [&name](auto& gpu_resource)
+                                       {
                                            return gpu_resource.second.name == name;
                                        });
 
@@ -188,34 +232,41 @@ std::shared_ptr<BufferBase> GpuResourceGroup::GetBuffer(const std::string &name)
     return nullptr;
 }
 
-bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock> &material_block)
+bool GpuResourceGroup::UpdateBuffer(const std::shared_ptr<MaterialBlock>& material_block)
 {
     for (int i = 0; i < kGpuBufferType_Count; ++i)
     {
-        for (auto &gpu_resource : m_gpu_resources_[i] | std::views::values)
+        for (auto& gpu_resource : m_gpu_resources_[i] | std::views::values)
         {
             if (SetGlobalResource(gpu_resource, i == kGpuBufferType_UAV))
                 continue;
 
             switch (gpu_resource.buffer_type)
             {
-                case kBufferType_ConstantBuffer: {
+            case kBufferType_ConstantBuffer:
+                {
                     UpdateConstantBuffer(gpu_resource, material_block);
                     break;
                 }
-                case kBufferType_StructuredBuffer: {
+            case kBufferType_StructuredBuffer:
+                {
                     UpdateStructuredBuffer(gpu_resource, material_block);
                     break;
                 }
-                case kBufferType_Texture2D: {
+            case kBufferType_Texture2D:
+                {
                     UpdateTextureBuffer(gpu_resource, material_block);
                     break;
                 }
-                case kBufferType_UavTexture:
-                    UpdateUavTextureBuffer(gpu_resource, material_block);
-                    break;
-                case kBufferType_ByteAddressBuffer:
-                    UpdateByteAddressBuffer(gpu_resource, material_block);
+            case kBufferType_UavTexture:
+                UpdateUavTextureBuffer(gpu_resource, material_block);
+                break;
+            case kBufferType_ByteAddressBuffer:
+                UpdateByteAddressBuffer(gpu_resource, material_block);
+                break;
+            case kBufferType_TextureCube:
+                UpdateTextureCubeBuffer(gpu_resource, material_block);
+                break;
             }
         }
     }
@@ -230,7 +281,8 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
 
     for (int i = 0; i < kGpuBufferType_Count; ++i)
     {
-        auto it = std::ranges::find_if(m_gpu_resources_[i], [](const std::pair<int, GpuResource> &a) {
+        auto it = std::ranges::find_if(m_gpu_resources_[i], [](const std::pair<int, GpuResource>& a)
+        {
             return a.second.handle == nullptr;
         });
         if (m_gpu_resources_[i].empty() || it == m_gpu_resources_[i].end())
@@ -238,7 +290,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
 
         auto itr = 0;
         const auto handles = DescriptorHeap::AllocateLinedUp(m_gpu_resources_[i].size());
-        for (auto &gpu_resource : m_gpu_resources_[i] | std::views::values)
+        for (auto& gpu_resource : m_gpu_resources_[i] | std::views::values)
         {
             if (gpu_resource.buffer == nullptr)
             {
@@ -262,7 +314,7 @@ bool GpuResourceGroup::SetBufferToDescriptorTable()
 
 void GpuResourceGroup::WaitUavWrite()
 {
-    for (auto &gpu_resource : m_gpu_resources_[kGpuBufferType_UAV] | std::views::values)
+    for (auto& gpu_resource : m_gpu_resources_[kGpuBufferType_UAV] | std::views::values)
     {
         D3D12_RESOURCE_BARRIER uavBarrier = {};
         uavBarrier.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "constant_buffer_data.h"
 
+#include "gui.h"
 #include "CabotEngine/Graphics/ConstantBuffer.h"
 
 namespace engine

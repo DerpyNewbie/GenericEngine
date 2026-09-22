@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "compute_shader_component.h"
+
+#include "gui.h"
 #include "Rendering/gpu_resource_manager.h"
 #include "Rendering/render_pipeline.h"
 

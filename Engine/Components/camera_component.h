@@ -2,6 +2,7 @@
 #include "renderer.h"
 #include "Rendering/camera.h"
 #include "Rendering/depth_texture.h"
+#include "Rendering/layer.h"
 #include "Rendering/render_texture.h"
 
 namespace engine
@@ -45,11 +46,12 @@ struct CameraProperty : Inspectable
     }
 };
 
-class CameraComponent : public Component, public IRenderReceiver
+class  CameraComponent : public Component, public IRenderReceiver
 {
     inline static std::weak_ptr<CameraComponent> m_main_camera_;
     inline static std::list<std::weak_ptr<CameraComponent>> m_cameras_;
 
+    Layer m_rendering_layer_;
     AssetPtr<RenderTexture> m_render_texture_;
     AssetPtr<DepthTexture> m_depth_texture_;
     
@@ -64,8 +66,11 @@ public:
 
     Matrix ViewMatrix() const;
     Camera GetCamera();
+    Layer GetRenderingLayer() const;
 
-    std::shared_ptr<RenderTexture> RenderTexture();
+    std::shared_ptr<RenderTexture> GetRenderTexture();
+
+    void SetRenderTexture(const AssetPtr<RenderTexture>& render_texture);
 
     static std::shared_ptr<CameraComponent> Main();
     static void SetMainCamera(const std::weak_ptr<CameraComponent> &camera);
@@ -85,10 +90,17 @@ public:
                 CEREAL_NVP(m_depth_texture_)
             );
         }
+
+        if (version >= 3)
+        {
+            ar(
+                CEREAL_NVP(m_rendering_layer_)
+            );
+        }
     }
 };
 }
 
 CEREAL_CLASS_VERSION(engine::CameraProperty, 1)
 
-CEREAL_CLASS_VERSION(engine::CameraComponent, 2)
+CEREAL_CLASS_VERSION(engine::CameraComponent, 3)

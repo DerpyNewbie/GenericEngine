@@ -16,6 +16,6 @@ class PSOManager
     static bool Register(const engine::ComputeShader *shader, const std::string &pso_name);
 
 public:
-    static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader, DXGI_FORMAT rtv_format = DXGI_FORMAT_R8G8B8A8_UNORM, UINT num_render_targets = 1);
+    static bool SetPipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::Shader *shader, DXGI_FORMAT rtv_format = DXGI_FORMAT_R32G32B32A32_FLOAT, UINT num_render_targets = 1);
     static bool SetComputePipelineState(ID3D12GraphicsCommandList *cmd_list, const engine::ComputeShader *shader);
 };

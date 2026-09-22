@@ -4,7 +4,6 @@
 
 namespace engine
 {
-
 class Texture2D : public Object, public Inspectable
 {
     friend class Texture2DImporter;
@@ -34,13 +33,12 @@ protected:
 public:
     Texture2D() = default;
     Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format);
-    ~Texture2D() override;
 
     void LoadFromAiTexture(aiTexture *ai_texture);
     
     void OnInspectorGui() override;
 
-    std::vector<DirectX::PackedVector::XMCOLOR> GetPixels();
+    virtual std::vector<DirectX::PackedVector::XMCOLOR> GetPixels();
 
     [[nodiscard]] uint32_t Width();
 
@@ -49,6 +47,8 @@ public:
     [[nodiscard]] uint16_t MipLevel();
     
     [[nodiscard]] DXGI_FORMAT Format();
+
+    void OnDestroy() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

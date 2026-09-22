@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "texture_buffer_data.h"
 
+#include "gui.h"
 #include "Asset/Importer/texture_2d_importer.h"
 
 namespace engine
@@ -11,7 +12,7 @@ TextureBufferData::TextureBufferData(const ShaderParameter &shader_param) : Buff
 
 void TextureBufferData::OnInspectorGui()
 {
-    if (Gui::PropertyField("Texture", m_texture_))
+    if (Gui::PropertyField(parameter.name.c_str(), m_texture_))
         SetTexture(m_texture_);
 }
 

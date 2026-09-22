@@ -7,6 +7,7 @@ namespace engine
 class DepthTexture : public Texture2D
 {
 public:
+    void OnInspectorGui() override;
     
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

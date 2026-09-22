@@ -148,7 +148,7 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
         {
             ctx->LogImportWarning(std::format("Material {} has no texture assigned!", ai_material->GetName().C_Str()).c_str());
         }
-        else if (ai_texture_path.C_Str()[0] == '*')
+        /*else if (ai_texture_path.C_Str()[0] == '*')
         {
             // embedded texture
             const int index = std::stoi(ai_texture_path.C_Str() + 1);
@@ -164,7 +164,7 @@ void FbxImporter::CreateMaterialMappings(AssetDescriptor *ctx, const aiScene *ai
             const auto texture = AssetDatabase::GetAsset<Texture2D>(file_path);
             const auto texture_buff_data = material_asset->shared_material_block->GetTextureBufferData("_MainTex");
             texture_buff_data->SetTexture(texture);
-        }
+        }*/
 
         ctx->AddObject(material_asset);
         out_conversion_mapping.EmplaceMaterial(i, material_asset);

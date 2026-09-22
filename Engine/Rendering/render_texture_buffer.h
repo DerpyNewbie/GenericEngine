@@ -17,7 +17,7 @@ public:
     
     ID3D12DescriptorHeap *GetHeap() const;
 
-    static D3D12_UNORDERED_ACCESS_VIEW_DESC UavDesc();
+    D3D12_UNORDERED_ACCESS_VIEW_DESC UavDesc();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 };
 }

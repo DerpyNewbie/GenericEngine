@@ -5,10 +5,12 @@
 #include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
 #include "camera_component.h"
+#include "gui.h"
 #include "Asset/asset_database.h"
 #include "Rendering/gizmos.h"
 #include "Rendering/buffer_data_base.h"
 #include "Rendering/gpu_resource_manager.h"
+#include "Rendering/lighting.h"
 #include "Rendering/render_pipeline.h"
 #include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RootSignature.h"
@@ -156,7 +158,7 @@ void MeshRenderer::DepthRender()
                                  ? mesh->sub_meshes[0].base_index
                                  : mesh->indices.size();
 
-    cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), instance_count, 0, 0, 0);
+    cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), instance_count * Lighting::Instance()->GetLightCount(), 0, 0, 0);
 
     // sub-meshes
     for (int i = 0; i < mesh->sub_meshes.size(); ++i)
@@ -164,7 +166,7 @@ void MeshRenderer::DepthRender()
         cmd_list->IASetIndexBuffer(mesh->index_buffers[i + 1]->View());
 
         const auto sub_mesh = mesh->sub_meshes[i];
-        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, instance_count, 0, 0, 0);
+        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, instance_count * Lighting::Instance()->GetLightCount(), 0, 0, 0);
     }
 }
 
@@ -173,7 +175,7 @@ void MeshRenderer::Render()
     UpdateWorldBuffer();
 
     RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, instance_count,
-                           GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress());
+                           GameObject()->Transform()->Position(), m_rendering_layer_, m_world_matrix_buffer_->GetAddress());
 }
 
 AssetPtr<Material> MeshRenderer::GetShadowMaterial()

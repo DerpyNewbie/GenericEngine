@@ -3,6 +3,7 @@
 #include "font_data.h"
 #include "material.h"
 #include "mesh.h"
+#include "layer.h"
 #include "shader.h"
 
 namespace engine
@@ -46,7 +47,7 @@ struct EffectCommand
 struct RenderCommand
 {
     uint64_t priority;
-    UINT64 target_camera_id;
+    Layer layer;
     std::variant<MeshCommand, TextCommand, ProceduralCommand, EffectCommand> data;
 };
 }

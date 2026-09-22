@@ -5,6 +5,7 @@
 #include "shader.h"
 #include "structured_buffer_data.h"
 #include "texture_buffer_data.h"
+#include "texture_cube_buffer_data.h"
 #include "uav_texture_buffer_data.h"
 #include "CabotEngine/Graphics/StructuredBuffer.h"
 
@@ -26,6 +27,7 @@ void OnInspectorGui() override;
     std::shared_ptr<TextureBufferData> GetTextureBufferData(const std::string &name);
     std::shared_ptr<UavTextureBufferData> GetUavTextureBufferData(const std::string &name);
     std::shared_ptr<ByteAddressBufferData> GetByteAddressBufferData(const std::string &name);
+    std::shared_ptr<TextureCubeBufferData> GetTextureCubeData(const std::string &name);
 
     void LoadShaderParameters(const std::vector<ShaderParameter> &shader_params);
     
