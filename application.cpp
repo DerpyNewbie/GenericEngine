@@ -141,7 +141,7 @@ void Application::InitWindow()
     window_handle = CreateWindow(
         w.lpszClassName,
         _T(window_title.c_str()),
-        WS_OVERLAPPEDWINDOW,
+        WS_POPUP,
         CW_USEDEFAULT,
         CW_USEDEFAULT,
         wrc.right - wrc.left,

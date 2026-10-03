@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include <any>
+
+#include "cancellation_token.h"
 #include "task.h"
 #include "yield_base.h"
 
@@ -7,13 +10,20 @@ namespace engine
 //先人がゲームとエンジンのcoroutineは別けたほうがいいよって言ってたのでシングルトンじゃないです
 class CoroutineManager
 {
-    std::vector<std::coroutine_handle<Task::promise_type>> m_coroutines_;
+    using CoroutineEntry = std::pair<std::coroutine_handle<Task::promise_type>, CancellationToken>;
+    std::vector<CoroutineEntry> m_coroutines_;
 
 public:
-    void Start(Task &&t)
+    void Start(Task&& t)
     {
         t.handle.resume();
-        m_coroutines_.emplace_back(t.handle);
+        m_coroutines_.emplace_back(t.handle, CancellationToken());
+        t.handle = nullptr;
+    }
+    void Start(Task&& t, CancellationToken token)
+    {
+        t.handle.resume();
+        m_coroutines_.emplace_back(t.handle, token);
         t.handle = nullptr;
     }
 
@@ -21,28 +31,46 @@ public:
     {
         for (auto it = m_coroutines_.begin(); it != m_coroutines_.end();)
         {
-            auto h = *it;
-            auto &promise = h.promise();
-
-            if (auto yield = promise.current_yield.get())
+            try
             {
-                if (!yield->should_resume())
+                if (it->second.IsCancellationRequested())
                 {
-                    ++it;
+                    it->first.destroy();
+                    it = m_coroutines_.erase(it);
                     continue;
                 }
-            }
+                
+                auto h = it->first;
+                auto& promise = h.promise();
 
-            h.resume();
+                if (auto yield = promise.current_yield.get())
+                {
+                    if (!yield->should_resume())
+                    {
+                        ++it;
+                        continue;
+                    }
+                }
 
-            if (h.done())
-            {
-                h.destroy();
-                it = m_coroutines_.erase(it);
+                h.resume();
+
+                if (h.done())
+                {
+                    h.destroy();
+                    it = m_coroutines_.erase(it);
+                }
+                else
+                {
+                    ++it;
+                }
             }
-            else
+            catch(const std::any& e)
             {
-                ++it;
+                std::cout << e.type().name() << std::endl;
+            }
+            catch(...)
+            {
+                std::cout << "unknown exception" << std::endl;
             }
         }
     }

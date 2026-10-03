@@ -33,23 +33,23 @@ Matrix CameraProperty::ProjectionMatrix() const
 {
     switch (view_mode)
     {
-        case kViewMode::kPerspective:
-            return DirectX::XMMatrixPerspectiveFovRH(
-                field_of_view * Mathf::kDeg2Rad,
-                aspect_ratio,
-                near_plane,
-                far_plane
-            );
-        case kViewMode::kOrthographic:
-            return DirectX::XMMatrixOrthographicRH(
-                ortho_size * aspect_ratio,
-                ortho_size,
-                near_plane,
-                far_plane
-            );
-        default:
-            assert(false && "Invalid ViewMode");
-            return Matrix::Identity;
+    case kViewMode::kPerspective:
+        return DirectX::XMMatrixPerspectiveFovRH(
+            field_of_view * Mathf::kDeg2Rad,
+            aspect_ratio,
+            near_plane,
+            far_plane
+        );
+    case kViewMode::kOrthographic:
+        return DirectX::XMMatrixOrthographicRH(
+            ortho_size * aspect_ratio,
+            ortho_size,
+            near_plane,
+            far_plane
+        );
+    default:
+        assert(false && "Invalid ViewMode");
+        return Matrix::Identity;
     }
 }
 
@@ -75,6 +75,7 @@ void CameraComponent::OnValidate()
         OnDisabled();
     }
 }
+
 void CameraComponent::Render()
 {
     RenderPipeline::RequestRender(GetCamera());
@@ -91,7 +92,8 @@ void CameraComponent::OnEnabled()
     const auto find = std::ranges::find(
         m_cameras_,
         shared_this,
-        [](auto a) {
+        [](auto a)
+        {
             return a.lock();
         }
     );
@@ -107,7 +109,8 @@ void CameraComponent::OnDisabled()
     auto shared_this = shared_from_base<CameraComponent>();
     std::erase_if(
         m_cameras_,
-        [shared_this](const std::weak_ptr<CameraComponent> &a) {
+        [shared_this](const std::weak_ptr<CameraComponent>& a)
+        {
             return a.expired() || a.lock() == shared_this;
         }
     );
@@ -122,7 +125,9 @@ void CameraComponent::OnDisabled()
 
 Camera CameraComponent::GetCamera()
 {
-    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), m_rendering_layer_, property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(), m_depth_texture_.CastedLock());
+    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), m_rendering_layer_,
+                  property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_.CastedLock(),
+                  m_depth_texture_.CastedLock());
 }
 
 Layer CameraComponent::GetRenderingLayer() const
@@ -133,9 +138,61 @@ Layer CameraComponent::GetRenderingLayer() const
 std::shared_ptr<RenderTexture> CameraComponent::GetRenderTexture()
 {
     return m_render_texture_.CastedLock() != nullptr
-        ? m_render_texture_.CastedLock()
-        : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
-        .CastedLock();
+               ? m_render_texture_.CastedLock()
+               : (m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>()))
+               .CastedLock();
+}
+
+Vector3 CameraComponent::ScreenPosToWorldPos(Vector2 screen_pos, float z_pos) const
+{
+    const auto view_port = RenderEngine::Viewport();
+    const Vector3 screen_near = {screen_pos.x, screen_pos.y, 0.0f};
+
+    const Vector3 ray_origin = DirectX::XMVector3Unproject(
+        screen_near,
+        0.0f, 0.0f, view_port.Width, view_port.Height,
+        0.0f, 1.0f,
+        property.ProjectionMatrix(), ViewMatrix(), DirectX::XMMatrixIdentity()
+    );
+
+    const Vector3 screen_far = {screen_pos.x, screen_pos.y, 1.0f};
+
+    Vector3 ray_dest = DirectX::XMVector3Unproject(
+        screen_far,
+        0.0f, 0.0f, view_port.Width, view_port.Height,
+        0.0f, 1.0f,
+        property.ProjectionMatrix(), ViewMatrix(), DirectX::XMMatrixIdentity()
+    );
+
+    const auto ray_dir = ray_dest - ray_origin;
+
+    Vector3 normalized_dir;
+    ray_dir.Normalize(normalized_dir);
+
+    const Vector3 camera_forward = GameObject()->Transform()->Forward();
+    float dot = normalized_dir.Dot(camera_forward);
+
+    if (Mathf::Approximately(dot, 0.0f))
+    {
+        return ray_origin + (normalized_dir * z_pos);
+    }
+
+    const float forward_distance = z_pos / dot;
+    return (normalized_dir * forward_distance);
+}
+
+Vector2 CameraComponent::WorldPosToScreenPos(const Vector3 world_pos) const
+{
+    const auto view_port = RenderEngine::Viewport();
+
+    const Vector3 screen_pos = DirectX::XMVector3Project(
+        world_pos,
+        0.0f, 0.0f, view_port.Width, view_port.Height,
+        0.0f, 1.0f,
+        property.ProjectionMatrix(), ViewMatrix(), DirectX::XMMatrixIdentity()
+    );
+
+    return {screen_pos.x, screen_pos.y};
 }
 
 void CameraComponent::SetRenderTexture(const AssetPtr<RenderTexture>& render_texture)
@@ -143,7 +200,7 @@ void CameraComponent::SetRenderTexture(const AssetPtr<RenderTexture>& render_tex
     m_render_texture_ = render_texture;
 }
 
-void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)
+void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent>& camera)
 {
     m_main_camera_ = camera;
 }

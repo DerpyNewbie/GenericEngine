@@ -70,6 +70,9 @@ public:
 
     std::shared_ptr<RenderTexture> GetRenderTexture();
 
+    Vector3 ScreenPosToWorldPos(Vector2 screen_pos, float z_pos) const;
+    Vector2 WorldPosToScreenPos(Vector3 world_pos) const;
+    
     void SetRenderTexture(const AssetPtr<RenderTexture>& render_texture);
 
     static std::shared_ptr<CameraComponent> Main();
