@@ -6,7 +6,6 @@
 #include "Components/camera_component.h"
 #include "Components/renderer.h"
 #include "gizmos.h"
-#include "gpu_resource_manager.h"
 #include "lighting.h"
 #include "render_command.h"
 #include "scene_data.h"
@@ -70,34 +69,6 @@ void SortCommands(std::vector<engine::RenderCommand> &render_commands, const Vec
                           return a.priority < b.priority;
                       });
 }
-
-bool SetDescriptorTable(const std::shared_ptr<engine::MaterialBlock> &material_block)
-{
-    const auto resource_group = engine::GpuResourceManager::GetBuffersForMaterial(material_block);
-    const auto cmd_list = RenderEngine::CommandList();
-
-    if (!resource_group->UpdateBuffer(material_block))
-        return false;
-    if (!resource_group->SetBufferToDescriptorTable())
-        return false;
-
-    for (int param_i = 0; param_i < engine::kGpuBufferType_Count; ++param_i)
-    {
-        const auto param_type = static_cast<engine::kGpuUploadType>(param_i);
-
-        if (resource_group->Empty(param_type))
-        {
-            continue;
-        }
-
-        const int root_param_idx = param_i +
-                                   engine::RootSignature::kPreDefinedVariableCount;
-        const auto itr = resource_group->Begin(param_type);
-        const auto desc_handle = itr.handle->handle_gpu;
-        cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
-    }
-    return true;
-}
 }
 
 namespace engine
@@ -126,16 +97,18 @@ void RenderPipeline::RenderCamera(const Camera &camera)
     ID3D12DescriptorHeap *rtv_heap = nullptr;
     ID3D12DescriptorHeap *dsv_heap = nullptr;
 
-    if (const auto render_texture_buffer = camera.render_texture ? TextureCollection::LoadRenderTexture(camera.render_texture) : nullptr)
+    const auto render_tex = camera.render_texture;
+    if (render_tex)
     {
-        render_texture_buffer->Transition(D3D12_RESOURCE_STATE_RENDER_TARGET);
-        rtv_heap = render_texture_buffer->GetHeap();
+        render_tex->BeginRender(camera.background_color);
+        rtv_heap = render_tex->GetHeap();
     }
 
-    if (const auto depth_texture_buffer = camera.depth_texture ? TextureCollection::LoadDepthTexture(camera.depth_texture) : nullptr)
+    const auto depth_tex = camera.depth_texture;
+    if (depth_tex)
     {
-        depth_texture_buffer->Transition(D3D12_RESOURCE_STATE_DEPTH_WRITE);
-        dsv_heap = depth_texture_buffer->GetHeap();
+        depth_tex->BeginRender();
+        dsv_heap = depth_tex->GetHeap();
     }
 
     if (rtv_heap == nullptr && dsv_heap == nullptr)
@@ -151,6 +124,12 @@ void RenderPipeline::RenderCamera(const Camera &camera)
 
     RenderEngine::Instance()->SetRenderTarget(rtv_heap, dsv_heap, camera.background_color);
     Render(view, proj);
+
+    if (render_tex)
+        render_tex->EndRender();
+
+    if (depth_tex)
+        depth_tex->EndRender();
 }
 
 void RenderPipeline::RenderVoid()
@@ -168,9 +147,10 @@ void RenderPipeline::RenderVoid()
 
 void RenderPipeline::InvokeDrawCall()
 {
-    m_view_proj_matrix_buffers_.ReturnAll();
-
-    SetSceneData();
+    for (auto view_proj_matrices_buffers : m_view_proj_matrix_buffers_)
+    {
+        view_proj_matrices_buffers.ReturnAll();
+    }
 
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
@@ -192,7 +172,6 @@ void RenderPipeline::InvokeDrawCall()
     }
 
     on_rendering.Invoke();
-    m_requesting_cameras_.clear();
 }
 
 void RenderPipeline::SetCurrentCamera(const Camera &camera)
@@ -203,7 +182,8 @@ void RenderPipeline::SetCurrentCamera(const Camera &camera)
 void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 {
     const auto cmd_list = RenderEngine::CommandList();
-    const auto view_projection_buffer = *m_view_proj_matrix_buffers_.Get();
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto view_projection_buffer = *m_view_proj_matrix_buffers_[current_buffer_idx].Get();
     ViewProjection view_projection;
     view_projection.matrices[0] = view;
     view_projection.matrices[1] = proj;
@@ -214,29 +194,32 @@ void RenderPipeline::SetViewProjMatrix(const Matrix &view, const Matrix &proj)
 
 void RenderPipeline::SetSceneData()
 {
-    if (m_scene_data_buffer_data_ == nullptr)
+    if (m_scene_data_buffer_ == nullptr)
     {
-        m_scene_data_buffer_data_ = std::make_shared<ConstantBufferData>();
-        m_scene_data_buffer_data_->AddVector2("screen_size");
-        m_scene_data_buffer_data_->AddVector2("shadow_map_size");
-        m_scene_data_buffer_data_->AddFloat("time");
-        m_scene_data_buffer_data_->AddFloat("delta_time");
+        m_scene_data_buffer_ = std::make_shared<ConstantBuffer>(sizeof(SceneData));
+        m_scene_data_buffer_->CreateBuffer();
     }
 
-    m_scene_data_buffer_data_->SetVector2("screen_size", Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight())));
-    m_scene_data_buffer_data_->SetVector2("shadow_map_size", RenderingConstants::kShadowMapSize);
-    m_scene_data_buffer_data_->SetFloat("time", Time::Get()->TimeSinceStartUp());
-    m_scene_data_buffer_data_->SetFloat("delta_time", Time::GetDeltaTime());
+    const auto cmd_list = RenderEngine::CommandList();
+    SceneData scene_data;
+    scene_data.screen_size = Vector2(static_cast<float>(Application::WindowWidth()), static_cast<float>(Application::WindowHeight()));
+    scene_data.shadow_map_size = RenderingConstants::kShadowMapSize;
+    scene_data.time = Time::Get()->TimeSinceStartUp();
+    scene_data.delta_time = Time::GetDeltaTime();
 
-    GpuResourceManager::SetGlobalBufferData("SceneData", m_scene_data_buffer_data_);
+    m_scene_data_buffer_->UpdateBuffer(&scene_data);
+
+    cmd_list->SetGraphicsRootConstantBufferView(kSceneDataCBV, m_scene_data_buffer_->GetAddress());
 }
 
 void RenderPipeline::UpdateBuffer(const Matrix &view, const Matrix &proj)
 {
     SetViewProjMatrix(view, proj);
+    SetSceneData();
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
     lighting_instance->SetShadowMap();
+    lighting_instance->SetCascadeSlicesBuffer();
     lighting_instance->SetBuffers();
     Skybox::Instance()->Render();
 }
@@ -261,7 +244,7 @@ void RenderPipeline::DepthRender()
 
     if (m_depth_shader_ == nullptr)
     {
-        m_depth_shader_ = AssetDatabase::GetAsset<Shader>("depth.hlsl").CastedLock();
+        m_depth_shader_ = AssetDatabase::GetAsset<Shader>("depth.hlsl");
         if (m_depth_shader_ == nullptr)
         {
             Logger::Error<Gizmos>("Failed to load DepthShader.hlsl");
@@ -289,8 +272,11 @@ void RenderPipeline::DepthRender()
     scissor_rect.top = 0;
     scissor_rect.bottom = static_cast<LONG>(shadow_map_size.y);
 
-    RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
-                                              Color(), &viewport, &scissor_rect);
+    RenderEngine::Instance()->SetRenderTarget(nullptr,
+                                              Lighting::Instance()->m_dsv_heap_.Get(),
+                                              Color(),
+                                              &viewport,
+                                              &scissor_rect);
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
@@ -368,21 +354,19 @@ void RenderPipeline::ExecuteRenderCommands()
 
             if (current_material != material)
             {
-                if (material->shared_material_block == nullptr)
+                current_material = material;
+                if (material->p_shared_material_block == nullptr)
                     material->CreateMaterialBlock();
 
-                if (!SetDescriptorTable(material->shared_material_block))
-                    continue;
-
-                current_material = material;
+                material->SetDescriptorTable();
             }
 
             if (sub_mesh_index == -1)
             {
                 cmd_list->IASetIndexBuffer(mesh->index_buffers[0]->View());
                 const auto index_count = mesh->HasSubMeshes()
-                    ? mesh->sub_meshes[0].base_index
-                    : mesh->indices.size();
+                ? mesh->sub_meshes[0].base_index
+                : mesh->indices.size();
 
                 cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
             }
@@ -437,7 +421,7 @@ void RenderPipeline::Submit(const std::shared_ptr<Mesh> &mesh, std::vector<Asset
         if (casted_material == nullptr)
             continue;
 
-        const auto casted_shader = casted_material->GetShader().CastedLock();
+        const auto casted_shader = casted_material->shader.CastedLock();
         if (!casted_shader)
         {
             continue;
@@ -507,8 +491,10 @@ uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const floa
 void RenderPipeline::Init()
 {
     const auto instance = Instance();
-
-    instance->m_view_proj_matrix_buffers_.SetMaxSize(kStableCameraCount);
+    for (auto view_proj_matrices_buffers : instance->m_view_proj_matrix_buffers_)
+    {
+        view_proj_matrices_buffers.SetMaxSize(kStableCameraCount);
+    }
 }
 RenderPipeline *RenderPipeline::Instance()
 {

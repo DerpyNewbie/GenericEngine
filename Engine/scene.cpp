@@ -2,6 +2,7 @@
 
 #include "scene.h"
 
+#include "application.h"
 #include "game_object.h"
 #include "update_manager.h"
 
@@ -17,7 +18,10 @@ void Scene::OnConstructed()
     for (const auto &game_object : m_all_game_objects_)
     {
         game_object->m_scene_ = self;
-        game_object->InvokeOnValidate();
+        if (!Application::IsPlayMode())
+        {
+            game_object->InvokeOnValidate();
+        }
     }
 }
 
@@ -28,7 +32,10 @@ void Scene::OnDeserialized()
     for (const auto &game_object : m_all_game_objects_)
     {
         game_object->m_scene_ = self;
-        game_object->InvokeOnValidate();
+        if (!Application::IsPlayMode())
+        {
+            game_object->InvokeOnValidate();
+        }
     }
 }
 
@@ -37,7 +44,7 @@ void Scene::OnUpdate()
     const auto root_objects = m_root_game_objects_;
     for (const auto &game_object : root_objects)
     {
-        game_object->InvokeUpdate();
+        game_object->InvokeOnUpdate();
     }
 }
 
@@ -45,7 +52,7 @@ void Scene::OnFixedUpdate()
 {
     for (const auto &game_object : m_root_game_objects_)
     {
-        game_object->InvokeFixedUpdate();
+        game_object->InvokeOnFixedUpdate();
     }
 }
 
@@ -65,7 +72,9 @@ void Scene::OnGarbageCollect()
 {
     if (m_has_destroying_game_object_)
     {
-        const auto is_destroying = [](const auto &go) { return go->IsDestroying(); };
+        const auto is_destroying = [](const auto &go) {
+            return go->IsDestroying();
+        };
         std::erase_if(m_root_game_objects_, is_destroying);
         std::erase_if(m_all_game_objects_, is_destroying);
         m_has_destroying_game_object_ = false;
@@ -97,8 +106,18 @@ void Scene::MoveGameObject(const std::shared_ptr<GameObject> &go)
     // handle ownership change 
     if (prev_scene != this_scene && prev_scene != nullptr)
     {
-        erase_if(prev_scene->m_all_game_objects_, [&go](const auto &a) { return a == go; });
-        erase_if(prev_scene->m_root_game_objects_, [&go](const auto &a) { return a == go; });
+        erase_if(
+            prev_scene->m_all_game_objects_,
+            [&go](const auto &a) {
+                return a == go;
+            }
+        );
+        erase_if(
+            prev_scene->m_root_game_objects_,
+            [&go](const auto &a) {
+                return a == go;
+            }
+        );
     }
 
     // refresh current status
@@ -122,7 +141,12 @@ void Scene::MoveGameObject(const std::shared_ptr<GameObject> &go)
     }
     else
     {
-        erase_if(m_root_game_objects_, [&go](const auto &a) { return a == go; });
+        erase_if(
+            m_root_game_objects_,
+            [&go](const auto &a) {
+                return a == go;
+            }
+        );
     }
 
     // update child objects

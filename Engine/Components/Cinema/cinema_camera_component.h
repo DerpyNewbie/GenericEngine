@@ -21,16 +21,16 @@ public:
     void OnInspectorGui() override;
 
     void RecalculateOffset();
-    void ApplyTransform();
+    void ApplyTransform() const;
 
-    [[nodiscard]] Vector3 GetTargetPosition();
-    [[nodiscard]] Quaternion GetTargetRotation();
+    [[nodiscard]] Vector3 GetTargetPosition() const;
+    [[nodiscard]] Quaternion GetTargetRotation() const;
 
     [[nodiscard]] Vector3 GetPosition() const;
     [[nodiscard]] Quaternion GetRotation() const;
 
-    [[nodiscard]] Quaternion GetLookAtRotation();
-    [[nodiscard]] Matrix GetLookAtMatrix();
+    [[nodiscard]] Quaternion GetLookAtRotation() const;
+    [[nodiscard]] Matrix GetLookAtMatrix() const;
 
     template <typename Archive>
     void serialize(Archive &ar, const uint32_t version)
@@ -42,7 +42,7 @@ public:
             CEREAL_NVP(m_apply_rotation_),
             CEREAL_NVP(m_tracking_target_),
             CEREAL_NVP(m_tracking_offset_)
-        );
+            );
     }
 };
 }

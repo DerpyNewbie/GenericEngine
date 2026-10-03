@@ -15,9 +15,9 @@ void Material::OnInspectorGui()
         render_queue = std::clamp(render_queue, static_cast<uint16_t>(0), static_cast<uint16_t>(10000));
     }
 
-    if (Gui::ExpandablePropertyField<Shader>("shader", m_shader_))
+    if (Gui::ExpandablePropertyField<Shader>("shader", shader))
     {
-        if (m_shader_.CastedLock())
+        if (shader != nullptr)
         {
             CreateMaterialBlock();
             return;
@@ -29,20 +29,20 @@ void Material::OnInspectorGui()
         CreateMaterialBlock();
     }
 
-    if (shared_material_block == nullptr)
+    if (p_shared_material_block == nullptr)
     {
         ImGui::Text("Material Block is not created.");
     }
     else
     {
-        shared_material_block->OnInspectorGui();
+        p_shared_material_block->OnInspectorGui();
     }
 }
 
 void Material::OnConstructed()
 {
-    m_shader_ = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
-    if (m_shader_ == nullptr)
+    shader = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
+    if (shader == nullptr)
     {
         Logger::Warn<Material>("Failed to find Engine Assets");
     }
@@ -52,39 +52,62 @@ void Material::OnConstructed()
 
 void Material::CreateMaterialBlock()
 {
-    if (m_shader_ == nullptr)
+    if (p_shared_material_block)
+    {
+        auto material_data = p_shared_material_block->material_data;
+        p_shared_material_block->DestroyThis();
+        p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
+        p_shared_material_block->LoadShaderParameters(shader->parameters, material_data);
+    }
+
+    if (shader == nullptr)
     {
         Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");
         return;
     }
 
-    shared_material_block = std::make_shared<MaterialBlock>();
-    shared_material_block->LoadShaderParameters(m_shader_.CastedLock()->parameters);
-}
-
-AssetPtr<Shader> Material::GetShader()
-{
-    return m_shader_;
+    p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
+    p_shared_material_block->LoadShaderParameters(shader->parameters);
 }
 
 void Material::UpdateBuffer()
 {
-    if (shared_material_block == nullptr)
+    if (p_shared_material_block == nullptr)
     {
         Logger::Log<Material>("MaterialBlock is null. Instantiating!");
         CreateMaterialBlock();
     }
+
+    p_shared_material_block->UpdateBuffer();
 }
 
 bool Material::IsDirty() const
 {
-    return shared_material_block == nullptr;
+    return p_shared_material_block == nullptr || p_shared_material_block->IsDirty();
 }
 
-void Material::SetShader(const AssetPtr<Shader> &shader)
+void Material::SetDescriptorTable()
 {
-    m_shader_ = shader;
-    CreateMaterialBlock();
+    const auto material_block = p_shared_material_block;
+    const auto cmd_list = RenderEngine::CommandList();
+
+    UpdateBuffer();
+
+    for (int param_i = 0; param_i < kParameterBufferType_Count; ++param_i)
+    {
+        const auto param_type = static_cast<kParameterBufferType>(param_i);
+
+        if (material_block->Empty(param_type))
+        {
+            continue;
+        }
+
+        const int root_param_idx = param_i +
+                                   RootSignature::kPreDefinedVariableCount;
+        const auto itr = material_block->Begin(param_type);
+        const auto desc_handle = itr->handle->handle_gpu;
+        cmd_list->SetGraphicsRootDescriptorTable(root_param_idx, desc_handle);
+    }
 }
 }
 

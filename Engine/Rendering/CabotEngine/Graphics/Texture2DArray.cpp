@@ -3,13 +3,10 @@
 
 #include "DescriptorHeap.h"
 #include "RenderEngine.h"
-#include "Rendering/texture_collection.h"
 
-namespace engine
-{
 void Texture2DArray::CopyResource()
 {
-    const auto texture = m_textures_[0].CastedLock();
+    const auto texture = m_textures_[0];
     const auto texture_size = Vector2(static_cast<float>(texture->Width()), static_cast<float>(texture->Height()));
 
     if (!CreateResource(texture_size, static_cast<UINT16>(m_textures_.size()), texture->MipLevel(), texture->Format()))
@@ -33,8 +30,7 @@ void Texture2DArray::CopyResource()
             );
 
         D3D12_TEXTURE_COPY_LOCATION src = {};
-        auto texture_buffer = TextureCollection::LoadTexture(m_textures_[i]);
-        src.pResource = texture_buffer->Resource();
+        src.pResource = m_textures_[i]->Resource();
         src.Type = D3D12_TEXTURE_COPY_TYPE_SUBRESOURCE_INDEX;
         src.SubresourceIndex = 0;
 
@@ -64,8 +60,8 @@ void Texture2DArray::CopyResource()
 }
 
 bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count, const UINT16 mip_level,
-                                    const DXGI_FORMAT format, const D3D12_RESOURCE_FLAGS flags,
-                                    D3D12_CLEAR_VALUE *clear_value)
+    const DXGI_FORMAT format, const D3D12_RESOURCE_FLAGS flags,
+    D3D12_CLEAR_VALUE *clear_value)
 {
     m_element_count_ = elem_count;
     m_format_ = format;
@@ -95,7 +91,7 @@ bool Texture2DArray::CreateResource(const Vector2 size, const UINT16 elem_count,
 
     if (FAILED(hr))
     {
-        Logger::Error<Texture2DArray>("failed to create texture2d array resource");
+        engine::Logger::Error<Texture2DArray>("failed to create texture2d array resource");
         return false;
     }
 
@@ -137,18 +133,19 @@ D3D12_SHADER_RESOURCE_VIEW_DESC Texture2DArray::ViewDesc()
     return view_desc;
 }
 
-void Texture2DArray::AddTexture(AssetPtr<Texture2D> texture)
+void Texture2DArray::AddTexture(engine::AssetPtr<Texture2D> texture)
 {
     ++m_element_count_;
     m_textures_.emplace_back(texture);
     CopyResource();
 }
 
-void Texture2DArray::RemoveTexture(AssetPtr<Texture2D> texture)
+void Texture2DArray::RemoveTexture(engine::AssetPtr<Texture2D> texture)
 {
-    std::erase_if(m_textures_, [texture](const AssetPtr<Texture2D> &texture1) {
-        return texture == texture1;
-    });
+    std::erase_if(m_textures_,
+                  [texture](const engine::AssetPtr<Texture2D> &texture1) {
+                      return texture == texture1;
+                  });
     if (m_textures_.empty())
     {
         m_is_valid_ = false;
@@ -160,5 +157,4 @@ void Texture2DArray::RemoveTexture(AssetPtr<Texture2D> texture)
 void Texture2DArray::SetFormat(const DXGI_FORMAT format)
 {
     m_format_ = format;
-}
 }

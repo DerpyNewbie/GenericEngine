@@ -39,13 +39,17 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 
 void SkinnedMeshRenderer::UpdateWorldBuffer()
 {
-    if (!m_world_matrix_buffer_)
+    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
     {
-        m_world_matrix_buffer_ = std::make_unique<ConstantBuffer>(sizeof(Matrix));
-        m_world_matrix_buffer_->CreateBuffer();
+        if (!world_matrix_buffer)
+        {
+            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
+            world_matrix_buffer->CreateBuffer();
+        }
     }
 
-    const auto &world_matrix_buffer = m_world_matrix_buffer_;
+    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
     const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
     *ptr = Matrix::Identity;
 }
@@ -67,9 +71,9 @@ void SkinnedMeshRenderer::DrawBones() const
 
 Matrix SkinnedMeshRenderer::BoundsOrigin()
 {
-    if (const auto root = root_bone.CastedLock())
+    if (root_bone != nullptr)
     {
-        return root->Parent()->WorldMatrix();
+        return root_bone->Parent()->WorldMatrix();
     }
 
     return GameObject()->Transform()->WorldMatrix();
@@ -107,7 +111,7 @@ void SkinnedMeshRenderer::Render()
     UpdateBoneTransformsBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffer_->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
+    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
 }
 }
 

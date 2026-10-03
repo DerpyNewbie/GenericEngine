@@ -17,14 +17,14 @@ void Renderer2D::OnAwake()
 void Renderer2D::OnEnabled()
 {
     m_canvas_ = AssetPtr<Canvas>::FromManaged(GameObject()->GetComponentInParent<Canvas>());
-    if (auto canvas = m_canvas_.CastedLock())
-        canvas->AddRenderer(shared_from_base<Renderer2D>());
+    if (m_canvas_ != nullptr)
+        m_canvas_->AddRenderer(shared_from_base<Renderer2D>());
 }
 
 void Renderer2D::OnDisabled()
 {
-    if (auto canvas = m_canvas_.CastedLock())
-        canvas->RemoveRenderer(shared_from_base<Renderer2D>());
+    if (m_canvas_ != nullptr)
+        m_canvas_->RemoveRenderer(shared_from_base<Renderer2D>());
 }
 
 void Renderer2D::SetCanvas(const std::shared_ptr<Canvas> &canvas)
@@ -32,21 +32,17 @@ void Renderer2D::SetCanvas(const std::shared_ptr<Canvas> &canvas)
     m_canvas_ = AssetPtr<Canvas>::FromManaged(canvas);
 }
 
-Rect Renderer2D::NormalizedRect()
+Rect Renderer2D::NormalizedRect() const
 {
-    auto canvas = m_canvas_.CastedLock();
-    if (!canvas)
+    if (m_canvas_ == nullptr)
     {
-        return Rect{Vector2::Zero,
-                    Vector2::Zero};
+        return Rect{Vector2::Zero, Vector2::Zero};
     }
 
-    auto canvas_size = m_canvas_.CastedLock()->CanvasSize();
-    auto rect_transform = GameObject()->GetComponent<RectTransform>();
-    auto rect = rect_transform->CalculateScreenRect();
-    return Rect{
-        rect.pos / canvas_size,
-        rect.size / canvas_size};
+    const auto canvas_size = m_canvas_->CanvasSize();
+    const auto rect_transform = GameObject()->GetComponent<RectTransform>();
+    const auto rect = rect_transform->CalculateScreenRect();
+    return Rect{rect.pos / canvas_size, rect.size / canvas_size};
 }
 }
 
