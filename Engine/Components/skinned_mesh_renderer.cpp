@@ -22,7 +22,7 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
             m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
         }
     }
-    
+
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto bone_matrices_buffer = m_bone_matrix_buffers_[current_buffer_idx];
 
@@ -47,7 +47,7 @@ void SkinnedMeshRenderer::UpdateWorldBuffer()
             world_matrix_buffer->CreateBuffer();
         }
     }
-    
+
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
     const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
     const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
@@ -71,9 +71,9 @@ void SkinnedMeshRenderer::DrawBones() const
 
 Matrix SkinnedMeshRenderer::BoundsOrigin()
 {
-    if (const auto root = root_bone.CastedLock())
+    if (root_bone != nullptr)
     {
-        return root->Parent()->WorldMatrix();
+        return root_bone->Parent()->WorldMatrix();
     }
 
     return GameObject()->Transform()->WorldMatrix();
@@ -111,7 +111,7 @@ void SkinnedMeshRenderer::Render()
     UpdateBoneTransformsBuffer();
     const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    RenderPipeline::Submit(m_shared_mesh_.CastedLock(), shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
+    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
 }
 }
 

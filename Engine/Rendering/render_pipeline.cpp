@@ -151,7 +151,7 @@ void RenderPipeline::InvokeDrawCall()
     {
         view_proj_matrices_buffers.ReturnAll();
     }
-    
+
     const auto cmd_list = RenderEngine::CommandList();
     cmd_list->SetGraphicsRootSignature(RootSignature::Get());
     const auto descriptor_heap = DescriptorHeap::GetHeap();
@@ -244,14 +244,14 @@ void RenderPipeline::DepthRender()
 
     if (m_depth_shader_ == nullptr)
     {
-        m_depth_shader_ = AssetDatabase::GetAsset<Shader>("depth.hlsl").CastedLock();
+        m_depth_shader_ = AssetDatabase::GetAsset<Shader>("depth.hlsl");
         if (m_depth_shader_ == nullptr)
         {
             Logger::Error<Gizmos>("Failed to load DepthShader.hlsl");
             return;
         }
     }
-    
+
     const auto cmd_list = RenderEngine::CommandList();
     PSOManager::SetPipelineState(cmd_list, m_depth_shader_.get(), DXGI_FORMAT_R32_FLOAT, 0);
 
@@ -272,8 +272,11 @@ void RenderPipeline::DepthRender()
     scissor_rect.top = 0;
     scissor_rect.bottom = static_cast<LONG>(shadow_map_size.y);
 
-    RenderEngine::Instance()->SetRenderTarget(nullptr, Lighting::Instance()->m_dsv_heap_.Get(),
-                                              Color(), &viewport, &scissor_rect);
+    RenderEngine::Instance()->SetRenderTarget(nullptr,
+                                              Lighting::Instance()->m_dsv_heap_.Get(),
+                                              Color(),
+                                              &viewport,
+                                              &scissor_rect);
 
     auto lighting_instance = Lighting::Instance();
     lighting_instance->SetLightsViewProjMatrix();
@@ -362,8 +365,8 @@ void RenderPipeline::ExecuteRenderCommands()
             {
                 cmd_list->IASetIndexBuffer(mesh->index_buffers[0]->View());
                 const auto index_count = mesh->HasSubMeshes()
-                    ? mesh->sub_meshes[0].base_index
-                    : mesh->indices.size();
+                ? mesh->sub_meshes[0].base_index
+                : mesh->indices.size();
 
                 cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
             }

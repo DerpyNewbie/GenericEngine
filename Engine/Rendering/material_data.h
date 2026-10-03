@@ -36,7 +36,7 @@ struct IMaterialData : Object, Inspectable
         ar(
             cereal::base_class<Object>(this),
             CEREAL_NVP(parameter)
-        );
+            );
     }
 };
 
@@ -55,8 +55,8 @@ struct MaterialData : IMaterialData
     static constexpr bool kIsAssetPtr = std::is_base_of_v<IAssetPtr, T>;
     static constexpr bool kIsTexture = std::is_same_v<AssetPtr<Texture2D>, T> || std::is_same_v<Texture2D, T>;
     static constexpr kParameterBufferType kBufferType = kIsVector || kIsTexture
-        ? kParameterBufferType_SRV
-        : kParameterBufferType_CBV;
+    ? kParameterBufferType_SRV
+    : kParameterBufferType_CBV;
 
     T value;
 
@@ -254,7 +254,7 @@ void *MaterialData<T>::Data()
     {
         if constexpr (kIsAssetPtr)
         {
-            return value.CastedLock()->GetTexData().data();
+            return value->GetTexData().data();
         }
         else
         {

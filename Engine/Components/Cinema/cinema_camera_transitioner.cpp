@@ -13,7 +13,7 @@ void CinemaCameraTransitioner::OnInspectorGui()
 
     if (ImGui::Button("Blend"))
     {
-        m_cinema_brain_.CastedLock()->Blend(m_from_camera_.CastedLock(), m_to_camera_.CastedLock(), 10, 0);
+        m_cinema_brain_->Blend(m_from_camera_, m_to_camera_, 10, 0);
     }
 }
 }

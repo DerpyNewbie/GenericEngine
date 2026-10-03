@@ -51,8 +51,7 @@ void Audio::OnUpdate()
 
 void Audio::Play(const std::shared_ptr<AudioSourceComponent> &audio_source)
 {
-    const auto clip = audio_source->m_clip_.CastedLock();
-    if (clip == nullptr)
+    if (audio_source->m_clip_ == nullptr)
     {
         return;
     }
@@ -64,7 +63,7 @@ void Audio::Play(const std::shared_ptr<AudioSourceComponent> &audio_source)
         instance_flags |= DirectX::SoundEffectInstance_Use3D;
     }
 
-    const std::shared_ptr sound_effect_instance = clip->m_sound_effect_->CreateInstance(instance_flags);
+    const std::shared_ptr sound_effect_instance = audio_source->m_clip_->m_sound_effect_->CreateInstance(instance_flags);
     if (audio_source->m_use_3d_)
     {
         sound_effect_instance->Apply3D(m_listener_, audio_source->m_emitter_);

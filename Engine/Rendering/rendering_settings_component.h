@@ -16,7 +16,7 @@ public:
     void OnInspectorGui() override;
     void OnAwake() override;
 
-    void ApplySettings();
+    void ApplySettings() const;
 
     template <class Archive>
     void serialize(Archive &ar)
@@ -24,7 +24,7 @@ public:
         ar(
             cereal::base_class<Component>(this),
             CEREAL_NVP(m_skybox_cube_)
-        );
+            );
     }
 };
 }

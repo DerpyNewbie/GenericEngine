@@ -17,7 +17,7 @@ void Material::OnInspectorGui()
 
     if (Gui::ExpandablePropertyField<Shader>("shader", shader))
     {
-        if (shader.CastedLock())
+        if (shader != nullptr)
         {
             CreateMaterialBlock();
             return;
@@ -42,7 +42,7 @@ void Material::OnInspectorGui()
 void Material::OnConstructed()
 {
     shader = AssetDatabase::GetAsset<Shader>("BasicShader.hlsl");
-    if (shader.Lock() == nullptr)
+    if (shader == nullptr)
     {
         Logger::Warn<Material>("Failed to find Engine Assets");
     }
@@ -57,17 +57,17 @@ void Material::CreateMaterialBlock()
         auto material_data = p_shared_material_block->material_data;
         p_shared_material_block->DestroyThis();
         p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
-        p_shared_material_block->LoadShaderParameters(shader.CastedLock()->parameters, material_data);
+        p_shared_material_block->LoadShaderParameters(shader->parameters, material_data);
     }
 
-    if (shader.CastedLock() == nullptr)
+    if (shader == nullptr)
     {
         Logger::Error<Material>("Shader is null. Cannot create MaterialBlock.");
         return;
     }
 
     p_shared_material_block = Instantiate<MaterialBlock>("Material Block of " + Name());
-    p_shared_material_block->LoadShaderParameters(shader.CastedLock()->parameters);
+    p_shared_material_block->LoadShaderParameters(shader->parameters);
 }
 
 void Material::UpdateBuffer()

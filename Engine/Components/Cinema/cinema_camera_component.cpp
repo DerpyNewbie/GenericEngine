@@ -21,14 +21,18 @@ void CinemaCameraComponent::OnInspectorGui()
     Gui::PropertyField("Apply Position", m_apply_position_);
     Gui::PropertyField("Apply Rotation", m_apply_rotation_);
 
-    ImGui::Text("Tracking Offset: {%.2f, %.2f, %.2f}", m_tracking_offset_.x, m_tracking_offset_.y,
+    ImGui::Text("Tracking Offset: {%.2f, %.2f, %.2f}",
+                m_tracking_offset_.x,
+                m_tracking_offset_.y,
                 m_tracking_offset_.z);
 
     auto look_at = GetLookAtRotation();
     auto look_at_euler = look_at.ToEuler() * Mathf::kRad2Deg;
     ImGui::Text("Look At: {%.2f, %.2f, %.2f}", look_at_euler.x, look_at_euler.y, look_at_euler.z);
     ImGui::Text("Position: {%.2f, %.2f, %.2f}", GetPosition().x, GetPosition().y, GetPosition().z);
-    ImGui::Text("Target Position: {%.2f, %.2f, %.2f}", GetTargetPosition().x, GetTargetPosition().y,
+    ImGui::Text("Target Position: {%.2f, %.2f, %.2f}",
+                GetTargetPosition().x,
+                GetTargetPosition().y,
                 GetTargetPosition().z);
 }
 
@@ -43,7 +47,7 @@ void CinemaCameraComponent::RecalculateOffset()
     m_tracking_offset_ = Vector3::Transform(forward, target_rot_inv);
 }
 
-void CinemaCameraComponent::ApplyTransform()
+void CinemaCameraComponent::ApplyTransform() const
 {
     const auto transform = GameObject()->Transform();
     const auto next_pos = GetTargetPosition() + Vector3::Transform(m_tracking_offset_, GetTargetRotation());
@@ -59,16 +63,14 @@ void CinemaCameraComponent::ApplyTransform()
     }
 }
 
-Vector3 CinemaCameraComponent::GetTargetPosition()
+Vector3 CinemaCameraComponent::GetTargetPosition() const
 {
-    const auto lock = m_tracking_target_.CastedLock();
-    return lock != nullptr ? lock->Position() : Vector3::Zero;
+    return m_tracking_target_ != nullptr ? m_tracking_target_->Position() : Vector3::Zero;
 }
 
-Quaternion CinemaCameraComponent::GetTargetRotation()
+Quaternion CinemaCameraComponent::GetTargetRotation() const
 {
-    const auto lock = m_tracking_target_.CastedLock();
-    return lock != nullptr ? lock->Rotation() : Quaternion::Identity;
+    return m_tracking_target_ != nullptr ? m_tracking_target_->Rotation() : Quaternion::Identity;
 }
 
 Vector3 CinemaCameraComponent::GetPosition() const
@@ -81,7 +83,7 @@ Quaternion CinemaCameraComponent::GetRotation() const
     return GameObject()->Transform()->Rotation();
 }
 
-Quaternion CinemaCameraComponent::GetLookAtRotation()
+Quaternion CinemaCameraComponent::GetLookAtRotation() const
 {
     auto look_at = GetLookAtMatrix();
     Vector3 pos, sca;
@@ -89,7 +91,7 @@ Quaternion CinemaCameraComponent::GetLookAtRotation()
     look_at.Decompose(sca, rot, pos);
     return rot;
 }
-Matrix CinemaCameraComponent::GetLookAtMatrix()
+Matrix CinemaCameraComponent::GetLookAtMatrix() const
 {
     const auto position = GetPosition();
     const auto target_pos = GetTargetPosition();

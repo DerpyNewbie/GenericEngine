@@ -10,13 +10,12 @@ namespace engine
 {
 void CinemaBrainComponent::DoBlending(const float delta_time)
 {
-    const auto target = m_target_camera_.CastedLock();
-    if (target == nullptr || !m_is_blending_)
+    if (m_target_camera_ == nullptr || !m_is_blending_)
     {
         return;
     }
 
-    const auto transform = target->GameObject()->Transform();
+    const auto transform = m_target_camera_->GameObject()->Transform();
     if (transform == nullptr)
     {
         return;
