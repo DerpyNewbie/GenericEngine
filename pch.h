@@ -1,6 +1,8 @@
 #pragma once
 #define NOMINMAX
 
+
+
 /* === begin C++ standard library === */
 #include <array>
 #include <algorithm>

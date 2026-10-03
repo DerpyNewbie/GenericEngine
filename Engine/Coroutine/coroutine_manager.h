@@ -1,4 +1,7 @@
 ﻿#pragma once
+#include <any>
+
+#include "cancellation_token.h"
 #include "task.h"
 #include "yield_base.h"
 
@@ -7,44 +10,25 @@ namespace engine
 //先人がゲームとエンジンのcoroutineは別けたほうがいいよって言ってたのでシングルトンじゃないです
 class CoroutineManager
 {
-    std::vector<std::coroutine_handle<Task::promise_type>> m_coroutines_;
+    using CoroutineEntry = std::pair<std::coroutine_handle<Task::promise_type>, CancellationToken>;
+    std::vector<CoroutineEntry> m_coroutines_;
 
 public:
-    void Start(Task &&t)
-    {
-        t.handle.resume();
-        m_coroutines_.emplace_back(t.handle);
-        t.handle = nullptr;
-    }
+    /// <summary>
+    /// coroutineを開始します。
+    /// </summary>
+    /// <param name="t">タスク</param>
+    void Start(Task &&t);
+    /// <summary>
+    /// coroutineを開始します。
+    /// </summary>
+    /// <param name="t">Task</param>
+    /// <param name="token">CancellationToken</param>
+    void Start(Task &&t, CancellationToken token);
 
-    void Update(float dt)
-    {
-        for (auto it = m_coroutines_.begin(); it != m_coroutines_.end();)
-        {
-            auto h = *it;
-            auto &promise = h.promise();
-
-            if (auto yield = promise.current_yield.get())
-            {
-                if (!yield->should_resume())
-                {
-                    ++it;
-                    continue;
-                }
-            }
-
-            h.resume();
-
-            if (h.done())
-            {
-                h.destroy();
-                it = m_coroutines_.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
+    /// <summary>
+    /// coroutineのupdateを行います。
+    /// </summary>
+    void Update();
 };
 }
