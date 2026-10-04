@@ -1,21 +1,33 @@
 #pragma once
-#include "CabotEngine/Graphics/ComPtr.h"
 #include "CabotEngine/Graphics/Texture2D.h"
-
-#include <directx/d3d12.h>
 
 namespace engine
 {
 class RenderTexture : public Texture2D
 {
-    ComPtr<ID3D12DescriptorHeap> m_RTVHeap_;
+    friend class RenderTextureBuffer;
 
+    bool m_allow_uav_;
+    int m_format_index_;
+    
 public:
-    void CreateBuffer() override;
-    void BeginRender(Color background_color);
-    void EndRender() const;
-    ID3D12DescriptorHeap *GetHeap();
+    RenderTexture();
 
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    void OnConstructed() override;
+    void OnInspectorGui() override;
+    void OnDeserialized() override;
+
+    bool AllowUav() const;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            cereal::base_class<Texture2D>(this),
+            CEREAL_NVP(m_allow_uav_)
+        );
+    }
 };
 }
+
+CEREAL_CLASS_VERSION(engine::RenderTexture, 1)
