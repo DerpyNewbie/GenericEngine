@@ -66,6 +66,8 @@
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
+        <ClCompile Include="Engine\cancellation_token.cpp"/>
+        <ClCompile Include="Engine\cancellation_token_source.cpp"/>
         <ClCompile Include="Engine\Components\billboard_renderer.cpp"/>
         <ClCompile Include="Engine\Audio\audio.cpp"/>
         <ClCompile Include="Engine\Audio\audio_clip.cpp"/>
@@ -227,6 +229,8 @@
         <ClInclude Include="Engine\Asset\persistent_data_store.h"/>
         <ClInclude Include="Engine\Asset\text_asset.h"/>
         <ClInclude Include="Engine\assimp_util.h"/>
+        <ClInclude Include="Engine\cancellation_token.h"/>
+        <ClInclude Include="Engine\cancellation_token_source.h"/>
         <ClInclude Include="Engine\Components\billboard_renderer.h"/>
         <ClInclude Include="Engine\Audio\audio.h"/>
         <ClInclude Include="Engine\Audio\audio_clip.h"/>
