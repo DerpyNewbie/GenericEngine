@@ -1,9 +1,6 @@
 ﻿#pragma once
-#include <any>
-
 #include "cancellation_token.h"
 #include "task.h"
-#include "yield_base.h"
 
 namespace engine
 {
@@ -15,7 +12,7 @@ class CoroutineManager
 
 public:
     /// <summary>
-    /// coroutineを開始します。
+    /// 
     /// </summary>
     /// <param name="t">タスク</param>
     void Start(Task &&t);
