@@ -4,6 +4,9 @@ namespace editor
 {
 using namespace engine;
 
+/// <summary>
+/// Objectを受け取り
+/// </summary>
 class IContextMenu
 {
 protected:
@@ -25,6 +28,10 @@ public:
         return OnContextMenu(std::dynamic_pointer_cast<T>(object));
     }
 
+    /// <summary>
+    /// ContextMenuの描画、押された際の実行を行います。
+    /// </summary>
+    /// <param name="object">対象のObject</param>
     virtual bool OnContextMenu(std::shared_ptr<T> object) = 0;
 };
 

@@ -4,6 +4,9 @@
 
 namespace editor
 {
+/// <summary>
+/// AssetHierarchyのContextMenuを管理するクラス
+/// </summary>
 class AssetHierarchyContextMenu : public ContextMenu<AssetHierarchy>
 {
 public:

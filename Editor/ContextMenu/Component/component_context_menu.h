@@ -4,6 +4,9 @@
 
 namespace editor
 {
+/// <summary>
+/// ComponentのContextMenuを管理するクラス
+/// </summary>
 class ComponentContextMenu : public ContextMenu<Component>
 {
     bool OnContextMenu(std::shared_ptr<Component> component) override;

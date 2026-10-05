@@ -5,6 +5,9 @@
 namespace editor
 {
 using namespace engine;
+/// <summary>
+/// GameObjectのContextMenuを管理するクラス
+/// </summary>
 class GameObjectContextMenu : public ContextMenu<GameObject>
 {
     bool OnContextMenu(std::shared_ptr<GameObject> object) override;
