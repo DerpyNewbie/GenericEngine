@@ -13,20 +13,23 @@ class CoroutineManager
 
 public:
     /// <summary>
-    /// coroutineを開始します。
+    /// 指定されたTaskをリストに追加します。
     /// </summary>
-    /// <param name="t">タスク</param>
+    /// <param name="t">Task</param>
     void Start(Task &&t);
     /// <summary>
-    /// coroutineを開始します。
+    /// 指定されたTaskをリストに追加します。
     /// </summary>
     /// <param name="t">Task</param>
     /// <param name="token">CancellationToken</param>
     void Start(Task &&t, CancellationToken token);
 
     /// <summary>
-    /// coroutineのupdateを行います。
+    /// coroutineが再開可能であればawaitに当たるまで進めます。Cancel もしくは co_return に当たった場合はリストから削除されます。
     /// </summary>
+    /// <remarks>
+    /// 任意updateのタイミングで一度だけ呼び出します。
+    /// </remarks>
     void Update();
 };
 }
