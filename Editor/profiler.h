@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// EngineのCycleをStageごとに分け計測されたデータを基にその実行時間をグラフとしてWindowに表示するクラス
+/// </summary>
 class Profiler final : public EditorWindow
 {
 public:

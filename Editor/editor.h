@@ -16,6 +16,9 @@ enum class EditorMode
     kPlay,
 };
 
+/// <summary>
+/// Editorの処理のすべてを管理するクラス
+/// </summary>
 class Editor final : public enable_shared_from_base<Editor>
 {
     struct PrioritizedEditorMenu
@@ -52,6 +55,10 @@ class Editor final : public enable_shared_from_base<Editor>
     EditorMode m_mode_ = EditorMode::kEdit;
     bool m_paused_ = false;
 
+    /// <summary>
+    /// Editorの見た目を変更する。
+    /// </summary>
+    /// <param name="i">0 : dark, 1 : Light, 2 : Classic</param>
     void SetEditorStyle(int i);
     void Init();
     void OnEngineTick() const;
@@ -59,32 +66,74 @@ class Editor final : public enable_shared_from_base<Editor>
 public:
     static std::shared_ptr<Editor> Instance();
 
+    /// <summary>
+    /// EditorのDrawを行います。
+    /// </summary>
+    /// <remark>
+    /// Engine側のDrawサイクルの中で呼び出してください。
+    /// </remark>
     void OnDraw();
 
+    /// <summary>
+    /// EngineにEditorをAttachします。
+    /// </summary>
     void Attach();
     void Finalize();
 
+    /// <summary>
+    /// SceneのSnapShotを保存する。
+    /// </summary>
     void PushSceneSnapshot();
+
+    /// <summary>
+    /// 今あるすべてのSceneを廃棄しSnapShotしてあるSceneに切り替えます。
+    /// </summary>
     engine::Task ApplyLastSceneSnapshot() const;
+
+    /// <summary>
+    /// SnapShotしてあるSceneに切り替え、そのSceneのSnapShotを削除します。
+    /// </summary>
+    /// <returns></returns>
     engine::Task PopSceneSnapshot();
 
     void SetEditorMode(EditorMode mode);
     EditorMode GetEditorMode() const;
+
+    /// <summary>
+    /// Engineの動作をPauseします。Pause状態の場合EngineのUpdate処理が呼ばれなくなります。
+    /// </summary>
     void SetPaused(bool is_paused);
+
+    /// <summary>
+    /// Pause状態の場合EngineのUpdate処理が呼ばれなくなります。
+    /// </summary>
+    /// <returns></returns>
     bool IsPaused() const;
 
+    /// <summary>
+    /// Pause状態でない場合Pause状態にし、1フレーム進めます。
+    /// </summary>
     void SingleTickStep();
 
+    /// <summary>
+    /// Gui上で選択中のObjectを設定します。
+    /// </summary>
+    /// <param name="object">選択中のオブジェクト</param>
     void SetSelectedObject(const std::shared_ptr<engine::Object> &object);
     std::shared_ptr<engine::Object> SelectedObject() const;
 
+    /// <summary>
+    /// Gui上で選択中のDirectoryを設定します。
+    /// </summary>
+    /// <param name="path">DirectoryのPath</param>
     void SetSelectedDirectory(const std::filesystem::path &path);
     std::filesystem::path SelectedDirectory() const;
 
     void AddEditorWindow(const std::string &name, std::shared_ptr<EditorWindow> window);
+    void RemoveEditorWindow(const std::string &name);
+    
     std::vector<std::string> GetEditorWindowNames();
     std::shared_ptr<EditorWindow> GetEditorWindow(const std::string &name);
-    void RemoveEditorWindow(const std::string &name);
 
     void AddEditorMenu(const std::string &name, const std::shared_ptr<EditorMenu> &menu, int priority = 0);
     std::vector<PrioritizedEditorMenu> GetEditorMenus();

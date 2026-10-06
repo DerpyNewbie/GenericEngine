@@ -5,6 +5,9 @@
 
 namespace editor
 {
+/// <summary>
+/// HierarchyのGuiを管理するクラス
+/// </summary>
 class Hierarchy final : public EditorWindow
 {
 public:
@@ -12,8 +15,22 @@ public:
     void OnEditorGui() override;
 
 private:
+    /// <summary>
+    /// Sceneを表示します。SceneのHeaderがクリックされている時Sceneの中にあるObjectも表示します。
+    /// </summary>
+    /// <param name="scene">表示されるScene</param>
     void DrawScene(const std::shared_ptr<engine::Scene> &scene);
+
+    /// <summary>
+    /// ObjectのChildがなくなるまで再帰的に表示します。
+    /// </summary>
+    /// <param name="game_object">表示されるGameObject</param>
     void DrawObjectRecursive(const std::shared_ptr<engine::GameObject> &game_object);
+    /// <summary>
+    /// Objectを表示します。
+    /// </summary>
+    /// <param name="game_object">表示されるGameObject</param>
+    /// <returns></returns>
     bool DrawObject(const std::shared_ptr<engine::GameObject> &game_object);
     void DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &game_object, int offset);
 };

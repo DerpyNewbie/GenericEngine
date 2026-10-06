@@ -426,7 +426,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\include\bullet;$(ProjectDir)vcpkg_installed\x64-windows\include</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -436,6 +436,7 @@
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <PerUserRedirection>true</PerUserRedirection>
+            <AdditionalDependencies>$(ProjectDir)vcpkg_installed\x64-windows\debug\lib\*.lib</AdditionalDependencies>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

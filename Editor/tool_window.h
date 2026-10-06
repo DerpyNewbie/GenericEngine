@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// ToolWindowのGuiを管理するクラス
+/// </summary>
 class ToolWindow : public EditorWindow
 {
 public:

@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// Editorの設定のGuiを管理するクラス
+/// </summary>
 class EditorPrefs final : public EditorWindow
 {
 public:

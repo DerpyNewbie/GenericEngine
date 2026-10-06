@@ -5,18 +5,28 @@ namespace editor
 using namespace engine;
 
 /// <summary>
-/// Objectを受け取り
+/// 指定されたObjectのContextMenuを表示するInterface。
 /// </summary>
 class IContextMenu
 {
 protected:
+    /// <summary>
+    /// ContextMenuRegistryへの登録を行います。
+    /// </summary>
+    /// <param name="target_name">対象のObjectのクラス名</param>
     explicit IContextMenu(const std::string &target_name);
 
 public:
     virtual ~IContextMenu() = default;
+    /// <summary>
+    /// ObjectのContextMenuを表示する
+    /// </summary>
     virtual bool OnObjectContextMenu(std::shared_ptr<Object>) = 0;
 };
 
+/// <summary>
+/// 様々なContextMenuのBaseとなるtemplate class
+/// </summary>
 template <class T>
 class ContextMenu : public IContextMenu
 {
@@ -35,12 +45,19 @@ public:
     virtual bool OnContextMenu(std::shared_ptr<T> object) = 0;
 };
 
+/// <summary>
+/// templateで作られたContextMenuを管理するクラス
+/// </summary>
 class ContextMenuRegistry
 {
     friend class IContextMenu;
     inline static std::unordered_map<std::string, IContextMenu *> m_menus_;
 
 public:
+    /// <summary>
+    /// 指定されたObjectのContextMenuを表示する。
+    /// </summary>
+    /// <param name="object">表示されるObject</param>
     template <class T>
     static void DrawMenuInline(std::shared_ptr<T> object)
     {
@@ -54,6 +71,11 @@ public:
         pos->second->OnObjectContextMenu(object);
     }
 
+    /// <summary>
+    /// 指定されたIDのItemが右クリックされた際にContextMenuを表示する。
+    /// </summary>
+    /// <param name="object">表示されるObject</param>
+    /// <param name="id">ItemのID</param>
     template <class T>
     static void DrawPopup(std::shared_ptr<T> object, const char *id = nullptr)
     {

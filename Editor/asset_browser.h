@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// ImportされたAssetのGui管理をするクラス
+/// </summary>
 class AssetBrowser : public EditorWindow
 {
 public:
