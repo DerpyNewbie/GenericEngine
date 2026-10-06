@@ -9,6 +9,10 @@ namespace editor
 class DefaultEditorMenu final : public EditorMenu
 {
 public:
+    /// <summary>
+    /// Menuの名前に対応するMenuのGuiを表示します。対応するMenuがない場合は例外を投げます。
+    /// </summary>
+    /// <param name="name">Menuの名前</param>
     void OnEditorMenuGui(std::string name) override;
 
     /// <summary>

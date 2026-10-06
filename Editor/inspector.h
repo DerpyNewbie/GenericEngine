@@ -65,6 +65,9 @@ class Inspector final : public EditorWindow
 
 public:
     std::string Name() override;
+    /// <summary>
+    /// 選択中のObjectの情報をGuiに表示します。
+    /// </summary>
     void OnEditorGui() override;
 };
 }

@@ -15,6 +15,9 @@ public:
     inline static int theme = 0;
 
     std::string Name() override;
+    /// <summary>
+    /// Editorの設定のGuiを表示します。
+    /// </summary>
     void OnEditorGui() override;
 };
 }

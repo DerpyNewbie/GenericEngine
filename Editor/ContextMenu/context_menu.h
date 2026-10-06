@@ -31,8 +31,15 @@ template <class T>
 class ContextMenu : public IContextMenu
 {
 public:
+    /// <summary>
+    /// T のクラス名をキーとしてContextMenuRegistryへの登録を行います。
+    /// </summary>
     ContextMenu() : IContextMenu(typeid(T).name()) { }
 
+    /// <summary>
+    /// Objectを T にCastし、OnContextMenuを呼び出します。
+    /// </summary>
+    /// <param name="object">対象のObject</param>
     bool OnObjectContextMenu(const std::shared_ptr<Object> object) override
     {
         return OnContextMenu(std::dynamic_pointer_cast<T>(object));
@@ -100,6 +107,10 @@ class ContextMenuRegisterer
     inline static T m_generated_;
 
 public:
+    /// <summary>
+    /// m_generated_を参照することで、ContextMenuのインスタンスが静的に生成されるようにします。
+    /// </summary>
+    /// <returns>自身のコピー</returns>
     ContextMenuRegisterer Bind()
     {
         (void)m_generated_;

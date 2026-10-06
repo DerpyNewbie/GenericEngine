@@ -10,6 +10,9 @@ class ObjectListWindow : public EditorWindow
 {
 public:
     std::string Name() override;
+    /// <summary>
+    /// ObjectのListをGuiに表示します。
+    /// </summary>
     void OnEditorGui() override;
 };
 }

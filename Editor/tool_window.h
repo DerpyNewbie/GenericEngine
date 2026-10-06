@@ -10,6 +10,9 @@ class ToolWindow : public EditorWindow
 {
 public:
     std::string Name() override;
+    /// <summary>
+    /// ToolWindowのGuiを表示します。
+    /// </summary>
     void OnEditorGui() override;
 };
 }

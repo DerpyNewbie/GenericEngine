@@ -10,6 +10,9 @@ class Profiler final : public EditorWindow
 {
 public:
     std::string Name() override;
+    /// <summary>
+    /// 計測されたStageごとの実行時間をグラフとして表示します。
+    /// </summary>
     void OnEditorGui() override;
 };
 }

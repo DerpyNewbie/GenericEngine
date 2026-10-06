@@ -25,9 +25,19 @@ public:
     bool is_open = true;
     ImGuiWindowFlags window_flags = ImGuiWindowFlags_None;
 
+    /// <summary>
+    /// このWindowの名前を返します。Windowのタイトルとして使われます。
+    /// </summary>
+    /// <returns>Windowの名前。overrideされていない場合はクラス名</returns>
     virtual std::string Name();
+    /// <summary>
+    /// WindowのGuiを表示する時に呼ばれる
+    /// </summary>
     virtual void OnEditorGui() = 0;
 
+    /// <summary>
+    /// Windowが開かれている場合、WindowのGuiを表示します。
+    /// </summary>
     void DrawGui();
 };
 }

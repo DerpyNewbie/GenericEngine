@@ -11,7 +11,14 @@ namespace editor
 class Hierarchy final : public EditorWindow
 {
 public:
+    /// <summary>
+    /// このWindowの名前を返します。Windowのタイトルとして使われます。
+    /// </summary>
+    /// <returns>Windowの名前</returns>
     std::string Name() override;
+    /// <summary>
+    /// 現在読み込まれているすべてのSceneとその中のGameObjectをGuiに表示します。
+    /// </summary>
     void OnEditorGui() override;
 
 private:
@@ -32,6 +39,11 @@ private:
     /// <param name="game_object">表示されるGameObject</param>
     /// <returns></returns>
     bool DrawObject(const std::shared_ptr<engine::GameObject> &game_object);
+    /// <summary>
+    /// Objectの並び替え用のDragDropTargetを表示します。Dropされた場合、DropされたObjectを指定されたObjectと同じ親の子にし、並び順を変更します。
+    /// </summary>
+    /// <param name="game_object">並び替えの基準となるGameObject</param>
+    /// <param name="offset">基準となるGameObjectのSiblingIndexからのずれ。 0 : 前, 1 : 後ろ</param>
     void DrawReorderingTarget(const std::shared_ptr<engine::GameObject> &game_object, int offset);
 };
 }
