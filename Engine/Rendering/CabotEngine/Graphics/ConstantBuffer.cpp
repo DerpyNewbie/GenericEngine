@@ -113,12 +113,12 @@ bool ConstantBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
 
 void ConstantBuffer::RequestReadBack()
 {
-    Logger::Warn<ConstantBuffer>("RequestReadBack() not implemented");
+    Logger::Warn<ConstantBuffer>("RequestReadBack() is not supported");
 }
 
 bool ConstantBuffer::FetchBufferData(void *data)
 {
-    Logger::Warn<ConstantBuffer>("FetchBufferData() not implemented");
+    Logger::Warn<ConstantBuffer>("FetchBufferData() is not supported");
     return false;
 }
 

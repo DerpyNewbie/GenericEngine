@@ -100,12 +100,12 @@ bool TextureBuffer::Transition(const D3D12_RESOURCE_STATES new_state)
 
 void TextureBuffer::RequestReadBack()
 {
-    Logger::Warn<TextureBuffer>("RequestReadBack() not implemented");
+    Logger::Warn<TextureBuffer>("RequestReadBack() is not supported");
 }
 
 bool TextureBuffer::FetchBufferData(void *data)
 {
-    Logger::Warn<TextureBuffer>("FetchBufferData() not implemented");
+    Logger::Warn<TextureBuffer>("FetchBufferData() is not supported");
     return false;
 }
 
