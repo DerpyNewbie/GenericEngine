@@ -96,11 +96,17 @@ public:
 
 namespace generated_internals::context_menu
 {
+/// <summary>
+/// ContextMenuを起動時に登録するためのタグです。
+/// </summary>
 template <class T>
 struct init_ctx_menu
 {
 };
 
+/// <summary>
+/// ContextMenuを起動時に自動で登録するためのクラスです。
+/// </summary>
 template <class T>
 class ContextMenuRegisterer
 {

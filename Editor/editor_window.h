@@ -5,6 +5,9 @@
 
 namespace editor
 {
+/// <summary>
+/// Editorに表示するWindowの基底クラスです。
+/// </summary>
 class EditorWindow
 {
 protected:

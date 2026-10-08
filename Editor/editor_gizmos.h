@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// Editor用のGizmos(Gridや選択中のObjectなど)を描画するクラスです。
+/// </summary>
 class EditorGizmos
 {
 public:

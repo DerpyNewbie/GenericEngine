@@ -28,12 +28,33 @@ class Component : public Object
     bool m_has_called_disabled_ = false;
     std::weak_ptr<GameObject> m_game_object_ = {};
 
+    /// <summary>
+    /// OnAwake、OnEnabled、OnStartのうち、まだ呼ばれていないものを呼び出します。
+    /// </summary>
     void EnsurePrepared();
+    /// <summary>
+    /// まだ呼ばれていなければOnAwakeを呼び出します。
+    /// </summary>
     void InvokeOnAwake();
+    /// <summary>
+    /// OnAwakeを済ませた上で、まだ呼ばれていなければOnEnabledを呼び出します。
+    /// </summary>
     void InvokeOnEnabled();
+    /// <summary>
+    /// OnEnabledまでを済ませた上で、まだ呼ばれていなければOnStartを呼び出します。
+    /// </summary>
     void InvokeOnStart();
+    /// <summary>
+    /// まだ呼ばれていなければOnDisabledを呼び出します。
+    /// </summary>
     void InvokeOnDisabled();
+    /// <summary>
+    /// OnStartまでを済ませた上で、OnUpdateを呼び出します。
+    /// </summary>
     void InvokeOnUpdate();
+    /// <summary>
+    /// OnStartまでを済ませた上で、OnFixedUpdateを呼び出します。
+    /// </summary>
     void InvokeOnFixedUpdate();
 
 public:
@@ -144,6 +165,9 @@ public:
     /// </remarks>
     virtual void OnInspectorGui();
 
+    /// <summary>
+    /// このComponentが付いているGameObjectを取得します。
+    /// </summary>
     [[nodiscard]] std::shared_ptr<GameObject> GameObject() const;
 
     template <class Archive>

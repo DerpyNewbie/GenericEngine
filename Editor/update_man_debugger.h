@@ -3,6 +3,9 @@
 
 namespace editor
 {
+/// <summary>
+/// UpdateManagerの状態を表示するデバッグ用のWindowです。
+/// </summary>
 class UpdateManDebugger final : public EditorWindow
 {
     std::string Name() override;

@@ -4,6 +4,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Canvas上での位置とサイズを、AnchorとPivotで指定するComponentです。
+/// </summary>
 class RectTransform : public Component
 {
 public:
@@ -15,6 +18,9 @@ public:
 
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// 親のRectTransformのサイズ、Anchor、Pivot、SizeDelta、AnchoredPositionから、位置とサイズを計算します。
+    /// </summary>
     [[nodiscard]] Rect CalculateScreenRect() const;
 
     template <class Archive>

@@ -25,15 +25,28 @@ class Shader : public Object, public Inspectable
 
     ShaderSettings m_shader_settings_;
 
+    /// <summary>
+    /// ZTest、ZWrite、Cull、Blendなどの設定を編集するGuiを表示します。
+    /// </summary>
     void DrawShaderSettings();
 
 public:
     std::vector<ShaderParameter> parameters;
 
     void OnInspectorGui() override;
+    /// <summary>
+    /// 描画の設定(ZTest、Cull、Blendなど)を取得します。
+    /// </summary>
     ShaderSettings ShaderSettings() const;
+    /// <summary>
+    /// コンパイル済みのBasicVertexShaderとBasicPixelShaderを読み込んだ、既定のShaderを取得します。初めて呼ばれた時に読み込まれます。
+    /// </summary>
     static std::shared_ptr<Shader> GetDefault();
 
+    /// <summary>
+    /// 指定された種類のShaderのバイトコードを取得します。GeometryShaderがない場合は空のバイトコードを返します。
+    /// </summary>
+    /// <param name="type">Shaderの種類</param>
     CD3DX12_SHADER_BYTECODE GetByteCode(const kShaderType type) const
     {
         switch (type)

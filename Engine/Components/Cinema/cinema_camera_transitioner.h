@@ -6,6 +6,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 2つのCinemaCameraの間のBlendを開始するための、動作確認用のComponentです。
+/// </summary>
 class CinemaCameraTransitioner : public Component
 {
     AssetPtr<CinemaCameraComponent> m_from_camera_;

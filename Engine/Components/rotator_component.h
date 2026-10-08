@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Transformを毎フレーム回転させるComponentです。
+/// </summary>
 class RotatorComponent : public Component
 {
     Vector3 m_rotating_axis_ = Vector3::UnitY;

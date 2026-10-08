@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Shaderの種類です。
+/// </summary>
 enum kShaderType
 {
     kShaderType_Vertex,

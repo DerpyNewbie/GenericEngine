@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Shaderの描画設定(Z Test、Cull、Blendなど)です。
+/// </summary>
 struct ShaderSettings
 {
     static constexpr std::uint32_t kSerializationVersion = 5;

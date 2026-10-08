@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Shaderが持つ1つのParameterの情報です。
+/// </summary>
 struct ShaderParameter
 {
     int index;
@@ -9,6 +12,9 @@ struct ShaderParameter
     std::string display_name;
     std::string type_hint;
 
+    /// <summary>
+    /// indexとnameが等しいかどうかを比較します。
+    /// </summary>
     bool operator==(const ShaderParameter &other) const
     {
         // do not check for `display_name` or `type_hint` because only real parameters are `index` and `name`

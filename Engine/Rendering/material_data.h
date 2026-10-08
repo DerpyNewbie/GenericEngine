@@ -10,24 +10,59 @@
 
 namespace engine
 {
+/// <summary>
+/// Materialが持つ1つのShaderParameterの値のInterfaceです。
+/// </summary>
 struct IMaterialData : Object, Inspectable
 {
     bool is_dirty = true;
     ShaderParameter parameter;
     std::shared_ptr<IBuffer> buffer = nullptr; // can be null
 
+    /// <summary>
+    /// 空のparameterでデータを作成します。
+    /// </summary>
     IMaterialData();
+    /// <summary>
+    /// 対応するShaderのparameterを指定してデータを作成します。
+    /// </summary>
+    /// <param name="param">対応するShaderのparameter</param>
     explicit IMaterialData(ShaderParameter param);
 
+    /// <summary>
+    /// 値の型に合ったBufferを作成します。
+    /// </summary>
     virtual std::shared_ptr<IBuffer> CreateBuffer() = 0;
+    /// <summary>
+    /// Bufferの内容を書き換えられるかどうかを取得します。
+    /// </summary>
     virtual bool CanUpdateBuffer() = 0;
+    /// <summary>
+    /// 値が変更されている場合に、Bufferへ書き込みます。
+    /// </summary>
     virtual void UpdateBuffer() = 0;
+    /// <summary>
+    /// BufferをDescriptorHeapに登録します。Bufferがない場合は作成します。
+    /// </summary>
+    /// <returns>登録されたDescriptorHandle</returns>
     virtual std::shared_ptr<DescriptorHandle> UploadBuffer() = 0;
 
+    /// <summary>
+    /// Bufferに書き込む値のデータへのポインタを取得します。
+    /// </summary>
     virtual void *Data() = 0;
 
+    /// <summary>
+    /// 値の要素数を取得します。
+    /// </summary>
     virtual int Count() = 0;
+    /// <summary>
+    /// 値全体のサイズ(byte)を取得します。
+    /// </summary>
     virtual int SizeInBytes() = 0;
+    /// <summary>
+    /// 値がCBV、SRV、UAVのどれとして扱われるかを取得します。
+    /// </summary>
     virtual kParameterBufferType BufferType() = 0;
 
     template <typename Archive>
@@ -48,6 +83,9 @@ inline IMaterialData::IMaterialData(ShaderParameter param) :
     parameter(std::move(param))
 { }
 
+/// <summary>
+/// T型の値を持つMaterialDataです。
+/// </summary>
 template <typename T>
 struct MaterialData : IMaterialData
 {
@@ -60,25 +98,69 @@ struct MaterialData : IMaterialData
 
     T value;
 
+    /// <summary>
+    /// 既定値と空のparameterでデータを作成します。
+    /// </summary>
     MaterialData();
+    /// <summary>
+    /// 既定値でデータを作成します。
+    /// </summary>
+    /// <param name="new_parameter">対応するShaderのparameter</param>
     explicit MaterialData(const ShaderParameter &new_parameter);
+    /// <summary>
+    /// 値とparameterを指定してデータを作成します。
+    /// </summary>
+    /// <param name="new_value">初期値</param>
+    /// <param name="new_parameter">対応するShaderのparameter</param>
     explicit MaterialData(T new_value, const ShaderParameter &new_parameter);
     ~MaterialData() override = default;
 
+    /// <summary>
+    /// Bufferへの書き込みが必要な状態にし、値がAssetの場合はBufferを作成します。
+    /// </summary>
     void OnDeserialized() override;
 
     void OnInspectorGui() override;
+    /// <summary>
+    /// 値を設定し、Bufferへの書き込みが必要な状態にします。Textureの場合はBufferを作り直します。
+    /// </summary>
+    /// <param name="value">設定する値</param>
     void SetValue(T value);
 
+    /// <summary>
+    /// Textureの場合はTexture自身を、それ以外の場合はConstantBufferまたはStructuredBufferを作成します。
+    /// </summary>
     std::shared_ptr<IBuffer> CreateBuffer() override;
+    /// <summary>
+    /// Bufferがあり、内容を書き換えられるかどうかを取得します。
+    /// </summary>
     bool CanUpdateBuffer() override;
+    /// <summary>
+    /// 値が変更されている場合に、Bufferへ書き込みます。Bufferがない場合は作成します。
+    /// </summary>
     void UpdateBuffer() override;
+    /// <summary>
+    /// BufferをDescriptorHeapに登録します。Bufferがない場合は作成します。
+    /// </summary>
+    /// <returns>登録されたDescriptorHandle</returns>
     std::shared_ptr<DescriptorHandle> UploadBuffer() override;
 
+    /// <summary>
+    /// Bufferに書き込む値のデータへのポインタを取得します。
+    /// </summary>
     void *Data() override;
 
+    /// <summary>
+    /// 値の要素数を取得します。std::vectorの場合はその要素数、それ以外の場合は 1 を返します。
+    /// </summary>
     int Count() override;
+    /// <summary>
+    /// 値全体のサイズ(byte)を取得します。
+    /// </summary>
     int SizeInBytes() override;
+    /// <summary>
+    /// 値の型に応じて、CBVとSRVのどちらとして扱われるかを取得します。
+    /// </summary>
     kParameterBufferType BufferType() override;
 
     template <typename Archive>

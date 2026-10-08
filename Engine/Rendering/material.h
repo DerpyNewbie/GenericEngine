@@ -19,12 +19,27 @@ public:
     std::shared_ptr<MaterialBlock> p_shared_material_block;
 
     void OnInspectorGui() override;
+    /// <summary>
+    /// BasicShaderを設定し、MaterialBlockを作成します。
+    /// </summary>
     void OnConstructed() override;
+    /// <summary>
+    /// Shaderのparametersに合わせて、MaterialBlockを作成します。
+    /// </summary>
     void CreateMaterialBlock();
 
+    /// <summary>
+    /// MaterialBlockのBufferを更新します。MaterialBlockがない場合は作成します。
+    /// </summary>
     void UpdateBuffer();
+    /// <summary>
+    /// まだBufferに反映されていない変更があるかどうかを取得します。
+    /// </summary>
     bool IsDirty() const;
 
+    /// <summary>
+    /// Bufferを更新し、CBV、SRV、UAVそれぞれのDescriptorTableをCommandListに設定します。
+    /// </summary>
     void SetDescriptorTable();
 
     template <class Archive>

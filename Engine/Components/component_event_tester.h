@@ -7,10 +7,17 @@
 
 namespace engine
 {
+/// <summary>
+/// Componentの各イベントが呼ばれたことをログに出力する、動作確認用のComponentです。
+/// </summary>
 class ComponentEventTester : public Component
 {
     bool m_log_update_functions_ = false;
 
+    /// <summary>
+    /// "GameObject名::message"の形式でログを出力します。
+    /// </summary>
+    /// <param name="message">出力する文字列</param>
     void Log(const std::string &message) const;
 
 public:

@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// RigidbodyTesterComponentのテストの種類です。
+/// </summary>
 enum class kTestType : unsigned char
 {
     kStarting,
@@ -11,6 +14,9 @@ enum class kTestType : unsigned char
     kForceAtPosition
 };
 
+/// <summary>
+/// Rigidbodyの動作確認用のComponentです。
+/// </summary>
 class RigidbodyTesterComponent : public Component
 {
     kTestType m_test_type_ = kTestType::kStarting;
@@ -18,6 +24,9 @@ class RigidbodyTesterComponent : public Component
     Vector3 m_position_ = {0, 0, 0};
 
 public:
+    /// <summary>
+    /// TestTypeに応じて、Rigidbodyを初期状態に戻す、または力を加え続けます。Rigidbodyがない場合は追加します。
+    /// </summary>
     void OnFixedUpdate() override;
     void OnInspectorGui() override;
 

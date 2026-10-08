@@ -8,6 +8,9 @@
 
 namespace engine
 {
+/// <summary>
+/// FBX内の1つのNodeの情報(名前、Transform、Mesh、親子関係など)です。
+/// </summary>
 struct ObjectMeta
 {
     // NOTE(derpy): everything is weak or shared ptr because at this point AssetPtr is unstable as it's used in import-time
@@ -52,6 +55,9 @@ struct ObjectMeta
     }
 };
 
+/// <summary>
+/// ImportしたFBXの階層の情報を持ち、GameObjectとして生成できるAssetです。
+/// </summary>
 class FbxMeta : public Object, public Inspectable
 {
 public:
@@ -60,6 +66,10 @@ public:
     
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// FBXの階層構造からGameObjectを生成し、Meshを持つものにMeshRendererまたはSkinnedMeshRendererを設定します。
+    /// </summary>
+    /// <returns>生成されたRootのGameObject</returns>
     std::shared_ptr<GameObject> Instantiate() const;
 
     template <class Archive>

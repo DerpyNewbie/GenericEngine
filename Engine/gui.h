@@ -25,15 +25,24 @@ template <typename T> requires std::is_same_v<decltype(std::declval<T>().OnInspe
 static constexpr bool is_inspectable<T> = true;
 // ReSharper restore CppInconsistentNaming
 
+/// <summary>
+/// ImGuiを使ったInspector用のGuiやダイアログなどの便利関数をまとめたクラスです。
+/// </summary>
 class Gui
 {
 public:
+    /// <summary>
+    /// Drag & Dropで使うPayloadの名前です。
+    /// </summary>
     struct DragDropTarget
     {
         static constexpr auto kObject = "ENGINE_OBJECT";
         static constexpr auto kObjectGuid = "ENGINE_OBJ_GUID";
     };
 
+    /// <summary>
+    /// MessageBoxのダイアログに表示するアイコンの種類です。
+    /// </summary>
     enum class MbDialogIcon
     {
         kNone,
@@ -43,67 +52,202 @@ public:
         kError
     };
 
+    /// <summary>
+    /// MessageBoxのダイアログの設定です。
+    /// </summary>
     struct MbDialogOption
     {
         MbDialogIcon icon = MbDialogIcon::kNone;
 
+        /// <summary>
+        /// iconに対応するMessageBoxのflagを取得します。
+        /// </summary>
         UINT Flags() const;
     };
 
+    /// <summary>
+    /// 表示するものがないことをInspectorに表示するためのInspectableです。
+    /// </summary>
     struct NothingToShowInspectable : Inspectable
     {
         void OnInspectorGui() override;
     };
 
+    /// <summary>
+    /// ファイルを開くDialogを表示します。
+    /// </summary>
+    /// <param name="file_path">最初に開くフォルダのPath。選択されたファイルのPathが書き込まれます。</param>
+    /// <param name="filters">表示するファイルの種類</param>
+    /// <returns>ファイルが選択された場合 true</returns>
     static bool OpenFileDialog(std::string &file_path, const std::vector<FilterSpec> &filters = {});
 
+    /// <summary>
+    /// ファイルを保存するDialogを表示します。
+    /// </summary>
+    /// <param name="file_path">選択された保存先のPathが書き込まれます。</param>
+    /// <param name="default_name">最初に入力されているファイル名</param>
+    /// <param name="filters">表示するファイルの種類</param>
+    /// <returns>保存先が選択された場合 true</returns>
     static bool SaveFileDialog(
         std::string &file_path, const std::string &default_name,
         const std::vector<FilterSpec> &filters = {}
     );
 
+    /// <summary>
+    /// OKボタンのみのMessageBoxを表示します。
+    /// </summary>
+    /// <param name="title">タイトル</param>
+    /// <param name="content">本文</param>
+    /// <param name="options">アイコンなどの設定</param>
+    /// <returns>OKが押された場合 true</returns>
     static bool OkDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
+    /// <summary>
+    /// OKとキャンセルのボタンがあるMessageBoxを表示します。
+    /// </summary>
+    /// <param name="title">タイトル</param>
+    /// <param name="content">本文</param>
+    /// <param name="options">アイコンなどの設定</param>
+    /// <returns>OKが押された場合 true</returns>
     static bool OkCancelDialog(const std::string &title, const std::string &content, MbDialogOption options = {});
 
+    /// <summary>
+    /// Objectの折りたたみ可能なHeaderを表示し、DragDropのSourceにします。
+    /// </summary>
+    /// <param name="object">対象のObject</param>
+    /// <param name="name">表示する名前。空の場合はNameOf(object)が使われます。</param>
+    /// <returns>Headerが開かれている場合 true</returns>
     static bool ObjectHeader(const std::shared_ptr<Object> &object, std::string name = "");
+    /// <summary>
+    /// 直前に表示したItemを、ObjectのDragDropのSourceにします。
+    /// </summary>
+    /// <param name="object">Dragで渡されるObject</param>
     static void MakeDragDropSource(const std::shared_ptr<Object> &object);
 
+    /// <summary>
+    /// ObjectのGuidをDragDropのPayloadに設定し、名前をDrag中の表示に追加します。
+    /// </summary>
+    /// <param name="object">Dragで渡されるObject</param>
     static void SetDragDropPayload(const std::shared_ptr<Object> &object);
+    /// <summary>
+    /// GuidをDragDropのPayloadに設定し、Guidをドラッグ中の表示に追加します。
+    /// </summary>
+    /// <param name="guid">Dragで渡されるObjectのGuid</param>
     static void SetDragDropPayload(xg::Guid guid);
 
+    /// <summary>
+    /// PayloadのGuidからObjectを取得します。まだ読み込まれていないAssetの場合はImportします。
+    /// </summary>
+    /// <param name="payload">DragDropのPayload</param>
+    /// <returns>見つからない場合 nullptr</returns>
     static std::shared_ptr<Object> GetDragDropPayload(const ImGuiPayload *payload);
+    /// <summary>
+    /// 現在DragされているPayloadからObjectを取得します。
+    /// </summary>
+    /// <returns>見つからない場合 nullptr</returns>
     static std::shared_ptr<Object> GetDragDropPayload();
 
+    /// <summary>
+    /// Objectの表示用の名前を取得します。Componentの場合は"GameObject名 (Component名)"、Assetの場合は"名前 (ファイル名)"になります。
+    /// </summary>
+    /// <param name="object">対象のObject</param>
     static std::string NameOf(const std::shared_ptr<Object> &object);
 
+    /// <summary>
+    /// Fieldの標準の大きさ(幅、高さ)を取得します。
+    /// </summary>
     static ImVec2 GetFieldRect();
 
+    /// <summary>
+    /// Objectを T にCastします。
+    /// </summary>
+    /// <returns>Castできない場合 nullptr</returns>
     template <typename T>
     static std::shared_ptr<T> MakeCompatible(std::shared_ptr<Object> object);
 
+    /// <summary>
+    /// Objectを T にCastします。Castできず、ObjectがGameObjectである場合は、そのGameObjectが持つ T のComponentを取得します。
+    /// </summary>
+    /// <returns>見つからない場合 nullptr</returns>
     template <typename T> requires std::is_base_of_v<Component, T>
     static std::shared_ptr<T> MakeCompatible(std::shared_ptr<Object> object);
 
+    /// <summary>
+    /// 直前に表示したItemを T のObjectのDropTargetにします。
+    /// </summary>
+    /// <param name="asset_ptr">Dropされた時に書き換えられるAssetPtr</param>
+    /// <returns>Dropされてasset_ptrが変更された場合 true</returns>
     template <typename T>
     static bool AssetDragDropTarget(IAssetPtr &asset_ptr);
 
+    /// <summary>
+    /// T のObjectの一覧をMenuとして表示し、選択されたものをasset_ptrに設定します。
+    /// </summary>
+    /// <param name="asset_ptr">選択された時に書き換えられるAssetPtr</param>
+    /// <returns>asset_ptrが変更された場合 true</returns>
     template <typename T>
     static bool AssetPicker(IAssetPtr &asset_ptr);
 
+    /// <summary>
+    /// 編集できない文字列のFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">表示する文字列</param>
     static void ReadOnlyStringField(const char *label, const std::string &value);
 
+    /// <summary>
+    /// boolを編集するCheckboxを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool BoolField(const char *label, bool &value);
 
+    /// <summary>
+    /// floatをDragで編集するFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool FloatField(const char *label, float &value);
 
+    /// <summary>
+    /// intをDragで編集するFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool IntField(const char *label, int &value);
 
+    /// <summary>
+    /// Vector2をDragで編集するFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool Vector2Field(const char *label, Vector2 &value);
 
+    /// <summary>
+    /// Vector3をDragで編集するFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool Vector3Field(const char *label, Vector3 &value);
 
+    /// <summary>
+    /// Quaternionをオイラー角(度)として編集するFieldを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool QuaternionField(const char *label, Quaternion &value);
 
+    /// <summary>
+    /// Colorを編集するColorPickerを表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集する値</param>
+    /// <returns>値が変更された場合 true</returns>
     static bool ColorField(const char *label, Color &value);
 
     /// base implementation
@@ -158,12 +302,29 @@ public:
     template <typename T>
     static bool PropertyField(const char *label, std::vector<T> &value);
 
+    /// <summary>
+    /// AssetのPropertyFieldに加えて、参照先のOnInspectorGuiを折りたたみ表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集するAssetPtr</param>
+    /// <returns>値が変更された場合 true</returns>
     template <typename T> requires is_inspectable<T>
     static bool ExpandablePropertyField(const char *label, IAssetPtr &value);
 
+    /// <summary>
+    /// AssetのPropertyFieldに加えて、参照先のOnInspectorGuiを折りたたみ表示します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="value">編集するAssetPtr</param>
+    /// <returns>値が変更された場合 true</returns>
     template <typename T> requires is_inspectable<T>
     static bool ExpandablePropertyField(const char *label, AssetPtr<T> &value);
 
+    /// <summary>
+    /// 折りたたみ可能なHeaderを表示し、開かれている場合にinspectableのOnInspectorGuiを呼び出します。
+    /// </summary>
+    /// <param name="label">ラベル</param>
+    /// <param name="inspectable">表示する対象</param>
     template <typename T> requires is_inspectable<T>
     static void Expand(const char *label, T *inspectable);
 };

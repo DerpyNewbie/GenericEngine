@@ -10,6 +10,9 @@ namespace editor
 class EditorMenu;
 class EditorWindow;
 
+/// <summary>
+/// Editorの動作モードです。
+/// </summary>
 enum class EditorMode
 {
     kEdit,
@@ -21,6 +24,9 @@ enum class EditorMode
 /// </summary>
 class Editor final : public enable_shared_from_base<Editor>
 {
+    /// <summary>
+    /// 表示順(priority)を持つEditorMenuです。
+    /// </summary>
     struct PrioritizedEditorMenu
     {
         std::string name;
@@ -28,6 +34,9 @@ class Editor final : public enable_shared_from_base<Editor>
         int priority;
     };
 
+    /// <summary>
+    /// PrioritizedEditorMenuをpriorityの順に並べるための比較関数です。
+    /// </summary>
     struct PrioritizedEditorMenuComparator
     {
         /// <summary>
@@ -39,6 +48,9 @@ class Editor final : public enable_shared_from_base<Editor>
         }
     };
 
+    /// <summary>
+    /// 表示順(priority)を持つ、Assetの作成メニューの項目です。
+    /// </summary>
     struct PrioritizedCreateMenu
     {
         std::string name;

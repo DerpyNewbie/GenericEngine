@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Tのインスタンスを使い回すためのPoolです。
+/// </summary>
 template <typename T>
 class ObjectPool
 {
@@ -12,14 +15,35 @@ class ObjectPool
     };
 
 public:
-
+    /// <summary>
+    /// Poolが保持するObjectの最大数を取得します。
+    /// </summary>
     size_t MaxSize() const;
+    /// <summary>
+    /// Poolが保持するObjectの最大数を設定し、足りない分のObjectを生成します。
+    /// </summary>
+    /// <param name="max_size">最大数</param>
     void SetMaxSize(size_t max_size);
 
+    /// <summary>
+    /// 使用されていないObjectを取得します。空きがない場合は新しく生成します。
+    /// </summary>
     T *Get();
+    /// <summary>
+    /// ObjectをPoolに返却します。Poolの数が最大数を超えている場合は、返却せずに削除します。
+    /// </summary>
+    /// <param name="object">Getで取得したObject</param>
     void Return(const T *object);
+    /// <summary>
+    /// すべてのObjectを未使用の状態に戻し、Poolの数を最大数に揃えます。
+    /// </summary>
     void ReturnAll();
 
+    /// <summary>
+    /// Poolを作成し、最大数の分のObjectをあらかじめ生成します。
+    /// </summary>
+    /// <param name="max_size">最大数</param>
+    /// <param name="on_create">Objectを生成する関数</param>
     explicit ObjectPool(size_t max_size, std::function<T()> on_create = [] {
         return T();
     });

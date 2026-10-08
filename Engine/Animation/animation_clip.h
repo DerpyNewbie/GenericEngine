@@ -3,6 +3,9 @@ namespace engine
 {
 class GameObject;
 
+/// <summary>
+/// 1つのTransformに対する位置、Scale、回転のKeyをまとめたAnimationのCurveです。
+/// </summary>
 struct TransformAnimationCurve
 {
     std::vector<std::pair<float, Vector3>> position_key;
@@ -28,6 +31,9 @@ struct TransformAnimationCurve
 
 };
 
+/// <summary>
+/// TransformごとのCurveをまとめた、Animationのデータを持つAssetです。
+/// </summary>
 class AnimationClip : public Object, public Inspectable
 {
     friend class FbxImporter;
@@ -38,7 +44,15 @@ class AnimationClip : public Object, public Inspectable
 public:
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// すべてのCurveの再生位置(index)を先頭に戻します。
+    /// </summary>
     void Initialize();
+    /// <summary>
+    /// 指定されたPath(GameObjectの名前)に対応するCurveを取得します。
+    /// </summary>
+    /// <param name="path">Curveの対象となるGameObjectの名前</param>
+    /// <returns>対応するCurve。見つからない場合 nullptr</returns>
     TransformAnimationCurve *FindCurve(const std::string &path);
 
     /// <summary>
