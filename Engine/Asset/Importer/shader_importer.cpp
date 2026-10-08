@@ -240,14 +240,20 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
 {
     ComPtr<ID3DBlob> error_blob;
 
+    UINT compile_flags = D3DCOMPILE_OPTIMIZATION_LEVEL3;
+
+#if defined(DEBUG) || defined(_DEBUG)
+    compile_flags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#endif
+
     HRESULT hr = D3DCompileFromFile(
         file_path.c_str(),
         nullptr,
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         "vrt",
         "vs_5_1",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
+        compile_flags,
+        0,
         &shader->m_vs_blob_,
         &error_blob
     );
@@ -273,8 +279,8 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         "pix",
         "ps_5_1",
-        D3DCOMPILE_SKIP_OPTIMIZATION,
-        D3DCOMPILE_DEBUG,
+        compile_flags,
+        0,
         &shader->m_ps_blob_,
         &error_blob
     );
@@ -300,7 +306,7 @@ bool ShaderImporter::CompileShader(const std::shared_ptr<Shader> &shader, const 
         D3D_COMPILE_STANDARD_FILE_INCLUDE,
         "geo",
         "gs_5_1",
-        0,
+        compile_flags,
         0,
         &shader->m_gs_blob_,
         &error_blob
