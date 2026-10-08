@@ -61,14 +61,15 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(
 
             new_group->Insert(byte_address_buffer, data, kBufferType_ByteAddressBuffer,
                               data->parameter.is_unordered_access ? kGpuBufferType_UAV : kGpuBufferType_SRV);
+            break;
         }
-        break;
         case kBufferType_TextureCube: {
             const auto tex_data = std::reinterpret_pointer_cast<TextureCubeBufferData>(data);
             auto textures = tex_data->Textures();
             auto texture_cube_buffer = std::make_shared<TextureCube>(textures);
 
             new_group->Insert(texture_cube_buffer, data, kBufferType_TextureCube, kGpuBufferType_SRV);
+            break;
         }
         }
     }
