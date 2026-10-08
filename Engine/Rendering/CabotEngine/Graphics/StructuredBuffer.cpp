@@ -1,6 +1,7 @@
 ﻿#include "pch.h"
 #include "StructuredBuffer.h"
 
+#include "ByteAddressBuffer.h"
 #include "DirectXResourceFactory.h"
 #include "RenderEngine.h"
 
@@ -73,7 +74,11 @@ void StructuredBuffer::UpdateBuffer(const void *data)
     }
 
     if (data == nullptr)
+    {
+        Logger::Error<ByteAddressBuffer>("UpdateBuffer failed: data is null");
         return;
+    }
+
 
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_resource_.Get(),

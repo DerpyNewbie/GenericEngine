@@ -72,7 +72,10 @@ void ByteAddressBuffer::UpdateBuffer(const void *data)
     }
 
     if (data == nullptr)
+    {
         Logger::Error<ByteAddressBuffer>("UpdateBuffer failed: data is null");
+        return;
+    }
 
     CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
         m_default_resource_.Get(),
