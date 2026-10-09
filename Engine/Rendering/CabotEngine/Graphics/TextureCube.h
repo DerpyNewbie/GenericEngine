@@ -1,24 +1,36 @@
 #pragma once
 #include "Texture2D.h"
-#include "Rendering/ibuffer.h"
+#include "Rendering/buffer_base.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/shader_resource.h"
 
 namespace engine
 {
-class TextureCube final : public Object, public Inspectable, public IBuffer, public ShaderResource
+class TextureCube final : public Object, public BufferBase, public ShaderResource
 {
     std::array<AssetPtr<Texture2D>, 6> m_textures_;
-    Microsoft::WRL::ComPtr<ID3D12Resource> m_buffer_;
-
+    Microsoft::WRL::ComPtr<ID3D12Resource> m_resource_;
+    D3D12_RESOURCE_STATES m_current_state_;
+    
 public:
-    void OnInspectorGui() override;
+    TextureCube(const std::array<AssetPtr<Texture2D>, 6> &textures = {});
+    ~TextureCube() override;
+    
     void CreateBuffer() override;
-    void UpdateBuffer(void *data) override;
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    bool CanUpdate() override;
+    void UpdateBuffer(const void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
+    kGpuUploadType BufferType() const override
+    {
+        return kGpuBufferType_SRV;
+    }
     bool IsValid() override;
+    bool Transition(D3D12_RESOURCE_STATES new_state) override;
+
+    void RequestReadBack() override;
+    bool FetchBufferData(void *data) override;
 
     ID3D12Resource *Resource() override;
+    D3D12_UNORDERED_ACCESS_VIEW_DESC UavDesc();
     D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
 
     bool SetTextures(const std::array<AssetPtr<Texture2D>, 6> &textures);

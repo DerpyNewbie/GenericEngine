@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "renderer_2d.h"
+#include "game_object.h"
 #include "image.h"
+
+#include "gui.h"
 #include "rect_transform.h"
 #include "Rendering/primitives.h"
 #include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
 
 using namespace DirectX::SimpleMath;
 

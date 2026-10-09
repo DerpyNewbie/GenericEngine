@@ -30,6 +30,7 @@
 
 #include <ranges>
 
+#include "gui.h"
 #include "scene_manager.h"
 #include "serializer.h"
 

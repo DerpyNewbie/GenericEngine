@@ -22,9 +22,6 @@ RootSignature::RootSignature()
 
     rootParam[kWorldCBV].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kViewProjCBV].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kSceneDataCBV].InitAsConstantBufferView(2, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kCascadeSlicesCBV].InitAsConstantBufferView(3, 0, D3D12_SHADER_VISIBILITY_ALL);
-    rootParam[kLightCountCBV].InitAsConstantBufferView(4, 0, D3D12_SHADER_VISIBILITY_ALL);
     CD3DX12_DESCRIPTOR_RANGE tableRangeBone = {};
     tableRangeBone.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
     rootParam[kBoneSRV].InitAsDescriptorTable(1, &tableRangeBone, D3D12_SHADER_VISIBILITY_ALL);
@@ -33,27 +30,23 @@ RootSignature::RootSignature()
     tableRangeLightVP.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 1);
     rootParam[kLightViewProj].InitAsDescriptorTable(1, &tableRangeLightVP, D3D12_SHADER_VISIBILITY_ALL);
     
-    CD3DX12_DESCRIPTOR_RANGE tableRangeLight = {};
-    tableRangeLight.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
-    rootParam[kLightSRV].InitAsDescriptorTable(1, &tableRangeLight, D3D12_SHADER_VISIBILITY_ALL);
-    
     CD3DX12_DESCRIPTOR_RANGE tableRangeShadowMap = {};
-    tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 3);
+    tableRangeShadowMap.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 2);
     rootParam[kShadowMapSRV].InitAsDescriptorTable(1, &tableRangeShadowMap, D3D12_SHADER_VISIBILITY_ALL);
 
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSCBV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSSRV = {};
     CD3DX12_DESCRIPTOR_RANGE tableRangeVSUAV = {};
 
-    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 5);
-    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 4);
-    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 0);
+    tableRangeVSCBV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 20, 2);
+    tableRangeVSSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 6, 3);
+    tableRangeVSUAV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 6, 1);
 
     rootParam[kMaterialCBV].InitAsDescriptorTable(1, &tableRangeVSCBV, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kMaterialSRV].InitAsDescriptorTable(1, &tableRangeVSSRV, D3D12_SHADER_VISIBILITY_ALL);
     rootParam[kMaterialUAV].InitAsDescriptorTable(1, &tableRangeVSUAV, D3D12_SHADER_VISIBILITY_ALL);
-    
-    D3D12_STATIC_SAMPLER_DESC sampler[2];
+
+    D3D12_STATIC_SAMPLER_DESC sampler[3];
     sampler[0] = CD3DX12_STATIC_SAMPLER_DESC(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR);
 
     sampler[1] = CD3DX12_STATIC_SAMPLER_DESC(
@@ -68,9 +61,23 @@ RootSignature::RootSignature()
     D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE
     );
 
+    sampler[2].Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+    sampler[2].AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler[2].AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler[2].AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+    sampler[2].MipLODBias = 0;
+    sampler[2].MaxAnisotropy = 1;
+    sampler[2].ComparisonFunc = D3D12_COMPARISON_FUNC_NEVER;
+    sampler[2].BorderColor = D3D12_STATIC_BORDER_COLOR_TRANSPARENT_BLACK;
+    sampler[2].MinLOD = 0.0f;
+    sampler[2].MaxLOD = D3D12_FLOAT32_MAX;
+    sampler[2].ShaderRegister = 2;
+    sampler[2].RegisterSpace = 0;
+    sampler[2].ShaderVisibility = D3D12_SHADER_VISIBILITY_ALL;
+
     D3D12_ROOT_SIGNATURE_DESC desc = {};
     desc.NumParameters = static_cast<UINT>(std::size(rootParam));
-    desc.NumStaticSamplers = 2;
+    desc.NumStaticSamplers = 3;
     desc.pParameters = rootParam.data();
     desc.pStaticSamplers = sampler;
     desc.Flags = flag;

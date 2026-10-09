@@ -104,5 +104,12 @@ public:
         return Instance()->m_p_rtv_heap_->GetDesc();
     }
 
+    static UINT64 FenceNextValue()
+    {
+        return Instance()->m_next_fence_value_;
+    }
+
+    static bool IsFenceComplete(uint64_t fence_value);
+    
     void SetBackgroundColor(Color color);
 };

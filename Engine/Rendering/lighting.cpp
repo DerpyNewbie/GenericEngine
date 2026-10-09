@@ -4,14 +4,18 @@
 #include "Components/camera_component.h"
 #include "lighting.h"
 
+#include "gpu_resource_manager.h"
+#include "texture_collection.h"
+#include "CabotEngine/Graphics/Texture2D.h"
+
 namespace
 {
 std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &cam_proj)
 {
     const Vector3 ndc_corners[8] =
     {
-        { -1, -1, 0 }, { -1, 1, 0 }, { 1, 1, 0 }, { 1, -1, 0 },
-        { -1, -1, 1 }, { -1, 1, 1 }, { 1, 1, 1 }, { 1, -1, 1 }
+        {-1, -1, 0}, {-1, 1, 0}, {1, 1, 0}, {1, -1, 0},
+        {-1, -1, 1}, {-1, 1, 1}, {1, 1, 1}, {1, -1, 1}
     };
 
     const Matrix inv_view_proj = (cam_view * cam_proj).Invert();
@@ -25,57 +29,29 @@ std::array<Vector3, 8> CalcFrustumCorners(const Matrix &cam_view, const Matrix &
 
 namespace engine
 {
-void Lighting::UpdateLightCountBuffer()
+void Lighting::SetLightCountBuffer()
 {
-    if (m_light_count_buffer_ == nullptr)
-    {
-        m_light_count_buffer_ = std::make_shared<ConstantBuffer>(sizeof(uint32_t));
-        m_light_count_buffer_->CreateBuffer();
-    }
-
-    uint32_t lcb(static_cast<uint32_t>(Instance()->m_lights_.size()));
-
-    m_light_count_buffer_->UpdateBuffer(&lcb);
+    GpuResourceManager::SetGlobalInt("LightCount", Instance()->m_lights_.size());
 }
 
-void Lighting::UpdateLightBuffer()
+void Lighting::SetLightBuffer()
 {
-    if (Instance()->m_lights_.empty())
-        return;
-
     if (m_lights_buffer_ == nullptr)
     {
-        m_lights_buffer_ = std::make_shared<StructuredBuffer>(sizeof(LightData),
-                                                              RenderingConstants::kMaxLightCount);
-        m_lights_buffer_->CreateBuffer();
-        m_lights_buffer_handle_ = m_lights_buffer_->UploadBuffer();
+        m_lights_buffer_ = std::make_shared<StructuredBufferData>();
+        m_lights_buffer_->SetStride(sizeof(LightData));
+        m_lights_buffer_->SetCount(RenderingConstants::kMaxLightCount);
     }
 
     std::array<LightData, RenderingConstants::kMaxLightCount> properties;
     for (int i = 0; i < Instance()->m_lights_.size(); ++i)
     {
         m_lights_[i]->UpdateData();
-        properties[i] = Instance()->m_lights_[i]->m_light_data_;
-        m_lights_buffer_->UpdateBuffer(properties.data());
+        properties[i] = m_lights_[i]->m_light_data_;
     }
-}
 
-void Lighting::SetLightCountBuffer()
-{
-    UpdateLightCountBuffer();
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kLightCountCBV, m_light_count_buffer_->GetAddress());
-}
-
-void Lighting::SetLightBuffer()
-{
-    UpdateLightBuffer();
-
-    if (m_lights_buffer_ == nullptr)
-        return;
-
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootDescriptorTable(kLightSRV, m_lights_buffer_handle_->handle_gpu);
+    m_lights_buffer_->SetData(properties.data());
+    GpuResourceManager::SetGlobalBufferData("Lights", m_lights_buffer_);
 }
 
 void Lighting::SetBuffers()
@@ -171,23 +147,11 @@ void Lighting::UpdateLightsViewProjMatrixBuffer(const Matrix &view, const Matrix
         m_light_view_proj_matrices_buffer_ = std::make_shared<StructuredBuffer>(
             sizeof(Matrix), RenderingConstants::kMaxShadowMapCount);
         m_light_view_proj_matrices_buffer_->CreateBuffer();
-        m_light_view_proj_handle_ = m_light_view_proj_matrices_buffer_->UploadBuffer();
+        m_light_view_proj_handle_ = DescriptorHeap::Allocate();
+        m_light_view_proj_matrices_buffer_->UploadBuffer(m_light_view_proj_handle_);
     }
 
     m_light_view_proj_matrices_buffer_->UpdateBuffer(m_light_view_proj_matrices_.data());
-}
-
-void Lighting::SetCascadeSlicesBuffer()
-{
-    if (m_cascade_slices_buffer_ == nullptr)
-    {
-        m_cascade_slices_buffer_ = std::make_shared<ConstantBuffer>(
-            sizeof(float) * RenderingConstants::kShadowCascadeCount);
-        m_cascade_slices_buffer_->CreateBuffer();
-    }
-
-    const auto cmd_list = RenderEngine::CommandList();
-    cmd_list->SetGraphicsRootConstantBufferView(kCascadeSlicesCBV, m_cascade_slices_buffer_->GetAddress());
 }
 
 void Lighting::SetLightsViewProjMatrix() const
@@ -207,6 +171,11 @@ void Lighting::SetShadowMap()
     if (!m_lights_.empty())
         cmd_list->SetGraphicsRootDescriptorTable(kShadowMapSRV,
                                                  m_shadow_map_handle_->handle_gpu);
+}
+
+uint32_t Lighting::GetLightCount() const
+{
+    return static_cast<uint32_t>(m_lights_.size());
 }
 
 void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)
@@ -229,8 +198,9 @@ void Lighting::TryApplyShadow(const std::shared_ptr<Light> &light)
         m_free_depth_texture_handles_.erase(handle_it);
         light->m_depth_texture_handle_.emplace_back(handle);
 
-        auto depth_texture = std::make_shared<DepthTexture>();
-        depth_texture->SetResource(m_depth_textures_, handle);
+        auto depth_texture = Object::Instantiate<DepthTexture>();
+        const auto depth_texture_buffer = TextureCollection::GetDepthTexture(depth_texture);
+        depth_texture_buffer->SetResource(m_depth_textures_, handle);
         if (m_shadow_maps_.size() <= handle)
             m_shadow_maps_.emplace_back(depth_texture);
         else
@@ -262,7 +232,10 @@ void Lighting::RemoveShadow(const std::shared_ptr<Light> &light)
 
     if (!m_waiting_lights_.empty())
     {
-        auto camera_pos = CameraComponent::Main()->GameObject()->Transform()->Position();
+        auto main_camera = CameraComponent::Main();
+        if (main_camera == nullptr)
+            return;
+        auto camera_pos = main_camera->GameObject()->Transform()->Position();
         auto it = std::ranges::min_element(m_waiting_lights_,
                                            [camera_pos](const std::shared_ptr<Light> &a,
                                            const std::shared_ptr<Light> &b) {
@@ -290,17 +263,8 @@ void Lighting::RemoveLight(const std::shared_ptr<Light> &light)
     RemoveShadow(light);
 }
 
-void Lighting::SetCascadeSlices(
-    std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices)
+void Lighting::SetCascadeSlices(std::array<float, RenderingConstants::kShadowCascadeCount> shadow_cascade_slices)
 {
-    auto &cascade_slices_buffer = Instance()->m_cascade_slices_buffer_;
-    if (cascade_slices_buffer == nullptr)
-    {
-        cascade_slices_buffer = std::make_shared<ConstantBuffer>(
-            sizeof(float) * RenderingConstants::kShadowCascadeCount);
-        cascade_slices_buffer->CreateBuffer();
-    }
-
-    cascade_slices_buffer->UpdateBuffer(shadow_cascade_slices.data());
+    GpuResourceManager::SetGlobalVector("ShadowCascadeSlices", *reinterpret_cast<Vector3 *>(shadow_cascade_slices.data()));
 }
 }
