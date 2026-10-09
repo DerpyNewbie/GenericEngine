@@ -29,7 +29,6 @@ public:
     void UpdateBuffer();
     bool IsDirty() const;
 
-    //これを作ったらBillboardが使えるようになるのでそれを使ってUAVが正しく出来ているかどうかチェックしてください
     void SetShader(const AssetPtr<Shader> &shader);
 
     template <class Archive>
