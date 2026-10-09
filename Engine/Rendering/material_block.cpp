@@ -127,6 +127,8 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
         case kBufferType_TextureCube:
             m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
             break;
+        default:
+            Logger::Error<MaterialBlock>("Unknown buffer type!");
         }
     }
 }
