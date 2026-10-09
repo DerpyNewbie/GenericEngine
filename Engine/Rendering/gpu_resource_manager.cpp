@@ -71,6 +71,8 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(
             new_group->Insert(texture_cube_buffer, data, kBufferType_TextureCube, kGpuBufferType_SRV);
             break;
         }
+        default:
+            Logger::Error("Unknown buffer type");
         }
     }
 
@@ -146,6 +148,9 @@ void GpuResourceManager::SetGlobalBufferData(const std::string &name,
             it->second = TextureCollection::GetRenderTexture(uav_tex_data->Data());
             break;
         }
+        default:
+            Logger::Error("Unknown buffer type");
+            break;
         }
     }
 }
