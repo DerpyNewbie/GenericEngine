@@ -18,7 +18,7 @@ void Material::OnInspectorGui()
 
     if (Gui::ExpandablePropertyField<Shader>("shader", m_shader_))
     {
-        if (m_shader_.CastedLock())
+        if (m_shader_ != nullptr)
         {
             CreateMaterialBlock();
             return;
