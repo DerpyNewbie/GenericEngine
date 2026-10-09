@@ -9,7 +9,7 @@ namespace engine
 {
 void Texture2DArray::CopyResource()
 {
-    const auto texture = m_textures_[0].CastedLock();
+    const auto texture = m_textures_[0];
     const auto texture_size = Vector2(static_cast<float>(texture->Width()), static_cast<float>(texture->Height()));
 
     if (!CreateResource(texture_size, static_cast<UINT16>(m_textures_.size()), texture->MipLevel(), texture->Format()))
