@@ -65,6 +65,7 @@ void TextureBuffer::CreateBuffer()
     if (FAILED(hr))
     {
         m_resource_ = nullptr;
+        Logger::Error<TextureBuffer>("failed to write to texture2d resource");
     }
 }
 
