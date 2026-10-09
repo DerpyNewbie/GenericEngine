@@ -49,6 +49,7 @@ void RenderTextureBuffer::CreateBuffer()
     if (FAILED(hr))
     {
         Logger::Error<RenderTextureBuffer>("Failed To Create RTV Heap for RenderTexture");
+        return;
     }
 
     D3D12_RENDER_TARGET_VIEW_DESC rtv_desc = {};
