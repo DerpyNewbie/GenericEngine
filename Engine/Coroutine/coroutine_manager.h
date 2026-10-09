@@ -1,5 +1,4 @@
 ﻿#pragma once
-
 #include "cancellation_token.h"
 #include "task.h"
 
@@ -13,22 +12,22 @@ class CoroutineManager
 
 public:
     /// <summary>
-    /// 指定されたTaskをリストに追加します。
+    /// coroutineをリストに追加します。
     /// </summary>
-    /// <param name="t">Task</param>
+    /// <param name="t">task</param>
     void Start(Task &&t);
     /// <summary>
-    /// 指定されたTaskをリストに追加します。
+    /// coroutineをリストに追加します。
     /// </summary>
-    /// <param name="t">Task</param>
+    /// <param name="t">task</param>
     /// <param name="token">CancellationToken</param>
     void Start(Task &&t, CancellationToken token);
 
     /// <summary>
-    /// coroutineが再開可能であればawaitに当たるまで進めます。Cancel もしくは co_return に当たった場合はリストから削除されます。
+    /// coroutineを再開可能であれば再開します。cancelもしくはco_returnされた場合リストから削除します。
     /// </summary>
     /// <remarks>
-    /// 任意updateのタイミングで一度だけ呼び出します。
+    /// Engine側のUpdateサイクルのタイミングで1度だけ呼び出してください。
     /// </remarks>
     void Update();
 };
