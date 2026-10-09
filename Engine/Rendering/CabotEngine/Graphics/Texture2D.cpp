@@ -173,7 +173,7 @@ std::vector<PackedVector::XMCOLOR> Texture2D::GetPixels()
 
 uint32_t Texture2D::Width()
 {
-    if (m_width_ != UINT32_MAX)
+    if (m_width_ != 0)
         return m_width_;
 
     CacheData();
@@ -182,7 +182,7 @@ uint32_t Texture2D::Width()
 
 uint32_t Texture2D::Height()
 {
-    if (m_height_ != UINT32_MAX)
+    if (m_height_ != 0)
         return m_height_;
 
     CacheData();

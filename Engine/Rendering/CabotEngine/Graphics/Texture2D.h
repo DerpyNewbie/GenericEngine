@@ -22,8 +22,8 @@ class Texture2D : public Object, public Inspectable
 
 protected:
     std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_ = {};
-    uint32_t m_width_ = UINT32_MAX;
-    uint32_t m_height_ = UINT32_MAX;
+    uint32_t m_width_ = 0;
+    uint32_t m_height_ = 0;
     uint16_t m_mip_level_ = UINT16_MAX;
     DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
     std::string m_path_;
