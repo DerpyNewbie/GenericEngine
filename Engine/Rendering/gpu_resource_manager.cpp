@@ -73,6 +73,7 @@ std::shared_ptr<GpuResourceGroup> GpuResourceManager::GetBuffersForMaterial(
         }
         default:
             Logger::Error("Unknown buffer type");
+            break;
         }
     }
 
