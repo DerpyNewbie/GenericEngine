@@ -41,6 +41,7 @@ void RenderTextureBuffer::CreateBuffer()
     if (FAILED(hr))
     {
         Logger::Error<RenderTextureBuffer>("Failed To Create RenderTexture");
+        return;
     }
 
     D3D12_DESCRIPTOR_HEAP_DESC heap_desc = RenderEngine::RTVHeapDesc();
