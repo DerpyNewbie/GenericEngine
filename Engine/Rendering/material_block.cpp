@@ -129,6 +129,7 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
             break;
         default:
             Logger::Error<MaterialBlock>("Unknown buffer type!");
+            break;
         }
     }
 }
