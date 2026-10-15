@@ -24,42 +24,52 @@ void Input::ProcessMessage(const UINT msg, const WPARAM w_param, const LPARAM l_
 
 void Input::Update()
 {
+    m_keyboard_state_ = m_keyboard_->GetState();
+    m_keyboard_tracker_.Update(m_keyboard_state_);
+
     if (m_mouse_mode_ == kMouseMode::kLocked && GetKeyDown(DirectX::Keyboard::Keys::Escape))
     {
-        m_next_mouse_mode_ = m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE
+        m_next_mouse_mode_ = m_next_mouse_mode_ == DirectX::Mouse::MODE_ABSOLUTE
                                    ? DirectX::Mouse::MODE_RELATIVE
                                    : DirectX::Mouse::MODE_ABSOLUTE;
 
         Logger::Log<Input>("Mouse Lock Interrupt! %d", m_next_mouse_mode_);
-        m_mouse_->SetVisible(m_next_mouse_mode_ != DirectX::Mouse::MODE_ABSOLUTE);
+        m_cursor_visible_ = m_next_mouse_mode_ == DirectX::Mouse::MODE_ABSOLUTE;
     }
-    
-    if (m_mouse_->GetState().positionMode != m_next_mouse_mode_)
+
+    // 注意: RELATIVE 中の Mouse::GetState() は呼ぶたびに移動量を消費するため、1フレーム1回だけ呼ぶ
+    if (m_applied_mouse_mode_ != m_next_mouse_mode_)
     {
         m_mouse_->SetMode(m_next_mouse_mode_);
+        m_applied_mouse_mode_ = m_next_mouse_mode_;
     }
-    
-    m_keyboard_state_ = m_keyboard_->GetState();
-    m_keyboard_tracker_.Update(m_keyboard_state_);
+
+    // DirectXTK の SetVisible は RELATIVE 中は無視されるため、モード確定後に反映する
+    if (m_applied_mouse_mode_ == DirectX::Mouse::MODE_ABSOLUTE)
+    {
+        m_mouse_->SetVisible(m_cursor_visible_);
+    }
 
     m_mouse_->ResetScrollWheelValue();
     m_mouse_state_ = m_mouse_->GetState();
     m_mouse_tracker_.Update(m_mouse_state_);
 
+    const bool mode_changed = m_mouse_state_.positionMode != m_prev_position_mode_;
+    m_prev_position_mode_ = m_mouse_state_.positionMode;
+
+    const Vector2 mouse_pos = {static_cast<float>(m_mouse_state_.x), static_cast<float>(m_mouse_state_.y)};
     if (m_mouse_state_.positionMode == DirectX::Mouse::MODE_ABSOLUTE)
     {
-        const Vector2 mouse_pos = {static_cast<float>(Instance()->m_mouse_state_.x), static_cast<float>(Instance()->m_mouse_state_.y)};
-        m_mouse_delta_ = mouse_pos - m_mouse_position_;
+        m_mouse_delta_ = mode_changed ? Vector2::Zero : mouse_pos - m_mouse_position_;
         m_mouse_position_ = mouse_pos;
     }
     else
     {
-        const Vector2 mouse_pos = {static_cast<float>(Instance()->m_mouse_state_.x), static_cast<float>(Instance()->m_mouse_state_.y)};
-        m_mouse_delta_ = mouse_pos;
-        m_mouse_position_ += mouse_pos;
+        m_mouse_delta_ = mode_changed ? Vector2::Zero : mouse_pos;
+        if (!mode_changed)
+            m_mouse_position_ += mouse_pos;
     }
-    
-    
+
     if (m_mouse_mode_ == kMouseMode::kLocked && m_mouse_->IsVisible())
     {
         m_mouse_delta_ = Vector2::Zero;
@@ -140,11 +150,11 @@ void Input::SetMouseMode(const kMouseMode mode)
     {
     case kMouseMode::kNormal:
         Instance()->m_next_mouse_mode_ = DirectX::Mouse::MODE_ABSOLUTE;
-        SetCursorVisible(true);
+        Instance()->m_cursor_visible_ = true;
         return;
     case kMouseMode::kLocked:
         Instance()->m_next_mouse_mode_ = DirectX::Mouse::MODE_RELATIVE;
-        SetCursorVisible(false);
+        Instance()->m_cursor_visible_ = false;
         return;
     default:
         throw std::runtime_error("Invalid MouseMode");
@@ -153,6 +163,7 @@ void Input::SetMouseMode(const kMouseMode mode)
 
 void Input::SetCursorVisible(const bool is_visible)
 {
+    Instance()->m_cursor_visible_ = is_visible;
     Instance()->m_mouse_->SetVisible(is_visible);
 }
 }
