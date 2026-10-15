@@ -346,7 +346,7 @@ bool Gui::PropertyField(const char *label, std::vector<T> &value)
             int size = value.size();
             if (ImGui::InputInt("Size", &size))
             {
-                value.resize(max(size, 0));
+                value.resize(std::max(size, 0));
                 result = true;
             }
 
