@@ -131,11 +131,19 @@
         <ClCompile Include="Engine\Physics\rigidbody_tester_component.cpp"/>
         <ClCompile Include="Engine\Physics\sphere_collider.cpp"/>
         <ClCompile Include="Engine\Rendering\bone_weight.cpp"/>
+        <ClCompile Include="Engine\Rendering\buffer_base.cpp"/>
+        <ClCompile Include="Engine\Rendering\buffer_data_base.cpp"/>
+        <ClCompile Include="Engine\Rendering\byte_address_buffer_data.cpp"/>
+        <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ByteAddressBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.cpp"/>
         <ClCompile Include="Engine\Rendering\camera.cpp"/>
+        <ClCompile Include="Engine\Rendering\constant_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\depth_texture.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.cpp"/>
+        <ClCompile Include="Engine\Rendering\depth_texture_buffer.cpp"/>
+        <ClCompile Include="Engine\Rendering\gpu_resource_group.cpp"/>
+        <ClCompile Include="Engine\Rendering\gpu_resource_manager.cpp"/>
         <ClCompile Include="Engine\Rendering\ibuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.cpp"/>
         <ClCompile Include="Engine\Rendering\CabotEngine\Graphics\DescriptorHeap.cpp"/>
@@ -152,7 +160,6 @@
         <ClCompile Include="Engine\Rendering\lighting.cpp"/>
         <ClCompile Include="Engine\Rendering\light_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material.cpp"/>
-        <ClCompile Include="Engine\Rendering\material_data.cpp"/>
         <ClCompile Include="Engine\Rendering\material_block.cpp"/>
         <ClCompile Include="Engine\Rendering\mesh.cpp"/>
         <ClCompile Include="Engine\Rendering\model_importer.cpp"/>
@@ -160,6 +167,7 @@
         <ClCompile Include="Engine\Rendering\render_command.cpp"/>
         <ClCompile Include="Engine\Rendering\render_pipeline.cpp"/>
         <ClCompile Include="Engine\Rendering\render_texture.cpp"/>
+        <ClCompile Include="Engine\Rendering\render_texture_buffer.cpp"/>
         <ClCompile Include="Engine\Rendering\scene_data.cpp"/>
         <ClCompile Include="Engine\Rendering\shader.cpp"/>
         <ClCompile Include="Engine\Rendering\shader_parameter.cpp"/>
@@ -168,7 +176,13 @@
         <ClCompile Include="Engine\Rendering\shader_type.cpp"/>
         <ClCompile Include="Engine\Rendering\skybox.cpp"/>
         <ClCompile Include="Engine\Rendering\rendering_settings_component.cpp"/>
+        <ClCompile Include="Engine\Rendering\structured_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\sub_mesh.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_buffer.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_buffer_data.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_collection.cpp"/>
+        <ClCompile Include="Engine\Rendering\texture_cube_buffer_data.cpp"/>
+        <ClCompile Include="Engine\Rendering\uav_texture_buffer_data.cpp"/>
         <ClCompile Include="Engine\Rendering\vertex.cpp"/>
         <ClCompile Include="Engine\Rendering\view_projection.cpp"/>
         <ClCompile Include="Engine\scene.cpp"/>
@@ -302,11 +316,19 @@
         <ClInclude Include="Engine\Physics\rigidbody_tester_component.h"/>
         <ClInclude Include="Engine\Physics\sphere_collider.h"/>
         <ClInclude Include="Engine\Rendering\bone_weight.h"/>
+        <ClInclude Include="Engine\Rendering\buffer_base.h"/>
+        <ClInclude Include="Engine\Rendering\buffer_data_base.h"/>
+        <ClInclude Include="Engine\Rendering\byte_address_buffer_data.h"/>
+        <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ByteAddressBuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\DirectXResourceFactory.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\Texture2DArray.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\TextureCube.h"/>
         <ClInclude Include="Engine\Rendering\camera.h"/>
+        <ClInclude Include="Engine\Rendering\constant_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\depth_texture.h"/>
+        <ClInclude Include="Engine\Rendering\depth_texture_buffer.h"/>
+        <ClInclude Include="Engine\Rendering\gpu_resource_group.h"/>
+        <ClInclude Include="Engine\Rendering\gpu_resource_manager.h"/>
         <ClInclude Include="Engine\Rendering\ibuffer.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ComPtr.h"/>
         <ClInclude Include="Engine\Rendering\CabotEngine\Graphics\ConstantBuffer.h"/>
@@ -324,7 +346,6 @@
         <ClInclude Include="Engine\Rendering\lighting.h"/>
         <ClInclude Include="Engine\Rendering\light_data.h"/>
         <ClInclude Include="Engine\Rendering\material.h"/>
-        <ClInclude Include="Engine\Rendering\material_data.h"/>
         <ClInclude Include="Engine\Rendering\material_block.h"/>
         <ClInclude Include="Engine\Rendering\mesh.h"/>
         <ClInclude Include="Engine\Rendering\model_importer.h"/>
@@ -333,6 +354,7 @@
         <ClInclude Include="Engine\Rendering\render_command.h"/>
         <ClInclude Include="Engine\Rendering\render_pipeline.h"/>
         <ClInclude Include="Engine\Rendering\render_texture.h"/>
+        <ClInclude Include="Engine\Rendering\render_texture_buffer.h"/>
         <ClInclude Include="Engine\Rendering\scene_data.h"/>
         <ClInclude Include="Engine\Rendering\shader.h"/>
         <ClInclude Include="Engine\Rendering\shader_parameter.h"/>
@@ -341,7 +363,13 @@
         <ClInclude Include="Engine\Rendering\shader_type.h"/>
         <ClInclude Include="Engine\Rendering\skybox.h"/>
         <ClInclude Include="Engine\Rendering\rendering_settings_component.h"/>
+        <ClInclude Include="Engine\Rendering\structured_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\sub_mesh.h"/>
+        <ClInclude Include="Engine\Rendering\texture_buffer.h"/>
+        <ClInclude Include="Engine\Rendering\texture_buffer_data.h"/>
+        <ClInclude Include="Engine\Rendering\texture_collection.h"/>
+        <ClInclude Include="Engine\Rendering\texture_cube_buffer_data.h"/>
+        <ClInclude Include="Engine\Rendering\uav_texture_buffer_data.h"/>
         <ClInclude Include="Engine\Rendering\vertex.h"/>
         <ClInclude Include="Engine\Rendering\view_projection.h"/>
         <ClInclude Include="Engine\scene.h"/>
@@ -430,7 +458,7 @@
             <SDLCheck>true</SDLCheck>
             <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
             <ConformanceMode>true</ConformanceMode>
-            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\x64-windows\include\bullet</AdditionalIncludeDirectories>
+            <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)Engine;$(ProjectDir)vcpkg_installed\x64-windows\include\bullet;$(ProjectDir)vcpkg_installed\x64-windows\include</AdditionalIncludeDirectories>
             <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
             <LanguageStandard>stdcpp20</LanguageStandard>
             <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -440,6 +468,9 @@
             <SubSystem>Windows</SubSystem>
             <GenerateDebugInformation>true</GenerateDebugInformation>
             <PerUserRedirection>true</PerUserRedirection>
+            <AdditionalLibraryDirectories>$(ProjectDir)vcpkginstalled\x64-windows\debug\lib</AdditionalLibraryDirectories>
+            <AdditionalDependencies>$(ProjectDir)vcpkg_installed\x64-windows\debug\lib\*.lib;</AdditionalDependencies>
+            <DelayLoadDLLs>assimp-vc143-mt.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
         </Link>
     </ItemDefinitionGroup>
     <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

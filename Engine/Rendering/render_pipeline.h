@@ -6,10 +6,11 @@
 #include "render_command.h"
 #include "render_texture.h"
 #include "view_projection.h"
-#include "CabotEngine/Graphics/RenderEngine.h"
+#include "CabotEngine/Graphics/ConstantBuffer.h"
 
 namespace engine
 {
+class GpuResourceGroup;
 struct CameraProperty;
 class Renderer;
 class DepthTexture;
@@ -27,34 +28,37 @@ class RenderPipeline
         return view_proj_buff;
     };
 
+    uint16_t m_effect_render_queue_;
+
     std::shared_ptr<Shader> m_depth_shader_;
 
-    std::vector<RenderCommand> m_commands_;
+    std::vector<RenderCommand> m_render_commands_;
     std::vector<std::shared_ptr<Renderer>> m_renderers_;
-    std::shared_ptr<ConstantBuffer> m_scene_data_buffer_;
+    std::shared_ptr<ConstantBufferData> m_scene_data_buffer_data_;
 
     Camera m_current_camera_;
     std::vector<Camera> m_requesting_cameras_;
     uint32_t m_current_view_proj_matrix_index_;
-    std::array<ObjectPool<std::shared_ptr<ConstantBuffer>>, RenderEngine::kFrame_Buffer_Count> m_view_proj_matrix_buffers_
-        = {ObjectPool(0, kOnViewProjBuffCreate), ObjectPool(0, kOnViewProjBuffCreate)};
+    ObjectPool<std::shared_ptr<ConstantBuffer>> m_view_proj_matrix_buffers_ = ObjectPool(0, kOnViewProjBuffCreate);
 
-
+    std::unordered_map<std::shared_ptr<MaterialBlock>, std::shared_ptr<GpuResourceGroup>> m_material_block_gpu_resource_groups_map_;
     void InvokeDrawCall();
 
     void RenderMainRenderTarget(const std::shared_ptr<CameraComponent> &main_camera);
     void RenderCamera(const Camera &camera);
     void RenderVoid();
     void Render(const Matrix &view, const Matrix &proj);
-    
+
     void SetCurrentCamera(const Camera &camera);
     void SetSceneData();
     void SetViewProjMatrix(const Matrix &view, const Matrix &proj);
     void UpdateBuffer(const Matrix &view, const Matrix &proj);
     void DepthRender();
+    
     void ExecuteRenderCommands();
 
 public:
+    Event<> on_cmd_list_open;
     Event<> on_rendering;
 
     static void Init();
@@ -63,8 +67,8 @@ public:
     static Camera GetCurrentCamera();
     static uint64_t GenerateSortKey(uint64_t render_queue, float depth, const Shader &shader);
 
-    static void Submit(const std::shared_ptr<Mesh> &mesh, std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
-    static void Submit(AssetPtr<FontData> font_data, Vector2 position, const std::string &string, Color color);
+    static void Submit(const std::shared_ptr<Mesh> &mesh, const std::vector<AssetPtr<Material>> &materials, Vector3 pos, D3D12_GPU_VIRTUAL_ADDRESS world_matrix_address = {}, D3D12_GPU_DESCRIPTOR_HANDLE bone_matrices_handle = {});
+    static void Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
     static void RequestRender(Camera camera);

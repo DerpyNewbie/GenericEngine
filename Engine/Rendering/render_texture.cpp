@@ -2,90 +2,54 @@
 
 #include "render_texture.h"
 #include "application.h"
-#include "logger.h"
-#include "CabotEngine/Graphics/RenderEngine.h"
-#include <directx/d3dx12_barriers.h>
+#include "gui.h"
+
+namespace
+{
+constexpr const char *TextureFormatNames[] = {
+    "RGBA8",
+    "RGBA32"
+};
+
+constexpr DXGI_FORMAT TextureFormats[] = {
+    DXGI_FORMAT_R8G8B8A8_UNORM,
+    DXGI_FORMAT_R32G32B32A32_FLOAT
+};
+}
 
 namespace engine
 {
-void RenderTexture::CreateBuffer()
+RenderTexture::RenderTexture() : Texture2D()
+{}
+
+void RenderTexture::OnConstructed()
 {
-    auto device = RenderEngine::Device();
-    auto res_desc = RenderEngine::BBuffDesc();
-    auto heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-
-    D3D12_CLEAR_VALUE clearValue = {};
-    clearValue.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    clearValue.Color[0] = 0.5f;
-    clearValue.Color[1] = 0.5f;
-    clearValue.Color[2] = 0.5f;
-    clearValue.Color[3] = 0.5f;
-
-    m_width_ = Application::WindowWidth();
-    m_height_ = Application::WindowHeight();
-
-    HRESULT hr = device->CreateCommittedResource(
-        &heapProps,
-        D3D12_HEAP_FLAG_NONE,
-        &res_desc,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        &clearValue,
-        IID_PPV_ARGS(m_buffer_.ReleaseAndGetAddressOf())
-    );
-    m_buffer_->SetName(L"RenderTexture");
-
-    if (FAILED(hr))
-    {
-        return;
-    }
-
-    D3D12_DESCRIPTOR_HEAP_DESC heap_desc = RenderEngine::RTVHeapDesc();
-    heap_desc.NumDescriptors = 1;
-    hr = device->CreateDescriptorHeap(&heap_desc, IID_PPV_ARGS(m_RTVHeap_.ReleaseAndGetAddressOf()));
-    if (FAILED(hr))
-    {
-        Logger::Error<RenderTexture>("Failed To Create RTV Heap for RenderTexture");
-    }
-
-    D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
-    rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-    rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-
-    device->CreateRenderTargetView(m_buffer_.Get(), &rtvDesc, m_RTVHeap_->GetCPUDescriptorHandleForHeapStart());
+    m_mip_level_ = 0;
+    m_format_ = DXGI_FORMAT_R8G8B8A8_UNORM;
 }
 
-void RenderTexture::BeginRender(const Color background_color)
+void RenderTexture::OnInspectorGui()
 {
-    if (!m_buffer_)
-    {
-        CreateBuffer();
-    }
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE,
-        D3D12_RESOURCE_STATE_RENDER_TARGET);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+    Gui::PropertyField("Width", m_width_);
+    Gui::PropertyField("Height", m_height_);
+
+    if (ImGui::Combo("Format", &m_format_index_, TextureFormatNames, IM_ARRAYSIZE(TextureFormatNames)))
+        m_format_ = TextureFormats[m_format_index_];
+
+    Gui::BoolField("Allow Uav", m_allow_uav_);
 }
 
-void RenderTexture::EndRender() const
+void RenderTexture::OnDeserialized()
 {
-    auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-        m_buffer_.Get(), D3D12_RESOURCE_STATE_RENDER_TARGET,
-        D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-    RenderEngine::CommandList()->ResourceBarrier(1, &barrier);
+    for (int i = 0; i < IM_ARRAYSIZE(TextureFormats); ++i)
+        if (TextureFormats[i] == m_format_)
+            m_format_index_ = i;
 }
 
-ID3D12DescriptorHeap *RenderTexture::GetHeap()
+bool RenderTexture::AllowUav() const
 {
-    return m_RTVHeap_.Get();
+    return m_allow_uav_;
+}
 }
 
-D3D12_SHADER_RESOURCE_VIEW_DESC RenderTexture::ViewDesc()
-{
-    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
-    srv_desc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    srv_desc.Texture2D.MipLevels = 1;
-    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-    return srv_desc;
-}
-}
+CEREAL_REGISTER_TYPE(engine::RenderTexture)

@@ -38,16 +38,18 @@ public:
     {
         switch (type)
         {
-            case kShaderType_Vertex:
-                return m_vs_blob_.Get();
-            case kShaderType_Pixel:
-                return m_ps_blob_.Get();
-            case kShaderType_Geometry:
-                return m_gs_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_gs_blob_.Get();
-            default:
-                throw std::runtime_error("Invalid shader type");
+        case kShaderType_Vertex:
+            return m_vs_blob_.Get();
+        case kShaderType_Pixel:
+            return m_ps_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_ps_blob_.Get();
+        case kShaderType_Geometry:
+            return m_gs_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_gs_blob_.Get();
+        default:
+            throw std::runtime_error("Invalid shader type");
         }
     }
+
+    D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

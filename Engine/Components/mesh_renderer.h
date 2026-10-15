@@ -1,7 +1,6 @@
 #pragma once
 #include "component.h"
 #include "renderer.h"
-#include "Rendering/material_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
 #include "Rendering/CabotEngine/Graphics/RenderEngine.h"
