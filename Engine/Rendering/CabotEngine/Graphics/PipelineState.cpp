@@ -34,7 +34,7 @@ void PipelineStateSettings::SetShader(const engine::Shader *shader)
 
     sample_mask = UINT_MAX;
     sample_count = 1;
-    primitive_topology_type = DX_PrimitiveTopologyType[shader_setting.primitive_topology_type];
+    primitive_topology_type = shader->GetPrimitiveTopologyType();
 }
 
 PipelineState::PipelineState(const PipelineStateSettings &setting)

@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "skinned_mesh_renderer.h"
-
+#include "game_object.h"
 #include "camera_component.h"
+#include "gui.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
 #include "Rendering/render_pipeline.h"
@@ -19,7 +20,8 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
         {
             m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
             m_bone_matrix_buffers_[i]->CreateBuffer();
-            m_bone_matrix_buffer_handles_[i] = m_bone_matrix_buffers_[i]->UploadBuffer();
+            m_bone_matrix_buffer_handles_[i] = DescriptorHeap::Allocate();
+            m_bone_matrix_buffers_[i]->UploadBuffer(m_bone_matrix_buffer_handles_[i]);
         }
     }
 
@@ -31,6 +33,7 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
     {
         auto world = transforms[i].lock()->WorldMatrix();
         auto invert_bind_poses = inverted_bind_poses[i];
+
         matrices[i] = invert_bind_poses * world;
     }
 

@@ -1,126 +1,60 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
-#include "Rendering/shader_resource.h"
+#include <assimp/texture.h>
+#include "Asset/asset_ptr.h"
 
 namespace engine
 {
-class Texture2DImporter;
-}
-
-struct aiTexture;
-class DescriptorHeap;
-class DescriptorHandle;
-
-/// <summary>
-/// 2DのTextureのAssetです。
-/// </summary>
-class Texture2D : public engine::Object, public engine::Inspectable, public IBuffer, public engine::ShaderResource
+class Texture2D : public Object, public Inspectable
 {
-    friend class engine::Texture2DImporter;
+    friend class Texture2DImporter;
+
+    enum class kImageFormat : uint8_t
+    {
+        kUnknown = 0,
+        kWic,
+        kTga
+    };
+
+    static kImageFormat GetImageFormat(const std::filesystem::path &file_path);
+
+    static void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch);
+    void CacheData();
 
 protected:
-    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_;
+    std::vector<DirectX::PackedVector::XMCOLOR> m_tex_data_ = {};
     uint32_t m_width_ = 0;
     uint32_t m_height_ = 0;
-    uint16_t m_mip_level_;
-    DXGI_FORMAT m_format_;
-
-    ComPtr<ID3D12Resource> m_buffer_ = nullptr;
+    uint16_t m_mip_level_ = UINT16_MAX;
+    DXGI_FORMAT m_format_ = DXGI_FORMAT_UNKNOWN;
+    std::string m_path_;
+    uint64_t m_id_ = -1;
+    bool m_enable_read_write_ = false;
 
 public:
+    Texture2D() = default;
+    Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format);
+
+    void LoadFromAiTexture(aiTexture *ai_texture);
+    
     void OnInspectorGui() override;
-    /// <summary>
-    /// 保持しているピクセルのデータからTextureのResourceを作成します。
-    /// </summary>
-    void CreateBuffer() override;
-    /// <summary>
-    /// Texture2Dは更新に対応していません。エラーをログに出力します。
-    /// </summary>
-    void UpdateBuffer(void *data) override;
-    /// <summary>
-    /// ShaderResourceViewをDescriptorHeapに登録します。
-    /// </summary>
-    /// <returns>登録されたDescriptorHandle</returns>
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    /// <summary>
-    /// 常に false を返します。
-    /// </summary>
-    bool CanUpdate() override;
-    /// <summary>
-    /// Resourceが作成済みであるかどうかを取得します。
-    /// </summary>
-    bool IsValid() override;
 
-    /// <summary>
-    /// Assimpの埋め込みTextureからピクセルのデータを読み込みます。圧縮されている場合はデコードします。
-    /// </summary>
-    /// <param name="ai_texture">読み込むTexture</param>
-    void LoadFromAiTexture(const aiTexture *ai_texture);
+    virtual std::vector<DirectX::PackedVector::XMCOLOR> GetPixels();
 
-    /// <summary>
-    /// TextureのResourceを取得します。作成されていない場合は作成します。
-    /// </summary>
-    ID3D12Resource *Resource() override;
-    /// <summary>
-    /// Texture2Dとして読むためのSRVの設定を取得します。
-    /// </summary>
-    D3D12_SHADER_RESOURCE_VIEW_DESC ViewDesc() override;
+    [[nodiscard]] uint32_t Width();
 
-    /// <summary>
-    /// ピクセルのデータのコピーを取得します。
-    /// </summary>
-    std::vector<DirectX::PackedVector::XMCOLOR> GetTexData()
-    {
-        return m_tex_data_;
-    }
+    [[nodiscard]] uint32_t Height();
 
-    /// <summary>
-    /// ピクセルのデータを設定します。
-    /// </summary>
-    /// <param name="resource">ピクセルのデータ</param>
-    void SetTexData(const std::vector<DirectX::PackedVector::XMCOLOR> &resource)
-    {
-        m_tex_data_ = resource;
-    }
+    [[nodiscard]] uint16_t MipLevel();
 
-    /// <summary>
-    /// 幅(pixel)を取得します。
-    /// </summary>
-    [[nodiscard]] uint32_t Width() const
-    {
-        return m_width_;
-    }
+    [[nodiscard]] DXGI_FORMAT Format();
 
-    /// <summary>
-    /// 高さ(pixel)を取得します。
-    /// </summary>
-    [[nodiscard]] uint32_t Height() const
-    {
-        return m_height_;
-    }
-
-    /// <summary>
-    /// MipLevelの数を取得します。
-    /// </summary>
-    [[nodiscard]] uint16_t MipLevel() const
-    {
-        return m_mip_level_;
-    }
-
-    /// <summary>
-    /// ピクセルのFormatを取得します。
-    /// </summary>
-    [[nodiscard]] DXGI_FORMAT Format() const
-    {
-        return m_format_;
-    }
+    void OnDestroy() override;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)
     {
         ar(
             cereal::base_class<Object>(this),
-            cereal::make_nvp("tex_data", m_tex_data_),
             cereal::make_nvp("width", m_width_),
             cereal::make_nvp("height", m_height_),
             cereal::make_nvp("format", m_format_),
@@ -128,5 +62,6 @@ public:
         );
     }
 };
+}
 
-CEREAL_CLASS_VERSION(Texture2D, 1)
+CEREAL_CLASS_VERSION(engine::Texture2D, 1)

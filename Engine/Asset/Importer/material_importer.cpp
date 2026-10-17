@@ -34,6 +34,7 @@ void MaterialImporter::OnExport(AssetDescriptor *ctx)
 
     std::ofstream file(ctx->AssetPath());
     Serializer serializer;
-    assert(serializer.Save(file, material) && "Something is wrong with this material instance");
+    if (!serializer.Save(file, material))
+        ctx->LogImportError("Something is wrong with this material instance");
 }
 }

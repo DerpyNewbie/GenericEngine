@@ -38,10 +38,13 @@ Skybox::Skybox()
 
 bool Skybox::ReconstructTextureCube()
 {
-    if (m_texture_cube_ == nullptr || !m_texture_cube_->IsValid())
+    if (m_texture_cube_ == nullptr)
         return false;
 
-    m_texture_cube_handle_ = m_texture_cube_->UploadBuffer();
+    m_texture_cube_->CreateBuffer();
+
+    m_texture_cube_handle_ = DescriptorHeap::Allocate();
+    m_texture_cube_->UploadBuffer(m_texture_cube_handle_);
     return true;
 }
 
@@ -58,14 +61,14 @@ void Skybox::Render()
 
     if (m_skybox_shader_ == nullptr)
     {
-        m_skybox_shader_ = AssetDatabase::GetAsset<Shader>("SkyBoxShader.hlsl");
+        m_skybox_shader_ = AssetDatabase::GetAsset<Shader>("SkyBoxShader.hlsl").CastedLock();
         if (m_skybox_shader_ == nullptr)
         {
             Logger::Error<Skybox>("Failed to load SkyBoxShader.hlsl");
             return;
         }
     }
-
+    
     if (m_texture_cube_handle_ == nullptr)
         ReconstructTextureCube();
 

@@ -1,70 +1,55 @@
 ﻿#pragma once
-#include "Rendering/ibuffer.h"
+#include "RenderEngine.h"
+#include "Rendering/buffer_base.h"
 
-/// <summary>
-/// Shaderに渡す定数Bufferです。
-/// </summary>
-class ConstantBuffer : public IBuffer
+namespace engine
+{
+class ConstantBuffer : public BufferBase
 {
     uint64_t m_size_aligned_;
     uint64_t m_size_;
 
-    ComPtr<ID3D12Resource> m_buffer_;
-    D3D12_CONSTANT_BUFFER_VIEW_DESC m_desc_;
+    bool m_is_first_update_ = true;
+    std::array<ComPtr<ID3D12Resource>, RenderEngine::kFrame_Buffer_Count> m_resources_;
+    std::array<D3D12_CONSTANT_BUFFER_VIEW_DESC, RenderEngine::kFrame_Buffer_Count> m_desc_;
+    std::array<D3D12_RESOURCE_STATES, RenderEngine::kFrame_Buffer_Count> m_current_state_;
 
-    void *m_p_mapped_ptr_ = nullptr;
+    std::array<void *, RenderEngine::kFrame_Buffer_Count> m_p_mapped_ptrs_ = {nullptr};
 
 public:
-    /// <summary>
-    /// 指定されたサイズのConstantBufferを準備します。サイズは256byte単位に切り上げられます。
-    /// </summary>
-    /// <param name="size">データのサイズ(byte)</param>
+    ~ConstantBuffer() override;
     explicit ConstantBuffer(size_t size);
 
-    /// <summary>
-    /// Upload用のHeapにBufferを作成し、書き込めるようにMapします。
-    /// </summary>
+    void SetBufferSize(const size_t size)
+    {
+        m_size_ = size;
+        constexpr size_t align = D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT;
+        m_size_aligned_ = ((size + (align - 1)) & ~(align - 1));
+    }
+    
     void CreateBuffer() override;
-    /// <summary>
-    /// データをBufferにコピーします。
-    /// </summary>
-    /// <param name="data">書き込むデータ</param>
-    void UpdateBuffer(void *data) override;
-    /// <summary>
-    /// ConstantBufferViewをDescriptorHeapに登録します。
-    /// </summary>
-    /// <returns>登録されたDescriptorHandle</returns>
-    std::shared_ptr<DescriptorHandle> UploadBuffer() override;
-    /// <summary>
-    /// Bufferが作成済みであるかどうかを取得します。
-    /// </summary>
+    void UpdateBuffer(const void *data) override;
+    void UploadBuffer(std::shared_ptr<DescriptorHandle> desc_handle, bool is_uav = false) override;
+    kGpuUploadType BufferType() const override
+    {
+        return kGpuBufferType_CBV;
+    }
     bool IsValid() override;
+    bool Transition(D3D12_RESOURCE_STATES new_state) override;
 
-    /// <summary>
-    /// 常に true を返します。
-    /// </summary>
-    bool CanUpdate() override;
+    void RequestReadBack() override;
+    bool FetchBufferData(void *data) override;
 
-    /// <summary>
-    /// Bufferの書き込み先のメモリへのポインタを取得します。
-    /// </summary>
     void *GetPtr() const;
 
-    /// <summary>
-    /// BufferのGPU上のアドレスを取得します。
-    /// </summary>
     D3D12_GPU_VIRTUAL_ADDRESS GetAddress() const;
-    /// <summary>
-    /// ConstantBufferViewの設定を取得します。
-    /// </summary>
     D3D12_CONSTANT_BUFFER_VIEW_DESC ViewDesc() const;
+    ID3D12Resource *Resource() override;
 
-    /// <summary>
-    /// Bufferの書き込み先のメモリへのポインタを T* として取得します。
-    /// </summary>
     template <typename T>
     T *GetPtr()
     {
         return static_cast<T *>(GetPtr());
     }
 };
+}

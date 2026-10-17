@@ -75,3 +75,9 @@ ComPtr<ID3D12Resource> DirectXResourceFactory::CreateUploadedBuffer(const void *
 
     return default_buffer;
 }
+
+void DirectXResourceFactory::ReleaseResource(ComPtr<ID3D12Resource> resource)
+{
+    auto current_back_buffer_index = RenderEngine::CurrentBackBufferIndex();
+    m_stored_resources_[current_back_buffer_index].emplace_back(resource);
+}

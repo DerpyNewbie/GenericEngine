@@ -82,7 +82,7 @@ void Engine::Tick()
     }
 
     Profiler::Begin("Coroutine");
-    coroutine.Update(Time::GetDeltaTime());
+    coroutine.Update();
     Profiler::End("Coroutine");
 
     Profiler::Begin("Draw Call");

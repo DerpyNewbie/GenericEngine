@@ -1,58 +1,34 @@
 ﻿#pragma once
+#include "cancellation_token.h"
 #include "task.h"
-#include "yield_base.h"
 
 namespace engine
 {
 //先人がゲームとエンジンのcoroutineは別けたほうがいいよって言ってたのでシングルトンじゃないです
 class CoroutineManager
 {
-    std::vector<std::coroutine_handle<Task::promise_type>> m_coroutines_;
+    using CoroutineEntry = std::pair<std::coroutine_handle<Task::promise_type>, CancellationToken>;
+    std::vector<CoroutineEntry> m_coroutines_;
 
 public:
     /// <summary>
-    /// Coroutineを最初の中断点まで実行し、管理対象に追加します。Coroutineの所有権はCoroutineManagerに移ります。
+    /// coroutineをリストに追加します。
     /// </summary>
-    /// <param name="t">開始するCoroutine</param>
-    void Start(Task &&t)
-    {
-        t.handle.resume();
-        m_coroutines_.emplace_back(t.handle);
-        t.handle = nullptr;
-    }
+    /// <param name="t">task</param>
+    void Start(Task &&t);
+    /// <summary>
+    /// coroutineをリストに追加します。
+    /// </summary>
+    /// <param name="t">task</param>
+    /// <param name="token">CancellationToken</param>
+    void Start(Task &&t, CancellationToken token);
 
     /// <summary>
-    /// 管理しているすべてのCoroutineについて、待機条件を満たしているものを再開し、完了したものを破棄します。
+    /// coroutineを再開可能であれば再開します。cancelもしくはco_returnされた場合リストから削除します。
     /// </summary>
-    /// <param name="dt">前フレームからの経過時間(現在は使われていません)</param>
-    void Update(float dt)
-    {
-        for (auto it = m_coroutines_.begin(); it != m_coroutines_.end();)
-        {
-            auto h = *it;
-            auto &promise = h.promise();
-
-            if (auto yield = promise.current_yield.get())
-            {
-                if (!yield->should_resume())
-                {
-                    ++it;
-                    continue;
-                }
-            }
-
-            h.resume();
-
-            if (h.done())
-            {
-                h.destroy();
-                it = m_coroutines_.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
+    /// <remarks>
+    /// Engine側のUpdateサイクルのタイミングで1度だけ呼び出してください。
+    /// </remarks>
+    void Update();
 };
 }

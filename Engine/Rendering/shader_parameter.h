@@ -2,19 +2,52 @@
 
 namespace engine
 {
-/// <summary>
-/// Shaderが持つ1つのParameterの情報です。
-/// </summary>
+enum class kConstantBufferDataType
+{
+    kConstantBufferDataTypeInt,
+    kConstantBufferDataType_Float,
+    kConstantBufferDataType_Vector2,
+    kConstantBufferDataType_Vector3,
+    kConstantBufferDataType_Color,
+    kConstantBufferDataType_Matrix,
+    kConstantBufferDataType_Unknown
+};
+
+enum kBufferType
+{
+    kBufferType_ConstantBuffer,
+    kBufferType_StructuredBuffer,
+    kBufferType_Texture2D,
+    kBufferType_TextureCube,
+    kBufferType_UavTexture,
+    kBufferType_ByteAddressBuffer,
+};
+
+struct ShaderVariableDesc
+{
+    std::string name;
+    kConstantBufferDataType data_type;
+
+    template <class Archive>
+    void serialize(Archive &ar, const uint32_t version)
+    {
+        ar(
+            CEREAL_NVP(name),
+            CEREAL_NVP(data_type)
+        );
+    }
+};
+
 struct ShaderParameter
 {
-    int index;
+    int index = 0;
     std::string name;
     std::string display_name;
-    std::string type_hint;
+    kBufferType buffer_type;
+    bool is_unordered_access = false;
+    size_t total_size = 0;
+    std::vector<ShaderVariableDesc> variables = {};
 
-    /// <summary>
-    /// indexとnameが等しいかどうかを比較します。
-    /// </summary>
     bool operator==(const ShaderParameter &other) const
     {
         // do not check for `display_name` or `type_hint` because only real parameters are `index` and `name`
@@ -28,7 +61,9 @@ struct ShaderParameter
             CEREAL_NVP(index),
             CEREAL_NVP(name),
             CEREAL_NVP(display_name),
-            CEREAL_NVP(type_hint)
+            CEREAL_NVP(is_unordered_access),
+            CEREAL_NVP(total_size),
+            CEREAL_NVP(variables)
         );
     }
 };
