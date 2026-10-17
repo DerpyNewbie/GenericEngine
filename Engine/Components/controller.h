@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// キー入力でTransformを移動、回転させるComponentです。
+/// </summary>
 class Controller : public Component
 {
     float m_movement_speed_ = 1.0f;
@@ -14,6 +17,9 @@ class Controller : public Component
     Vector2 m_last_rotation_input_;
 
 public:
+    /// <summary>
+    /// キー入力(WASD、Space、左Ctrl、矢印キー)に応じてTransformを移動、回転させます。
+    /// </summary>
     void OnUpdate() override;
     void OnInspectorGui() override;
 

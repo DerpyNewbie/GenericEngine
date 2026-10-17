@@ -5,6 +5,9 @@
 
 namespace engine
 {
+/// <summary>
+/// カプセル型のColliderです。
+/// </summary>
 class CapsuleCollider : public Collider
 {
     std::shared_ptr<btCapsuleShape> m_capsule_shape_ = std::make_shared<btCapsuleShape>(1.0F, 0.5F);
@@ -14,13 +17,33 @@ class CapsuleCollider : public Collider
 public:
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// RadiusとHeightを 0 より大きい値に補正し、Capsuleの形状に反映します。
+    /// </summary>
     void UpdateShape() override;
+    /// <summary>
+    /// BulletのCapsuleの形状を取得します。
+    /// </summary>
     std::shared_ptr<btCollisionShape> GetShape() override;
 
+    /// <summary>
+    /// Capsuleの半径を設定し、形状を更新します。
+    /// </summary>
+    /// <param name="radius">半径</param>
     void SetRadius(float radius);
+    /// <summary>
+    /// Capsuleの高さを設定し、形状を更新します。
+    /// </summary>
+    /// <param name="height">高さ</param>
     void SetHeight(float height);
 
+    /// <summary>
+    /// Capsuleの半径を取得します。
+    /// </summary>
     [[nodiscard]] float Radius() const;
+    /// <summary>
+    /// Capsuleの高さを取得します。
+    /// </summary>
     [[nodiscard]] float Height() const;
 
     template <class Archive>

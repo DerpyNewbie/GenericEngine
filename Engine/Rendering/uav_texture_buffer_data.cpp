@@ -21,6 +21,7 @@ void UavTextureBufferData::SetTexture(const AssetPtr<RenderTexture> &render_text
     if (!render_texture->AllowUav())
         m_texture_ = {};
 
+    m_texture_ = render_texture;
     is_dirty = true;
 }
 

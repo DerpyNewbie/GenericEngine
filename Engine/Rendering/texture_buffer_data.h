@@ -5,19 +5,36 @@
 
 namespace engine
 {
+/// <summary>
+/// Texture2Dのスロットに渡すTextureを保持するデータです。
+/// </summary>
 class TextureBufferData : public BufferDataBase
 {
     AssetPtr<Texture2D> m_texture_;
 
 public:
     TextureBufferData() = default;
+    /// <summary>
+    /// Shaderのパラメーター情報からデータを生成します。
+    /// </summary>
+    /// <param name="shader_param">対応するShaderのパラメーター</param>
     TextureBufferData(const ShaderParameter &shader_param);
 
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// 渡すTextureを設定します。
+    /// </summary>
+    /// <param name="texture">設定するTexture</param>
     void SetTexture(const AssetPtr<Texture2D> &texture);
+    /// <summary>
+    /// 設定されているTextureを取得します。
+    /// </summary>
     AssetPtr<Texture2D> Data();
 
+    /// <summary>
+    /// kBufferType_Texture2Dを返します。
+    /// </summary>
     kBufferType BufferType() override;
 
     template <typename Archive>

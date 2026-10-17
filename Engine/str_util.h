@@ -48,30 +48,52 @@ static std::string ConvertToString(const std::wstring &wstring, const unsigned i
     buffer.shrink_to_fit();
     return {buffer.begin(), buffer.end()};
 }
+/// <summary>
+/// Shift-JISの文字列をUTF-16の文字列に変換します。
+/// </summary>
 static std::wstring ShiftJisToUtf16(const std::string &shift_jis_string)
 {
     return ConvertToWString(shift_jis_string, CP_SHIFT_JIS);
 }
+/// <summary>
+/// UTF-8の文字列をUTF-16の文字列に変換します。
+/// </summary>
 static std::wstring Utf8ToUtf16(const std::string &utf8_string)
 {
     return ConvertToWString(utf8_string, CP_UTF8);
 }
+/// <summary>
+/// UTF-16の文字列をUTF-8の文字列に変換します。
+/// </summary>
 static std::string Utf16ToUtf8(const std::wstring &utf16_string)
 {
     return ConvertToString(utf16_string, CP_UTF8);
 }
+/// <summary>
+/// UTF-16の文字列をShift-JISの文字列に変換します。
+/// </summary>
 static std::string Utf16ToShiftJis(const std::wstring &utf16_string)
 {
     return ConvertToString(utf16_string, CP_SHIFT_JIS);
 }
+/// <summary>
+/// Shift-JISの文字列をUTF-8の文字列に変換します。
+/// </summary>
 static std::string ShiftJisToUtf8(const std::string &shift_jis_string)
 {
     return Utf16ToUtf8(ShiftJisToUtf16(shift_jis_string));
 }
+/// <summary>
+/// UTF-8の文字列をShift-JISの文字列に変換します。
+/// </summary>
 static std::string Utf8ToShiftJis(const std::string &utf8_string)
 {
     return Utf16ToShiftJis(Utf8ToUtf16(utf8_string));
 }
+/// <summary>
+/// 時間を"[日:][時:]分:秒.ミリ秒"の形式の文字列に変換します。日と時は 0 の場合省略されます。
+/// </summary>
+/// <param name="ms">変換する時間</param>
 static std::string DurationToString(std::chrono::milliseconds ms)
 {
     const auto days = duration_cast<std::chrono::days>(ms);

@@ -2,9 +2,19 @@
 
 namespace engine
 {
+/// <summary>
+/// Objectの保存と読み込み(Serialize / Deserialize)を行うクラスです。
+/// </summary>
 class Serializer
 {
 public:
+    /// <summary>
+    /// ObjectをJSONとしてstreamに書き出します。
+    /// </summary>
+    /// <param name="output_stream">書き出し先</param>
+    /// <param name="save_resource">保存するObject</param>
+    /// <param name="pretty">インデントを付けて出力する場合 true</param>
+    /// <returns>成功した場合 true</returns>
     template <typename T>
     [[nodiscard]] bool Save(std::ostream &output_stream, std::shared_ptr<T> save_resource, const bool pretty = true)
     {
@@ -36,6 +46,11 @@ public:
         }
     }
 
+    /// <summary>
+    /// streamのJSONから T のObjectを読み込みます。
+    /// </summary>
+    /// <param name="input_stream">読み込み元</param>
+    /// <returns>読み込まれたObject。失敗した場合 nullptr</returns>
     template <typename T>
     std::shared_ptr<T> Load(std::istream &input_stream)
     {

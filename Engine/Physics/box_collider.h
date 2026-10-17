@@ -5,6 +5,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 箱型のColliderです。
+/// </summary>
 class BoxCollider : public Collider
 {
     std::shared_ptr<btBoxShape> m_box_shape_ = std::make_shared<btBoxShape>(btVector3{1.0F, 1.0F, 1.0F});
@@ -13,11 +16,24 @@ class BoxCollider : public Collider
 public:
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// Extentsを 0 より大きい値に補正し、Boxの形状に反映します。
+    /// </summary>
     void UpdateShape() override;
+    /// <summary>
+    /// BulletのBoxの形状を取得します。
+    /// </summary>
     std::shared_ptr<btCollisionShape> GetShape() override;
 
+    /// <summary>
+    /// Boxの大きさを取得します。
+    /// </summary>
     [[nodiscard]] Vector3 Extents() const;
 
+    /// <summary>
+    /// Boxの大きさを設定し、形状を更新します。
+    /// </summary>
+    /// <param name="extents">Boxの大きさ</param>
     void SetExtents(Vector3 extents);
 
     template <class Archive>

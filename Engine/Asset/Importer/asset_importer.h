@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// AssetをImport / ExportするImporterの基底クラスです。拡張子ごとのImporterの登録も管理します。
+/// </summary>
 class AssetImporter
 {
     static std::set<std::shared_ptr<AssetImporter>> m_importers_;

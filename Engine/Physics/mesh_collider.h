@@ -9,6 +9,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Meshの形状を使うColliderです。
+/// </summary>
 class MeshCollider : public Collider
 {
     AssetPtr<Mesh> m_mesh_;
@@ -20,10 +23,21 @@ class MeshCollider : public Collider
 
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// 設定に応じて、ConvexHullまたは三角形Meshの形状を取得します。
+    /// </summary>
+    /// <returns>Meshが設定されていない場合 nullptr</returns>
     std::shared_ptr<btCollisionShape> GetShape() override;
+    /// <summary>
+    /// Meshから三角形Meshの形状とConvexHullの形状を作り直します。
+    /// </summary>
     void UpdateShape() override;
 
 public:
+    /// <summary>
+    /// 形状に使うMeshを設定し、Rigidbodyに反映します。
+    /// </summary>
+    /// <param name="mesh">形状に使うMesh</param>
     void SetMesh(const AssetPtr<Mesh> &mesh);
 
     template <class Archive>

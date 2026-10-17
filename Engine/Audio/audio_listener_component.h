@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 音を聞く位置を表すComponentです。
+/// </summary>
 class AudioListenerComponent : public Component
 {
     friend class Audio;
@@ -13,6 +16,10 @@ public:
     void OnDisabled() override;
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// 現在使用されているListener(リストの先頭のListener)を取得します。
+    /// </summary>
+    /// <returns>Listenerが1つもない場合 nullptr</returns>
     static std::shared_ptr<AudioListenerComponent> ActiveListener();
 
     template <class Archive>

@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 定数バッファ内の変数の型です。
+/// </summary>
 enum class kConstantBufferDataType
 {
     kConstantBufferDataTypeInt,
@@ -13,6 +16,9 @@ enum class kConstantBufferDataType
     kConstantBufferDataType_Unknown
 };
 
+/// <summary>
+/// Shaderのパラメーターの種類です。
+/// </summary>
 enum kBufferType
 {
     kBufferType_ConstantBuffer,
@@ -23,6 +29,9 @@ enum kBufferType
     kBufferType_ByteAddressBuffer,
 };
 
+/// <summary>
+/// 定数バッファ内の1つの変数の名前と型です。
+/// </summary>
 struct ShaderVariableDesc
 {
     std::string name;
@@ -38,6 +47,9 @@ struct ShaderVariableDesc
     }
 };
 
+/// <summary>
+/// Shaderのリフレクションから取得した1つのパラメーター(Buffer/Texture)の情報です。
+/// </summary>
 struct ShaderParameter
 {
     int index = 0;
@@ -48,6 +60,9 @@ struct ShaderParameter
     size_t total_size = 0;
     std::vector<ShaderVariableDesc> variables = {};
 
+    /// <summary>
+    /// indexとnameが一致するかどうかで比較します。
+    /// </summary>
     bool operator==(const ShaderParameter &other) const
     {
         // do not check for `display_name` or `type_hint` because only real parameters are `index` and `name`
