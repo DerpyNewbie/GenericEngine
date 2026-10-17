@@ -85,6 +85,9 @@ class Editor final : public enable_shared_from_base<Editor>
     void OnEngineTick() const;
 
 public:
+    /// <summary>
+    /// Editorの唯一のインスタンスを取得します。
+    /// </summary>
     static std::shared_ptr<Editor> Instance();
 
     /// <summary>

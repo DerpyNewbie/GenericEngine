@@ -35,6 +35,9 @@ class RootSignature
 
 public:
     constexpr static int kPreDefinedVariableCount = kMaterialCBV;
+    /// <summary>
+    /// RootSignatureの唯一のインスタンスを取得します。
+    /// </summary>
     static std::shared_ptr<RootSignature> Instance();
     /// <summary>
     /// DirectXのRootSignatureを取得します。

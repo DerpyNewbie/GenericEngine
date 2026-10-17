@@ -7,6 +7,9 @@
 class PSOManager
 {
     static std::shared_ptr<PSOManager> m_instance_;
+    /// <summary>
+    /// PSOManagerの唯一のインスタンスを取得します。
+    /// </summary>
     static std::shared_ptr<PSOManager> Instance();
 
     using FormatPsoMap = std::unordered_map<DXGI_FORMAT, std::shared_ptr<PipelineState>>;

@@ -62,6 +62,9 @@ public:
         }
     }
 
+    /// <summary>
+    /// ShaderSettingsのプリミティブトポロジーから、PSOに設定するトポロジーの種類(点/線/三角形)を取得します。
+    /// </summary>
     D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const;
 
     template <class Archive>

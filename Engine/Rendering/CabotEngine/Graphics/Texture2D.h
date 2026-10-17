@@ -4,10 +4,16 @@
 
 namespace engine
 {
+/// <summary>
+/// 2次元のTextureのAssetです。サイズやフォーマットなどの情報を持ち、ピクセルデータは必要になった時に画像ファイルから読み込みます。
+/// </summary>
 class Texture2D : public Object, public Inspectable
 {
     friend class Texture2DImporter;
 
+    /// <summary>
+    /// 読み込みに使用する画像ファイルの形式です。
+    /// </summary>
     enum class kImageFormat : uint8_t
     {
         kUnknown = 0,
@@ -15,9 +21,23 @@ class Texture2D : public Object, public Inspectable
         kTga
     };
 
+    /// <summary>
+    /// 拡張子から画像ファイルの形式を判定します。
+    /// </summary>
+    /// <param name="file_path">画像ファイルのパス</param>
+    /// <returns>WICで読み込める形式ならkWic、TGAならkTga、それ以外はkUnknown</returns>
     static kImageFormat GetImageFormat(const std::filesystem::path &file_path);
 
+    /// <summary>
+    /// 画像ファイルを読み込み、メタデータと画像データを取得します。WIC形式の場合は上下を反転します。
+    /// </summary>
+    /// <param name="file_path">画像ファイルのパス</param>
+    /// <param name="metadata">読み込んだメタデータの出力先</param>
+    /// <param name="scratch">読み込んだ画像データの出力先</param>
     static void LoadMetadata(const std::filesystem::path &file_path, DirectX::TexMetadata &metadata, DirectX::ScratchImage &scratch);
+    /// <summary>
+    /// Assetの画像ファイルを読み込み、幅、高さ、フォーマット、MipLevelをキャッシュします。Assetでない場合は何もしません。
+    /// </summary>
     void CacheData();
 
 protected:
@@ -32,22 +52,51 @@ protected:
 
 public:
     Texture2D() = default;
+    /// <summary>
+    /// サイズとフォーマットを指定してTextureを生成します。
+    /// </summary>
+    /// <param name="width">幅</param>
+    /// <param name="height">高さ</param>
+    /// <param name="mip_level">MipLevel</param>
+    /// <param name="format">フォーマット</param>
     Texture2D(uint32_t width, uint32_t height, uint16_t mip_level, DXGI_FORMAT format);
 
+    /// <summary>
+    /// Assimpの埋め込みTextureからピクセルデータを読み込みます。圧縮されている場合はstbでデコードします。
+    /// </summary>
+    /// <param name="ai_texture">読み込むTexture</param>
     void LoadFromAiTexture(aiTexture *ai_texture);
     
     void OnInspectorGui() override;
 
+    /// <summary>
+    /// ピクセルデータを取得します。Assetの場合は画像ファイルから読み込み直し、そうでない場合は保持しているデータを返します。
+    /// </summary>
     virtual std::vector<DirectX::PackedVector::XMCOLOR> GetPixels();
 
+    /// <summary>
+    /// 幅を取得します。未取得の場合は画像ファイルから読み込みます。
+    /// </summary>
     [[nodiscard]] uint32_t Width();
 
+    /// <summary>
+    /// 高さを取得します。未取得の場合は画像ファイルから読み込みます。
+    /// </summary>
     [[nodiscard]] uint32_t Height();
 
+    /// <summary>
+    /// MipLevelを取得します。未取得の場合は画像ファイルから読み込みます。
+    /// </summary>
     [[nodiscard]] uint16_t MipLevel();
 
+    /// <summary>
+    /// フォーマットを取得します。未取得の場合は画像ファイルから読み込みます。
+    /// </summary>
     [[nodiscard]] DXGI_FORMAT Format();
 
+    /// <summary>
+    /// 破棄時に、TextureCollectionから対応するTextureBufferを削除します。
+    /// </summary>
     void OnDestroy() override;
 
     template <class Archive>
