@@ -82,6 +82,11 @@ public:
         return m_time_since_start_up_;
     }
 
+    [[nodiscard]] const float &UnscaledTimeSinceStartUp() const
+    {
+        return m_unscaled_tim_since_start_up_;
+    }
+
     [[nodiscard]] const float &TimeSinceLevelLoad() const
     {
         return m_time_since_level_load_;

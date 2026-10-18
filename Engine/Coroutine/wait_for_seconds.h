@@ -6,15 +6,23 @@ namespace engine
 {
 struct WaitForSeconds : YieldBase
 {
+    bool use_unscaled;
     float end_time;
-    explicit WaitForSeconds(const float t)
+
+    static float GetTimeSinceStartUp(bool use_unscaled_time)
     {
-        end_time = t + static_cast<float>(Time::Get()->TimeSinceStartUp());
+        const auto time = use_unscaled_time ? Time::Get()->UnscaledTimeSinceStartUp() : Time::Get()->TimeSinceStartUp();
+        return time;
+    }
+    
+    explicit WaitForSeconds(const float t, const bool use_unscaled_time = false) : use_unscaled(use_unscaled_time)
+    {
+        end_time = t + GetTimeSinceStartUp(use_unscaled);
     }
 
     bool should_resume() override
     {
-        return end_time <= static_cast<float>(Time::Get()->TimeSinceStartUp());
+        return end_time <= GetTimeSinceStartUp(use_unscaled);
     }
     bool await_ready() const noexcept
     {
