@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// テキストファイルの内容を持つAssetです。
+/// </summary>
 class TextAsset final : public Object, public Inspectable
 {
 public:

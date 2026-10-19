@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// ShaderのLightsバッファに渡す1つのLightのデータです。
+/// </summary>
 struct alignas(16) LightData
 {
     int type = 1;

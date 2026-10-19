@@ -5,6 +5,9 @@
 
 namespace engine
 {
+/// <summary>
+/// AssetPtrとPropertyFieldの動作確認用のComponentです。
+/// </summary>
 class TextAssetRefTestComponent : public Component
 {
     IAssetPtr m_any_;

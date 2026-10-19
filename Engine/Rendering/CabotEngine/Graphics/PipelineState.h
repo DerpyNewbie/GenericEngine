@@ -1,6 +1,9 @@
 ﻿#pragma once
 #include "Rendering/material.h"
 
+/// <summary>
+/// PipelineStateを作成するための設定です。
+/// </summary>
 struct PipelineStateSettings
 {
     D3D12_INPUT_LAYOUT_DESC layout_desc;
@@ -17,9 +20,16 @@ struct PipelineStateSettings
     UINT sample_mask;
     UINT sample_count;
 
+    /// <summary>
+    /// Shaderのバイトコードと、ShaderSettings(Cull、ZTest、Blendなど)を設定に反映します。
+    /// </summary>
+    /// <param name="shader">使用するShader</param>
     void SetShader(const engine::Shader *shader);
 };
 
+/// <summary>
+/// DirectXのPipelineStateを保持するクラスです。
+/// </summary>
 class PipelineState
 {
     bool m_is_valid_ = false;
@@ -31,9 +41,19 @@ class PipelineState
     ComPtr<ID3DBlob> m_p_gs_blob_ = nullptr;
     
 public:
+    /// <summary>
+    /// 設定からDirectXのPipelineStateを作成します。
+    /// </summary>
+    /// <param name="setting">PipelineStateの設定</param>
     PipelineState(const PipelineStateSettings &setting);
+    /// <summary>
+    /// PipelineStateの作成に成功したかどうかを取得します。
+    /// </summary>
     [[nodiscard]] bool IsValid() const;
 
 
+    /// <summary>
+    /// DirectXのPipelineStateを取得します。
+    /// </summary>
     ID3D12PipelineState *Get() const;
 };

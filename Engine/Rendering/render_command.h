@@ -6,6 +6,9 @@
 
 namespace engine
 {
+/// <summary>
+/// RenderCommandの種類です。
+/// </summary>
 enum class CommandType
 {
     Mesh,
@@ -13,6 +16,9 @@ enum class CommandType
     Text
 };
 
+/// <summary>
+/// 描画1回分の情報をまとめたCommandです。priorityの順に描画されます。
+/// </summary>
 struct RenderCommand
 {
     uint64_t priority;

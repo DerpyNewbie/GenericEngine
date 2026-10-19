@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// GPUに送る1つの頂点のデータです。
+/// </summary>
 struct Vertex
 {
     Vector3 vertex;

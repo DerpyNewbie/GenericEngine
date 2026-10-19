@@ -1,5 +1,8 @@
 #pragma once
 
+/// <summary>
+/// 描画に関する定数です。
+/// </summary>
 namespace engine::RenderingConstants
 {
 static constexpr int kShadowCascadeCount = 3;

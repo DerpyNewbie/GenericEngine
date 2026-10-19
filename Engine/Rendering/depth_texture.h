@@ -4,6 +4,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 深度値を書き込むためのTextureです。
+/// </summary>
 class DepthTexture : public Texture2D
 {
 public:

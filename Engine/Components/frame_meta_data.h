@@ -3,6 +3,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Modelの頂点数や頂点座標の範囲などの情報を持つComponentです。
+/// </summary>
 class FrameMetaData : public Component
 {
 public:

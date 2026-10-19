@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// Meshの中の一部分(頂点とindexの範囲)です。
+/// </summary>
 struct SubMesh
 {
     int base_vertex;

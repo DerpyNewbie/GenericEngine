@@ -6,6 +6,9 @@
 namespace engine
 {
 
+/// <summary>
+/// 文字列を描画するRendererです。
+/// </summary>
 class TextRenderer : public Renderer
 {
 public:
@@ -15,8 +18,14 @@ public:
     Color color;
 
     void OnInspectorGui() override;
+    /// <summary>
+    /// 文字列の描画をRenderPipelineに登録します。
+    /// </summary>
     void Render() override;
 
+    /// <summary>
+    /// boundsの基準となるMatrixとして、現在描画中のCameraのWorldMatrixを返します。
+    /// </summary>
     Matrix BoundsOrigin() override;
 
     template <class Archive>

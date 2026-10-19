@@ -2,6 +2,9 @@
 
 namespace engine
 {
+/// <summary>
+/// 頂点に影響するBoneのindexとWeightです。
+/// </summary>
 struct BoneWeight
 {
     int bone_index;

@@ -9,31 +9,73 @@ namespace engine
 {
 class Scene;
 
+/// <summary>
+/// Scene上に配置されるObjectです。Componentを持ち、Transformによる親子関係を持ちます。
+/// </summary>
 class GameObject final : public Object
 {
 public:
+    /// <summary>
+    /// 空のGameObjectを生成します。Sceneへの登録やTransformの追加はOnConstructedで行われます。
+    /// </summary>
     explicit GameObject();
 
+    /// <summary>
+    /// ActiveなSceneに自身を登録し、Transformを持っていなければ追加します。
+    /// </summary>
     void OnConstructed() override;
 
+    /// <summary>
+    /// Hierarchy上でのActive状態を更新します。
+    /// </summary>
     void OnDeserialized() override;
 
+    /// <summary>
+    /// Sceneに破棄されることを通知し、自身を非Activeにした上で、すべてのComponentを破棄します。
+    /// </summary>
     void OnDestroy() override;
 
+    /// <summary>
+    /// このGameObjectのTransformを取得します。
+    /// </summary>
     [[nodiscard]] std::shared_ptr<Transform> Transform() const;
 
+    /// <summary>
+    /// 自身とすべての親がActiveであるかどうかを取得します。
+    /// </summary>
     [[nodiscard]] bool IsActiveInHierarchy() const;
 
+    /// <summary>
+    /// 自身に設定されているActive状態を取得します。親の状態は考慮されません。
+    /// </summary>
     [[nodiscard]] bool IsActiveSelf() const;
 
+    /// <summary>
+    /// 自身のActive状態を設定し、自身と子のHierarchy上でのActive状態を更新します。
+    /// </summary>
+    /// <param name="is_active">Activeにする場合 true</param>
     void SetActive(bool is_active);
 
+    /// <summary>
+    /// このGameObjectが属しているSceneを取得します。
+    /// </summary>
     [[nodiscard]] std::shared_ptr<Scene> Scene() const;
 
+    /// <summary>
+    /// Rootからこのオブジェクトまでの名前を"/"で繋いだPathを取得します。
+    /// </summary>
     [[nodiscard]] std::string Path() const;
 
+    /// <summary>
+    /// 自身のPathから、指定された親のPathの部分を取り除いたPathを取得します。parentの子でない場合は自身の名前を返します。
+    /// </summary>
+    /// <param name="parent">基準となる親のGameObject</param>
     [[nodiscard]] std::string PathFrom(const std::shared_ptr<GameObject> &parent) const;
 
+    /// <summary>
+    /// T のComponentを生成し、このGameObjectに追加します。PlayMode中はOnAwake、Activeな場合はOnEnabledが呼ばれます。
+    /// </summary>
+    /// <returns>追加されたComponent</returns>
     template <typename T>
     std::shared_ptr<T> AddComponent()
     {
@@ -61,6 +103,10 @@ public:
         return instance;
     }
 
+    /// <summary>
+    /// このGameObjectが持つ T のComponentを取得します。破棄待ちのものは除きます。
+    /// </summary>
+    /// <returns>見つからない場合 nullptr</returns>
     template <typename T>
     [[nodiscard]] std::shared_ptr<T> GetComponent() const
     {
@@ -79,6 +125,9 @@ public:
         return nullptr;
     }
 
+    /// <summary>
+    /// このGameObjectが持つ T のComponentをすべて取得します。破棄待ちのものは除きます。
+    /// </summary>
     template <typename T>
     [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponents() const
     {
@@ -98,6 +147,9 @@ public:
         return results;
     }
 
+    /// <summary>
+    /// このGameObjectが持つComponentをすべて取得します。破棄待ちのものは除きます。
+    /// </summary>
     [[nodiscard]] std::vector<std::shared_ptr<Component>> GetComponents() const
     {
         auto filtered = m_components_ | std::ranges::views::filter(
@@ -109,6 +161,10 @@ public:
         return std::vector(filtered.begin(), filtered.end());
     }
 
+    /// <summary>
+    /// 自身から親に向かって T のComponentを探し、最初に見つかったものを取得します。
+    /// </summary>
+    /// <returns>見つからない場合 nullptr</returns>
     template <typename T>
     [[nodiscard]] std::shared_ptr<T> GetComponentInParent()
     {
@@ -121,6 +177,9 @@ public:
         return parent->GameObject()->GetComponentInParent<T>();
     }
 
+    /// <summary>
+    /// 自身とすべての親が持つ T のComponentをすべて取得します。
+    /// </summary>
     template <typename T>
     [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponentsInParent()
     {
@@ -133,6 +192,10 @@ public:
         return result;
     }
 
+    /// <summary>
+    /// 自身から子に向かって T のComponentを探し、最初に見つかったものを取得します。
+    /// </summary>
+    /// <returns>見つからない場合 nullptr</returns>
     template <typename T>
     [[nodiscard]] std::shared_ptr<T> GetComponentInChildren()
     {
@@ -151,6 +214,9 @@ public:
         return nullptr;
     }
 
+    /// <summary>
+    /// 自身とすべての子が持つ T のComponentをすべて取得します。
+    /// </summary>
     template <typename T>
     [[nodiscard]] std::vector<std::shared_ptr<T>> GetComponentsInChildren()
     {
@@ -177,19 +243,59 @@ private:
     std::weak_ptr<engine::Scene> m_scene_ = {};
     std::vector<std::shared_ptr<Component>> m_components_ = {};
 
+    /// <summary>
+    /// 破棄待ちのComponentをリストから取り除きます。
+    /// </summary>
     void RemoveDestroyedComponents();
 
+    /// <summary>
+    /// 自身のComponentのOnUpdateを呼び出し、続けて子のGameObjectにも同じ処理を行います。非Activeの場合は何もしません。
+    /// </summary>
     void InvokeOnUpdate();
+    /// <summary>
+    /// 自身のComponentのOnFixedUpdateを呼び出し、続けて子のGameObjectにも同じ処理を行います。非Activeの場合は何もしません。
+    /// </summary>
     void InvokeOnFixedUpdate() const;
+    /// <summary>
+    /// 自身のComponentのOnValidateを呼び出します。
+    /// </summary>
     void InvokeOnValidate();
+    /// <summary>
+    /// 親の状態と自身のActive状態からHierarchy上でのActive状態を更新し、子にも同じ処理を行います。
+    /// </summary>
+    /// <param name="invoke_component_events">状態が変わった時にComponentのOnEnabled / OnDisabledを呼び出すかどうか</param>
     void UpdateActiveInHierarchy(bool invoke_component_events);
 
+    /// <summary>
+    /// 自身と子のComponentのOnCollisionEnterを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="collision">衝突の情報</param>
     void InvokeOnCollisionEnter(const Collision &collision) const;
+    /// <summary>
+    /// 自身と子のComponentのOnCollisionStayを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="collision">衝突の情報</param>
     void InvokeOnCollisionStay(const Collision &collision) const;
+    /// <summary>
+    /// 自身と子のComponentのOnCollisionExitを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="collision">衝突の情報</param>
     void InvokeOnCollisionExit(const Collision &collision) const;
 
+    /// <summary>
+    /// 自身と子のComponentのOnTriggerEnterを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="other">接触した相手のGameObject</param>
     void InvokeOnTriggerEnter(const std::shared_ptr<GameObject> &other) const;
+    /// <summary>
+    /// 自身と子のComponentのOnTriggerStayを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="other">接触した相手のGameObject</param>
     void InvokeOnTriggerStay(const std::shared_ptr<GameObject> &other) const;
+    /// <summary>
+    /// 自身と子のComponentのOnTriggerExitを呼び出します。非Activeの場合は何もしません。
+    /// </summary>
+    /// <param name="other">接触した相手のGameObject</param>
     void InvokeOnTriggerExit(const std::shared_ptr<GameObject> &other) const;
 
 public:

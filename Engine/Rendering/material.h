@@ -22,13 +22,29 @@ public:
     
     void OnInspectorGui() override;
     void OnConstructed() override;
+    /// <summary>
+    /// 設定されているShaderのパラメーターから、MaterialBlockを新しく作成します。
+    /// </summary>
     void CreateMaterialBlock();
 
+    /// <summary>
+    /// 設定されているShaderを取得します。
+    /// </summary>
     AssetPtr<Shader> GetShader();
-    
+
+    /// <summary>
+    /// MaterialBlockが作成されていなければ作成します。
+    /// </summary>
     void UpdateBuffer();
+    /// <summary>
+    /// MaterialBlockが未作成で、作り直しが必要かどうかを取得します。
+    /// </summary>
     bool IsDirty() const;
 
+    /// <summary>
+    /// Shaderを設定し、MaterialBlockを作り直します。
+    /// </summary>
+    /// <param name="shader">設定するShader</param>
     void SetShader(const AssetPtr<Shader> &shader);
 
     template <class Archive>
