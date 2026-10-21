@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "game_object.h"
 #include "application.h"
 #include "camera_component.h"
@@ -6,8 +6,6 @@
 #include "renderer.h"
 #include "renderer_2d.h"
 #include "canvas.h"
-
-#include "Rendering/render_pipeline.h"
 
 namespace
 {
@@ -84,9 +82,12 @@ void Canvas::OnStart()
 
 void Canvas::Render()
 {
-    if (RenderPipeline::GetCurrentCamera() == m_target_camera_->GetCamera())
-        for (const auto it : m_child_renderers_)
-            it->Render();
+    // UIは画面に出すカメラ(Main Camera)の上にだけ描く
+    if (m_target_camera_ != nullptr && m_target_camera_ != CameraComponent::Main())
+        return;
+
+    for (const auto it : m_child_renderers_)
+        it->Render();
 }
 
 Vector2 Canvas::CanvasSize() const

@@ -1,14 +1,14 @@
-#pragma once
+﻿#pragma once
 #include "component.h"
 #include "renderer.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace engine
 {
 /// <summary>
-/// Meshを描画するRendererです。
+/// Meshを描画するRendererです。描画データはCaboRenderingSystemに登録します。
 /// </summary>
 class MeshRenderer : public Renderer
 {
@@ -16,17 +16,27 @@ class MeshRenderer : public Renderer
     /// boundsの基準となるMatrixとして、自身のWorldMatrixを返します。
     /// </summary>
     Matrix BoundsOrigin() override;
-    /// <summary>
-    /// WorldMatrix用のBufferがなければ作成し、自身のWorldMatrixを現在のフレームのBufferに書き込みます。
-    /// </summary>
-    virtual void UpdateWorldBuffer();
 
 protected:
     static bool m_draw_bounds_;
-    
+
     AssetPtr<Mesh> m_shared_mesh_;
 
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
+    // CaboRenderingSystemに登録した描画データのID
+    CRS::MeshRendererId m_crs_id_;
+
+    /// <summary>
+    /// 非表示になった時に、CaboRenderingSystemから描画データを取り除きます。
+    /// </summary>
+    void OnVisibilityChanged(bool visible) override;
+    /// <summary>
+    /// Meshの描画データをCaboRenderingSystemに登録 / 更新します。
+    /// </summary>
+    /// <param name="world">WorldMatrix</param>
+    /// <param name="local_bounds">worldを基準としたbounds</param>
+    /// <param name="bone_buffer">スキニングに使うボーン行列のBuffer。使わない場合は無効なハンドル</param>
+    void SubmitToRenderer(const Matrix &world, const DirectX::BoundingBox &local_bounds,
+                          CRS::BufferHandle bone_buffer = {});
 
     /// <summary>
     /// boundsをGizmosで描画します。
@@ -38,16 +48,12 @@ protected:
     void RecalculateBoundingBox();
 
 public:
-    
+
     bool buffer_creation_failed = false;
 
     void OnInspectorGui() override;
     /// <summary>
-    /// ShadowMap用に、Materialを使わずWorldMatrixのみを設定してMeshを描画します。
-    /// </summary>
-    void DepthRender() override;
-    /// <summary>
-    /// WorldMatrixを更新し、Meshの描画をRenderPipelineに登録します。
+    /// Meshの描画データをCaboRenderingSystemに登録 / 更新します。
     /// </summary>
     void Render() override;
 

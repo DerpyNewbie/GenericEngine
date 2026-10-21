@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 
 #include "mesh_renderer.h"
 #include "Asset/asset_ptr.h"
+#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {
@@ -13,14 +14,10 @@ class Transform;
 class SkinnedMeshRenderer : public MeshRenderer
 {
     static bool m_draw_bones_;
-    
-    std::array<std::shared_ptr<StructuredBuffer>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffers_;
-    std::array<std::shared_ptr<DescriptorHandle>, RenderEngine::kFrame_Buffer_Count> m_bone_matrix_buffer_handles_;
 
-    /// <summary>
-    /// WorldMatrix用のBufferがなければ作成し、単位行列を現在のフレームのBufferに書き込みます。頂点の移動はBoneのMatrixで行われます。
-    /// </summary>
-    void UpdateWorldBuffer() override;
+    // ボーン行列（Boneのworld空間）。CaboRenderingSystemのシェーダーで頂点を変形する
+    CRS::StructuredBuffer<Matrix> m_bone_matrix_buffer_;
+
     /// <summary>
     /// 各Boneと親を結ぶ線をGizmosで描画します。
     /// </summary>
@@ -44,11 +41,7 @@ public:
     
     void OnInspectorGui() override;
     /// <summary>
-    /// ShadowMapへの描画の前に、BoneのMatrixを更新してCommandListに設定します。
-    /// </summary>
-    void UpdateBuffer() override;
-    /// <summary>
-    /// WorldMatrixとBoneのMatrixを更新し、Meshの描画をRenderPipelineに登録します。
+    /// BoneのMatrixを更新し、Meshの描画データをCaboRenderingSystemに登録 / 更新します。頂点はBoneの空間で変形するので、WorldMatrixは単位行列です。
     /// </summary>
     void Render() override;
 

@@ -1,10 +1,9 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gui.h"
 #include "text_renderer.h"
+#include "game_object.h"
 #include "Components/camera_component.h"
-#include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
+#include "Rendering/crs_bridge.h"
 
 using namespace DirectX;
 
@@ -43,12 +42,14 @@ void TextRenderer::OnInspectorGui()
 
 void TextRenderer::Render()
 {
-    RenderPipeline::Submit(font_data, position, string, color);
+    CrsBridge::AddUiText(font_data, position, string, color);
 }
 
 Matrix TextRenderer::BoundsOrigin()
 {
-    return RenderPipeline::GetCurrentCamera().GetWorldMatrix();
+    const auto camera = CameraComponent::Main();
+    const auto camera_pos = camera ? camera->GameObject()->Transform()->WorldMatrix() : Matrix::Identity;
+    return camera_pos;
 }
 }
 

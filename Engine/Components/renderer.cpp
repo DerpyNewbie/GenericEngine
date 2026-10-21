@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "renderer.h"
 
@@ -6,14 +6,10 @@
 
 #include "gui.h"
 #include "update_manager.h"
-#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
-void Renderer::UpdateBuffer()
-{ }
-
-void Renderer::DepthRender()
+void Renderer::OnVisibilityChanged(bool visible)
 { }
 
 void Renderer::SetVisible(const bool visible)
@@ -28,13 +24,13 @@ void Renderer::SetVisible(const bool visible)
     if (m_is_visible_)
     {
         UpdateManager::SubscribeRender(shared_from_base<Renderer>());
-        RenderPipeline::AddRenderer(shared_from_base<Renderer>());
     }
     else
     {
         UpdateManager::UnsubscribeRender(shared_from_base<Renderer>());
-        RenderPipeline::RemoveRenderer(shared_from_base<Renderer>());
     }
+
+    OnVisibilityChanged(m_is_visible_);
 }
 
 void Renderer::OnValidate()

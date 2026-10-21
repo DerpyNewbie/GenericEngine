@@ -1,37 +1,14 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "mesh_renderer.h"
-#include "Rendering/CabotEngine/Graphics/PSOManager.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/VertexBuffer.h"
 #include "game_object.h"
-#include "camera_component.h"
 #include "gui.h"
 #include "Rendering/gizmos.h"
-#include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
+#include "Rendering/crs_bridge.h"
 
 namespace engine
 {
 bool MeshRenderer::m_draw_bounds_ = false;
-
-void MeshRenderer::UpdateWorldBuffer()
-{
-    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
-    {
-        if (!world_matrix_buffer)
-        {
-            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-            world_matrix_buffer->CreateBuffer();
-        }
-    }
-
-    const auto world_matrix = GameObject()->Transform()->WorldMatrix();
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
-    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
-    *ptr = world_matrix;
-}
 
 void MeshRenderer::RecalculateBoundingBox()
 {
@@ -77,48 +54,23 @@ void MeshRenderer::OnInspectorGui()
     }
 }
 
-void MeshRenderer::DepthRender()
-{
-    const auto cmd_list = RenderEngine::CommandList();
-    if (m_shared_mesh_ == nullptr)
-    {
-        Logger::Error<MeshRenderer>("Mesh is null!");
-        return;
-    }
-
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    cmd_list->IASetVertexBuffers(0, 1, m_shared_mesh_->vertex_buffer->View());
-
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx]->GetAddress();
-    cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
-
-    cmd_list->IASetIndexBuffer(m_shared_mesh_->index_buffers[0]->View());
-
-    const auto index_count = m_shared_mesh_->HasSubMeshes()
-    ? m_shared_mesh_->sub_meshes[0].base_index
-    : m_shared_mesh_->indices.size();
-
-    cmd_list->DrawIndexedInstanced(static_cast<UINT>(index_count), 1, 0, 0, 0);
-
-    // sub-meshes
-    for (int i = 0; i < m_shared_mesh_->sub_meshes.size(); ++i)
-    {
-        cmd_list->SetGraphicsRootConstantBufferView(kWorldCBV, world_matrix_buffer);
-
-        cmd_list->IASetIndexBuffer(m_shared_mesh_->index_buffers[i + 1]->View());
-
-        const auto sub_mesh = m_shared_mesh_->sub_meshes[i];
-        cmd_list->DrawIndexedInstanced(sub_mesh.index_count, 1, 0, 0, 0);
-    }
-}
-
 void MeshRenderer::Render()
 {
-    UpdateWorldBuffer();
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
+    const auto &world_matrix = GameObject()->Transform()->WorldMatrix();
+    SubmitToRenderer(world_matrix, bounds);
+}
 
-    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress());
+void MeshRenderer::SubmitToRenderer(const Matrix &world, const DirectX::BoundingBox &local_bounds,
+                                    const CRS::BufferHandle bone_buffer)
+{
+    CrsBridge::SubmitMeshRenderer(m_crs_id_, m_shared_mesh_, shared_materials, world, local_bounds,
+                                  bone_buffer);
+}
+
+void MeshRenderer::OnVisibilityChanged(const bool visible)
+{
+    if (!visible)
+        CrsBridge::RemoveMeshRenderer(m_crs_id_);
 }
 
 void MeshRenderer::SetSharedMesh(const AssetPtr<Mesh> &mesh)

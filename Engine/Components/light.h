@@ -1,8 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "component.h"
 #include "Rendering/light_data.h"
-#include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/StructuredBuffer.h"
 
 namespace engine
 {
@@ -20,19 +18,13 @@ enum class kLightType : uint8_t
 /// </summary>
 class Light : public Component
 {
-    friend class CameraComponent;
-    friend class RenderPipeline;
-    friend class Lighting;
-
 protected:
-    std::vector<int> m_depth_texture_handle_;
     LightData m_light_data_;
-    bool m_has_shadow_;
 
 public:
     void OnInspectorGui() override;
     /// <summary>
-    /// Lightingに自身を登録し、影が有効な場合はShadowMapの割り当てを試みます。
+    /// Lightingに自身を登録します。
     /// </summary>
     void OnEnabled() override;
     void OnDisabled() override;
@@ -42,25 +34,30 @@ public:
     /// Transformの状態をLightDataに反映します。
     /// </summary>
     virtual void UpdateData() = 0;
+
     /// <summary>
-    /// Lightの影響範囲がカメラのFrustumに入っているかどうかを判定します。
+    /// 描画に使うLightのデータを取得します。影の割り当てなどはCaboRenderingSystemが行います。
     /// </summary>
-    /// <param name="frustum">カメラのFrustumの8頂点</param>
-    virtual bool InCameraView(const std::array<Vector3, 8> &frustum) = 0;
+    const LightData &Data() const
+    {
+        return m_light_data_;
+    }
+
     /// <summary>
-    /// Lightの位置を取得します。
+    /// 影を落とすかどうかを設定します。
     /// </summary>
-    virtual Vector3 GetPos() = 0;
+    void SetCastShadow(const bool cast_shadow)
+    {
+        m_light_data_.cast_shadow = cast_shadow ? 1 : 0;
+    }
+
     /// <summary>
-    /// このLightが使用するShadowMapの枚数を取得します。
+    /// Lightの色を設定します。
     /// </summary>
-    virtual int ShadowMapCount() = 0;
-    /// <summary>
-    /// ShadowMapの描画に使うViewProjectionMatrixを計算します。
-    /// </summary>
-    /// <param name="frustum_corners">カメラのFrustumの8頂点</param>
-    /// <returns>ShadowMapごとのViewProjectionMatrix</returns>
-    virtual std::vector<Matrix> CalcViewProj(const std::array<Vector3, 8> &frustum_corners) = 0;
+    void SetColor(const Color &color)
+    {
+        m_light_data_.color = color;
+    }
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "renderer.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace engine
 {
@@ -11,21 +11,22 @@ class Material;
 /// </summary>
 class BillboardRenderer : public Renderer
 {
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
+    // CaboRenderingSystemに登録した描画データのID
+    CRS::MeshRendererId m_crs_id_;
 
     /// <summary>
-    /// WorldMatrix用のBufferがなければ作成し、Main Cameraの方を向くようにしたWorldMatrixを現在のフレームのBufferに書き込みます。
+    /// 非表示になった時に、CaboRenderingSystemから描画データを取り除きます。
     /// </summary>
-    void UpdateWorldBuffer();
-    
+    void OnVisibilityChanged(bool visible) override;
+
 public:
     /// <summary>
-    /// BillboardShaderを使うMaterialを作成し、boundsを初期化します。
+    /// Unlit.hlslを使うMaterialを作成し、boundsを初期化します。
     /// </summary>
     void OnConstructed() override;
     void OnInspectorGui() override;
     /// <summary>
-    /// WorldMatrixを更新し、QuadのMeshの描画をRenderPipelineに登録します。
+    /// Main Cameraの方を向くようにしたWorldMatrixで、QuadのMeshの描画データをCaboRenderingSystemに登録 / 更新します。
     /// </summary>
     void Render() override;
     /// <summary>

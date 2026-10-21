@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "component.h"
 #include "event_receivers.h"
 #include "transform.h"
@@ -13,21 +13,16 @@ namespace engine
 /// </summary>
 class Renderer : public Component, public IRenderReceiver
 {
-    friend class RenderPipeline;
-
 protected:
     bool m_is_visible_ = false;
 
     /// <summary>
-    /// ShadowMapへの描画の前にRenderPipelineから呼ばれ、描画に使うBufferを更新します。既定では何もしません。
+    /// 表示状態が変わった時に呼ばれます。非表示になった時に、CaboRenderingSystemから描画データを取り除くのに使います。既定では何もしません。
     /// </summary>
-    virtual void UpdateBuffer();
+    /// <param name="visible">表示する場合 true</param>
+    virtual void OnVisibilityChanged(bool visible);
     /// <summary>
-    /// ShadowMapへのDepthのみの描画を行います。RenderPipelineから呼ばれます。既定では何もしません。
-    /// </summary>
-    virtual void DepthRender();
-    /// <summary>
-    /// 表示状態を設定し、UpdateManagerとRenderPipelineへの登録 / 解除を行います。
+    /// 表示状態を設定し、UpdateManagerへの登録 / 解除を行います。表示中は毎フレームRenderが呼ばれます。
     /// </summary>
     /// <param name="visible">表示する場合 true</param>
     void SetVisible(bool visible);

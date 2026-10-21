@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Components/component.h"
 #include "Asset/asset_ptr.h"
 #include "cinema_brain_component.h"

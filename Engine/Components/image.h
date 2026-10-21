@@ -1,9 +1,8 @@
-#pragma once
+﻿#pragma once
 #include "renderer_2d.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/material.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
-#include "Rendering/CabotEngine/Graphics/Texture2D.h"
+#include "Rendering/texture2d.h"
 
 namespace engine
 {
@@ -12,19 +11,17 @@ namespace engine
 /// </summary>
 class Image : public Renderer2D
 {
-    std::array<std::shared_ptr<ConstantBuffer>, RenderEngine::kFrame_Buffer_Count> m_world_matrix_buffers_;
-
     /// <summary>
-    /// WorldMatrix用のBufferがなければ作成し、Canvas上の正規化されたRectから作ったMatrixを現在のフレームのBufferに書き込みます。
+    /// Canvas上の正規化されたRectから、Quadを画面に置くMatrixを作ります。
     /// </summary>
-    void UpdateWorldBuffer();
-    
+    Matrix CalcScreenMatrix() const;
+
 public:
     AssetPtr<Material> shared_material;
 
     void OnInspectorGui() override;
     /// <summary>
-    /// WorldMatrixを更新し、QuadのMeshの描画をRenderPipelineに登録します。
+    /// MaterialのTexture(_MainTex)を貼った四角形を、CaboRenderingSystemのUIとして登録します。
     /// </summary>
     void Render() override;
 

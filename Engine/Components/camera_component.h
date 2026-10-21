@@ -1,8 +1,13 @@
-#pragma once
+﻿#pragma once
 #include "renderer.h"
-#include "Rendering/camera.h"
 #include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
+#include "Rendering/CaboRenderingSystem/RHI/handles.h"
+
+namespace CRS
+{
+struct CameraTag;
+}
 
 namespace engine
 {
@@ -64,17 +69,21 @@ class CameraComponent : public Component, public IRenderReceiver
 
     AssetPtr<RenderTexture> m_render_texture_;
     AssetPtr<DepthTexture> m_depth_texture_;
-    
+
+    // CaboRenderingSystemに登録したカメラのID
+    CRS::Handle<CRS::CameraTag> m_crs_camera_id_;
+
 public:
     CameraProperty property;
-    
+
     void OnInspectorGui() override;
     /// <summary>
     /// GameObjectのActive状態に合わせてOnEnabledまたはOnDisabledを呼び出します。
     /// </summary>
     void OnValidate() override;
     /// <summary>
-    /// このCameraでの描画をRenderPipelineに要求します。
+    /// このCameraの視点と描画先をCaboRenderingSystemに登録 / 更新します。
+    /// Main Cameraは画面に、それ以外はRenderTextureが設定されている場合だけそこに描きます。
     /// </summary>
     void Render() override;
     /// <summary>
@@ -90,15 +99,19 @@ public:
     /// Transformの位置と向きから、右手系のViewMatrixを計算します。
     /// </summary>
     Matrix ViewMatrix() const;
-    /// <summary>
-    /// 描画に使うCameraの情報(背景色、View / ProjectionMatrix、描画先)を作成します。
-    /// </summary>
-    Camera GetCamera();
 
     /// <summary>
     /// 描画先のRenderTextureを取得します。設定されていない場合は新しく生成します。
     /// </summary>
     std::shared_ptr<RenderTexture> RenderTexture();
+    /// <summary>
+    /// 描画先に設定されているRenderTextureを取得します。設定されていない場合はnullptrを返します（生成しません）。
+    /// </summary>
+    std::shared_ptr<class RenderTexture> TargetTexture() const;
+    /// <summary>
+    /// 深度の描画先に設定されているDepthTextureを取得します。設定されていない場合はnullptrを返します。
+    /// </summary>
+    std::shared_ptr<DepthTexture> TargetDepthTexture() const;
 
     /// <summary>
     /// Main Cameraを取得します。
