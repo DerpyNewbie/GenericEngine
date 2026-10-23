@@ -20,13 +20,12 @@
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
-#include "Rendering/DirectX/render_engine.h"
+#include "Rendering/crs_bridge.h"
 #include "Asset/text_asset.h"
 #include "Components/camera_component.h"
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
 #include "Physics/physics.h"
-#include "Rendering/DirectX/render_engine.h"
 
 #include <ranges>
 
@@ -88,13 +87,13 @@ void Editor::Init()
         IM_ASSERT(font != nullptr);
 
         // フォントのSRVは、CRSのシェーダーから見えるヒープに置く（描画時にCRSのヒープが設定されている）
-        auto &device = RenderEngine::NewDevice();
+        auto &device = CrsBridge::Device();
         const auto font_descriptor = device.AllocatePersistentSrv();
 
         ImGui_ImplWin32_Init(Application::Instance()->WindowHandle());
         ImGui_ImplDX12_Init(
-            RenderEngine::Device(),
-            RenderEngine::kFrame_Buffer_Count,
+            CrsBridge::Device().NativeDevice(),
+            CRS::kMaxFramesInFlight,
             DXGI_FORMAT_R8G8B8A8_UNORM,
             device.NativeSrvHeap(),
             font_descriptor.cpu,
@@ -227,7 +226,7 @@ void Editor::OnDraw()
     {
         ImGui::Render();
         auto draw_data = ImGui::GetDrawData();
-        auto cmd_list = RenderEngine::CommandList();
+        auto cmd_list = CrsBridge::Device().NativeCommandList();
         ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
@@ -245,7 +244,7 @@ void Editor::Attach()
         }
     );
 
-    RenderEngine::Instance()->on_overlay_render.AddListener(
+    CrsBridge::on_overlay_render.AddListener(
         [this] {
             OnDraw();
         }

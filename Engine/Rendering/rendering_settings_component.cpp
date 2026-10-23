@@ -1,8 +1,7 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "rendering_settings_component.h"
 #include "gui.h"
 #include "lighting.h"
-#include "render_pipeline.h"
 #include "skybox.h"
 #include "Components/directional_light.h"
 

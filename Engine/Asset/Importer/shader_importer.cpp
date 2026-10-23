@@ -34,12 +34,6 @@ bool ShaderImporter::IsCompatibleWith(const std::shared_ptr<Object> object)
 
 void ShaderImporter::OnImport(AssetDescriptor *ctx)
 {
-    if (ctx->Guid() == xg::Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
-    {
-        ctx->SetMainObject(Shader::GetDefault());
-        return;
-    }
-
     // shader_metaが無い、または壊れている場合は作り直す
     std::shared_ptr<Shader> shader;
     if (const auto shader_meta = ctx->DataStore().GetString(kShaderMetaKey);

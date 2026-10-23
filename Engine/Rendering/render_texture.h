@@ -1,18 +1,23 @@
-#pragma once
-#include "CabotEngine/Graphics/Texture2D.h"
+﻿#pragma once
+#include "texture2d.h"
 
 namespace engine
 {
 /// <summary>
-/// 描画結果を書き込むためのTextureです。UAVを許可するとComputeShaderなどから書き込むこともできます。
+/// 描画結果を書き込むためのTextureです。CameraComponentの描画先に設定でき、Materialのテクスチャとして読むこともできます。
 /// </summary>
 class RenderTexture : public Texture2D
 {
-    friend class RenderTextureBuffer;
+    bool m_allow_uav_ = false;
+    int m_format_index_ = 0;
 
-    bool m_allow_uav_;
-    int m_format_index_;
-    
+protected:
+    /// <summary>
+    /// 描画先として使えるテクスチャを、設定されたサイズとフォーマットで作ります。
+    /// </summary>
+    std::shared_ptr<CRS::Texture> CreateGpuTexture() override;
+    bool IsGpuTextureUpToDate() const override;
+
 public:
     RenderTexture();
 

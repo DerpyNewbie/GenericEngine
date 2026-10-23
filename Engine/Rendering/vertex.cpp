@@ -1,45 +1,31 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "vertex.h"
 
 namespace engine
 {
-const D3D12_INPUT_ELEMENT_DESC Vertex::kInputElements[] =
+std::shared_ptr<const CRS::VertexLayout> Vertex::Layout()
 {
-    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}, // float3のPOSITION
-    {"COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}, // float3のNORMAL
-    {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TANGENT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}, // float3のTANGENT
-    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 1, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 2, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 3, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 4, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 5, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 6, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"TEXCOORD", 7, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"BONESPERVERTEX", 0, DXGI_FORMAT_R32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0}, // float4のCOLOR
-    {"BONEINDEX", 0, DXGI_FORMAT_R32G32B32A32_UINT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-    {"BONEWEIGHT", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT,
-     D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-};
-const D3D12_INPUT_LAYOUT_DESC Vertex::kInputLayout =
-{
- kInputElements,
- kInputElementCount
-};
+    static const auto layout = [] {
+        auto result = std::make_shared<CRS::VertexLayout>();
+        result->stride = sizeof(Vertex);
+        auto &attributes = result->attributes;
+        attributes.push_back({"POSITION", 0, CRS::Format::R32G32B32_Float, offsetof(Vertex, vertex)});
+        attributes.push_back({"COLOR", 0, CRS::Format::R32G32B32A32_Float, offsetof(Vertex, color)});
+        attributes.push_back({"NORMAL", 0, CRS::Format::R32G32B32_Float, offsetof(Vertex, normal)});
+        attributes.push_back({"TANGENT", 0, CRS::Format::R32G32B32A32_Float, offsetof(Vertex, tangent)});
+        for (uint32_t i = 0; i < 8; ++i)
+        {
+            attributes.push_back({
+                "TEXCOORD", i, CRS::Format::R32G32_Float,
+                static_cast<uint32_t>(offsetof(Vertex, uvs) + sizeof(Vector2) * i)
+            });
+        }
+        attributes.push_back({"BONESPERVERTEX", 0, CRS::Format::R32_UInt, offsetof(Vertex, bones_per_vertex)});
+        attributes.push_back({"BONEINDEX", 0, CRS::Format::R32G32B32A32_UInt, offsetof(Vertex, bone_index)});
+        attributes.push_back({"BONEWEIGHT", 0, CRS::Format::R32G32B32A32_Float, offsetof(Vertex, bone_weight)});
+        return std::shared_ptr<const CRS::VertexLayout>(result);
+    }();
+    return layout;
+}
 }

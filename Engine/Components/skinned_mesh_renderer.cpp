@@ -4,7 +4,7 @@
 #include "gui.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
-#include "Rendering/DirectX/render_engine.h"
+#include "Rendering/crs_bridge.h"
 #include "Rendering/CaboRenderingSystem/render_engine.h"
 
 namespace engine
@@ -19,7 +19,7 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
     if (!m_bone_matrix_buffer_.IsValid() || m_bone_matrix_buffer_.Count() != transforms.size())
     {
         m_bone_matrix_buffer_ = CRS::StructuredBuffer<Matrix>(
-            RenderEngine::NewRenderer().Device(), static_cast<uint32_t>(transforms.size()), CRS::MemoryType::Upload,
+            CrsBridge::Crs().Device(), static_cast<uint32_t>(transforms.size()), CRS::MemoryType::Upload,
             CRS::BufferUsage::None, "BoneMatrices");
     }
 

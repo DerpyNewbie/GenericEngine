@@ -1,7 +1,8 @@
-#pragma once
+﻿#pragma once
 #include "rendering_constants.h"
-#include "CabotEngine/Graphics/TextureCube.h"
+#include "Asset/asset_ptr.h"
 #include "Components/component.h"
+#include "texture_cube.h"
 
 namespace engine
 {
