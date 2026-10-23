@@ -3,6 +3,7 @@
     "assimp",
     "cereal",
     "directx-headers",
+    "directx-dxc",
     "directxtex",
     {
       "name": "directxtk12",

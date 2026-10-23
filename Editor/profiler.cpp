@@ -3,7 +3,7 @@
 #include "profiler.h"
 
 #include "engine_profiler.h"
-#include "Rendering/DirectX/render_engine.h"
+#include "Rendering/crs_bridge.h"
 #include "Rendering/CaboRenderingSystem/render_engine.h"
 
 template <typename T>
@@ -66,7 +66,7 @@ void Profiler::OnEditorGui()
         ImGui::Text("Unscaled Delta Time: %f", time->UnscaledDeltaTime());
         ImGui::Text("Time Scale         : %f", time->TimeScale());
         ImGui::Text("Last Fixed Frame Count: %d", time->LastFixedFrameCount());
-        ImGui::Text("Renderer Count        : %d", static_cast<int>(RenderEngine::NewRenderer().Meshes().Count()));
+        ImGui::Text("Renderer Count        : %d", static_cast<int>(engine::CrsBridge::Crs().Meshes().Count()));
         ImGui::Unindent();
     }
 

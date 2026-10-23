@@ -1,0 +1,9 @@
+{
+    "data": {
+        "shader_meta": "{\n\"value0\": {\n\"polymorphic_id\": 1073741824,\n\"ptr_wrapper\": {\n\"id\": 2147483649,\n\"data\": {\n\"cereal_class_version\": 1,\n\"value0\": {\n\"cereal_class_version\": 1,\n\"m_guid_\": \"80c8ea2d-64d0-40b4-b8cd-8ef30bdfee5b\",\n\"m_name_\": \"Lit.hlsl\"\n},\n\"parameters\": [\n{\n\"cereal_class_version\": 1,\n\"index\": 0,\n\"name\": \"Material\",\n\"display_name\": \"Material\",\n\"is_unordered_access\": false,\n\"total_size\": 16,\n\"variables\": [\n{\n\"cereal_class_version\": 0,\n\"name\": \"_Color\",\n\"data_type\": 4\n}\n]\n},\n{\n\"index\": 0,\n\"name\": \"_MainTex\",\n\"display_name\": \"_MainTex\",\n\"is_unordered_access\": false,\n\"total_size\": 0,\n\"variables\": []\n}\n],\n\"m_shader_settings_\": {\n\"cereal_class_version\": 6,\n\"z_test\": 0,\n\"z_write\": 0,\n\"cull\": 0,\n\"blend_mode\": 0\n}\n}\n}\n}\n}",
+        "shader_meta_version": 5
+    },
+    "guid": "80c8ea2d-64d0-40b4-b8cd-8ef30bdfee5b",
+    "type": ".hlsl",
+    "objects": []
+}

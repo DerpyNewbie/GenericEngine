@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #ifdef _DEBUG
 #pragma comment(lib, "assimp-vc143-mtd.lib")
@@ -11,6 +11,8 @@
 #include "mesh.h"
 
 #include "assimp_util.h"
+#include "crs_bridge.h"
+#include "CaboRenderingSystem/render_engine.h"
 
 namespace engine
 {
@@ -48,71 +50,68 @@ void Mesh::OnInspectorGui()
     }
 }
 
+const MeshGpuData *Mesh::GpuData()
+{
+    if (m_gpu_data_ != nullptr)
+        return m_gpu_data_.get();
+
+    if (vertices.empty() || indices.empty())
+        return nullptr;
+
+    auto &device = CrsBridge::Crs().Device();
+    auto data = std::make_shared<MeshGpuData>();
+
+    const auto vertex_data = BuildVertices();
+    data->vertices = CRS::Buffer(device, {
+                                     vertex_data.size() * sizeof(Vertex), sizeof(Vertex), CRS::BufferUsage::Vertex,
+                                     CRS::MemoryType::GpuOnly, vertex_data.data(), Name() + " Vertices"
+                                 });
+    data->indices = CRS::Buffer(device, {
+                                    indices.size() * sizeof(uint32_t), sizeof(uint32_t), CRS::BufferUsage::Index,
+                                    CRS::MemoryType::GpuOnly, indices.data(), Name() + " Indices"
+                                });
+
+    const auto main_index_count = HasSubMeshes() ? sub_meshes[0].base_index : indices.size();
+    data->parts.emplace_back(0, static_cast<uint32_t>(main_index_count));
+    for (const auto &sub_mesh : sub_meshes)
+        data->parts.emplace_back(sub_mesh.base_index, sub_mesh.index_count);
+
+    m_gpu_data_ = std::move(data);
+    return m_gpu_data_.get();
+}
+
 void Mesh::ReconstructMeshesBuffer()
 {
-    // clean up old buffers
-    if (vertex_buffer)
+    m_gpu_data_.reset();
+}
+
+std::vector<Vertex> Mesh::BuildVertices() const
+{
+    std::vector<Vertex> result(vertices.size());
+    for (size_t i = 0; i < vertices.size(); ++i)
+        result[i].vertex = vertices[i];
+    for (size_t i = 0; i < colors.size() && i < result.size(); ++i)
+        result[i].color = colors[i];
+    for (size_t i = 0; i < normals.size() && i < result.size(); ++i)
+        result[i].normal = normals[i];
+    for (size_t i = 0; i < tangents.size() && i < result.size(); ++i)
+        result[i].tangent = tangents[i];
+    for (size_t channel = 0; channel < uvs.size(); ++channel)
     {
-        vertex_buffer = nullptr;
+        for (size_t i = 0; i < uvs[channel].size() && i < result.size(); ++i)
+            result[i].uvs[channel] = uvs[channel][i];
     }
-
-    if (!index_buffers.empty())
+    for (size_t i = 0; i < bone_weights.size() && i < result.size(); ++i)
     {
-        for (auto &index_buffer : index_buffers)
-            index_buffer = nullptr;
-        index_buffers.clear();
-    }
-
-    // create vertex buffer
-    auto mesh = shared_from_base<Mesh>().get();
-    vertex_buffer = std::make_shared<VertexBuffer>(mesh);
-    if (!vertex_buffer->IsValid())
-    {
-        Logger::Error<Mesh>("Failed to create vertex buffer!");
-        return;
-    }
-
-    // create index buffer
-    const auto index_buffer_size = mesh->HasSubMeshes()
-        ? mesh->sub_meshes[0].base_index
-        : mesh->indices.size();
-    const auto indices = mesh->indices.data();
-
-    auto ib = std::make_shared<IndexBuffer>(index_buffer_size * sizeof(uint32_t), indices);
-
-    if (!ib->IsValid())
-    {
-        Logger::Error<Mesh>(
-            "Failed to create index buffer of '%d'",
-            index_buffer_size
-        );
-        return;
-    }
-
-    index_buffers.emplace_back(ib);
-
-    // create index buffers for sub meshes
-    for (auto i = 0; i < mesh->sub_meshes.size(); i++)
-    {
-        const auto sub_mesh = mesh->sub_meshes[i];
-
-        const auto sub_index_buffer_size = sub_mesh.index_count * sizeof(uint32_t);
-        std::vector<uint32_t> sub_indices;
-        sub_indices.insert(
-            sub_indices.begin(),
-            mesh->indices.begin() + sub_mesh.base_index,
-            mesh->indices.begin() + sub_mesh.base_index + sub_mesh.index_count
-        );
-
-        const auto sub_index_buffer = std::make_shared<IndexBuffer>(sub_index_buffer_size, sub_indices.data());
-        if (!sub_index_buffer->IsValid())
+        const auto count = std::min<size_t>(bone_weights[i].size(), 4);
+        result[i].bones_per_vertex = static_cast<unsigned int>(count);
+        for (size_t j = 0; j < count; ++j)
         {
-            Logger::Error<Mesh>("Failed to create sub index buffer!: sub mesh index: %d", i);
-            continue;
+            result[i].bone_index[j] = bone_weights[i][j].bone_index;
+            result[i].bone_weight[j] = bone_weights[i][j].weight;
         }
-
-        index_buffers.emplace_back(sub_index_buffer);
     }
+    return result;
 }
 
 std::shared_ptr<Mesh> Mesh::CreateFromAiMesh(const aiMesh *mesh)

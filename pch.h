@@ -61,7 +61,6 @@
 #include <DirectXTex.h>
 #include <directxtk12/SimpleMath.h>
 #include <DirectXMath.h>
-#include <d3dcompiler.h>
 #include <dxgi1_4.h>
 /* === end directx === */
 
@@ -81,5 +80,5 @@
 /* === end engine.serializer === */
 
 /* === begin engine.cabot_engine === */
-#include "Rendering/CabotEngine/Graphics/ComPtr.h"
+#include "Rendering/DirectX/com_ptr.h"
 /* === end engine.cabot_engine === */

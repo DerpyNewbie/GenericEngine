@@ -1,9 +1,5 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "material_block.h"
-
-#include "buffer_data_base.h"
-#include "gpu_resource_manager.h"
-#include "texture_cube_buffer_data.h"
 
 namespace
 {
@@ -35,9 +31,6 @@ void MaterialBlock::OnInspectorGui()
 {
     for (auto &[name, data] : m_buffer_data_)
     {
-        if (GpuResourceManager::GetGlobalBuffer(name))
-            continue;
-
         ImGui::PushID(data.get());
         data->OnInspectorGui();
         ImGui::PopID();
@@ -132,6 +125,44 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
             break;
         }
     }
+}
+
+std::shared_ptr<ConstantBufferData> MaterialBlock::FindConstantBufferData(const std::string &variable_name)
+{
+    for (const auto &data : m_buffer_data_ | std::views::values)
+    {
+        if (data == nullptr || data->BufferType() != kBufferType_ConstantBuffer)
+            continue;
+
+        auto constant_buffer = std::static_pointer_cast<ConstantBufferData>(data);
+        if (constant_buffer->HasVariable(variable_name))
+            return constant_buffer;
+    }
+    return nullptr;
+}
+
+void MaterialBlock::ForEachBufferData(
+    const std::function<void(const std::string &, BufferDataBase &)> &action) const
+{
+    for (const auto &[name, data] : m_buffer_data_)
+    {
+        if (data != nullptr)
+            action(name, *data);
+    }
+}
+
+bool MaterialBlock::ConsumeDirty()
+{
+    bool is_dirty = false;
+    for (const auto &data : m_buffer_data_ | std::views::values)
+    {
+        if (data != nullptr && data->is_dirty)
+        {
+            is_dirty = true;
+            data->is_dirty = false;
+        }
+    }
+    return is_dirty;
 }
 }
 
