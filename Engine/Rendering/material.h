@@ -44,9 +44,14 @@ class Material : public Object, public Inspectable
     T GetValue(const std::string &name, const T &default_value) const;
 
 public:
+    // 描く順番のグループ。小さい順に描きます（0..10000）
     uint16_t render_queue = 5000;
+    // パラメーターの値。保存・Inspectorでの編集はこれに対して行い、描画の前にCRSのMaterialへ写します
     std::shared_ptr<MaterialBlock> shared_material_block;
 
+    /// <summary>
+    /// CRSに登録したMaterialを取り除きます。
+    /// </summary>
     ~Material() override;
 
     /// <summary>
@@ -57,6 +62,8 @@ public:
     static std::shared_ptr<Material> Create(const std::string &shader_path, const std::string &name = "Material");
 
     // ---- パラメーター（Shaderの変数名で指定します） ----
+    // Set: その名前・型の変数がShaderにない場合はfalseを返します。どのcbufferに入っているかは気にしなくてかまいません
+    // Get: その名前の変数がない場合はdefault_valueを返します
     bool SetInt(const std::string &name, int value);
     bool SetFloat(const std::string &name, float value);
     bool SetVector2(const std::string &name, const Vector2 &value);

@@ -17,6 +17,9 @@ class TextureCube final : public Object, public Inspectable
     std::shared_ptr<CRS::Texture> m_gpu_texture_;
 
 public:
+    /// <summary>
+    /// 6面のテクスチャを指定して作ります。順番は +X, -X, +Y, -Y, +Z, -Z です。
+    /// </summary>
     TextureCube(const std::array<AssetPtr<Texture2D>, 6> &textures = {});
 
     void OnInspectorGui() override;

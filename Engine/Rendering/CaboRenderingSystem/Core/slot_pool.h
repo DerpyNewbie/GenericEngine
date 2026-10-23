@@ -9,10 +9,14 @@ namespace CRS
 {
 /// <summary>
 /// 世代番号付きのスロット配列です。ハンドルで要素を引き、破棄済みのハンドルはnullptrになります。
+/// <para>取り除いたスロットは空きとして再利用し、そのたびに世代番号を進めるので、古いハンドルでは引けません。
+/// 配列は詰めないので、Getで得たポインタはAddで配列が伸びると無効になります（ハンドルを保持してください）。</para>
+/// <para>スレッドセーフではありません。</para>
 /// </summary>
 template <typename Tag, typename T>
 class SlotPool
 {
+    // 1つの要素の入れ物。valueが空なら空きスロット
     struct Slot
     {
         std::optional<T> value;
@@ -26,6 +30,10 @@ class SlotPool
 public:
     using HandleType = Handle<Tag>;
 
+    /// <summary>
+    /// 要素を追加します。空きスロットがあれば再利用し、なければ末尾に追加します。
+    /// </summary>
+    /// <returns>追加した要素を指すハンドル</returns>
     HandleType Add(T value)
     {
         uint32_t index;
@@ -61,6 +69,10 @@ public:
         return true;
     }
 
+    /// <summary>
+    /// ハンドルが指す要素を取得します。
+    /// </summary>
+    /// <returns>範囲外、取り除き済み（世代番号が違う）の場合はnullptr</returns>
     T *Get(const HandleType handle)
     {
         if (handle.index >= m_slots_.size())
@@ -78,13 +90,17 @@ public:
         return const_cast<SlotPool *>(this)->Get(handle);
     }
 
+    /// <summary>
+    /// 生きている要素の数です（空きスロットは数えません）。
+    /// </summary>
     size_t Count() const
     {
         return m_count_;
     }
 
     /// <summary>
-    /// 生きている要素すべてに対して関数を呼びます。
+    /// 生きている要素すべてに対して func(handle, value) を呼びます。
+    /// 途中でAdd / Removeすると配列が変わるので、呼ばないでください。
     /// </summary>
     template <typename Func>
     void ForEach(Func &&func)

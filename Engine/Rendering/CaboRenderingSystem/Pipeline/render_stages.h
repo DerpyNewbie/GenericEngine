@@ -15,12 +15,15 @@ namespace CRS
 struct DrawItem
 {
     PipelineStateHandle pipeline_state;
+    // スナップショットの中を指す（そのフレームの間だけ有効）
     const MeshRendererData *mesh = nullptr;
     const DrawRange *range = nullptr;
     const Material *material = nullptr;
+    // 描く順番。上位16bitがrender_queue。不透明はPSOと手前からの距離、半透明は奥からの距離で並ぶ
     uint64_t sort_key = 0;
 };
 
+// sort_keyの小さい順に並んだ描画リスト
 using DrawList = std::vector<DrawItem>;
 
 /// <summary>
@@ -41,6 +44,7 @@ public:
 /// </summary>
 class DrawListBuilder
 {
+    // PSOを決める要素の組み合わせ。デバイス側のキャッシュより手前で引き、PipelineStateDescを作る手間を省く
     struct PipelineKey
     {
         MaterialId material;
@@ -62,12 +66,17 @@ class DrawListBuilder
     IRenderDevice &m_device_;
     std::unordered_map<PipelineKey, PipelineStateHandle, PipelineKeyHash> m_pipeline_cache_;
 
+    // マテリアルのパスと、ビューの描画先・メッシュの頂点の並びから、PSOをキャッシュから引く（なければ作る）
     PipelineStateHandle ResolvePipelineState(MaterialId material_id, const Material &material, const MaterialPass &pass,
                                              PassTag tag, const RenderView &view, const MeshRendererData &mesh);
 
 public:
     explicit DrawListBuilder(IRenderDevice &device);
 
+    /// <summary>
+    /// 見えるメッシュのサブメッシュごとに、tagのパスを持つマテリアルの描画項目を作り、sort_keyで並べます。
+    /// </summary>
+    /// <param name="visible">CullingStage::Cullの結果（frame.meshesの番号）</param>
     DrawList Build(PassTag tag, const RenderView &view, const std::vector<uint32_t> &visible,
                    const FrameSnapshot &frame, const MaterialRegistry &materials);
 };

@@ -7,6 +7,9 @@
 
 namespace CRS
 {
+/// <summary>
+/// ビューの出どころです。パスはこれを見て、そのビューを描くかを決めます（AcceptsView）。
+/// </summary>
 enum class RenderViewKind : uint8_t
 {
     Camera,
@@ -48,6 +51,7 @@ struct RenderView
     // デバッグ表示の線とUIを描くかどうか
     bool draw_overlays = false;
 
+    // カメラ由来のビューの場合の、パイプライン固有の設定（影のビューではnullptr）
     const ICameraSettings *camera_settings = nullptr;
 };
 
@@ -69,8 +73,11 @@ struct LightingConstants
 struct FrameLighting
 {
     LightingConstants constants;
+    // StructuredBuffer<GpuLight>（t0, space1）
     BufferHandle lights;
+    // 影の行列。GpuLight::shadow_indexから続けて並ぶ（t1, space1）
     BufferHandle light_view_projections;
+    // 全ライトの影を入れたTexture2DArray（t2, space1）
     TextureHandle shadow_maps;
 };
 
@@ -93,11 +100,13 @@ struct ViewConstants
 /// </summary>
 struct ObjectConstants
 {
+    // flagsのビット。立っていれば頂点シェーダーでボーン行列（t3, space1）を使ってスキニングする
     static constexpr uint32_t kFlagSkinned = 1;
 
     Matrix world;
     Matrix previous_world;
     uint32_t flags = 0;
+    // HLSLのcbufferの16バイト境界に合わせる
     uint32_t padding[3] = {};
 };
 }

@@ -13,6 +13,9 @@ protected:
     /// 深度の描画先として使えるテクスチャ(D32)を、設定されたサイズで作ります。
     /// </summary>
     std::shared_ptr<CRS::Texture> CreateGpuTexture() override;
+    /// <summary>
+    /// GPU上のテクスチャが、今のサイズと合っているかどうかです。
+    /// </summary>
     bool IsGpuTextureUpToDate() const override;
 
 public:

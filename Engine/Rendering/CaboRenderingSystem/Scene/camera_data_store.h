@@ -9,6 +9,7 @@
 
 namespace CRS
 {
+// CameraDataStoreに登録したカメラを指すID
 using CameraId = Handle<struct CameraTag>;
 
 /// <summary>
@@ -18,6 +19,9 @@ class ICameraSettings
 {
 public:
     virtual ~ICameraSettings() = default;
+    /// <summary>
+    /// 同じ内容のコピーを作ります。スナップショットを取るときに使います。
+    /// </summary>
     virtual std::unique_ptr<ICameraSettings> Clone() const = 0;
 };
 
@@ -28,12 +32,16 @@ struct CameraCommon
 {
     Matrix view;
     Matrix projection;
+    // 前フレームのView * Projection。Updateで自動的に入る（モーションベクトルなど用）
     Matrix previous_view_projection;
     Vector3 position;
     Viewport viewport;
+    // 描画先。バックバッファかRenderTexture
     TextureHandle color_target;
     TextureHandle depth_target;
+    // MeshRendererData::layer_maskとANDを取り、0なら描かない
     uint32_t culling_mask = UINT32_MAX;
+    // 小さい順に描く
     int32_t priority = 0;
     LoadOp color_load = LoadOp::Clear;
     LoadOp depth_load = LoadOp::Clear;
@@ -42,6 +50,9 @@ struct CameraCommon
     bool draw_overlays = false;
 };
 
+/// <summary>
+/// 1フレーム分のカメラのコピーです。描画中にゲーム側が値を変えても影響を受けません。
+/// </summary>
 struct CameraSnapshot
 {
     CameraCommon common;
@@ -49,7 +60,7 @@ struct CameraSnapshot
 };
 
 /// <summary>
-/// カメラのデータを持つストアです。
+/// カメラのデータを持つストアです。ゲーム側が毎フレームUpdateし、描画の前にスナップショットを取ります。
 /// </summary>
 class CameraDataStore
 {
@@ -57,13 +68,21 @@ class CameraDataStore
     {
         CameraCommon common;
         std::unique_ptr<ICameraSettings> settings;
+        // 一度でもUpdateされたか。されていないカメラは描かない
         bool has_previous = false;
     };
 
     SlotPool<CameraTag, Entry> m_cameras_;
 
 public:
+    /// <summary>
+    /// カメラを登録します。最初のUpdateまでは描きません。
+    /// </summary>
+    /// <param name="settings">パイプライン固有の設定（nullptrでもよい）</param>
     CameraId Create(std::unique_ptr<ICameraSettings> settings);
+    /// <summary>
+    /// カメラを取り除きます。
+    /// </summary>
     void Destroy(CameraId id);
 
     /// <summary>
@@ -71,9 +90,18 @@ public:
     /// </summary>
     void Update(CameraId id, const CameraCommon &common);
 
+    /// <summary>
+    /// 共通設定を取得します。無効なIDならnullptrを返します。
+    /// </summary>
     const CameraCommon *GetCommon(CameraId id) const;
+    /// <summary>
+    /// パイプライン固有の設定を取得します。パイプラインの型にキャストして使います。
+    /// </summary>
     ICameraSettings *GetSettings(CameraId id);
 
+    /// <summary>
+    /// Updateされたことのあるカメラのコピーを作ります。
+    /// </summary>
     std::vector<CameraSnapshot> TakeSnapshot() const;
 };
 }

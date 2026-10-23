@@ -6,6 +6,7 @@
 
 namespace CRS
 {
+// 平行光源の影を、カメラからの距離で何枚のシャドウマップに分けるか
 constexpr uint32_t kShadowCascadeCount = 3;
 
 /// <summary>
@@ -17,7 +18,7 @@ struct SceneEnvironment
     TextureHandle skybox;
     // カメラからの距離で、影のカスケードを切り替える位置
     std::array<float, kShadowCascadeCount> cascade_splits = {10.0f, 30.0f, 100.0f};
-    // ライトが1つも無い場合の明るさ
+    // 環境光。どのライトにも照らされていない面の明るさとして、ライトの結果に足す
     Color ambient = Color(0.25f, 0.25f, 0.25f, 1.0f);
 };
 }

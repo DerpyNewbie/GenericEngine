@@ -16,6 +16,9 @@ protected:
     /// 描画先として使えるテクスチャを、設定されたサイズとフォーマットで作ります。
     /// </summary>
     std::shared_ptr<CRS::Texture> CreateGpuTexture() override;
+    /// <summary>
+    /// GPU上のテクスチャが、今のサイズとフォーマットと合っているかどうかです。
+    /// </summary>
     bool IsGpuTextureUpToDate() const override;
 
 public:

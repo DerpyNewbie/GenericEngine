@@ -33,6 +33,9 @@ public:
     /// </summary>
     virtual void AddPass(std::unique_ptr<IRenderPass> pass) = 0;
 
+    /// <summary>
+    /// スナップショットのすべてのカメラについて、登録したパスを順に実行して描きます。
+    /// </summary>
     virtual void Render(const FrameSnapshot &frame, ICommandList &command_list, const MaterialRegistry &materials) = 0;
 };
 }

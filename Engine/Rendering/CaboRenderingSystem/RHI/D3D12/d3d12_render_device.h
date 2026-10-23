@@ -15,7 +15,9 @@ namespace CRS
 {
 class D3D12CommandList;
 
-// 共通ルートシグネチャのパラメーター番号です
+/// <summary>
+/// 共通ルートシグネチャのパラメーター番号です。定数はルートCBV、t / s はディスクリプタテーブルで渡します。
+/// </summary>
 enum D3D12RootParameter : uint32_t
 {
     kRootParameter_Constants = 0, // b0..b3, space0（kConstantSlotCount個続く）
@@ -26,24 +28,35 @@ enum D3D12RootParameter : uint32_t
     kRootParameter_Count
 };
 
+/// <summary>
+/// BufferHandleが指すバッファの本体です。
+/// </summary>
 struct D3D12Buffer
 {
     BufferDesc desc;
     // Uploadメモリの場合はフレーム数分のコピーを持つ。それ以外は[0]だけを使う
     std::array<ComPtr<ID3D12Resource>, kMaxFramesInFlight> resources;
+    // Uploadメモリの場合の、CPUから書き込めるアドレス（Mapしたまま）
     std::array<uint8_t *, kMaxFramesInFlight> mapped = {};
     std::array<CpuDescriptor, kMaxFramesInFlight> srv;
     ResourceState state = ResourceState::Common;
     // Uploadメモリの場合の最新の内容。他のフレームのコピーへ反映するために使う
     std::vector<uint8_t> shadow;
+    // まだ最新の内容を反映していないフレームのビット（1 << frame_index）
     uint32_t pending_frame_mask = 0;
 
+    /// <summary>
+    /// フレームごとのコピーを持つ（Uploadメモリの）バッファかどうかです。
+    /// </summary>
     bool IsVersioned() const
     {
         return desc.memory == MemoryType::Upload;
     }
 };
 
+/// <summary>
+/// TextureHandleが指すテクスチャの本体と、そのビューです。
+/// </summary>
 struct D3D12Texture
 {
     TextureDesc desc;
@@ -59,18 +72,27 @@ struct D3D12Texture
     std::vector<CpuDescriptor> dsv_slices;
 };
 
+/// <summary>
+/// ShaderHandleが指す、コンパイル済みのDXILとリフレクションです。
+/// </summary>
 struct D3D12Shader
 {
     std::vector<uint8_t> bytecode;
     ShaderReflection reflection;
 };
 
+/// <summary>
+/// PipelineStateHandleが指すPSOです。キャッシュで同じ設定か比べるためにdescも持ちます。
+/// </summary>
 struct D3D12PipelineState
 {
     PipelineStateDesc desc;
     ComPtr<ID3D12PipelineState> pipeline_state;
 };
 
+/// <summary>
+/// SamplerHandleが指すサンプラーです（シェーダーから見えないヒープに置いたもの）。
+/// </summary>
 struct D3D12Sampler
 {
     SamplerDesc desc;
@@ -84,14 +106,17 @@ class D3D12RenderDevice final : public IRenderDevice
 {
     friend class D3D12CommandList;
 
+    // アップロード用のリングの1ページ。先頭から順に切り出し、そのフレームのGPU処理が終わったら巻き戻す
     struct UploadPage
     {
         ComPtr<ID3D12Resource> resource;
         uint8_t *mapped = nullptr;
         uint64_t size = 0;
+        // 次に切り出す位置
         uint64_t offset = 0;
     };
 
+    // 読み戻し中のバッファ。fence_valueまでのGPU処理が終わればstagingを読める
     struct PendingReadback
     {
         ComPtr<ID3D12Resource> staging;
@@ -99,6 +124,7 @@ class D3D12RenderDevice final : public IRenderDevice
         uint64_t fence_value = 0;
     };
 
+    // アップロード用のリングの1ページの大きさ。これより大きい確保は専用のページを作る
     static constexpr uint64_t kUploadPageSize = 4ull * 1024 * 1024;
 
     ComPtr<IDXGIFactory4> m_factory_;
@@ -154,26 +180,41 @@ class D3D12RenderDevice final : public IRenderDevice
 
     D3D12RenderDevice() = default;
 
+    // デバイス、キュー、スワップチェーン、ヒープ、ルートシグネチャ、バックバッファを順に作る
     bool Init(HWND hwnd, uint32_t width, uint32_t height);
+    // 全シェーダー共通のルートシグネチャを作る（割り当てはrhi_types.hのコメントを参照）
     bool CreateRootSignature();
+    // スワップチェーンのバッファをテクスチャとして登録する（m_back_buffers_）
     bool CreateBackBuffers();
+    // Resizeの前に、スワップチェーンのバッファへの参照をすべて手放す
     void ReleaseBackBuffers();
 
+    // フェンスがvalueに届くまでCPUを止める
     void WaitForFence(uint64_t value);
+    // frame_indexのGPU処理が終わった後の片付け。遅延破棄の実行、アップロード用のリングの巻き戻し、
+    // Uploadバッファの最新の内容をこのフレームのコピーに反映する
     void RetireFrame(uint32_t frame_index);
+    // 今のフレームのGPU処理が終わった後（同じフレーム番号のRetireFrame）にreleaseを呼ぶ
     void DeferRelease(std::function<void()> release);
 
-
+    // 用途に合わせてSRV / RTV / DSV（配列ならスライスごとのDSVも）を作る
     void CreateTextureViews(D3D12Texture &texture);
+    // テクスチャの形（2D / 配列 / キューブ / MSAA）に合わせたSRVの設定を作る。
+    // 深度テクスチャはformatに読めるフォーマット（R32_FLOAT）を渡す
     static D3D12_SHADER_RESOURCE_VIEW_DESC MakeSrvDesc(DXGI_FORMAT format, TextureDimension dimension,
                                                        uint32_t array_size, bool multisampled, uint32_t mip_levels);
+    // StructuredBufferのSRVを、フレームごとのコピーの数だけ作る
     void CreateBufferViews(D3D12Buffer &buffer);
+    // テクスチャのビューのスロットを返す（遅延破棄の中で呼ぶ）
     void ReleaseTextureViews(D3D12Texture &texture);
 
-    // 現在のフレームのアップロード用リングから確保します
+    // 現在のフレームのアップロード用リングから確保します。CPUで書き込むアドレスと、GPUから読むアドレスを返します
     bool AllocateUpload(uint64_t size, uint64_t alignment, uint8_t *&out_cpu, D3D12_GPU_VIRTUAL_ADDRESS &out_gpu);
+    // バッファのGPUアドレス。Uploadなら今のフレームのコピーのアドレス
     D3D12_GPU_VIRTUAL_ADDRESS GetBufferAddress(BufferHandle buffer);
+    // ResourceBindingが指すもののSRV。何も指していなければ空のSRV（読むと0）
     D3D12_CPU_DESCRIPTOR_HANDLE GetResourceSrv(const ResourceBinding &binding);
+    // サンプラーのディスクリプタ。無効なハンドルなら既定のサンプラー（Linear / Wrap）
     D3D12_CPU_DESCRIPTOR_HANDLE GetSamplerDescriptor(SamplerHandle sampler);
 
 public:
@@ -181,8 +222,12 @@ public:
     /// デバイス、スワップチェーン、共通ルートシグネチャなどを作成します。失敗した場合はnullptrを返します。
     /// </summary>
     static std::unique_ptr<D3D12RenderDevice> Create(HWND hwnd, uint32_t width, uint32_t height);
+    /// <summary>
+    /// GPUの処理がすべて終わるまで待ってから、残っているリソースを解放します。
+    /// </summary>
     ~D3D12RenderDevice() override;
 
+    // ---- IRenderDeviceの実装（説明はIRenderDeviceを参照） ----
     BufferHandle CreateBuffer(const BufferDesc &desc) override;
     TextureHandle CreateTexture(const TextureDesc &desc) override;
     ShaderHandle CreateShader(const ShaderSource &source) override;
@@ -215,20 +260,44 @@ public:
     void Resize(uint32_t width, uint32_t height) override;
     void WaitIdle() override;
 
-    // ---- D3D12固有。RHI/D3D12と、旧描画システムとの橋渡しからだけ使います ----
+    // ---- D3D12固有。RHI/D3D12と、エンジン側のつなぎ（CrsBridge、ImGui）からだけ使います ----
+    /// <summary>
+    /// D3D12のデバイスです（ImGuiの初期化など）。
+    /// </summary>
     ID3D12Device6 *NativeDevice() const;
+    /// <summary>
+    /// コマンドを送るキューです。
+    /// </summary>
     ID3D12CommandQueue *NativeQueue() const;
-    // 現在のフレームのコマンドリスト（BeginFrameとSubmitの間だけ記録可能）
+    /// <summary>
+    /// 現在のフレームのコマンドリストです（BeginFrameとSubmitの間だけ記録可能）。
+    /// 直接記録した後は、D3D12CommandList::InvalidateStateで覚えている設定を捨ててください。
+    /// </summary>
     ID3D12GraphicsCommandList *NativeCommandList() const;
+    /// <summary>
+    /// テクスチャのD3D12リソースです。無効なハンドルならnullptrを返します。
+    /// </summary>
     ID3D12Resource *NativeResource(TextureHandle texture);
+    /// <summary>
+    /// テクスチャを描画先にするときのRTVです（OMSetRenderTargetsに直接渡す場合）。
+    /// </summary>
     D3D12_CPU_DESCRIPTOR_HANDLE GetRtv(TextureHandle texture);
+    /// <summary>
+    /// テクスチャを深度バッファにするときのDSVです。配列テクスチャならsliceで1枚を選べます（kAllSlicesなら全体）。
+    /// </summary>
     D3D12_CPU_DESCRIPTOR_HANDLE GetDsv(TextureHandle texture, uint32_t slice = kAllSlices);
     /// <summary>
     /// 外部で作成したテクスチャを取り込みます。状態はfixed_stateのまま変わらない前提です。
     /// </summary>
     TextureHandle ImportTexture(ID3D12Resource *resource, ResourceState fixed_state,
                                 TextureDimension dimension = TextureDimension::Texture2D);
+    /// <summary>
+    /// 次にSignalで使うフェンスの値です。今記録しているコマンドが終わったかを、後でIsFenceCompleteで確かめるのに使います。
+    /// </summary>
     uint64_t NextFenceValue() const;
+    /// <summary>
+    /// fence_valueまでのGPU処理が終わっているかどうかです（待ちません）。
+    /// </summary>
     bool IsFenceComplete(uint64_t fence_value) const;
     /// <summary>
     /// フレームのコマンドリストが記録可能（BeginFrameとSubmitの間）かどうかです。
@@ -254,6 +323,9 @@ public:
     {
         return m_gpu_srv_ring_.Heap();
     }
+    /// <summary>
+    /// AllocatePersistentSrvで確保したスロットを返します。
+    /// </summary>
     void FreePersistentSrv(const GpuDescriptorRange &range);
     /// <summary>
     /// テクスチャのSRVを、このフレームだけ有効なスロットに置き、GPUハンドルを返します（ImGui::Imageなど）。

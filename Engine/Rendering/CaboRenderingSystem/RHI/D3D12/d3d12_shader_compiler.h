@@ -21,13 +21,20 @@ class D3D12ShaderCompiler
     ComPtr<IDxcIncludeHandler> m_include_handler_;
 
 public:
+    /// <summary>
+    /// DXCを読み込みます（dxcompiler.dll / dxil.dll が実行ファイルの横に必要です）。失敗した場合はIsValid()がfalseになります。
+    /// </summary>
     D3D12ShaderCompiler();
     ~D3D12ShaderCompiler();
 
+    /// <summary>
+    /// DXCを読み込めたかどうかです。
+    /// </summary>
     bool IsValid() const;
 
     /// <summary>
-    /// コンパイルします。失敗した場合はfalseを返し、error_messageにエラーを入れます。
+    /// シェーダーモデル6でコンパイルし、リフレクションも取り出します。#includeはソースのファイルからの相対パスで探します。
+    /// 失敗した場合はfalseを返し、error_messageにエラーを入れます。
     /// </summary>
     bool Compile(const ShaderSource &source, std::vector<uint8_t> &out_bytecode, ShaderReflection &out_reflection,
                  std::string &error_message) const;

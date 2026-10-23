@@ -14,6 +14,9 @@ struct Handle
     uint32_t index = kInvalidIndex;
     uint32_t generation = 0;
 
+    /// <summary>
+    /// 無効値（何も指していない）でないかどうかです。指す先がまだ生きているかは、SlotPool::Getなどで確かめてください。
+    /// </summary>
     bool IsValid() const
     {
         return index != kInvalidIndex;

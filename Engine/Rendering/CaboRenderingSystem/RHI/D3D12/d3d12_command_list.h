@@ -14,25 +14,35 @@ class D3D12CommandList final : public ICommandList
     D3D12RenderDevice &m_device_;
     ComPtr<ID3D12GraphicsCommandList> m_list_;
 
+    // 同じ設定を何度も送らないよう、最後に設定したものを覚えておく
     PipelineStateHandle m_current_pipeline_state_;
     PrimitiveTopology m_current_topology_ = PrimitiveTopology::TriangleList;
     bool m_root_state_bound_ = false;
 
+    // ディスクリプタヒープと共通ルートシグネチャを、まだなら設定する
     void BindRootState();
 
 public:
+    /// <summary>
+    /// デバイスが作ったコマンドリストを包みます。D3D12RenderDeviceの中からだけ作ります。
+    /// </summary>
     D3D12CommandList(D3D12RenderDevice &device, ComPtr<ID3D12GraphicsCommandList> list);
 
+    /// <summary>
+    /// D3D12のコマンドリストです。外部のライブラリ（ImGuiなど）に直接記録させるときに使います。
+    /// </summary>
     ID3D12GraphicsCommandList *Native() const
     {
         return m_list_.Get();
     }
 
     /// <summary>
-    /// キャッシュしている設定を捨てます。外部（旧描画システム）が同じコマンドリストに記録した後に呼びます。
+    /// 覚えている設定（PSO、ルートシグネチャ）を捨て、次の呼び出しで設定し直すようにします。
+    /// フレームの始めや、外部（ImGuiなど）が同じコマンドリストに記録した後に呼びます。
     /// </summary>
     void InvalidateState();
 
+    // ---- ICommandListの実装（説明はICommandListを参照） ----
     void Transition(TextureHandle texture, ResourceState state) override;
     void Transition(BufferHandle buffer, ResourceState state) override;
 

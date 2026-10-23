@@ -50,6 +50,9 @@ public:
     /// そのビューを描くかどうかです。
     /// </summary>
     virtual bool AcceptsView(const RenderView &view, const FrameSnapshot &frame) const = 0;
+    /// <summary>
+    /// 描画します。UsesDrawList()がtrueなら、context.draw_listにこのパスの描画リストが入っています。
+    /// </summary>
     virtual void Execute(const PassContext &context) = 0;
 };
 

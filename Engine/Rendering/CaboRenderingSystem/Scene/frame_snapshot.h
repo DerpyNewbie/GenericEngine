@@ -20,6 +20,7 @@ struct FrameSnapshot
     SceneEnvironment environment;
     // 線とUIは毎フレーム作り直すので、コピーせずに参照する（描画中は変更されない）
     const ImmediateDrawStore *immediate = nullptr;
+    // 起動からの秒数と、前フレームからの秒数（シェーダーのView.timeに入る）
     float time = 0.0f;
     float delta_time = 0.0f;
 };

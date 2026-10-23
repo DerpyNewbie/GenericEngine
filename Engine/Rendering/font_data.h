@@ -66,11 +66,17 @@ public:
     /// </summary>
     const Glyph *FindGlyph(uint32_t character) const;
 
+    /// <summary>
+    /// 改行したときに下へ進むピクセル数です。
+    /// </summary>
     float LineSpacing() const
     {
         return m_line_spacing_;
     }
 
+    /// <summary>
+    /// 全文字を並べた画像（CPU側のピクセルデータ）です。GPU上のテクスチャはGpuTexture()で取得します。
+    /// </summary>
     const TextureData &Texture() const
     {
         return m_texture_;
