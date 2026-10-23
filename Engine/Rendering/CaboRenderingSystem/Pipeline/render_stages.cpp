@@ -1,6 +1,6 @@
-﻿#include "Rendering/CaboRenderingSystem/Pipeline/render_stages.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Pipeline/render_stages.h"
 
-#include <algorithm>
 #include <cstring>
 #include <functional>
 

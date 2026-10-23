@@ -1,6 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_pipeline.h"
-
-#include <algorithm>
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_pipeline.h"
 
 #include "Rendering/CaboRenderingSystem/Core/log.h"
 #include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_passes.h"

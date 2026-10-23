@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Scene/light_data_store.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Scene/light_data_store.h"
 
 namespace CRS
 {

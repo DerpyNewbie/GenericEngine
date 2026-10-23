@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/RHI/rhi_types.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/RHI/rhi_types.h"
 
 #include <functional>
 

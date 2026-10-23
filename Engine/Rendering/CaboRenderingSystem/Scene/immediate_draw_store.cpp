@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Scene/immediate_draw_store.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Scene/immediate_draw_store.h"
 
 namespace CRS
 {

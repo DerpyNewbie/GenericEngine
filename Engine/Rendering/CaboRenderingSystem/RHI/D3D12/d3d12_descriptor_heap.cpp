@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_descriptor_heap.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_descriptor_heap.h"
 
 #include "Rendering/CaboRenderingSystem/Core/log.h"
 

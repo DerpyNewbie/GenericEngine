@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_common.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_common.h"
 
 namespace CRS
 {

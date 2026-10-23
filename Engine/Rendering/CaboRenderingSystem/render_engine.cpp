@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/render_engine.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/render_engine.h"
 
 #include "Rendering/CaboRenderingSystem/Core/log.h"
 #include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_pipeline.h"

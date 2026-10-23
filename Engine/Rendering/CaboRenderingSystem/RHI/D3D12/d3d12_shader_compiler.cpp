@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_shader_compiler.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_shader_compiler.h"
 
 #include <d3d12shader.h>
 #include <directx-dxc/dxcapi.h>

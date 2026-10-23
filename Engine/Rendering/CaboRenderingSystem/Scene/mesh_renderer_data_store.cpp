@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace CRS
 {

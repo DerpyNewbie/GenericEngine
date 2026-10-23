@@ -1,4 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_passes.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Pipeline/Forward/forward_passes.h"
 
 namespace CRS
 {

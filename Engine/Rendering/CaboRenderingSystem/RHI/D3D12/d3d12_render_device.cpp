@@ -1,6 +1,6 @@
-﻿#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_render_device.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_render_device.h"
 
-#include <algorithm>
 #include <cstring>
 
 #include "Rendering/CaboRenderingSystem/Core/log.h"

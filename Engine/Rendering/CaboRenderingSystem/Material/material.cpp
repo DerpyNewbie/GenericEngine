@@ -1,6 +1,6 @@
-﻿#include "Rendering/CaboRenderingSystem/Material/material.h"
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Material/material.h"
 
-#include <algorithm>
 #include <cstring>
 
 #include "Rendering/CaboRenderingSystem/Core/log.h"

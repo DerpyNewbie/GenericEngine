@@ -1,7 +1,5 @@
-﻿#include "Rendering/CaboRenderingSystem/Pipeline/shadow_system.h"
-
-#include <algorithm>
-#include <cmath>
+﻿#include "pch.h"
+#include "Rendering/CaboRenderingSystem/Pipeline/shadow_system.h"
 
 namespace CRS
 {
