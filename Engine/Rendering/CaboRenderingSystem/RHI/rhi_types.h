@@ -89,6 +89,8 @@ enum class BufferUsage : uint32_t
     Vertex = 1 << 3,
     Index = 1 << 4,
     Indirect = 1 << 5,
+    // ByteAddressBufferとしてシェーダーから読む（sizeは4の倍数）
+    Raw = 1 << 6,
 };
 
 /// <summary>
@@ -205,7 +207,7 @@ struct TextureDesc
 enum class ShaderStage : uint8_t
 {
     Vertex,
-    Pixel,
+    Pixel
 };
 
 /// <summary>

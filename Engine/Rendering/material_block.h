@@ -2,6 +2,7 @@
 #include "shader.h"
 #include "MaterialData/byte_address_buffer_data.h"
 #include "MaterialData/constant_buffer_data.h"
+#include "MaterialData/sampler_data.h"
 #include "MaterialData/structured_buffer_data.h"
 #include "MaterialData/texture_buffer_data.h"
 #include "MaterialData/texture_cube_buffer_data.h"
@@ -58,9 +59,16 @@ public:
     /// <param name="name">Shader上のBuffer名</param>
     /// <returns>見つからない、または種類が異なる場合はnullptr</returns>
     std::shared_ptr<TextureCubeBufferData> GetTextureCubeData(const std::string &name);
+    /// <summary>
+    /// 指定した名前のSamplerDataを取得します。
+    /// </summary>
+    /// <param name="name">Shader上のSampler名</param>
+    /// <returns>見つからない、または種類が異なる場合はnullptr</returns>
+    std::shared_ptr<SamplerData> GetSamplerData(const std::string &name);
 
     /// <summary>
-    /// Shaderのパラメーターごとに、種類に応じたBufferDataを生成して追加します。既に同じ名前のデータがある場合は追加しません。
+    /// Shaderのパラメーターごとに、種類に応じたBufferDataを生成して追加します。
+    /// 同じ名前・同じ種類のデータが既にある場合は残し、種類が違う場合は作り直します。
     /// </summary>
     /// <param name="shader_params">Shaderのパラメーター</param>
     void LoadShaderParameters(const std::vector<ShaderParameter> &shader_params);

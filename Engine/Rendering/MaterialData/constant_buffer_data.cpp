@@ -227,6 +227,12 @@ bool ConstantBufferData::HasVariable(const std::string &name) const
     return m_data_type_offset_pairs_.contains(name);
 }
 
+kConstantBufferDataType ConstantBufferData::VariableType(const std::string &name) const
+{
+    const auto itr = m_data_type_offset_pairs_.find(name);
+    return itr != m_data_type_offset_pairs_.end() ? itr->second.first : kConstantBufferDataType::kConstantBufferDataType_Unknown;
+}
+
 bool ConstantBufferData::GetData(const std::string &name, void *out, const size_t size) const
 {
     bool found = false;

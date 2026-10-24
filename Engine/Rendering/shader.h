@@ -24,7 +24,8 @@ struct CrsShaderProgram
 /// <para>エントリーポイントは VSMain（必須）、PSMain、VSShadow（影用。無い場合は標準の影を使う）です。</para>
 /// <para>メッシュ用は Engine/Rendering/CaboRenderingSystem/Shaders/crs_common.hlsli を、
 /// UI(Image)用は crs_ui.hlsli をincludeして書きます。</para>
-/// <para>Materialのパラメーターは space0 の cbuffer（名前は自由、registerは省略可、b0..b3 まで）の変数と、t0..t7 のテクスチャです。
+/// <para>Materialのパラメーターは space0 の cbuffer（名前は自由、registerは省略可、b0..b3 まで）の変数と、
+/// t0..t7 のリソース（Texture2D、TextureCube、StructuredBuffer、ByteAddressBuffer）、s0..s3 のサンプラーです。
 /// ZTestなどの描画設定は "// @Blend Alpha" のように書けます（ShaderSettingsを参照）。</para>
 /// </remarks>
 class Shader : public Object, public Inspectable

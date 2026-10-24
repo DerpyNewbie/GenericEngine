@@ -9,7 +9,11 @@ StructuredBufferData::StructuredBufferData() : BufferDataBase(ShaderParameter())
 {}
 
 StructuredBufferData::StructuredBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
-{}
+{
+    // total_sizeには、Shaderで宣言された1要素のバイト数が入っている
+    if (shader_param.total_size > 0)
+        SetStride(shader_param.total_size);
+}
 
 void StructuredBufferData::OnInspectorGui()
 {

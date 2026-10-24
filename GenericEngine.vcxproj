@@ -146,6 +146,7 @@
         <ClCompile Include="Engine\Rendering\MaterialData\structured_buffer_data.cpp" />
         <ClCompile Include="Engine\Rendering\MaterialData\texture_buffer_data.cpp" />
         <ClCompile Include="Engine\Rendering\MaterialData\texture_cube_buffer_data.cpp" />
+        <ClCompile Include="Engine\Rendering\MaterialData\sampler_data.cpp"/>
         <ClCompile Include="Engine\Rendering\MaterialData\uav_texture_buffer_data.cpp" />
         <ClCompile Include="Engine\Rendering\texture_cube.cpp" />
         <ClCompile Include="Engine\Rendering\texture2d.cpp" />
@@ -322,6 +323,7 @@
         <ClInclude Include="Engine\Rendering\MaterialData\structured_buffer_data.h" />
         <ClInclude Include="Engine\Rendering\MaterialData\texture_buffer_data.h" />
         <ClInclude Include="Engine\Rendering\MaterialData\texture_cube_buffer_data.h" />
+        <ClInclude Include="Engine\Rendering\MaterialData\sampler_data.h"/>
         <ClInclude Include="Engine\Rendering\MaterialData\uav_texture_buffer_data.h" />
         <ClInclude Include="Engine\Rendering\texture_cube.h" />
         <ClInclude Include="Engine\Rendering\texture2d.h" />

@@ -1,21 +1,17 @@
 ﻿#include "pch.h"
-#include "gui.h"
 #include "texture_cube_buffer_data.h"
+
+#include "gui.h"
 
 namespace engine
 {
-TextureCubeBufferData::TextureCubeBufferData(const ShaderParameter &shader_param):
-    BufferDataBase(shader_param)
+TextureCubeBufferData::TextureCubeBufferData(const ShaderParameter &shader_param) : BufferDataBase(shader_param)
 {}
 
 void TextureCubeBufferData::OnInspectorGui()
 {
-    for (int i = 0; i < 6; ++i)
-    {
-        constexpr const char *dir_labels[] = {"Right", "Left", "Bottom", "Top", "Front", "Back"};
-        if (Gui::PropertyField(dir_labels[i], m_textures_[i]))
-            is_dirty = true;
-    }
+    if (Gui::PropertyField(parameter.name.c_str(), m_texture_))
+        is_dirty = true;
 }
 
 kBufferType TextureCubeBufferData::BufferType()
@@ -23,9 +19,15 @@ kBufferType TextureCubeBufferData::BufferType()
     return kBufferType_TextureCube;
 }
 
-std::array<AssetPtr<Texture2D>, 6> &TextureCubeBufferData::Textures()
+void TextureCubeBufferData::SetTexture(const AssetPtr<TextureCube> &texture)
 {
-    return m_textures_;
+    m_texture_ = texture;
+    is_dirty = true;
+}
+
+AssetPtr<TextureCube> TextureCubeBufferData::Data()
+{
+    return m_texture_;
 }
 }
 

@@ -24,6 +24,23 @@ PipelineStateDesc MakeSimpleDesc(const RenderView &view, const ShaderHandle vert
     return desc;
 }
 
+/// <summary>
+/// Materialのテクスチャを、シェーダーで読める状態にします。
+/// RenderTextureなど、別のカメラの描画先になっているテクスチャも読めるようにするためです（静的なテクスチャは何もしません）。
+/// 今の描画先そのものは読めないので切り替えません。
+/// </summary>
+void PrepareMaterialResources(const PassContext &context, const Bindings &bindings)
+{
+    for (const auto &resource : bindings.resources)
+    {
+        if (!resource.texture.IsValid() || resource.texture == context.view.color_target ||
+            resource.texture == context.view.depth_target)
+            continue;
+
+        context.command_list.Transition(resource.texture, ResourceState::ShaderResource);
+    }
+}
+
 void BeginColorPass(const PassContext &context, const bool use_depth)
 {
     auto &command_list = context.command_list;
@@ -59,9 +76,7 @@ Bindings MakeMeshBindings(const PassContext &context, const DrawItem &item, Obje
     bindings.frame_constants[kFrameConstant_Lighting] = ConstantBinding::FromValue(context.lighting.constants);
     material.BindConstants(bindings);
 
-    const auto &textures = material.Textures();
-    for (uint32_t i = 0; i < kResourceSlotCount; ++i)
-        bindings.resources[i].texture = textures[i].IsValid() ? textures[i] : context.default_texture;
+    material.BindResources(bindings, context.default_texture);
 
     const auto &samplers = material.Samplers();
     for (uint32_t i = 0; i < kSamplerSlotCount; ++i)
@@ -73,6 +88,7 @@ Bindings MakeMeshBindings(const PassContext &context, const DrawItem &item, Obje
     if (context.view.kind != RenderViewKind::Shadow)
         bindings.frame_resources[kFrameSlotShadowMaps].texture = context.lighting.shadow_maps;
     bindings.frame_resources[kFrameSlotBones].buffer = mesh.bone_buffer;
+    PrepareMaterialResources(context, bindings);
     return bindings;
 }
 
@@ -363,19 +379,14 @@ void UiPass::Execute(const PassContext &context)
                 continue;
 
             material->BindConstants(bindings);
-
-            const auto &textures = material->Textures();
-            for (uint32_t i = 0; i < kResourceSlotCount; ++i)
-            {
-                if (textures[i].IsValid())
-                    bindings.resources[i].texture = textures[i];
-            }
+            material->BindResources(bindings, context.default_texture);
         }
 
         // _MainTex (t0) がMaterialで指定されていなければ、四角形のテクスチャを使う
-        if (batch.texture.IsValid() && (material == nullptr || !material->Textures()[0].IsValid()))
+        if (batch.texture.IsValid() && (material == nullptr || !material->IsResourceSet(0)))
             bindings.resources[0].texture = batch.texture;
 
+        PrepareMaterialResources(context, bindings);
         command_list.SetPipelineState(pipeline_state);
         command_list.SetBindings(bindings);
         command_list.Draw(batch.vertex_count, 1, batch.first_vertex);

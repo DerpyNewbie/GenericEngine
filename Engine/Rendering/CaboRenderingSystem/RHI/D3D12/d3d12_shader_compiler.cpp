@@ -200,8 +200,9 @@ bool D3D12ShaderCompiler::Reflect(const std::vector<uint8_t> &bytecode, ShaderRe
             });
             break;
         case D3D_SIT_STRUCTURED:
+            // StructuredBufferでは、NumSamplesに1要素のバイト数が入っている
             out_reflection.resources.push_back({bind_desc.Name, bind_desc.BindPoint, bind_desc.Space,
-                                                ShaderResourceKind::StructuredBuffer});
+                                                ShaderResourceKind::StructuredBuffer, bind_desc.NumSamples});
             break;
         case D3D_SIT_BYTEADDRESS:
             out_reflection.resources.push_back({bind_desc.Name, bind_desc.BindPoint, bind_desc.Space,

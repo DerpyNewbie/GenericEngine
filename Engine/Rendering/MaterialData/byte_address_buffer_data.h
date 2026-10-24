@@ -8,7 +8,7 @@ namespace engine
 /// </summary>
 class ByteAddressBufferData : public BufferDataBase
 {
-    size_t m_element_count_;
+    size_t m_element_count_ = 0;
     std::vector<uint8_t> m_data_;
 
 public:
@@ -24,9 +24,9 @@ public:
     void OnInspectorGui() override;
 
     /// <summary>
-    /// 要素数を設定し、データ領域をリサイズします。
+    /// バイト数を設定し、データ領域をリサイズします（GPUには4バイト単位に切り上げて渡します）。
     /// </summary>
-    /// <param name="count">要素数</param>
+    /// <param name="count">バイト数</param>
     void SetCount(size_t count);
     /// <summary>
     /// 要素数分のデータをコピーして設定します。

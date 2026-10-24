@@ -37,7 +37,7 @@ kConstantBufferDataType ToDataType(const CRS::ShaderVariableType type)
 }
 
 /// <summary>
-/// コンパイル結果のリフレクションから、Materialのパラメーター（b1の定数とspace0のテクスチャ）を作ります。
+/// コンパイル結果のリフレクションから、Materialのパラメーター（space0のcbuffer、テクスチャ、バッファ、サンプラー）を作ります。
 /// </summary>
 std::vector<ShaderParameter> ReadMaterialParameters(const CrsShaderProgram &program)
 {
@@ -68,8 +68,34 @@ std::vector<ShaderParameter> ReadMaterialParameters(const CrsShaderProgram &prog
 
         for (const auto &resource : reflection.resources)
         {
-            if (resource.space == 0 && resource.kind == CRS::ShaderResourceKind::Texture)
-                add({static_cast<int>(resource.slot), resource.name, resource.name, kBufferType_Texture2D});
+            if (resource.space != 0)
+                continue;
+
+            ShaderParameter param = {static_cast<int>(resource.slot), resource.name, resource.name};
+            switch (resource.kind)
+            {
+            case CRS::ShaderResourceKind::Texture:
+                param.buffer_type = kBufferType_Texture2D;
+                break;
+            case CRS::ShaderResourceKind::TextureCube:
+                param.buffer_type = kBufferType_TextureCube;
+                break;
+            case CRS::ShaderResourceKind::StructuredBuffer:
+                param.buffer_type = kBufferType_StructuredBuffer;
+                // StructuredBufferは、1要素のバイト数をtotal_sizeに入れておく
+                param.total_size = resource.stride;
+                break;
+            case CRS::ShaderResourceKind::ByteAddressBuffer:
+                param.buffer_type = kBufferType_ByteAddressBuffer;
+                break;
+            case CRS::ShaderResourceKind::Sampler:
+                param.buffer_type = kBufferType_Sampler;
+                break;
+            default:
+                // RWTextureなどは、Materialからは設定できない
+                continue;
+            }
+            add(std::move(param));
         }
     }
     return result;

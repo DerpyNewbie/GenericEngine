@@ -44,15 +44,17 @@ class Material
     // パスごとのシェーダーと描画設定。使わないパスは空
     std::array<std::optional<MaterialPass>, static_cast<size_t>(PassTag::Count)> m_passes_;
 
-    // 名前から、定数の位置 / テクスチャのtレジスタ / サンプラーのsレジスタを引く表（BuildPropertyTableで作る）
+    // 名前から、定数の位置 / リソースのtレジスタ / サンプラーのsレジスタを引く表（BuildPropertyTableで作る）
     std::unordered_map<std::string, MaterialProperty> m_properties_;
-    std::unordered_map<std::string, uint32_t> m_texture_slots_;
+    std::unordered_map<std::string, uint32_t> m_resource_slots_;
     std::unordered_map<std::string, uint32_t> m_sampler_slots_;
+    // tレジスタごとの、シェーダーが宣言しているリソースの種類（宣言されていないスロットは空）
+    std::array<std::optional<ShaderResourceKind>, kResourceSlotCount> m_resource_kinds_;
 
     // space0 の b レジスタごとの定数
     std::array<std::vector<uint8_t>, kConstantSlotCount> m_constants_;
-    // space0 の t / s レジスタの番号の位置に入れる。無効なハンドルは既定のテクスチャ / サンプラーになる
-    std::array<TextureHandle, kResourceSlotCount> m_textures_ = {};
+    // space0 の t / s レジスタの番号の位置に入れる。空のスロットはBindResourcesで既定値になる
+    std::array<ResourceBinding, kResourceSlotCount> m_resources_ = {};
     std::array<SamplerHandle, kSamplerSlotCount> m_samplers_ = {};
 
     // パスの構成が変わったら進める。PSOのキャッシュの無効化に使う
@@ -99,6 +101,10 @@ public:
     /// </summary>
     bool SetTexture(const std::string &name, TextureHandle texture);
     /// <summary>
+    /// 名前のバッファ（StructuredBuffer / ByteAddressBuffer）を設定します。
+    /// </summary>
+    bool SetBuffer(const std::string &name, BufferHandle buffer);
+    /// <summary>
     /// 名前のサンプラー（space0のsレジスタ）を設定します。
     /// </summary>
     bool SetSampler(const std::string &name, SamplerHandle sampler);
@@ -108,22 +114,24 @@ public:
     /// </summary>
     bool HasProperty(const std::string &name) const;
     /// <summary>
-    /// シェーダーにその名前のテクスチャがあるかどうかです。
+    /// シェーダーにその名前のリソース（テクスチャ、バッファ）があるかどうかです。
     /// </summary>
-    bool HasTexture(const std::string &name) const;
+    bool HasResource(const std::string &name) const;
+    /// <summary>
+    /// tレジスタのslot番にリソースが設定されているかどうかです。
+    /// </summary>
+    bool IsResourceSet(uint32_t slot) const;
 
     /// <summary>
     /// 定数を、space0 の b レジスタの位置に設定します。
     /// </summary>
     void BindConstants(Bindings &bindings) const;
-
     /// <summary>
-    /// t0..t7の位置に並べたテクスチャです。
+    /// リソースを、space0 の t レジスタの位置に設定します。
+    /// 設定されていないTexture2Dのスロットと、シェーダーが宣言していないスロットにはdefault_textureを入れます。
+    /// それ以外（TextureCube、バッファ）は空のままにします（シェーダーからは0が読めます）。
     /// </summary>
-    const std::array<TextureHandle, kResourceSlotCount> &Textures() const
-    {
-        return m_textures_;
-    }
+    void BindResources(Bindings &bindings, TextureHandle default_texture) const;
 
     /// <summary>
     /// s0..s3の位置に並べたサンプラーです。

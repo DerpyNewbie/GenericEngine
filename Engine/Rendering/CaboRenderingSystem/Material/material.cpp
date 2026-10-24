@@ -37,7 +37,8 @@ void Material::BuildPropertyTable(const IRenderDevice &device)
     const auto old_properties = std::move(m_properties_);
     const auto old_constants = std::move(m_constants_);
     m_properties_.clear();
-    m_texture_slots_.clear();
+    m_resource_slots_.clear();
+    m_resource_kinds_ = {};
     m_sampler_slots_.clear();
 
     for (auto &constants : m_constants_)
@@ -73,10 +74,29 @@ void Material::BuildPropertyTable(const IRenderDevice &device)
             if (resource.space != 0)
                 continue;
 
-            if (resource.kind == ShaderResourceKind::Sampler)
+            switch (resource.kind)
+            {
+            case ShaderResourceKind::Sampler:
                 m_sampler_slots_[resource.name] = resource.slot;
-            else if (resource.kind == ShaderResourceKind::Texture)
-                m_texture_slots_[resource.name] = resource.slot;
+                break;
+            case ShaderResourceKind::Texture:
+            case ShaderResourceKind::TextureCube:
+            case ShaderResourceKind::StructuredBuffer:
+            case ShaderResourceKind::ByteAddressBuffer:
+                if (resource.slot >= kResourceSlotCount)
+                {
+                    LogWarning("'{}' uses t{}, but materials support up to t{}", resource.name, resource.slot,
+                               kResourceSlotCount - 1);
+                    break;
+                }
+                m_resource_slots_[resource.name] = resource.slot;
+                m_resource_kinds_[resource.slot] = resource.kind;
+                break;
+            default:
+                // RWTextureなどのUAVは、共通ルートシグネチャに枠がないので使えない
+                LogWarning("'{}' is a read-write resource, which materials do not support", resource.name);
+                break;
+            }
         }
     }
 
@@ -169,11 +189,29 @@ bool Material::SetData(const std::string &name, const void *data, const uint32_t
 
 bool Material::SetTexture(const std::string &name, const TextureHandle texture)
 {
-    const auto itr = m_texture_slots_.find(name);
-    if (itr == m_texture_slots_.end() || itr->second >= kResourceSlotCount)
+    const auto itr = m_resource_slots_.find(name);
+    if (itr == m_resource_slots_.end())
         return false;
 
-    m_textures_[itr->second] = texture;
+    const auto kind = m_resource_kinds_[itr->second];
+    if (kind != ShaderResourceKind::Texture && kind != ShaderResourceKind::TextureCube)
+        return false;
+
+    m_resources_[itr->second] = {texture, {}};
+    return true;
+}
+
+bool Material::SetBuffer(const std::string &name, const BufferHandle buffer)
+{
+    const auto itr = m_resource_slots_.find(name);
+    if (itr == m_resource_slots_.end())
+        return false;
+
+    const auto kind = m_resource_kinds_[itr->second];
+    if (kind != ShaderResourceKind::StructuredBuffer && kind != ShaderResourceKind::ByteAddressBuffer)
+        return false;
+
+    m_resources_[itr->second] = {{}, buffer};
     return true;
 }
 
@@ -192,9 +230,33 @@ bool Material::HasProperty(const std::string &name) const
     return m_properties_.contains(name);
 }
 
-bool Material::HasTexture(const std::string &name) const
+bool Material::HasResource(const std::string &name) const
 {
-    return m_texture_slots_.contains(name);
+    return m_resource_slots_.contains(name);
+}
+
+bool Material::IsResourceSet(const uint32_t slot) const
+{
+    return slot < kResourceSlotCount && (m_resources_[slot].texture.IsValid() || m_resources_[slot].buffer.IsValid());
+}
+
+void Material::BindResources(Bindings &bindings, const TextureHandle default_texture) const
+{
+    for (uint32_t slot = 0; slot < kResourceSlotCount; ++slot)
+    {
+        if (IsResourceSet(slot))
+        {
+            bindings.resources[slot] = m_resources_[slot];
+            continue;
+        }
+
+        // Texture2Dは白にしておく（0だと真っ黒になるため）。それ以外の種類は空のSRVにする
+        const auto kind = m_resource_kinds_[slot];
+        if (!kind.has_value() || *kind == ShaderResourceKind::Texture)
+            bindings.resources[slot] = {default_texture, {}};
+        else
+            bindings.resources[slot] = {};
+    }
 }
 
 MaterialId MaterialRegistry::Add(Material material)

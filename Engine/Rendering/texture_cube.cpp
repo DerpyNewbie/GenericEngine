@@ -42,7 +42,8 @@ CRS::TextureHandle TextureCube::GpuTexture()
     uint32_t height = 0;
     for (int i = 0; i < 6; ++i)
     {
-        const auto texture = m_textures_[i];
+        // 参照先が見つからない（未設定、またはAssetが無い）場合も失敗にする
+        const auto texture = m_textures_[i].CastedLock();
         if (texture == nullptr)
         {
             Logger::Error<TextureCube>("Texture at index %d was invalid", i);

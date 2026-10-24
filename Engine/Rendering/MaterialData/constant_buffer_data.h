@@ -114,6 +114,10 @@ public:
     /// </summary>
     bool HasVariable(const std::string &name) const;
     /// <summary>
+    /// 指定した名前の変数の型を取得します。無い場合はkConstantBufferDataType_Unknownを返します。
+    /// </summary>
+    kConstantBufferDataType VariableType(const std::string &name) const;
+    /// <summary>
     /// 指定した名前の変数の値をコピーします。
     /// </summary>
     /// <returns>変数があり、サイズが合っていてコピーできた場合はtrue</returns>

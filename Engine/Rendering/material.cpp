@@ -5,6 +5,7 @@
 #include "Asset/asset_database.h"
 #include "crs_bridge.h"
 #include "texture2d.h"
+#include "texture_cube.h"
 #include "CaboRenderingSystem/render_engine.h"
 
 namespace engine
@@ -39,6 +40,197 @@ bool IsColorVariable(const std::string &name, const size_t size)
 {
     return size == sizeof(Color) && name == "_Color";
 }
+
+/// <summary>
+/// C++の型に対応する、Shaderの変数の型です。
+/// </summary>
+template <typename T>
+constexpr kConstantBufferDataType DataTypeOf()
+{
+    if constexpr (std::is_same_v<T, int>)
+        return kConstantBufferDataType::kConstantBufferDataTypeInt;
+    else if constexpr (std::is_same_v<T, float>)
+        return kConstantBufferDataType::kConstantBufferDataType_Float;
+    else if constexpr (std::is_same_v<T, Vector2>)
+        return kConstantBufferDataType::kConstantBufferDataType_Vector2;
+    else if constexpr (std::is_same_v<T, Vector3>)
+        return kConstantBufferDataType::kConstantBufferDataType_Vector3;
+    else if constexpr (std::is_same_v<T, Color>)
+        return kConstantBufferDataType::kConstantBufferDataType_Color;
+    else if constexpr (std::is_same_v<T, Matrix>)
+        return kConstantBufferDataType::kConstantBufferDataType_Matrix;
+    else
+        static_assert(sizeof(T) == 0, "Unsupported material value type");
+}
+
+// SetGlobal〜で設定された値の書き込み方。後から作ったMaterialにも書き込むために、名前ごとに覚えておく
+std::unordered_map<std::string, std::function<void(Material &)>> g_global_writers;
+
+/// <summary>
+/// 今あるすべてのMaterialに対してactionを呼びます。
+/// </summary>
+template <typename Func>
+void ForEachMaterial(Func &&action)
+{
+    for (const auto &object : Object::AllObjects() | std::views::values)
+    {
+        if (const auto material = std::dynamic_pointer_cast<Material>(object))
+            action(*material);
+    }
+}
+}
+
+void Material::ApplyGlobals()
+{
+    for (const auto &writer : g_global_writers | std::views::values)
+        writer(*this);
+}
+
+void Material::SetGlobalMaterialWriter(const std::string &name, std::function<void(Material &)> writer)
+{
+    ForEachMaterial([&](Material &material) {
+        writer(material);
+    });
+    g_global_writers[name] = std::move(writer);
+}
+
+void Material::SetGlobalWriter(const std::string &name, std::function<void(MaterialBlock &)> writer)
+{
+    SetGlobalMaterialWriter(name, [writer = std::move(writer)](Material &material) {
+        if (material.shared_material_block != nullptr)
+            writer(*material.shared_material_block);
+    });
+}
+
+void Material::SetGlobalBuffer(const std::string &name, const CRS::BufferHandle buffer)
+{
+    SetGlobalMaterialWriter(name, [name, buffer](Material &material) {
+        // バッファを持たないMaterialには何もしない（警告も出さない）
+        if (material.shared_material_block == nullptr ||
+            (material.shared_material_block->GetStructuredBufferData(name) == nullptr &&
+             material.shared_material_block->GetByteAddressBufferData(name) == nullptr))
+            return;
+
+        material.SetBufferOverride(name, buffer);
+    });
+}
+
+bool Material::SetBuffer(const std::string &name, const CRS::BufferHandle buffer)
+{
+    if (shared_material_block == nullptr)
+        CreateMaterialBlock();
+
+    if (shared_material_block == nullptr || (shared_material_block->GetStructuredBufferData(name) == nullptr &&
+                                             shared_material_block->GetByteAddressBufferData(name) == nullptr))
+    {
+        Logger::Warn<Material>("Material '%s' has no buffer '%s'", Name().c_str(), name.c_str());
+        return false;
+    }
+
+    SetBufferOverride(name, buffer);
+    return true;
+}
+
+void Material::SetBufferOverride(const std::string &name, const CRS::BufferHandle buffer)
+{
+    if (buffer.IsValid())
+        m_buffer_overrides_[name] = buffer;
+    else
+        m_buffer_overrides_.erase(name);
+    m_renderer_dirty_ = true;
+}
+
+template <typename T>
+void Material::SetGlobalValue(const std::string &name, const T &value)
+{
+    // 同じ名前・型の変数があれば書き込む。無ければ何もしない（警告も出さない）
+    SetGlobalWriter(name, [name, value](MaterialBlock &block) {
+        const auto constant_buffer = block.FindConstantBufferData(name);
+        if (constant_buffer != nullptr && constant_buffer->VariableType(name) == DataTypeOf<T>())
+            constant_buffer->SetData(name, &value, sizeof(T));
+    });
+}
+
+void Material::SetGlobalInt(const std::string &name, const int value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalFloat(const std::string &name, const float value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalVector2(const std::string &name, const Vector2 &value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalVector3(const std::string &name, const Vector3 &value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalColor(const std::string &name, const Color &value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalMatrix(const std::string &name, const Matrix &value)
+{
+    SetGlobalValue(name, value);
+}
+
+void Material::SetGlobalTexture(const std::string &name, const AssetPtr<Texture2D> &texture)
+{
+    SetGlobalWriter(name, [name, texture](MaterialBlock &block) {
+        if (const auto data = block.GetTextureBufferData(name))
+            data->SetTexture(texture);
+    });
+}
+
+void Material::SetGlobalTextureCube(const std::string &name, const AssetPtr<TextureCube> &texture)
+{
+    SetGlobalWriter(name, [name, texture](MaterialBlock &block) {
+        if (const auto data = block.GetTextureCubeData(name))
+            data->SetTexture(texture);
+    });
+}
+
+void Material::SetGlobalBuffer(const std::string &name, const void *data, const size_t stride, const size_t count)
+{
+    const auto bytes = static_cast<const uint8_t *>(data);
+    std::vector<uint8_t> copy(bytes, bytes + stride * count);
+    SetGlobalWriter(name, [name, copy = std::move(copy), stride, count](MaterialBlock &block) {
+        const auto buffer = block.GetStructuredBufferData(name);
+        if (buffer == nullptr || buffer->Stride() != stride)
+            return;
+
+        buffer->SetCount(count);
+        buffer->SetData(copy.data());
+    });
+}
+
+void Material::SetGlobalRawBuffer(const std::string &name, const void *data, const size_t size)
+{
+    const auto bytes = static_cast<const uint8_t *>(data);
+    std::vector<uint8_t> copy(bytes, bytes + size);
+    SetGlobalWriter(name, [name, copy = std::move(copy)](MaterialBlock &block) {
+        const auto buffer = block.GetByteAddressBufferData(name);
+        if (buffer == nullptr)
+            return;
+
+        buffer->SetCount(copy.size());
+        buffer->SetData(copy.data());
+    });
+}
+
+void Material::SetGlobalSampler(const std::string &name, const CRS::Filter filter, const CRS::AddressMode address)
+{
+    SetGlobalWriter(name, [name, filter, address](MaterialBlock &block) {
+        if (const auto sampler = block.GetSamplerData(name))
+            sampler->SetState(static_cast<int>(filter), static_cast<int>(address));
+    });
 }
 
 template <typename T>
@@ -56,7 +248,7 @@ bool Material::SetValue(const std::string &name, const T &value)
         return false;
     }
 
-    if (!constant_buffer->SetData(name, &value, sizeof(T)))
+    if (constant_buffer->VariableType(name) != DataTypeOf<T>() || !constant_buffer->SetData(name, &value, sizeof(T)))
     {
         Logger::Warn<Material>("Material property '%s' has a different type", name.c_str());
         return false;
@@ -170,10 +362,137 @@ AssetPtr<Texture2D> Material::GetTexture(const std::string &name) const
     return texture_data ? texture_data->Data() : AssetPtr<Texture2D>{};
 }
 
+AssetPtr<TextureCube> Material::GetTextureCube(const std::string &name) const
+{
+    const auto texture_data = shared_material_block ? shared_material_block->GetTextureCubeData(name) : nullptr;
+    return texture_data ? texture_data->Data() : AssetPtr<TextureCube>{};
+}
+
+bool Material::SetTextureCube(const std::string &name, const AssetPtr<TextureCube> &texture)
+{
+    if (shared_material_block == nullptr)
+        CreateMaterialBlock();
+
+    const auto texture_data = shared_material_block ? shared_material_block->GetTextureCubeData(name) : nullptr;
+    if (texture_data == nullptr)
+    {
+        Logger::Warn<Material>("Material '%s' has no TextureCube '%s'", Name().c_str(), name.c_str());
+        return false;
+    }
+
+    texture_data->SetTexture(texture);
+    return true;
+}
+
+bool Material::SetBuffer(const std::string &name, const void *data, const size_t stride, const size_t count)
+{
+    if (shared_material_block == nullptr)
+        CreateMaterialBlock();
+
+    const auto buffer = shared_material_block ? shared_material_block->GetStructuredBufferData(name) : nullptr;
+    if (buffer == nullptr)
+    {
+        Logger::Warn<Material>("Material '%s' has no StructuredBuffer '%s'", Name().c_str(), name.c_str());
+        return false;
+    }
+
+    if (buffer->Stride() != stride)
+    {
+        Logger::Warn<Material>("StructuredBuffer '%s' expects %zu bytes per element, but %zu was given", name.c_str(),
+                               buffer->Stride(), stride);
+        return false;
+    }
+
+    buffer->SetCount(count);
+    buffer->SetData(data);
+    return true;
+}
+
+bool Material::SetRawBuffer(const std::string &name, const void *data, const size_t size)
+{
+    if (shared_material_block == nullptr)
+        CreateMaterialBlock();
+
+    const auto buffer = shared_material_block ? shared_material_block->GetByteAddressBufferData(name) : nullptr;
+    if (buffer == nullptr)
+    {
+        Logger::Warn<Material>("Material '%s' has no ByteAddressBuffer '%s'", Name().c_str(), name.c_str());
+        return false;
+    }
+
+    buffer->SetCount(size);
+    buffer->SetData(data);
+    return true;
+}
+
+bool Material::SetSampler(const std::string &name, const CRS::Filter filter, const CRS::AddressMode address)
+{
+    if (shared_material_block == nullptr)
+        CreateMaterialBlock();
+
+    const auto sampler = shared_material_block ? shared_material_block->GetSamplerData(name) : nullptr;
+    if (sampler == nullptr)
+    {
+        Logger::Warn<Material>("Material '%s' has no sampler '%s'", Name().c_str(), name.c_str());
+        return false;
+    }
+
+    sampler->SetState(static_cast<int>(filter), static_cast<int>(address));
+    return true;
+}
+
 bool Material::HasProperty(const std::string &name) const
 {
-    return shared_material_block != nullptr && (shared_material_block->FindConstantBufferData(name) != nullptr ||
-                                                shared_material_block->GetTextureBufferData(name) != nullptr);
+    if (shared_material_block == nullptr)
+        return false;
+
+    auto &block = *shared_material_block;
+    return block.FindConstantBufferData(name) != nullptr || block.GetTextureBufferData(name) != nullptr ||
+           block.GetTextureCubeData(name) != nullptr || block.GetStructuredBufferData(name) != nullptr ||
+           block.GetByteAddressBufferData(name) != nullptr || block.GetSamplerData(name) != nullptr;
+}
+
+CRS::BufferHandle Material::UploadBuffer(const std::string &name, const void *data, const size_t size,
+                                         const size_t stride, const bool raw)
+{
+    if (size == 0)
+    {
+        m_gpu_buffers_.erase(name);
+        return {};
+    }
+
+    // ByteAddressBufferは4バイト単位で読むので、大きさを4の倍数に切り上げる
+    const auto gpu_size = raw ? (size + 3) / 4 * 4 : size;
+    auto &entry = m_gpu_buffers_[name];
+    if (!entry.buffer.IsValid() || entry.size != gpu_size)
+    {
+        CRS::BufferDesc desc;
+        desc.size = gpu_size;
+        desc.stride = raw ? 0 : static_cast<uint32_t>(stride);
+        desc.usage = raw ? CRS::BufferUsage::Raw : CRS::BufferUsage::Structured;
+        desc.memory = CRS::MemoryType::Upload;
+        desc.debug_name = Name() + " " + name;
+        entry.buffer = CRS::Buffer(CrsBridge::Crs().Device(), desc);
+        entry.size = gpu_size;
+    }
+
+    entry.buffer.Update(data, size);
+    return entry.buffer.GetHandle();
+}
+
+CRS::SamplerHandle Material::GetSampler(const std::string &name, const int filter, const int address)
+{
+    auto &entry = m_gpu_samplers_[name];
+    if (!entry.sampler.IsValid() || entry.filter != filter || entry.address != address)
+    {
+        CRS::SamplerDesc desc;
+        desc.filter = static_cast<CRS::Filter>(filter);
+        desc.address = static_cast<CRS::AddressMode>(address);
+        entry.sampler = CRS::Sampler(CrsBridge::Crs().Device(), desc);
+        entry.filter = filter;
+        entry.address = address;
+    }
+    return entry.sampler.GetHandle();
 }
 
 CRS::MaterialId Material::GetRendererMaterial()
@@ -193,6 +512,9 @@ CRS::MaterialId Material::GetRendererMaterial()
             if (!had_color && shared_material_block->FindConstantBufferData("_Color") != nullptr)
                 SetColor("_Color", Color(1, 1, 1, 1));
         }
+
+        // 読み込んだMaterialや、Shaderが変わったMaterialにもグローバルな値を入れる
+        ApplyGlobals();
     }
 
     if (shared_material_block == nullptr)
@@ -277,11 +599,46 @@ void Material::SyncRendererMaterial(const std::shared_ptr<Shader> &shader)
                 });
             break;
         case kBufferType_Texture2D: {
+            // RenderTexture / DepthTextureもTexture2Dの派生なので、ここでGPU上の描画先を渡す
             const auto texture = static_cast<TextureBufferData &>(data).Data().CastedLock();
             material->SetTexture(name, texture ? texture->GpuTexture() : CRS::TextureHandle{});
             break;
         }
+        case kBufferType_TextureCube: {
+            const auto texture = static_cast<TextureCubeBufferData &>(data).Data().CastedLock();
+            material->SetTexture(name, texture ? texture->GpuTexture() : CRS::TextureHandle{});
+            break;
+        }
+        case kBufferType_StructuredBuffer: {
+            // 外から渡されたバッファがあれば、値のコピーではなくそのバッファを使う
+            if (const auto itr = m_buffer_overrides_.find(name);
+                itr != m_buffer_overrides_.end())
+            {
+                material->SetBuffer(name, itr->second);
+                break;
+            }
+            auto &buffer = static_cast<StructuredBufferData &>(data);
+            material->SetBuffer(name, UploadBuffer(name, buffer.Data(), buffer.Size(), buffer.Stride(), false));
+            break;
+        }
+        case kBufferType_ByteAddressBuffer: {
+            if (const auto itr = m_buffer_overrides_.find(name);
+                itr != m_buffer_overrides_.end())
+            {
+                material->SetBuffer(name, itr->second);
+                break;
+            }
+            auto &buffer = static_cast<ByteAddressBufferData &>(data);
+            material->SetBuffer(name, UploadBuffer(name, buffer.Data(), buffer.Count(), 0, true));
+            break;
+        }
+        case kBufferType_Sampler: {
+            const auto &sampler = static_cast<SamplerData &>(data);
+            material->SetSampler(name, GetSampler(name, sampler.Filter(), sampler.Address()));
+            break;
+        }
         default:
+            // RWTextureなどのUAVは、Materialからは設定できない
             break;
         }
     });
@@ -356,6 +713,7 @@ void Material::CreateMaterialBlock()
             constant_buffer.SetData(variable, &white, sizeof(white));
     });
 
+    ApplyGlobals();
     m_renderer_dirty_ = true;
 }
 

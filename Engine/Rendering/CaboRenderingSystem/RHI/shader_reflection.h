@@ -73,6 +73,8 @@ struct ShaderResourceInfo
     // レジスタスペース（0: マテリアル、1: エンジン）
     uint32_t space = 0;
     ShaderResourceKind kind = ShaderResourceKind::Texture;
+    // StructuredBufferの1要素のバイト数（それ以外は0）
+    uint32_t stride = 0;
 };
 
 /// <summary>

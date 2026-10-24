@@ -21,7 +21,10 @@ std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader
         return std::make_shared<ByteAddressBufferData>(shader_param);
     case kBufferType_TextureCube:
         return std::make_shared<TextureCubeBufferData>(shader_param);
+    case kBufferType_Sampler:
+        return std::make_shared<SamplerData>(shader_param);
     }
+    return nullptr;
 }
 }
 
@@ -76,10 +79,19 @@ std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(con
 std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(const std::string &name)
 {
     auto it = m_buffer_data_.find(name);
-    if (it == m_buffer_data_.end())
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_ByteAddressBuffer)
         return nullptr;
 
     return std::reinterpret_pointer_cast<ByteAddressBufferData>(it->second);
+}
+
+std::shared_ptr<SamplerData> MaterialBlock::GetSamplerData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_Sampler)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<SamplerData>(it->second);
 }
 
 std::shared_ptr<TextureCubeBufferData> MaterialBlock::GetTextureCubeData(const std::string &name)
@@ -95,35 +107,20 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
 {
     for (auto &param : shader_params)
     {
-        const auto data = CreateMaterialData(param);
-
-        if (data == nullptr)
+        // 同じ名前・同じ種類のデータが既にあれば、設定済みの値を残す
+        const auto existing = m_buffer_data_.find(param.name);
+        if (existing != m_buffer_data_.end() && existing->second != nullptr &&
+            existing->second->BufferType() == param.buffer_type)
             continue;
 
-        switch (param.buffer_type)
+        const auto data = CreateMaterialData(param);
+        if (data == nullptr)
         {
-        case kBufferType_ConstantBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
-            break;
-        case kBufferType_StructuredBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
-            break;
-        case kBufferType_Texture2D:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
-            break;
-        case kBufferType_UavTexture:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
-            break;
-        case kBufferType_ByteAddressBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ByteAddressBufferData>(data));
-            break;
-        case kBufferType_TextureCube:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
-            break;
-        default:
             Logger::Error<MaterialBlock>("Unknown buffer type!");
-            break;
+            continue;
         }
+
+        m_buffer_data_[param.name] = data;
     }
 }
 

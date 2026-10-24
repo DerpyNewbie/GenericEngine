@@ -464,19 +464,32 @@ D3D12_SHADER_RESOURCE_VIEW_DESC D3D12RenderDevice::MakeSrvDesc(const DXGI_FORMAT
 
 void D3D12RenderDevice::CreateBufferViews(D3D12Buffer &buffer)
 {
-    if (!HasFlag(buffer.desc.usage, BufferUsage::Structured) || buffer.desc.stride == 0)
+    const bool structured = HasFlag(buffer.desc.usage, BufferUsage::Structured) && buffer.desc.stride != 0;
+    const bool raw = HasFlag(buffer.desc.usage, BufferUsage::Raw);
+    if (!structured && !raw)
         return;
+
+    D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
+    srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+    srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+    if (raw)
+    {
+        // ByteAddressBufferは、4バイト単位のR32_TYPELESSとして見せる
+        srv_desc.Format = DXGI_FORMAT_R32_TYPELESS;
+        srv_desc.Buffer.NumElements = static_cast<UINT>(buffer.desc.size / 4);
+        srv_desc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_RAW;
+    }
+    else
+    {
+        srv_desc.Format = DXGI_FORMAT_UNKNOWN;
+        srv_desc.Buffer.NumElements = static_cast<UINT>(buffer.desc.size / buffer.desc.stride);
+        srv_desc.Buffer.StructureByteStride = buffer.desc.stride;
+    }
 
     const uint32_t version_count = buffer.IsVersioned() ? kMaxFramesInFlight : 1;
     for (uint32_t i = 0; i < version_count; ++i)
     {
         buffer.srv[i] = m_cpu_srv_heap_.Allocate();
-        D3D12_SHADER_RESOURCE_VIEW_DESC srv_desc = {};
-        srv_desc.Format = DXGI_FORMAT_UNKNOWN;
-        srv_desc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
-        srv_desc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-        srv_desc.Buffer.NumElements = static_cast<UINT>(buffer.desc.size / buffer.desc.stride);
-        srv_desc.Buffer.StructureByteStride = buffer.desc.stride;
         m_device_->CreateShaderResourceView(buffer.resources[i].Get(), &srv_desc, buffer.srv[i].handle);
     }
 }
