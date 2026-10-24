@@ -1,9 +1,5 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "material_block.h"
-
-#include "buffer_data_base.h"
-#include "gpu_resource_manager.h"
-#include "texture_cube_buffer_data.h"
 
 namespace
 {
@@ -25,7 +21,10 @@ std::shared_ptr<BufferDataBase> CreateMaterialData(const ShaderParameter &shader
         return std::make_shared<ByteAddressBufferData>(shader_param);
     case kBufferType_TextureCube:
         return std::make_shared<TextureCubeBufferData>(shader_param);
+    case kBufferType_Sampler:
+        return std::make_shared<SamplerData>(shader_param);
     }
+    return nullptr;
 }
 }
 
@@ -35,9 +34,6 @@ void MaterialBlock::OnInspectorGui()
 {
     for (auto &[name, data] : m_buffer_data_)
     {
-        if (GpuResourceManager::GetGlobalBuffer(name))
-            continue;
-
         ImGui::PushID(data.get());
         data->OnInspectorGui();
         ImGui::PopID();
@@ -83,10 +79,19 @@ std::shared_ptr<UavTextureBufferData> MaterialBlock::GetUavTextureBufferData(con
 std::shared_ptr<ByteAddressBufferData> MaterialBlock::GetByteAddressBufferData(const std::string &name)
 {
     auto it = m_buffer_data_.find(name);
-    if (it == m_buffer_data_.end())
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_ByteAddressBuffer)
         return nullptr;
 
     return std::reinterpret_pointer_cast<ByteAddressBufferData>(it->second);
+}
+
+std::shared_ptr<SamplerData> MaterialBlock::GetSamplerData(const std::string &name)
+{
+    auto it = m_buffer_data_.find(name);
+    if (it == m_buffer_data_.end() || it->second->BufferType() != kBufferType_Sampler)
+        return nullptr;
+
+    return std::reinterpret_pointer_cast<SamplerData>(it->second);
 }
 
 std::shared_ptr<TextureCubeBufferData> MaterialBlock::GetTextureCubeData(const std::string &name)
@@ -102,36 +107,59 @@ void MaterialBlock::LoadShaderParameters(const std::vector<ShaderParameter> &sha
 {
     for (auto &param : shader_params)
     {
-        const auto data = CreateMaterialData(param);
-
-        if (data == nullptr)
+        // 同じ名前・同じ種類のデータが既にあれば、設定済みの値を残す
+        const auto existing = m_buffer_data_.find(param.name);
+        if (existing != m_buffer_data_.end() && existing->second != nullptr &&
+            existing->second->BufferType() == param.buffer_type)
             continue;
 
-        switch (param.buffer_type)
+        const auto data = CreateMaterialData(param);
+        if (data == nullptr)
         {
-        case kBufferType_ConstantBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ConstantBufferData>(data));
-            break;
-        case kBufferType_StructuredBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<StructuredBufferData>(data));
-            break;
-        case kBufferType_Texture2D:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
-            break;
-        case kBufferType_UavTexture:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<UavTextureBufferData>(data));
-            break;
-        case kBufferType_ByteAddressBuffer:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<ByteAddressBufferData>(data));
-            break;
-        case kBufferType_TextureCube:
-            m_buffer_data_.try_emplace(param.name, std::static_pointer_cast<TextureBufferData>(data));
-            break;
-        default:
             Logger::Error<MaterialBlock>("Unknown buffer type!");
-            break;
+            continue;
+        }
+
+        m_buffer_data_[param.name] = data;
+    }
+}
+
+std::shared_ptr<ConstantBufferData> MaterialBlock::FindConstantBufferData(const std::string &variable_name)
+{
+    for (const auto &data : m_buffer_data_ | std::views::values)
+    {
+        if (data == nullptr || data->BufferType() != kBufferType_ConstantBuffer)
+            continue;
+
+        auto constant_buffer = std::static_pointer_cast<ConstantBufferData>(data);
+        if (constant_buffer->HasVariable(variable_name))
+            return constant_buffer;
+    }
+    return nullptr;
+}
+
+void MaterialBlock::ForEachBufferData(
+    const std::function<void(const std::string &, BufferDataBase &)> &action) const
+{
+    for (const auto &[name, data] : m_buffer_data_)
+    {
+        if (data != nullptr)
+            action(name, *data);
+    }
+}
+
+bool MaterialBlock::ConsumeDirty()
+{
+    bool is_dirty = false;
+    for (const auto &data : m_buffer_data_ | std::views::values)
+    {
+        if (data != nullptr && data->is_dirty)
+        {
+            is_dirty = true;
+            data->is_dirty = false;
         }
     }
+    return is_dirty;
 }
 }
 

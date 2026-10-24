@@ -20,19 +20,20 @@
 
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/crs_bridge.h"
 #include "Asset/text_asset.h"
 #include "Components/camera_component.h"
 #include "Rendering/material.h"
 #include "Rendering/render_texture.h"
 #include "Physics/physics.h"
-#include "Rendering/render_pipeline.h"
 
 #include <ranges>
 
 #include "gui.h"
 #include "scene_manager.h"
 #include "serializer.h"
+#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_render_device.h"
+#include "Rendering/texture_cube.h"
 
 namespace editor
 {
@@ -85,19 +86,18 @@ void Editor::Init()
         );
         IM_ASSERT(font != nullptr);
 
-        auto descriptor_handle = DescriptorHeap::Allocate();
-        // フォントディスクリプタ取得
-        D3D12_CPU_DESCRIPTOR_HANDLE font_cpu_desc_handle = descriptor_handle->handle_cpu;
-        D3D12_GPU_DESCRIPTOR_HANDLE font_gpu_desc_handle = descriptor_handle->handle_gpu;
+        // フォントのSRVは、CRSのシェーダーから見えるヒープに置く（描画時にCRSのヒープが設定されている）
+        auto &device = CrsBridge::Device();
+        const auto font_descriptor = device.AllocatePersistentSrv();
 
         ImGui_ImplWin32_Init(Application::Instance()->WindowHandle());
         ImGui_ImplDX12_Init(
-            RenderEngine::Device(),
-            RenderEngine::kFrame_Buffer_Count,
+            CrsBridge::Device().NativeDevice(),
+            CRS::kMaxFramesInFlight,
             DXGI_FORMAT_R8G8B8A8_UNORM,
-            DescriptorHeap::GetHeap(),
-            font_cpu_desc_handle,
-            font_gpu_desc_handle
+            device.NativeSrvHeap(),
+            font_descriptor.cpu,
+            font_descriptor.gpu
         );
     }
     // end IMGUI init
@@ -226,7 +226,7 @@ void Editor::OnDraw()
     {
         ImGui::Render();
         auto draw_data = ImGui::GetDrawData();
-        auto cmd_list = RenderEngine::CommandList();
+        auto cmd_list = CrsBridge::Device().NativeCommandList();
         ImGui_ImplDX12_RenderDrawData(draw_data, cmd_list);
         if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
         {
@@ -244,7 +244,7 @@ void Editor::Attach()
         }
     );
 
-    RenderPipeline::Instance()->on_rendering.AddListener(
+    CrsBridge::on_overlay_render.AddListener(
         [this] {
             OnDraw();
         }

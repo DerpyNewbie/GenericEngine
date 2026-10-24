@@ -1,4 +1,5 @@
-#pragma once
+﻿#pragma once
+#include "Rendering/CaboRenderingSystem/RHI/rhi_types.h"
 
 namespace engine
 {
@@ -12,14 +13,14 @@ struct Vertex
     Vector3 normal;
     Vector4 tangent;
     Vector2 uvs[8];
-    unsigned int bones_per_vertex;
-    unsigned int bone_index[4];
-    float bone_weight[4];
+    unsigned int bones_per_vertex = 0;
+    unsigned int bone_index[4] = {};
+    float bone_weight[4] = {};
 
-    static const D3D12_INPUT_LAYOUT_DESC kInputLayout;
-
-private:
-    static constexpr int kInputElementCount = 15;
-    static const D3D12_INPUT_ELEMENT_DESC kInputElements[kInputElementCount];
+    /// <summary>
+    /// この構造体の並びを表す頂点レイアウトです。
+    /// シェーダーの入力は POSITION, COLOR, NORMAL, TANGENT, TEXCOORD0..7, BONESPERVERTEX, BONEINDEX, BONEWEIGHT です。
+    /// </summary>
+    static std::shared_ptr<const CRS::VertexLayout> Layout();
 };
 }

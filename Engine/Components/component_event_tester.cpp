@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "component_event_tester.h"
 
 #include "gui.h"

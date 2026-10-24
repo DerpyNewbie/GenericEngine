@@ -14,13 +14,12 @@
 #include "engine_time.h"
 #include "update_manager.h"
 #include "scene_manager.h"
-#include "Rendering/CabotEngine/Graphics/RenderEngine.h"
+#include "Rendering/crs_bridge.h"
 #include "application.h"
 #include "Rendering/gizmos.h"
 #include "input.h"
 #include "Physics/physics.h"
 #include "Audio/audio.h"
-#include "Rendering/render_pipeline.h"
 
 namespace engine
 {
@@ -36,7 +35,7 @@ bool Engine::Init()
 #else
     LoadLibraryExA("assimp-vc143-mt.dll", NULL, NULL);
 #endif
-    if (!RenderEngine::Instance()->Init(
+    if (!CrsBridge::Init(
         Application::WindowHandle(),
         Application::WindowWidth(),
         Application::WindowHeight()
@@ -50,7 +49,6 @@ bool Engine::Init()
     Physics::Init();
     Time::Get()->Init();
     Input::Instance()->Init();
-    RenderPipeline::Init();
     AssetDatabase::Init();
     IComponentFactory::Init();
     on_init.Invoke();
@@ -86,10 +84,10 @@ void Engine::Tick()
     Profiler::End("Coroutine");
 
     Profiler::Begin("Draw Call");
-    RenderEngine::Instance()->BeginRender();
+    CrsBridge::BeginFrame();
     UpdateManager::InvokeRender();
-    RenderPipeline::Instance()->InvokeDrawCall();
-    RenderEngine::Instance()->EndRender();
+    CrsBridge::Render();
+    CrsBridge::EndFrame();
     Profiler::End("Draw Call");
 
     Profiler::Begin("OnDeserialization");
@@ -105,5 +103,7 @@ void Engine::Tick()
 void Engine::Finalize()
 {
     on_finalize.Invoke();
+
+    CrsBridge::WaitIdle();
 }
 }

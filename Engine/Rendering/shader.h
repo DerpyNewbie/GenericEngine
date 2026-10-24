@@ -1,71 +1,79 @@
-#pragma once
+﻿#pragma once
 #include "shader_parameter.h"
 #include "shader_settings.h"
-#include "Rendering/shader_type.h"
-#include "CabotEngine/Graphics/ComPtr.h"
+#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {
 class ShaderImporter;
 
 /// <summary>
-/// Shader object representation
+/// コンパイル済みのShaderです。
+/// </summary>
+struct CrsShaderProgram
+{
+    CRS::Shader vertex;
+    CRS::Shader pixel;
+    CRS::Shader shadow_vertex;
+};
+
+/// <summary>
+/// .hlslファイルから作るShaderのAssetです。
 /// </summary>
 /// <remarks>
-/// Base of all shaders used in the engine. Shaders such as PS, VS inherits from here.
+/// <para>エントリーポイントは VSMain（必須）、PSMain、VSShadow（影用。無い場合は標準の影を使う）です。</para>
+/// <para>メッシュ用は Engine/Rendering/CaboRenderingSystem/Shaders/crs_common.hlsli を、
+/// UI(Image)用は crs_ui.hlsli をincludeして書きます。</para>
+/// <para>Materialのパラメーターは space0 の cbuffer（名前は自由、registerは省略可、b0..b3 まで）の変数と、
+/// t0..t7 のリソース（Texture2D、TextureCube、StructuredBuffer、ByteAddressBuffer）、s0..s3 のサンプラーです。
+/// ZTestなどの描画設定は "// @Blend Alpha" のように書けます（ShaderSettingsを参照）。</para>
 /// </remarks>
 class Shader : public Object, public Inspectable
 {
     friend ShaderImporter;
-    static std::shared_ptr<Shader> m_default_shader_;
-
-    ComPtr<ID3DBlob> m_vs_blob_;
-    ComPtr<ID3DBlob> m_ps_blob_;
-    ComPtr<ID3DBlob> m_gs_blob_;
 
     ShaderSettings m_shader_settings_;
+    std::shared_ptr<CrsShaderProgram> m_program_;
+    // UI(Image)用のShaderかどうか（crs_ui.hlsliをincludeしているか）
+    bool m_is_ui_shader_ = false;
 
     /// <summary>
-    /// ZTest、ZWrite、Cull、Blendなどの設定を編集するGuiを表示します。
+    /// ZTest、ZWrite、Cull、Blendの設定を編集するGuiを表示します。
     /// </summary>
     void DrawShaderSettings();
 
 public:
     std::vector<ShaderParameter> parameters;
 
-    void OnInspectorGui() override;
     /// <summary>
-    /// 描画の設定(ZTest、Cull、Blendなど)を取得します。
+    /// .hlslファイルをコンパイルし、描画設定(// @Blend など)とMaterialのパラメーターを読み取ります。
     /// </summary>
-    ShaderSettings ShaderSettings() const;
-    /// <summary>
-    /// コンパイル済みのBasicVertexShaderとBasicPixelShaderを読み込んだ、既定のShaderを取得します。初めて呼ばれた時に読み込まれます。
-    /// </summary>
-    static std::shared_ptr<Shader> GetDefault();
+    /// <param name="file_path">.hlslファイルのパス</param>
+    /// <param name="error_message">失敗時のエラーメッセージの出力先</param>
+    /// <returns>コンパイルに成功した場合はtrue</returns>
+    bool Compile(const std::wstring &file_path, std::string &error_message);
 
     /// <summary>
-    /// 指定された種類のShaderのバイトコードを取得します。GeometryShaderがない場合は空のバイトコードを返します。
+    /// コンパイル済みのShaderを取得します。コンパイルしていない場合はnullptrを返します。
     /// </summary>
-    /// <param name="type">Shaderの種類</param>
-    CD3DX12_SHADER_BYTECODE GetByteCode(const kShaderType type) const
+    const CrsShaderProgram *CrsProgram() const
     {
-        switch (type)
-        {
-        case kShaderType_Vertex:
-            return m_vs_blob_.Get();
-        case kShaderType_Pixel:
-            return m_ps_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_ps_blob_.Get();
-        case kShaderType_Geometry:
-            return m_gs_blob_.Get() == nullptr ? CD3DX12_SHADER_BYTECODE{} : m_gs_blob_.Get();
-        default:
-            throw std::runtime_error("Invalid shader type");
-        }
+        return m_program_.get();
     }
 
     /// <summary>
-    /// ShaderSettingsのプリミティブトポロジーから、PSOに設定するトポロジーの種類(点/線/三角形)を取得します。
+    /// UI(Image)用のShaderかどうかを取得します。
     /// </summary>
-    D3D12_PRIMITIVE_TOPOLOGY_TYPE GetPrimitiveTopologyType() const;
+    bool IsUiShader() const
+    {
+        return m_is_ui_shader_;
+    }
+
+    void OnInspectorGui() override;
+    /// <summary>
+    /// 描画の設定(ZTest、ZWrite、Cull、Blend)を取得します。
+    /// </summary>
+    ShaderSettings ShaderSettings() const;
 
     template <class Archive>
     void serialize(Archive &ar, const uint32_t version)

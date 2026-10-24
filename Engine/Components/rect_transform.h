@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "transform.h"
 #include "Math/rect.h"
 

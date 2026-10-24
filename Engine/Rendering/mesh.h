@@ -1,8 +1,8 @@
-#pragma once
+﻿#pragma once
 #include "bone_weight.h"
 #include "sub_mesh.h"
-#include "CabotEngine/Graphics/VertexBuffer.h"
-#include "CabotEngine/Graphics/IndexBuffer.h"
+#include "vertex.h"
+#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
 
 struct aiMesh;
 struct aiScene;
@@ -10,10 +10,23 @@ struct aiScene;
 namespace engine
 {
 /// <summary>
+/// GPU上のMeshのバッファです。indexはMesh本体とSubMeshで1本にまとめ、partsで範囲を分けます。
+/// </summary>
+struct MeshGpuData
+{
+    CRS::Buffer vertices;
+    CRS::Buffer indices;
+    // 1つ目はMesh本体、以降はSubMeshの (先頭のindex, indexの数)
+    std::vector<std::pair<uint32_t, uint32_t>> parts;
+};
+
+/// <summary>
 /// 頂点、index、SubMeshなどのMeshのデータを持つAssetです。
 /// </summary>
 class Mesh : public Object, public Inspectable
 {
+    std::shared_ptr<MeshGpuData> m_gpu_data_;
+
 public:
     size_t max_bones_in_vertex = 0;
 
@@ -27,14 +40,20 @@ public:
     std::vector<Matrix> bind_poses; // per-bone
     std::vector<SubMesh> sub_meshes;
 
-    std::shared_ptr<VertexBuffer> vertex_buffer;
-    std::vector<std::shared_ptr<IndexBuffer>> index_buffers;
-
     void OnInspectorGui() override;
+
     /// <summary>
-    /// VertexBufferと、Mesh本体およびSubMeshごとのIndexBufferを作り直します。
+    /// 描画に使うGPU上のバッファを取得します。初回、またはReconstructMeshesBufferの後に作ります。頂点が無い場合はnullptrを返します。
+    /// </summary>
+    const MeshGpuData *GpuData();
+    /// <summary>
+    /// 頂点やindexを書き換えた後に呼びます。次に描画する時にGPU上のバッファを作り直します。
     /// </summary>
     void ReconstructMeshesBuffer();
+    /// <summary>
+    /// 頂点、色、法線、接線、UV、Boneの情報を、GPUに送るVertexの配列にまとめます。
+    /// </summary>
+    std::vector<Vertex> BuildVertices() const;
 
     /// <summary>
     /// AssimpのMeshから、頂点、色、UV、Index、法線、接線、Boneの情報をコピーしてMeshを作成します。

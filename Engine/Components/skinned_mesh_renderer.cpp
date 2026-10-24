@@ -1,12 +1,11 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "skinned_mesh_renderer.h"
 #include "game_object.h"
-#include "camera_component.h"
 #include "gui.h"
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
-#include "Rendering/render_pipeline.h"
-#include "Rendering/CabotEngine/Graphics/RootSignature.h"
+#include "Rendering/crs_bridge.h"
+#include "Rendering/CaboRenderingSystem/render_engine.h"
 
 namespace engine
 {
@@ -14,47 +13,25 @@ bool SkinnedMeshRenderer::m_draw_bones_ = false;
 
 void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
 {
-    for (int i = 0; i < m_bone_matrix_buffers_.size(); ++i)
-    {
-        if (!m_bone_matrix_buffers_[i])
-        {
-            m_bone_matrix_buffers_[i] = std::make_shared<StructuredBuffer>(sizeof(Matrix), transforms.size());
-            m_bone_matrix_buffers_[i]->CreateBuffer();
-            m_bone_matrix_buffer_handles_[i] = DescriptorHeap::Allocate();
-            m_bone_matrix_buffers_[i]->UploadBuffer(m_bone_matrix_buffer_handles_[i]);
-        }
-    }
+    if (transforms.empty())
+        return;
 
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto bone_matrices_buffer = m_bone_matrix_buffers_[current_buffer_idx];
+    if (!m_bone_matrix_buffer_.IsValid() || m_bone_matrix_buffer_.Count() != transforms.size())
+    {
+        m_bone_matrix_buffer_ = CRS::StructuredBuffer<Matrix>(
+            CrsBridge::Crs().Device(), static_cast<uint32_t>(transforms.size()), CRS::MemoryType::Upload,
+            CRS::BufferUsage::None, "BoneMatrices");
+    }
 
     std::vector<Matrix> matrices(transforms.size());
     for (int i = 0; i < transforms.size(); ++i)
     {
-        auto world = transforms[i].lock()->WorldMatrix();
-        auto invert_bind_poses = inverted_bind_poses[i];
-
-        matrices[i] = invert_bind_poses * world;
+        const auto transform = transforms[i].lock();
+        const auto world = transform ? transform->WorldMatrix() : Matrix::Identity;
+        matrices[i] = inverted_bind_poses[i] * world;
     }
 
-    bone_matrices_buffer->UpdateBuffer(matrices.data());
-}
-
-void SkinnedMeshRenderer::UpdateWorldBuffer()
-{
-    for (auto &world_matrix_buffer : m_world_matrix_buffers_)
-    {
-        if (!world_matrix_buffer)
-        {
-            world_matrix_buffer = std::make_shared<ConstantBuffer>(sizeof(Matrix));
-            world_matrix_buffer->CreateBuffer();
-        }
-    }
-
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-    const auto &world_matrix_buffer = m_world_matrix_buffers_[current_buffer_idx];
-    const auto ptr = world_matrix_buffer->GetPtr<Matrix>();
-    *ptr = Matrix::Identity;
+    m_bone_matrix_buffer_.Set(matrices);
 }
 
 void SkinnedMeshRenderer::DrawBones() const
@@ -97,24 +74,18 @@ void SkinnedMeshRenderer::OnInspectorGui()
         }
     }
 }
-void SkinnedMeshRenderer::UpdateBuffer()
-{
-    MeshRenderer::UpdateBuffer();
-    UpdateBoneTransformsBuffer();
-
-    const auto current_buffer = RenderEngine::CurrentBackBufferIndex();
-    const auto cmd_list = RenderEngine::CommandList();
-
-    cmd_list->SetGraphicsRootDescriptorTable(kBoneSRV, m_bone_matrix_buffer_handles_[current_buffer]->handle_gpu);
-}
 
 void SkinnedMeshRenderer::Render()
 {
-    UpdateWorldBuffer();
     UpdateBoneTransformsBuffer();
-    const auto current_buffer_idx = RenderEngine::CurrentBackBufferIndex();
 
-    RenderPipeline::Submit(m_shared_mesh_, shared_materials, GameObject()->Transform()->Position(), m_world_matrix_buffers_[current_buffer_idx]->GetAddress(), m_bone_matrix_buffer_handles_[current_buffer_idx]->handle_gpu);
+    if (m_draw_bones_)
+        DrawBones();
+
+    // ボーン行列がworld空間なのでWorldMatrixは単位行列。カリング用のboundsはworld空間に直して渡す
+    DirectX::BoundingBox world_bounds;
+    bounds.Transform(world_bounds, BoundsOrigin());
+    SubmitToRenderer(Matrix::Identity, world_bounds, m_bone_matrix_buffer_.GetHandle());
 }
 }
 
