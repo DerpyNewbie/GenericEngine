@@ -5,7 +5,7 @@
 #include "Rendering/gizmos.h"
 #include "Components/transform.h"
 #include "Rendering/crs_bridge.h"
-#include "Rendering/CaboRenderingSystem/render_engine.h"
+#include "CaboRenderingSystem/render_engine.h"
 
 namespace engine
 {
@@ -21,6 +21,11 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
         m_bone_matrix_buffer_ = CRS::StructuredBuffer<Matrix>(
             CrsBridge::Crs().Device(), static_cast<uint32_t>(transforms.size()), CRS::MemoryType::Upload,
             CRS::BufferUsage::None, "BoneMatrices");
+        m_previous_bone_matrix_buffer_ = CRS::StructuredBuffer<Matrix>(
+            CrsBridge::Crs().Device(), static_cast<uint32_t>(transforms.size()), CRS::MemoryType::Upload,
+            CRS::BufferUsage::None, "PreviousBoneMatrices");
+        // ボーンの数が変わったら前フレームの値は使えないので捨てる
+        m_previous_bone_matrices_.clear();
     }
 
     std::vector<Matrix> matrices(transforms.size());
@@ -31,7 +36,13 @@ void SkinnedMeshRenderer::UpdateBoneTransformsBuffer()
         matrices[i] = inverted_bind_poses[i] * world;
     }
 
+    // 前フレームの値が無い最初のフレームは、今の値を入れておく（モーションベクトルが0になる）
+    if (m_previous_bone_matrices_.size() != matrices.size())
+        m_previous_bone_matrices_ = matrices;
+
     m_bone_matrix_buffer_.Set(matrices);
+    m_previous_bone_matrix_buffer_.Set(m_previous_bone_matrices_);
+    m_previous_bone_matrices_ = std::move(matrices);
 }
 
 void SkinnedMeshRenderer::DrawBones() const
@@ -85,7 +96,8 @@ void SkinnedMeshRenderer::Render()
     // ボーン行列がworld空間なのでWorldMatrixは単位行列。カリング用のboundsはworld空間に直して渡す
     DirectX::BoundingBox world_bounds;
     bounds.Transform(world_bounds, BoundsOrigin());
-    SubmitToRenderer(Matrix::Identity, world_bounds, m_bone_matrix_buffer_.GetHandle());
+    SubmitToRenderer(Matrix::Identity, world_bounds, m_bone_matrix_buffer_.GetHandle(),
+                     m_previous_bone_matrix_buffer_.GetHandle());
 }
 }
 

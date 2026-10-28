@@ -5,12 +5,12 @@
 #include <stb_image.h>
 
 #include <assimp/texture.h>
+#include <CaboRenderingSystem/RHI/D3D12/d3d12_render_device.h>
 
 #include "gui.h"
 #include "crs_bridge.h"
 #include "Asset/asset_database.h"
-#include "Rendering/CaboRenderingSystem/render_engine.h"
-#include "Rendering/CaboRenderingSystem/RHI/D3D12/d3d12_render_device.h"
+#include "CaboRenderingSystem/render_engine.h"
 
 #pragma comment(lib, "DirectXTex.lib")
 

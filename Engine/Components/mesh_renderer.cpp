@@ -61,10 +61,11 @@ void MeshRenderer::Render()
 }
 
 void MeshRenderer::SubmitToRenderer(const Matrix &world, const DirectX::BoundingBox &local_bounds,
-                                    const CRS::BufferHandle bone_buffer)
+                                    const CRS::BufferHandle bone_buffer,
+                                    const CRS::BufferHandle previous_bone_buffer)
 {
     CrsBridge::SubmitMeshRenderer(m_crs_id_, m_shared_mesh_, shared_materials, world, local_bounds,
-                                  bone_buffer);
+                                  bone_buffer, previous_bone_buffer);
 }
 
 void MeshRenderer::OnVisibilityChanged(const bool visible)

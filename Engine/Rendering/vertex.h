@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "Rendering/CaboRenderingSystem/RHI/rhi_types.h"
+#include "CaboRenderingSystem/RHI/rhi_types.h"
 
 namespace engine
 {

@@ -150,7 +150,8 @@ void SubmitFallbackCamera()
 
 void CrsBridge::SubmitMeshRenderer(CRS::MeshRendererId &id, const std::shared_ptr<Mesh> &mesh,
                                    const std::vector<AssetPtr<Material>> &materials, const Matrix &world,
-                                   const DirectX::BoundingBox &local_bounds, const CRS::BufferHandle bone_buffer)
+                                   const DirectX::BoundingBox &local_bounds, const CRS::BufferHandle bone_buffer,
+                                   const CRS::BufferHandle previous_bone_buffer)
 {
     const auto gpu_data = mesh ? mesh->GpuData() : nullptr;
     if (gpu_data == nullptr)
@@ -164,6 +165,7 @@ void CrsBridge::SubmitMeshRenderer(CRS::MeshRendererId &id, const std::shared_pt
     data.index_buffer = gpu_data->indices.GetHandle();
     data.vertex_layout = Vertex::Layout();
     data.bone_buffer = bone_buffer;
+    data.previous_bone_buffer = previous_bone_buffer;
     data.world = world;
     data.local_bounds = local_bounds;
 
@@ -336,7 +338,9 @@ void CrsBridge::RenderOverlay()
 
 bool CrsBridge::Init(const HWND hwnd, const uint32_t width, const uint32_t height)
 {
-    auto crs = CRS::CreateDefaultRenderEngine(hwnd, width, height);
+    CRS::ForwardRenderingSettings settings;
+    settings.shader_directory = L"C:/cabotya/Projects/team/Resources/Shaders";
+    auto crs = CRS::CreateDefaultRenderEngine(hwnd, width, height, settings);
     if (crs == nullptr)
     {
         Logger::Error<CrsBridge>("Failed to create CaboRenderingSystem");

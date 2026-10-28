@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "renderer.h"
-#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
+#include "CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace engine
 {

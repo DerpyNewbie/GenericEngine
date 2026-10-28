@@ -2,7 +2,7 @@
 #include "bone_weight.h"
 #include "sub_mesh.h"
 #include "vertex.h"
-#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
+#include "CaboRenderingSystem/RHI/gpu_resources.h"
 
 struct aiMesh;
 struct aiScene;

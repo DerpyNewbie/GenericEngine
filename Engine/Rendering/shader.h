@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "shader_parameter.h"
 #include "shader_settings.h"
-#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
+#include "CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {

@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "Asset/asset_ptr.h"
 #include "Rendering/texture2d.h"
-#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
+#include "CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {

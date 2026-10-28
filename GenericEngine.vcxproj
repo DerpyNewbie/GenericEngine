@@ -150,22 +150,6 @@
         <ClCompile Include="Engine\Rendering\MaterialData\uav_texture_buffer_data.cpp" />
         <ClCompile Include="Engine\Rendering\texture_cube.cpp" />
         <ClCompile Include="Engine\Rendering\texture2d.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Material\material.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Pipeline\Forward\forward_passes.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Pipeline\Forward\forward_pipeline.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Pipeline\render_stages.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Pipeline\shadow_system.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\render_engine.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_command_list.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_convert.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_descriptor_heap.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_render_device.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_shader_compiler.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\RHI\rhi_types.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Scene\camera_data_store.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Scene\immediate_draw_store.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Scene\light_data_store.cpp" />
-        <ClCompile Include="Engine\Rendering\CaboRenderingSystem\Scene\mesh_renderer_data_store.cpp" />
         <ClCompile Include="Engine\Rendering\crs_bridge.cpp" />
         <ClCompile Include="Engine\Rendering\primitives.cpp" />
         <ClCompile Include="Engine\Rendering\render_texture.cpp" />
@@ -327,36 +311,6 @@
         <ClInclude Include="Engine\Rendering\MaterialData\uav_texture_buffer_data.h" />
         <ClInclude Include="Engine\Rendering\texture_cube.h" />
         <ClInclude Include="Engine\Rendering\texture2d.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Core\log.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Core\math_types.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Core\slot_pool.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Material\material_id.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Material\material.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\Forward\forward_passes.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\Forward\forward_pipeline.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\i_render_pass.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\i_render_pipeline.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\render_stages.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\render_view.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Pipeline\shadow_system.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\render_engine.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_command_list.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_common.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_descriptor_heap.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_render_device.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\D3D12\d3d12_shader_compiler.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\gpu_resources.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\handles.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\i_command_list.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\i_render_device.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\rhi_types.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\RHI\shader_reflection.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\camera_data_store.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\frame_snapshot.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\immediate_draw_store.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\light_data_store.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\mesh_renderer_data_store.h" />
-        <ClInclude Include="Engine\Rendering\CaboRenderingSystem\Scene\scene_environment.h" />
         <ClInclude Include="Engine\Rendering\crs_bridge.h" />
         <ClInclude Include="Engine\Rendering\primitives.h" />
         <ClInclude Include="Engine\Rendering\rendering_constants.h" />
@@ -379,6 +333,7 @@
     </ItemGroup>
     <ItemGroup>
         <Content Include=".gitignore" />
+        <Content Include="vcpkg-configuration.json"/>
         <Content Include="vcpkg.json" />
     </ItemGroup>
     <ItemGroup>
@@ -503,6 +458,18 @@
             <DxcDll Include="$(ProjectDir)vcpkg_installed\x64-windows\bin\dxcompiler.dll;$(ProjectDir)vcpkg_installed\x64-windows\bin\dxil.dll"/>
         </ItemGroup>
         <Copy SourceFiles="@(DxcDll)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
+    </Target>
+    <!-- Streamlineのプラグイン(sl.dlss.dll等)は実行時に動的ロードされるため出力先にコピーする -->
+    <!-- Debugはログ・オーバーレイ付きの開発版、Releaseは署名済みの製品版を使う -->
+    <Target Name="CopyStreamlineDlls" AfterTargets="Build" Condition="'$(Platform)'=='x64'">
+        <PropertyGroup>
+            <StreamlineBinDir Condition="'$(Configuration)'=='Debug'">$(ProjectDir)vcpkg_installed\x64-windows\debug\bin\</StreamlineBinDir>
+            <StreamlineBinDir Condition="'$(Configuration)'!='Debug'">$(ProjectDir)vcpkg_installed\x64-windows\bin\</StreamlineBinDir>
+        </PropertyGroup>
+        <ItemGroup>
+            <StreamlineDll Include="$(StreamlineBinDir)sl.*.dll;$(StreamlineBinDir)nvngx_*.dll;$(StreamlineBinDir)NvLowLatencyVk.dll;$(StreamlineBinDir)WinPixEventRuntime.dll"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(StreamlineDll)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true"/>
     </Target>
     <ImportGroup Label="ExtensionTargets">
     </ImportGroup>

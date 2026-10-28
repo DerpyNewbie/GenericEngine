@@ -12,7 +12,7 @@ namespace engine
 {
 namespace
 {
-constexpr auto kDefaultShaderPath = "Lit.hlsl";
+constexpr auto kDefaultShaderPath = "Shaders/forward_standard.hlsl";
 
 CRS::RenderState ToRenderState(const ShaderSettings &settings)
 {

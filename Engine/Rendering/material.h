@@ -1,8 +1,8 @@
 ﻿#pragma once
 #include "material_block.h"
 #include "shader.h"
-#include "Rendering/CaboRenderingSystem/Material/material_id.h"
-#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
+#include "CaboRenderingSystem/Material/material_id.h"
+#include "CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {

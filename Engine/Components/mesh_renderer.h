@@ -3,7 +3,7 @@
 #include "renderer.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
+#include "CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace engine
 {
@@ -34,9 +34,8 @@ protected:
     /// </summary>
     /// <param name="world">WorldMatrix</param>
     /// <param name="local_bounds">worldを基準としたbounds</param>
-    /// <param name="bone_buffer">スキニングに使うボーン行列のBuffer。使わない場合は無効なハンドル</param>
     void SubmitToRenderer(const Matrix &world, const DirectX::BoundingBox &local_bounds,
-                          CRS::BufferHandle bone_buffer = {});
+                          CRS::BufferHandle bone_buffer = {}, CRS::BufferHandle previous_bone_buffer = {});
 
     /// <summary>
     /// boundsをGizmosで描画します。

@@ -2,7 +2,7 @@
 #include "renderer.h"
 #include "Rendering/depth_texture.h"
 #include "Rendering/render_texture.h"
-#include "Rendering/CaboRenderingSystem/RHI/handles.h"
+#include "CaboRenderingSystem/RHI/handles.h"
 
 namespace CRS
 {

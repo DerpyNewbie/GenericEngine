@@ -4,7 +4,7 @@
 
 #include "engine_profiler.h"
 #include "Rendering/crs_bridge.h"
-#include "Rendering/CaboRenderingSystem/render_engine.h"
+#include "CaboRenderingSystem/render_engine.h"
 
 template <typename T>
 struct ScrollingBuffer

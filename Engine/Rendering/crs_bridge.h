@@ -4,8 +4,8 @@
 #include "Rendering/font_data.h"
 #include "Rendering/material.h"
 #include "Rendering/mesh.h"
-#include "Rendering/CaboRenderingSystem/Scene/camera_data_store.h"
-#include "Rendering/CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
+#include "CaboRenderingSystem/Scene/camera_data_store.h"
+#include "CaboRenderingSystem/Scene/mesh_renderer_data_store.h"
 
 namespace CRS
 {
@@ -80,9 +80,11 @@ public:
     /// <param name="world">WorldMatrix</param>
     /// <param name="local_bounds">worldを基準としたbounds（カリングに使います）</param>
     /// <param name="bone_buffer">スキニングに使うボーン行列のBuffer。使わない場合は無効なハンドル</param>
+    /// <param name="previous_bone_buffer">前フレームのボーン行列のBuffer（モーションベクトル用）。無効ならbone_bufferを使う</param>
     static void SubmitMeshRenderer(CRS::MeshRendererId &id, const std::shared_ptr<Mesh> &mesh,
                                    const std::vector<AssetPtr<Material>> &materials, const Matrix &world,
-                                   const DirectX::BoundingBox &local_bounds, CRS::BufferHandle bone_buffer = {});
+                                   const DirectX::BoundingBox &local_bounds, CRS::BufferHandle bone_buffer = {},
+                                   CRS::BufferHandle previous_bone_buffer = {});
     /// <summary>
     /// Meshの描画データをCRSから取り除きます。
     /// </summary>

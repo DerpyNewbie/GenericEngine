@@ -2,7 +2,7 @@
 
 #include "mesh_renderer.h"
 #include "Asset/asset_ptr.h"
-#include "Rendering/CaboRenderingSystem/RHI/gpu_resources.h"
+#include "CaboRenderingSystem/RHI/gpu_resources.h"
 
 namespace engine
 {
@@ -17,6 +17,10 @@ class SkinnedMeshRenderer : public MeshRenderer
 
     // ボーン行列（Boneのworld空間）。CaboRenderingSystemのシェーダーで頂点を変形する
     CRS::StructuredBuffer<Matrix> m_bone_matrix_buffer_;
+    // 前フレームのボーン行列。モーションベクトルの計算に使う
+    CRS::StructuredBuffer<Matrix> m_previous_bone_matrix_buffer_;
+    // 前フレームに書き込んだボーン行列（次のフレームでm_previous_bone_matrix_buffer_に書き込む）
+    std::vector<Matrix> m_previous_bone_matrices_;
 
     /// <summary>
     /// 各Boneと親を結ぶ線をGizmosで描画します。
@@ -24,6 +28,7 @@ class SkinnedMeshRenderer : public MeshRenderer
     void DrawBones() const;
     /// <summary>
     /// BoneのMatrix用のBufferがなければ作成し、各BoneのWorldMatrixとBindPoseの逆行列から計算したMatrixを書き込みます。
+    /// 前フレームのMatrixも、前フレーム用のBufferに書き込みます。1フレームに1回だけ呼んでください。
     /// </summary>
     void UpdateBoneTransformsBuffer();
     /// <summary>
