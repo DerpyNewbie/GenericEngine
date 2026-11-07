@@ -21,6 +21,8 @@ void RenderingSettingsComponent::OnInspectorGui()
     has_changed |= Gui::PropertyField("Skybox Cube", m_skybox_cube_);
     has_changed |= ShadowCascadeInspector();
     has_changed |= Gui::PropertyField("Effect Render Queue", m_effect_render_queue_);
+    has_changed |= Gui::PropertyField("Ambient Color", m_ambient_color_);
+    has_changed |= Gui::PropertyField("Ambient Intensity", m_ambient_intensity_);
 
     ImGui::Checkbox("Apply Settings", &has_changed);
     
@@ -38,6 +40,7 @@ void RenderingSettingsComponent::ApplySettings()
     Lighting::Instance()->SetCascadeSlices(m_cascade_slices_);
     DirectionalLight::SetCascadeSlices(m_cascade_slices_);
     RenderPipeline::SetEffectRenderQueue(m_effect_render_queue_);
+    RenderPipeline::SetAmbientLight(m_ambient_color_, m_ambient_intensity_);
 }
 }
 

@@ -10,6 +10,8 @@ class RenderingSettingsComponent final : public Component
     AssetPtr<TextureCube> m_skybox_cube_;
     std::array<float, RenderingConstants::kShadowCascadeCount> m_cascade_slices_ = {10.0f, 200.0f, 1000.0f};
     uint16_t m_effect_render_queue_ = 5500;
+    Color m_ambient_color_ = Color(1, 1, 1);
+    float m_ambient_intensity_ = 0.0f;
 
     bool ShadowCascadeInspector();
 
@@ -40,7 +42,15 @@ public:
                 CEREAL_NVP(m_cascade_slices_)
             );
         }
+
+        if (version >= 4)
+        {
+            ar(
+                CEREAL_NVP(m_ambient_color_),
+                CEREAL_NVP(m_ambient_intensity_)
+            );
+        }
     }
 };
 }
-CEREAL_CLASS_VERSION(engine::RenderingSettingsComponent, 3)
+CEREAL_CLASS_VERSION(engine::RenderingSettingsComponent, 4)

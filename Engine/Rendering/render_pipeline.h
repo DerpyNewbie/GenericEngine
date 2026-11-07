@@ -31,6 +31,8 @@ class RenderPipeline
     };
     
     uint16_t m_effect_render_queue_;
+    Color m_ambient_color_ = Color(1, 1, 1);
+    float m_ambient_intensity_ = 0.0f;
 
     std::shared_ptr<Shader> m_depth_shader_;
 
@@ -78,6 +80,7 @@ public:
     static void Submit(const AssetPtr<FontData> &font_data, Vector2 position, const std::string &string, Color color, float rotation, Vector2 origin, float scale, uint16_t render_queue, const Layer& layer);
     static void Submit(const std::vector<AssetPtr<Material>> &materials, uint32_t vertex_count, const Layer& layer);
     static void SetEffectRenderQueue(uint16_t render_queue);
+    static void SetAmbientLight(const Color &color, float intensity);
     static void AddRenderer(std::shared_ptr<Renderer> renderer);
     static void RemoveRenderer(const std::shared_ptr<Renderer> &renderer);
     static void RequestRender(Camera camera);

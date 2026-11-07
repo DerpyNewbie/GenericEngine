@@ -257,6 +257,8 @@ void RenderPipeline::SetSceneData()
         m_scene_data_buffer_data_->AddFloatData("delta_time");
         m_scene_data_buffer_data_->AddVector3Data("camera_pos");
         m_scene_data_buffer_data_->AddVector3Data("camera_dir");
+        m_scene_data_buffer_data_->AddColorData("ambient_color");
+        m_scene_data_buffer_data_->AddFloatData("ambient_intensity");
     }
 
     m_scene_data_buffer_data_->SetVector2Data("screen_size",
@@ -268,7 +270,8 @@ void RenderPipeline::SetSceneData()
     auto main_camera = CameraComponent::Main();
     m_scene_data_buffer_data_->SetVector3Data("camera_pos", main_camera == nullptr ? Vector3::Zero : main_camera->GameObject()->Transform()->Position());
     m_scene_data_buffer_data_->SetVector3Data("camera_dir", main_camera == nullptr ? Vector3::Zero : main_camera->GameObject()->Transform()->Forward());
-    
+    m_scene_data_buffer_data_->SetColorData("ambient_color", m_ambient_color_);
+    m_scene_data_buffer_data_->SetFloatData("ambient_intensity", m_ambient_intensity_);
 
     GpuResourceManager::SetGlobalBufferData("SceneData", m_scene_data_buffer_data_);
 }
@@ -542,6 +545,13 @@ void RenderPipeline::SetEffectRenderQueue(const uint16_t render_queue)
 {
     const auto instance = Instance();
     instance->m_effect_render_queue_ = render_queue;
+}
+
+void RenderPipeline::SetAmbientLight(const Color &color, const float intensity)
+{
+    const auto instance = Instance();
+    instance->m_ambient_color_ = color;
+    instance->m_ambient_intensity_ = intensity;
 }
 
 uint64_t RenderPipeline::GenerateSortKey(const uint64_t render_queue, const float depth, const Shader& shader)
