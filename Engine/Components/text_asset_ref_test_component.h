@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "component.h"
 #include "Asset/asset_ptr.h"
 #include "Asset/text_asset.h"

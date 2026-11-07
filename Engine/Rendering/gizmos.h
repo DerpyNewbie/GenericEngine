@@ -1,8 +1,4 @@
-#pragma once
-#include "event_receivers.h"
-#include "CabotEngine/Graphics/ConstantBuffer.h"
-#include "CabotEngine/Graphics/RenderEngine.h"
-#include "CabotEngine/Graphics/VertexBuffer.h"
+﻿#pragma once
 #include "Components/renderer.h"
 
 namespace engine
@@ -10,40 +6,37 @@ namespace engine
 using namespace DirectX::SimpleMath;
 
 /// <summary>
-/// Simple line drawer for preview purposes 
+/// Simple line drawer for preview purposes
 /// </summary>
 /// <remarks>
-/// Can be called at any time. Rendering is guaranteed at the end of a frame. 
+/// Can be called at any time. Rendering is guaranteed at the end of a frame.
 /// </remarks>
 class Gizmos
 {
+public:
+    /// <summary>
+    /// 線の頂点です。2つで1本の線になります。
+    /// </summary>
+    struct LineVertex
+    {
+        Vector3 position;
+        Color color;
+    };
+
+private:
     friend class Engine;
 
-    static std::shared_ptr<Gizmos> m_instance_;
-    static std::vector<Vertex> m_vertices_;
+    static std::vector<LineVertex> m_vertices_;
 
-    std::shared_ptr<VertexBuffer> m_vertex_buffers_[RenderEngine::kFrame_Buffer_Count];
-    std::shared_ptr<Shader> m_line_shader_;
-    int m_vertices_count_[RenderEngine::kFrame_Buffer_Count];
-    int m_last_back_buffer_idx_ = -1;
-
-    /// <summary>
-    /// Gizmosのインスタンスを生成します。
-    /// </summary>
     static void Init();
-    /// <summary>
-    /// 登録されている線の頂点からVertexBufferを作成し、頂点のリストをクリアします。
-    /// </summary>
-    /// <param name="current_back_buffer_idx">現在のBackBufferのindex</param>
-    void CreateVertexBuffer(int current_back_buffer_idx);
 
 public:
     static constexpr auto kDefaultColor = Color(1, 1, 1);
 
     /// <summary>
-    /// 登録されている線を描画します。
+    /// 登録されている線の頂点を取り出し、リストを空にします。描画側(CrsBridge)が毎フレーム呼びます。
     /// </summary>
-    static void Render();
+    static std::vector<LineVertex> TakeLines();
 
     /// <summary>
     /// 線を登録します。実際の描画はRenderで行われます。

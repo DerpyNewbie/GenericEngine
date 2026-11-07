@@ -197,7 +197,8 @@ IAssetPtr AssetDatabase::GetAsset(const path &path)
     if (asset_desc_it == m_assets_by_guid_map_.end())
     {
         Logger::Log<AssetDatabase>("Asset '%s' not found. Importing...", path.string().c_str());
-        Import(path);
+        // AssetDescriptorと同じく、相対パスはProjectDirectoryからのパスとして扱う
+        Import(path.is_relative() ? m_project_directory_ / path : path);
         asset_desc_it = m_assets_by_guid_map_.find(guid);
         if (asset_desc_it == m_assets_by_guid_map_.end())
         {

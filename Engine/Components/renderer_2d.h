@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Math/rect.h"
 #include "component.h"
 #include "canvas.h"

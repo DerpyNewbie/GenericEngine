@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "cinema_camera_transitioner.h"
 
 #include "gui.h"

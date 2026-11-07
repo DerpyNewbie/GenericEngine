@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Components/renderer.h"
 #include "Components/camera_component.h"
 

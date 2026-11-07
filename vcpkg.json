@@ -3,6 +3,7 @@
     "assimp",
     "cereal",
     "directx-headers",
+    "directx-dxc",
     "directxtex",
     {
       "name": "directxtk12",
@@ -19,7 +20,9 @@
     },
     "implot",
     "crossguid",
-    "bullet3"
+    "bullet3",
+    "streamline",
+    "cabo-rendering-system"
   ],
   "overrides": [
     {

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Components/component.h"
 #include "Components/transform.h"
 #include "Components/camera_component.h"

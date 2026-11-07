@@ -1,8 +1,8 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "texture_cube_importer.h"
 
 #include "serializer.h"
-#include "Rendering/CabotEngine/Graphics/TextureCube.h"
+#include "Rendering/texture_cube.h"
 
 namespace engine
 {

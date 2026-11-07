@@ -1,8 +1,8 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "texture_2d_importer.h"
 #include "Asset/asset_database.h"
-#include "Rendering/CabotEngine/Graphics/Texture2D.h"
+#include "Rendering/texture2d.h"
 
 using namespace DirectX;
 

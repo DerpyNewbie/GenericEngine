@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 /// <summary>
 /// ShaderのLightsバッファに渡す1つのLightのデータです。

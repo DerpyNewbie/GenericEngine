@@ -14,6 +14,17 @@
       "kind": "artifact",
       "location": "https://artifacts.tools.arm.com/vcpkg-registry",
       "name": "arm"
+    },
+    {
+      "kind": "git",
+      "baseline": "15a9cb032ffe4e663a58230cd5f59a92469d1d46",
+      "repository": "https://github.com/cabotyanonimono/CaboRenderingSystem",
+      "packages": [
+        "cabo-rendering-system"
+      ]
     }
+  ],
+  "overlay-ports": [
+    "./ports"
   ]
 }

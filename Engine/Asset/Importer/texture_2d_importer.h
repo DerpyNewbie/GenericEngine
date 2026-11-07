@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 #include "asset_importer.h"
-#include "Rendering/CabotEngine/Graphics/Texture2D.h"
+#include "Rendering/texture2d.h"
 
 namespace engine
 {

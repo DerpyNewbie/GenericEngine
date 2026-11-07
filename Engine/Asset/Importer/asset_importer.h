@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Asset/asset_descriptor.h"
 
 namespace engine

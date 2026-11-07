@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 namespace engine
 {
@@ -27,6 +27,7 @@ enum kBufferType
     kBufferType_TextureCube,
     kBufferType_UavTexture,
     kBufferType_ByteAddressBuffer,
+    kBufferType_Sampler,
 };
 
 /// <summary>
@@ -55,7 +56,7 @@ struct ShaderParameter
     int index = 0;
     std::string name;
     std::string display_name;
-    kBufferType buffer_type;
+    kBufferType buffer_type = kBufferType_ConstantBuffer;
     bool is_unordered_access = false;
     size_t total_size = 0;
     std::vector<ShaderVariableDesc> variables = {};
@@ -80,8 +81,13 @@ struct ShaderParameter
             CEREAL_NVP(total_size),
             CEREAL_NVP(variables)
         );
+
+        if (version >= 2)
+        {
+            ar(CEREAL_NVP(buffer_type));
+        }
     }
 };
 }
 
-CEREAL_CLASS_VERSION(engine::ShaderParameter, 1)
+CEREAL_CLASS_VERSION(engine::ShaderParameter, 2)

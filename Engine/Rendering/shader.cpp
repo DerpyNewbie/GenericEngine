@@ -1,70 +1,173 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "shader.h"
 #include "gui.h"
+#include "crs_bridge.h"
+#include "CaboRenderingSystem/render_engine.h"
 
 namespace engine
 {
-std::shared_ptr<Shader> Shader::m_default_shader_;
-
-std::shared_ptr<Shader> Shader::GetDefault()
+namespace
 {
-    if (!m_default_shader_)
-    {
-        m_default_shader_ = std::make_shared<Shader>();
-        std::wstring file_path = L"x64/Debug/BasicVertexShader.cso";
-        auto hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_vs_blob_.GetAddressOf());
-        if (FAILED(hr))
-        {
-            Logger::Error("Failed to create default shader");
-        }
-        file_path = L"x64/Debug/BasicPixelShader.cso";
-        hr = D3DReadFileToBlob(file_path.c_str(), m_default_shader_->m_ps_blob_.GetAddressOf());
-        if (FAILED(hr))
-        {
-            Logger::Error("Failed to create default shader");
-        }
-    }
-    return m_default_shader_;
+std::string ReadText(const std::wstring &file_path)
+{
+    std::ifstream file(file_path);
+    return {std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>()};
 }
 
-D3D12_PRIMITIVE_TOPOLOGY_TYPE Shader::GetPrimitiveTopologyType() const
+kConstantBufferDataType ToDataType(const CRS::ShaderVariableType type)
 {
-    switch (DX_PrimitiveTopology[m_shader_settings_.primitive_topology_type])
+    switch (type)
     {
-    case D3D_PRIMITIVE_TOPOLOGY_POINTLIST:
-        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
-
-    case D3D_PRIMITIVE_TOPOLOGY_LINELIST:
-    case D3D_PRIMITIVE_TOPOLOGY_LINESTRIP:
-        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_LINE;
-
-    case D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST:
-    case D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP:
-        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-
+    case CRS::ShaderVariableType::Int:
+    case CRS::ShaderVariableType::UInt:
+        return kConstantBufferDataType::kConstantBufferDataTypeInt;
+    case CRS::ShaderVariableType::Float:
+        return kConstantBufferDataType::kConstantBufferDataType_Float;
+    case CRS::ShaderVariableType::Float2:
+        return kConstantBufferDataType::kConstantBufferDataType_Vector2;
+    case CRS::ShaderVariableType::Float3:
+        return kConstantBufferDataType::kConstantBufferDataType_Vector3;
+    case CRS::ShaderVariableType::Float4:
+        return kConstantBufferDataType::kConstantBufferDataType_Color;
+    case CRS::ShaderVariableType::Float4x4:
+        return kConstantBufferDataType::kConstantBufferDataType_Matrix;
     default:
-        return D3D12_PRIMITIVE_TOPOLOGY_TYPE_UNDEFINED;
-
+        return kConstantBufferDataType::kConstantBufferDataType_Unknown;
     }
+}
+
+/// <summary>
+/// コンパイル結果のリフレクションから、Materialのパラメーター（space0のcbuffer、テクスチャ、バッファ、サンプラー）を作ります。
+/// </summary>
+std::vector<ShaderParameter> ReadMaterialParameters(const CrsShaderProgram &program)
+{
+    std::vector<ShaderParameter> result;
+    const auto add = [&](ShaderParameter param) {
+        if (std::ranges::none_of(result, [&](const ShaderParameter &p) { return p.name == param.name; }))
+            result.push_back(std::move(param));
+    };
+
+    for (const auto *shader : {&program.vertex, &program.pixel})
+    {
+        if (!shader->IsValid())
+            continue;
+
+        const auto &reflection = shader->Reflection();
+        for (const auto &cb : reflection.constant_buffers)
+        {
+            if (cb.space != 0)
+                continue;
+
+            ShaderParameter param = {
+                static_cast<int>(cb.slot), cb.name, cb.name, kBufferType_ConstantBuffer, false, cb.size
+            };
+            for (const auto &variable : cb.variables)
+                param.variables.push_back({variable.name, ToDataType(variable.type)});
+            add(std::move(param));
+        }
+
+        for (const auto &resource : reflection.resources)
+        {
+            if (resource.space != 0)
+                continue;
+
+            ShaderParameter param = {static_cast<int>(resource.slot), resource.name, resource.name};
+            switch (resource.kind)
+            {
+            case CRS::ShaderResourceKind::Texture:
+                param.buffer_type = kBufferType_Texture2D;
+                break;
+            case CRS::ShaderResourceKind::TextureCube:
+                param.buffer_type = kBufferType_TextureCube;
+                break;
+            case CRS::ShaderResourceKind::StructuredBuffer:
+                param.buffer_type = kBufferType_StructuredBuffer;
+                // StructuredBufferは、1要素のバイト数をtotal_sizeに入れておく
+                param.total_size = resource.stride;
+                break;
+            case CRS::ShaderResourceKind::ByteAddressBuffer:
+                param.buffer_type = kBufferType_ByteAddressBuffer;
+                break;
+            case CRS::ShaderResourceKind::Sampler:
+                param.buffer_type = kBufferType_Sampler;
+                break;
+            default:
+                // RWTextureなどは、Materialからは設定できない
+                continue;
+            }
+            add(std::move(param));
+        }
+    }
+    return result;
+}
+}
+
+bool Shader::Compile(const std::wstring &file_path, std::string &error_message)
+{
+    const auto source = ReadText(file_path);
+    if (source.empty())
+    {
+        error_message = "Failed to read shader file";
+        return false;
+    }
+
+    if (source.find("VSMain") == std::string::npos)
+    {
+        error_message = "Entry point VSMain was not found. Shaders must define VSMain (and PSMain / VSShadow).";
+        return false;
+    }
+
+    auto &device = CrsBridge::Crs().Device();
+    auto program = std::make_shared<CrsShaderProgram>();
+    program->vertex = CRS::Shader(device, {file_path, L"VSMain", CRS::ShaderStage::Vertex, {}});
+    if (!program->vertex.IsValid())
+    {
+        error_message = "Failed to compile VSMain (see the log for details)";
+        return false;
+    }
+
+    if (source.find("PSMain") != std::string::npos)
+    {
+        program->pixel = CRS::Shader(device, {file_path, L"PSMain", CRS::ShaderStage::Pixel, {}});
+        if (!program->pixel.IsValid())
+        {
+            error_message = "Failed to compile PSMain (see the log for details)";
+            return false;
+        }
+    }
+
+    if (source.find("VSShadow") != std::string::npos)
+    {
+        program->shadow_vertex = CRS::Shader(device, {file_path, L"VSShadow", CRS::ShaderStage::Vertex, {}});
+        if (!program->shadow_vertex.IsValid())
+        {
+            error_message = "Failed to compile VSShadow (see the log for details)";
+            return false;
+        }
+    }
+
+    m_program_ = std::move(program);
+    m_is_ui_shader_ = source.find("crs_ui.hlsli") != std::string::npos;
+    m_shader_settings_.ApplySourceTags(source);
+
+    // パラメーターを読み直す。表示名は引き継ぐ
+    auto new_parameters = ReadMaterialParameters(*m_program_);
+    for (auto &parameter : new_parameters)
+    {
+        const auto old = std::ranges::find(parameters, parameter);
+        if (old != parameters.end())
+            parameter.display_name = old->display_name;
+    }
+    parameters = std::move(new_parameters);
+    return true;
 }
 
 void Shader::DrawShaderSettings()
 {
     ImGui::Combo("ZTest", &m_shader_settings_.z_test, ZTestNames, IM_ARRAYSIZE(ZTestNames));
     ImGui::Combo("ZWrite", &m_shader_settings_.z_write, ZWriteNames, IM_ARRAYSIZE(ZWriteNames));
-
     ImGui::Combo("Cull", &m_shader_settings_.cull, CullNames, IM_ARRAYSIZE(CullNames));
-
-    ImGui::Separator();
-    ImGui::Text("Blend");
-    ImGui::Checkbox("UseBlend", &m_shader_settings_.use_blend);
-    ImGui::Combo("SrcFactor", &m_shader_settings_.blend_src, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
-    ImGui::Combo("DstFactor", &m_shader_settings_.blend_dst, BlendFactorNames, IM_ARRAYSIZE(BlendFactorNames));
-    ImGui::Combo("BlendOp", &m_shader_settings_.blend_op, BlendOpNames, IM_ARRAYSIZE(BlendOpNames));
-
-    ImGui::Combo("ColorMask", &m_shader_settings_.color_mask, ColorMaskNames, IM_ARRAYSIZE(ColorMaskNames));
-    ImGui::Checkbox("AlphaToMask(Coverage)", &m_shader_settings_.alpha_to_mask);
-    ImGui::Combo("PrimitiveTopologyType", &m_shader_settings_.primitive_topology_type, PrimitiveTopologyNames, IM_ARRAYSIZE(PrimitiveTopologyNames));
+    ImGui::Combo("Blend", &m_shader_settings_.blend_mode, BlendModeNames, IM_ARRAYSIZE(BlendModeNames));
 }
 
 void Shader::OnInspectorGui()
@@ -85,7 +188,6 @@ void Shader::OnInspectorGui()
         {
             ImGui::PushID(&param);
             const auto should_show = ImGui::CollapsingHeader(("Parameter " + std::to_string(index++)).c_str());
-
             if (should_show)
             {
                 ImGui::Indent();
@@ -96,6 +198,7 @@ void Shader::OnInspectorGui()
             }
             ImGui::PopID();
         }
+        ImGui::Unindent();
     }
     ImGui::PopID();
 }
@@ -105,3 +208,5 @@ ShaderSettings Shader::ShaderSettings() const
     return m_shader_settings_;
 }
 }
+
+CEREAL_REGISTER_TYPE(engine::Shader)

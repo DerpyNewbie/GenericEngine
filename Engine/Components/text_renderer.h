@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "renderer.h"
 #include "Asset/asset_ptr.h"
 #include "Rendering/font_data.h"
@@ -19,7 +19,7 @@ public:
 
     void OnInspectorGui() override;
     /// <summary>
-    /// 文字列の描画をRenderPipelineに登録します。
+    /// 文字列を、CaboRenderingSystemのUIとして登録します。
     /// </summary>
     void Render() override;
 

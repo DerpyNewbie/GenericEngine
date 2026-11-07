@@ -1,11 +1,11 @@
-#include "pch.h"
+﻿#include "pch.h"
 
 #include "gui.h"
 #include "application.h"
 #include "Components/camera_component.h"
 
 #include "update_manager.h"
-#include "Rendering/render_pipeline.h"
+#include "Rendering/crs_bridge.h"
 
 namespace engine
 {
@@ -73,7 +73,7 @@ void CameraComponent::OnValidate()
 }
 void CameraComponent::Render()
 {
-    RenderPipeline::RequestRender(GetCamera());
+    CrsBridge::SubmitCamera(m_crs_camera_id_, *this);
 }
 
 void CameraComponent::OnEnabled()
@@ -114,18 +114,25 @@ void CameraComponent::OnDisabled()
     }
 
     UpdateManager::UnsubscribeRender(shared_from_base<IRenderReceiver>());
+    CrsBridge::RemoveCamera(m_crs_camera_id_);
 }
 
-Camera CameraComponent::GetCamera()
-{
-    return Camera(reinterpret_cast<UINT64>(shared_from_base<CameraComponent>().get()), property.background_color, ViewMatrix(), property.ProjectionMatrix(), m_render_texture_, m_depth_texture_);
-}
 
 std::shared_ptr<RenderTexture> CameraComponent::RenderTexture()
 {
     return m_render_texture_ != nullptr
     ? m_render_texture_
     : m_render_texture_ = AssetPtr<class RenderTexture>::FromInstance(Instantiate<class RenderTexture>());
+}
+
+std::shared_ptr<RenderTexture> CameraComponent::TargetTexture() const
+{
+    return m_render_texture_;
+}
+
+std::shared_ptr<DepthTexture> CameraComponent::TargetDepthTexture() const
+{
+    return m_depth_texture_;
 }
 
 void CameraComponent::SetMainCamera(const std::weak_ptr<CameraComponent> &camera)

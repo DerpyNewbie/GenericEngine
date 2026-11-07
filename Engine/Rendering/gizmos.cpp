@@ -1,99 +1,23 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "gizmos.h"
-
-#include "update_manager.h"
-#include "Asset/asset_database.h"
-#include "CabotEngine/Graphics/PSOManager.h"
-#include "CabotEngine/Graphics/RenderEngine.h"
 
 namespace engine
 {
-std::shared_ptr<Gizmos> Gizmos::m_instance_ = nullptr;
-std::vector<Vertex> Gizmos::m_vertices_;
+std::vector<Gizmos::LineVertex> Gizmos::m_vertices_;
 
 void Gizmos::Init()
+{}
+
+std::vector<Gizmos::LineVertex> Gizmos::TakeLines()
 {
-    assert(m_instance_ == nullptr && "Gizmos is already initialized");
-
-    m_instance_ = std::make_shared<Gizmos>();
-}
-
-void Gizmos::CreateVertexBuffer(const int current_back_buffer_idx)
-{
-    if (m_vertices_.empty())
-    {
-        m_vertex_buffers_[current_back_buffer_idx] = nullptr;
-        m_vertices_count_[current_back_buffer_idx] = 0;
-        return;
-    }
-
-    const auto vertex_buffer = std::make_shared<VertexBuffer>(m_vertices_.size(), m_vertices_.data());
-
-    if (!vertex_buffer->IsValid())
-    {
-        Logger::Error<Gizmos>("Failed to create VertexBuffer: Invalid VertexBuffer");
-        m_vertex_buffers_[current_back_buffer_idx] = nullptr;
-        m_vertices_count_[current_back_buffer_idx] = 0;
-        m_vertices_.clear();
-        return;
-    }
-
-    // store it, then clear current vertices
-    m_instance_->m_vertex_buffers_[current_back_buffer_idx] = vertex_buffer;
-    m_instance_->m_vertices_count_[current_back_buffer_idx] = static_cast<int>(m_vertices_.size());
-    m_vertices_.clear();
-}
-
-void Gizmos::Render()
-{
-    auto current_back_buffer_idx = RenderEngine::CurrentBackBufferIndex();
-
-    assert(m_instance_ != nullptr && "Gizmos is not initialized");
-
-    // have we created a vertex buffer for this frame? 
-    if (current_back_buffer_idx != m_instance_->m_last_back_buffer_idx_)
-    {
-        // if not, create a new vertex buffer for this frame
-        m_instance_->CreateVertexBuffer(current_back_buffer_idx);
-        m_instance_->m_last_back_buffer_idx_ = current_back_buffer_idx;
-    }
-
-    const auto current_vertex_buffer = m_instance_->m_vertex_buffers_[current_back_buffer_idx];
-    const auto current_vertices_count = m_instance_->m_vertices_count_[current_back_buffer_idx];
-
-    // if we had nothing to render, ignore it
-    if (current_vertices_count == 0 || current_vertex_buffer == nullptr)
-    {
-        return;
-    }
-
-    if (m_instance_->m_line_shader_ == nullptr)
-    {
-        m_instance_->m_line_shader_ = AssetDatabase::GetAsset<Shader>("LineShader.hlsl");
-        if (m_instance_->m_line_shader_ == nullptr)
-        {
-            Logger::Error<Gizmos>("Failed to load LineShader.hlsl");
-            return;
-        }
-    }
-
-    // render stuff
-    const auto cmd_list = RenderEngine::CommandList();
-    PSOManager::SetPipelineState(cmd_list, m_instance_->m_line_shader_.get());
-    cmd_list->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_LINELIST);
-    cmd_list->IASetVertexBuffers(0, 1, current_vertex_buffer->View());
-    cmd_list->DrawInstanced(current_vertices_count, 1, 0, 0);
+    return std::exchange(m_vertices_, {});
 }
 
 void Gizmos::DrawLine(const Vector3 &start, const Vector3 &end, const Color &color)
 {
-    Vertex vert_start{.vertex = start, .color = color};
-    Vertex vert_end{.vertex = end, .color = color};
-
-    m_vertices_.emplace_back(vert_start);
-    m_vertices_.emplace_back(vert_end);
+    m_vertices_.push_back({start, color});
+    m_vertices_.push_back({end, color});
 }
-
 void Gizmos::DrawLines(const std::vector<Vector3> &line, const Color &color)
 {
     for (size_t i = 0; i < line.size() - 1; i++)

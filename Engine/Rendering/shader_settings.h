@@ -1,48 +1,51 @@
-#pragma once
+﻿#pragma once
 
 namespace engine
 {
 /// <summary>
-/// Shaderの描画設定(Z Test、Cull、Blendなど)です。
+/// Shaderの描画設定(ZTest、ZWrite、Cull、Blend)です。
 /// </summary>
+/// <remarks>
+/// .hlslファイルに次のような行を書いておくと、インポート時にその値になります（Inspectorより優先されます）。
+/// <code>
+/// // @ZTest LEqual   (Less / Greater / LEqual / GEqual / Equal / NotEqual / Always / Never)
+/// // @ZWrite Off     (On / Off)
+/// // @Cull Off       (Back / Front / Off)
+/// // @Blend Alpha    (Opaque / Alpha / Additive)
+/// </code>
+/// </remarks>
 struct ShaderSettings
 {
-    static constexpr std::uint32_t kSerializationVersion = 5;
-    
+    static constexpr std::uint32_t kSerializationVersion = 6;
+
+    // 番号はそれぞれ ZTestNames / ZWriteNames / CullNames / BlendModeNames の並び
     int z_test = 0;
-    int z_write = 1;
+    int z_write = 0;
     int cull = 0;
+    int blend_mode = 0;
 
-    bool use_blend = false;
-    int blend_src = 0;
-    int blend_dst = 0;
-    int blend_op = 0;
-
-    int color_mask = 0;
-
-    bool alpha_to_mask = false;
-
-    int primitive_topology_type = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+    /// <summary>
+    /// .hlslのソースに書かれた "// @ZTest LEqual" のような設定を読み取って反映します。
+    /// </summary>
+    /// <param name="source">.hlslファイルの中身</param>
+    void ApplySourceTags(const std::string &source);
 
     template <class Archive>
     void serialize(Archive &ar, const std::uint32_t version)
     {
+        if (version < 6)
+        {
+            // 旧来の描画システム用の設定は使わない。既定値から始める
+            *this = ShaderSettings{};
+            return;
+        }
+
         ar(
             CEREAL_NVP(z_test),
             CEREAL_NVP(z_write),
             CEREAL_NVP(cull),
-            CEREAL_NVP(blend_src),
-            CEREAL_NVP(blend_dst),
-            CEREAL_NVP(blend_op),
-            CEREAL_NVP(color_mask),
-            CEREAL_NVP(alpha_to_mask)
-            );
-
-        if (4 <= version)
-            ar(CEREAL_NVP(use_blend));
-
-        if (5 <= version)
-            ar(CEREAL_NVP(primitive_topology_type));
+            CEREAL_NVP(blend_mode)
+        );
     }
 };
 }
@@ -58,127 +61,18 @@ constexpr const char *ZTestNames[] = {
     "Never",
 };
 constexpr const char *ZWriteNames[] = {
-    "On(All)",
-    "Off(Zero)",
+    "On",
+    "Off",
 };
 constexpr const char *CullNames[] = {
     "Back",
     "Front",
     "Off",
 };
-constexpr const char *BlendFactorNames[] = {
-    "One",
-    "Zero",
-    "SrcColor",
-    "SrcAlpha",
-    "DstColor",
-    "DstAlpha",
-    "OneMinusSrcColor",
-    "OneMinusSrcAlpha",
-    "OneMinusDstColor",
-    "OneMinusDstAlpha"
-};
-constexpr const char *BlendOpNames[] = {
-    "Add",
-    "Subtract",
-    "ReverseSubtract",
-    "Min",
-    "Max"
-};
-constexpr const char *ColorMaskNames[] = {
-    "RGBA",
-    "RGB",
-    "A",
-    "R",
-    "G",
-    "B",
-    "0"
-};
-constexpr const char *LightModeNames[] = {
-    "UniversalForward",
-    "ShadowCaster",
-    "DepthOnly",
-    "Meta",
-    "UniversalGBuffer"
-};
-constexpr const char *RenderTypeNames[] = {
+constexpr const char *BlendModeNames[] = {
     "Opaque",
-    "Transparent",
-    "TransparentCutout"
-};
-constexpr const char *RenderQueueNames[] = {
-    "Background",
-    "Geometry",
-    "AlphaTest",
-    "Transparent",
-    "Overlay"
+    "Alpha",
+    "Additive",
 };
 
-constexpr const char *PrimitiveTopologyNames[] = {
-    "PointList",
-    "LineList",
-    "LineStrip",
-    "TriangleList",
-    "TriangleStrip"
-};
-
-constexpr D3D12_COMPARISON_FUNC DX_ZTest[] = {
-    D3D12_COMPARISON_FUNC_LESS,
-    D3D12_COMPARISON_FUNC_GREATER,
-    D3D12_COMPARISON_FUNC_LESS_EQUAL,
-    D3D12_COMPARISON_FUNC_GREATER_EQUAL,
-    D3D12_COMPARISON_FUNC_EQUAL,
-    D3D12_COMPARISON_FUNC_NOT_EQUAL,
-    D3D12_COMPARISON_FUNC_ALWAYS,
-    D3D12_COMPARISON_FUNC_NEVER
-};
-
-constexpr D3D12_DEPTH_WRITE_MASK DX_ZWrite[] = {
-    D3D12_DEPTH_WRITE_MASK_ALL,
-    D3D12_DEPTH_WRITE_MASK_ZERO
-};
-
-constexpr D3D12_CULL_MODE DX_Cull[] = {
-    D3D12_CULL_MODE_BACK,
-    D3D12_CULL_MODE_FRONT,
-    D3D12_CULL_MODE_NONE
-};
-
-constexpr D3D12_BLEND DX_BlendFactor[] = {
-    D3D12_BLEND_ONE,
-    D3D12_BLEND_ZERO,
-    D3D12_BLEND_SRC_COLOR,
-    D3D12_BLEND_SRC_ALPHA,
-    D3D12_BLEND_DEST_COLOR,
-    D3D12_BLEND_DEST_ALPHA,
-    D3D12_BLEND_INV_SRC_COLOR,
-    D3D12_BLEND_INV_SRC_ALPHA,
-    D3D12_BLEND_INV_DEST_COLOR,
-    D3D12_BLEND_INV_DEST_ALPHA
-};
-
-constexpr D3D12_BLEND_OP DX_BlendOp[] = {
-    D3D12_BLEND_OP_ADD,
-    D3D12_BLEND_OP_SUBTRACT,
-    D3D12_BLEND_OP_REV_SUBTRACT,
-    D3D12_BLEND_OP_MIN,
-    D3D12_BLEND_OP_MAX
-};
-
-constexpr UINT8 DX_ColorMask[] = {
-    D3D12_COLOR_WRITE_ENABLE_ALL,
-    D3D12_COLOR_WRITE_ENABLE_RED | D3D12_COLOR_WRITE_ENABLE_GREEN | D3D12_COLOR_WRITE_ENABLE_BLUE,
-    D3D12_COLOR_WRITE_ENABLE_ALPHA,
-    D3D12_COLOR_WRITE_ENABLE_RED,
-    D3D12_COLOR_WRITE_ENABLE_GREEN,
-    D3D12_COLOR_WRITE_ENABLE_BLUE,
-    0
-};
-
-constexpr D3D_PRIMITIVE_TOPOLOGY DX_PrimitiveTopology[] = {
-    D3D_PRIMITIVE_TOPOLOGY_POINTLIST,
-    D3D_PRIMITIVE_TOPOLOGY_LINELIST,
-    D3D_PRIMITIVE_TOPOLOGY_LINESTRIP,
-    D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-    D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP,
-};
+CEREAL_CLASS_VERSION(engine::ShaderSettings, engine::ShaderSettings::kSerializationVersion)
