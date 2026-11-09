@@ -17,7 +17,7 @@
     },
     {
       "kind": "git",
-      "baseline": "15a9cb032ffe4e663a58230cd5f59a92469d1d46",
+      "baseline": "975d23086c50ada23a879a78e2f7a730fdc68ab0",
       "repository": "https://github.com/cabotyanonimono/CaboRenderingSystem",
       "packages": [
         "cabo-rendering-system"
