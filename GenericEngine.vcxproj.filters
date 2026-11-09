@@ -80,6 +80,8 @@
     <ClCompile Include="Engine\Asset\Importer\render_texture_importer.cpp" />
     <ClCompile Include="Engine\Asset\persistent_data_store.cpp" />
     <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp" />
+    <ClCompile Include="Engine\Asset\Importer\compute_shader_importer.cpp" />
+    <ClCompile Include="Engine\Rendering\compute_shader.cpp" />
     <ClCompile Include="Engine\Components\billboard_renderer.cpp" />
     <ClCompile Include="Engine\Audio\audio.cpp" />
     <ClCompile Include="Engine\Audio\audio_clip.cpp" />
@@ -189,6 +191,8 @@
     <ClInclude Include="Engine\Asset\Importer\import_log.h" />
     <ClInclude Include="Engine\Asset\Importer\render_texture_importer.h" />
     <ClInclude Include="Engine\Asset\Importer\shader_importer.h" />
+    <ClInclude Include="Engine\Asset\Importer\compute_shader_importer.h" />
+    <ClInclude Include="Engine\Rendering\compute_shader.h" />
     <ClInclude Include="Engine\Asset\persistent_data_store.h" />
     <ClInclude Include="Engine\Components\billboard_renderer.h" />
     <ClInclude Include="Engine\Audio\audio.h" />

@@ -16,6 +16,7 @@ class D3D12RenderDevice;
 namespace engine
 {
 class CameraComponent;
+class ComputeShader;
 
 /// <summary>
 /// エンジンからCaboRenderingSystem(CRS)を使うための窓口です。
@@ -114,5 +115,18 @@ public:
     /// <param name="color">文字色</param>
     static void AddUiText(const std::shared_ptr<FontData> &font, Vector2 position, const std::string &string,
                           const Color &color);
+
+    /// <summary>
+    /// ComputeShaderを実行します。BeginFrameとEndFrameの間（OnDrawなど）でのみ呼べます。
+    /// bindingsのUAVとリソースの状態は自動で切り替え、実行後にUAVバリアを張ります。
+    /// </summary>
+    /// <param name="shader">実行するComputeShader</param>
+    /// <param name="bindings">定数、リソース、UAV、サンプラー</param>
+    /// <param name="group_count_x">Xのスレッドグループ数</param>
+    /// <param name="group_count_y">Yのスレッドグループ数</param>
+    /// <param name="group_count_z">Zのスレッドグループ数</param>
+    /// <returns>実行のコマンドを記録できた場合はtrue</returns>
+    static bool DispatchCompute(const std::shared_ptr<ComputeShader> &shader, const CRS::Bindings &bindings,
+                                uint32_t group_count_x, uint32_t group_count_y = 1, uint32_t group_count_z = 1);
 };
 }
