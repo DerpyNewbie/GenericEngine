@@ -2,6 +2,7 @@
 #include "crs_bridge.h"
 
 #include "application.h"
+#include "compute_shader.h"
 #include "depth_texture.h"
 #include "game_object.h"
 #include "gizmos.h"
@@ -33,6 +34,8 @@ std::unordered_map<const CameraComponent *, CameraDepthEntry> g_camera_depths;
 std::vector<CRS::LightId> g_lights;
 CRS::CameraId g_fallback_camera;
 bool g_main_camera_submitted = false;
+// BeginFrameからEndFrameの間だけtrue（コマンドリストが有効な間）
+bool g_is_recording = false;
 
 // 終了時の静的変数の破棄順で問題が起きないよう、解放しない（プロセスの終了で解放される）
 CRS::RenderEngine *g_crs = nullptr;
@@ -307,6 +310,52 @@ void CrsBridge::AddUiText(const std::shared_ptr<FontData> &font, const Vector2 p
     });
 }
 
+bool CrsBridge::DispatchCompute(const std::shared_ptr<ComputeShader> &shader, const CRS::Bindings &bindings,
+                                const uint32_t group_count_x, const uint32_t group_count_y,
+                                const uint32_t group_count_z)
+{
+    if (shader == nullptr || !shader->IsValid())
+    {
+        Logger::Error<CrsBridge>("DispatchCompute: the compute shader is not compiled");
+        return false;
+    }
+
+    if (!g_is_recording)
+    {
+        Logger::Error<CrsBridge>("DispatchCompute: must be called between BeginFrame and EndFrame (e.g. OnDraw)");
+        return false;
+    }
+
+    auto &command_list = g_crs->CommandList();
+    for (const auto &[texture, buffer] : bindings.resources)
+    {
+        if (texture.IsValid())
+            command_list.Transition(texture, CRS::ResourceState::ShaderResource);
+        if (buffer.IsValid())
+            command_list.Transition(buffer, CRS::ResourceState::ShaderResource);
+    }
+    for (const auto &[texture, buffer] : bindings.unordered_access)
+    {
+        if (texture.IsValid())
+            command_list.Transition(texture, CRS::ResourceState::UnorderedAccess);
+        if (buffer.IsValid())
+            command_list.Transition(buffer, CRS::ResourceState::UnorderedAccess);
+    }
+
+    command_list.SetComputePipelineState(shader->PipelineState());
+    command_list.SetComputeBindings(bindings);
+    command_list.Dispatch(group_count_x, group_count_y, group_count_z);
+
+    for (const auto &[texture, buffer] : bindings.unordered_access)
+    {
+        if (texture.IsValid())
+            command_list.UavBarrier(texture);
+        if (buffer.IsValid())
+            command_list.UavBarrier(buffer);
+    }
+    return true;
+}
+
 void CrsBridge::PrepareFrame()
 {
     SubmitGizmoLines();
@@ -362,6 +411,7 @@ bool CrsBridge::Init(const HWND hwnd, const uint32_t width, const uint32_t heigh
 void CrsBridge::BeginFrame()
 {
     g_crs->BeginFrame();
+    g_is_recording = true;
 }
 
 void CrsBridge::Render()
@@ -376,6 +426,7 @@ void CrsBridge::Render()
 
 void CrsBridge::EndFrame()
 {
+    g_is_recording = false;
     g_crs->EndFrame();
 }
 

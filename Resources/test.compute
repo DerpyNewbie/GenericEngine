@@ -1,0 +1,8 @@
+// ComputeShaderの動作確認用です。u0の各要素に自分のインデックスを書き込みます。
+RWStructuredBuffer<uint> Result : register(u0);
+
+[numthreads(1, 1, 1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
+{
+    Result[id.x] = id.x;
+}

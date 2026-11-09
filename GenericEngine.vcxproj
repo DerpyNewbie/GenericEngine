@@ -64,6 +64,8 @@
         <ClCompile Include="Engine\Asset\text_asset.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\asset_importer.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\shader_importer.cpp"/>
+        <ClCompile Include="Engine\Asset\Importer\compute_shader_importer.cpp"/>
+        <ClCompile Include="Engine\Rendering\compute_shader.cpp"/>
         <ClCompile Include="Engine\Asset\Importer\txt_importer.cpp"/>
         <ClCompile Include="Engine\assimp_util.cpp"/>
         <ClCompile Include="Engine\cancellation_token.cpp"/>
@@ -214,6 +216,8 @@
         <ClInclude Include="Engine\Asset\asset_hierarchy.h" />
         <ClInclude Include="Engine\Asset\Importer\asset_importer.h" />
         <ClInclude Include="Engine\Asset\Importer\shader_importer.h" />
+        <ClInclude Include="Engine\Asset\Importer\compute_shader_importer.h"/>
+        <ClInclude Include="Engine\Rendering\compute_shader.h"/>
         <ClInclude Include="Engine\Asset\Importer\txt_importer.h" />
         <ClInclude Include="Engine\Asset\persistent_data_store.h" />
         <ClInclude Include="Engine\Asset\text_asset.h" />
