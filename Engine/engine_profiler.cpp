@@ -2,6 +2,9 @@
 
 #include "engine_profiler.h"
 
+#include "Rendering/crs_bridge.h"
+#include "CaboRenderingSystem/render_engine.h"
+
 namespace engine
 {
 std::unordered_map<std::string, Instant> Profiler::m_begin_times_;
@@ -10,6 +13,10 @@ std::unordered_map<std::string, Instant> Profiler::m_end_times_;
 std::unordered_map<std::string, Instant> Profiler::prev_begins;
 std::unordered_map<std::string, Instant> Profiler::prev_ends;
 std::unordered_map<std::string, float> Profiler::prev_durations;
+
+bool Profiler::m_gpu_profiling_enabled_ = false;
+CRS::GpuProfileResult Profiler::gpu_profile;
+bool Profiler::has_gpu_profile = false;
 
 void Profiler::NewFrame()
 {
@@ -38,5 +45,29 @@ void Profiler::NewFrame()
 
     prev_durations.insert_or_assign("__ProfilerInternal",
                                     std::chrono::duration<float>(begin - Time::Instant()).count());
+}
+
+void Profiler::SetGpuProfilingEnabled(const bool enabled)
+{
+    m_gpu_profiling_enabled_ = enabled;
+    CrsBridge::Crs().SetGpuProfilingEnabled(enabled);
+    if (!enabled)
+    {
+        gpu_profile = {};
+        has_gpu_profile = false;
+    }
+}
+
+void Profiler::UpdateGpuProfile()
+{
+    if (!m_gpu_profiling_enabled_)
+        return;
+
+    CRS::GpuProfileResult result;
+    if (CrsBridge::Crs().GetGpuProfile(result))
+    {
+        gpu_profile = std::move(result);
+        has_gpu_profile = true;
+    }
 }
 }

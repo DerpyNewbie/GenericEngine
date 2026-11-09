@@ -45,6 +45,8 @@ static int g_history_data_size = 1000;
 static float g_history_seconds = 5.0f;
 static std::unordered_map<std::string, ScrollingBuffer<ImVec2>> g_history;
 static auto g_history_sum = ScrollingBuffer<ImVec2>(g_history_data_size);
+static auto g_gpu_history = ScrollingBuffer<ImVec2>(g_history_data_size);
+static uint64_t g_last_gpu_frame = 0;
 
 namespace editor
 {
@@ -70,6 +72,68 @@ void Profiler::OnEditorGui()
         ImGui::Unindent();
     }
 
+    if (ImGui::CollapsingHeader("GPU", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Indent();
+        bool gpu_enabled = engine::Profiler::IsGpuProfilingEnabled();
+        if (ImGui::Checkbox("Enable GPU Profiler", &gpu_enabled))
+        {
+            engine::Profiler::SetGpuProfilingEnabled(gpu_enabled);
+            g_gpu_history.Erase();
+            g_gpu_history.data.resize(g_gpu_history.max_size);
+            g_last_gpu_frame = 0;
+        }
+
+        if (gpu_enabled && engine::Profiler::has_gpu_profile)
+        {
+            const auto &profile = engine::Profiler::gpu_profile;
+            const float t = engine::Time::Get()->TimeSinceStartUp();
+            if (profile.frame_number != g_last_gpu_frame)
+            {
+                g_gpu_history.Add({t, static_cast<float>(profile.frame_gpu_ms / 1000.0)});
+                g_last_gpu_frame = profile.frame_number;
+            }
+
+            ImGui::Text("GPU Frame  : %.3f ms", profile.frame_gpu_ms);
+            ImGui::Text("Draw Calls : %u", profile.draw_calls);
+            ImGui::Text("Frame No.  : %llu", static_cast<unsigned long long>(profile.frame_number));
+
+            constexpr auto table_flags = ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg |
+                                         ImGuiTableFlags_SizingStretchProp;
+            if (ImGui::BeginTable("##GpuScopes", 5, table_flags))
+            {
+                ImGui::TableSetupColumn("Scope", ImGuiTableColumnFlags_WidthStretch, 3.0f);
+                ImGui::TableSetupColumn("GPU ms");
+                ImGui::TableSetupColumn("Draws");
+                ImGui::TableSetupColumn("Vertices");
+                ImGui::TableSetupColumn("Indices");
+                ImGui::TableHeadersRow();
+                for (const auto &scope : profile.scopes)
+                {
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Indent(static_cast<float>(scope.depth) * 12.0f + 0.001f);
+                    ImGui::TextUnformatted(scope.name.c_str());
+                    ImGui::Unindent(static_cast<float>(scope.depth) * 12.0f + 0.001f);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%.3f", scope.gpu_ms);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%u", scope.draw_calls);
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%llu", static_cast<unsigned long long>(scope.vertices));
+                    ImGui::TableNextColumn();
+                    ImGui::Text("%llu", static_cast<unsigned long long>(scope.indices));
+                }
+                ImGui::EndTable();
+            }
+        }
+        else if (gpu_enabled)
+        {
+            ImGui::TextUnformatted("Waiting for GPU results...");
+        }
+        ImGui::Unindent();
+    }
+
     if (ImPlot::BeginPlot("##Profiler"))
     {
         const float t = engine::Time::Get()->TimeSinceStartUp();
@@ -90,6 +154,11 @@ void Profiler::OnEditorGui()
         g_history_sum.Add({t, total});
 
         float max_y = 0.025f;
+        if (engine::Profiler::IsGpuProfilingEnabled())
+        {
+            for (auto &[x, y] : g_gpu_history.data)
+                max_y = (std::max)(max_y, y);
+        }
         for (auto &[x, y] : g_history_sum.data)
         {
             if (y < max_y)
@@ -109,6 +178,19 @@ void Profiler::OnEditorGui()
                 static_cast<int>(history.data.size()),
                 0,
                 history.offset,
+                sizeof(float) * 2
+            );
+        }
+
+        if (engine::Profiler::IsGpuProfilingEnabled())
+        {
+            ImPlot::PlotLine(
+                "GPU Frame",
+                &g_gpu_history.data.data()[0].x,
+                &g_gpu_history.data.data()[0].y,
+                static_cast<int>(g_gpu_history.data.size()),
+                0,
+                g_gpu_history.offset,
                 sizeof(float) * 2
             );
         }
